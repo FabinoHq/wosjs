@@ -273,7 +273,15 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     handleMouseMove: function(mouseX, mouseY)
     {
-
+        // Compute mouse position
+        this.mouseX = mouseX;
+        this.mouseY = mouseY;
+        this.curMouseX = ((this.mouseX/this.renderer.getWidth())*GameWidth);
+        this.curMouseY = ((this.mouseY/this.renderer.getHeight())*GameHeight);
+        this.realMouseX = (this.mouseX-this.renderer.getViewportOffsetX())/
+                            this.renderer.getViewportWidth()*GameWidth;
+        this.realMouseY = (this.mouseY-this.renderer.getViewportOffsetY())/
+                            this.renderer.getViewportHeight()*GameHeight;
     },
 
     ////////////////////////////////////////////////////////////////////////////
