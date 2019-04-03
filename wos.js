@@ -196,6 +196,8 @@ function Wos()
     this.curMouseY = 0.0;
     this.realMouseX = 0.0;
     this.realMouseY = 0.0;
+
+    this.renderer = null;
 }
 
 
@@ -214,6 +216,12 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
+        // Init renderer
+        this.renderer = new Renderer();
+        this.renderer.init("canvscreen");
+        this.renderer.clear();
+
+        // Init done
         this.initDone();
     },
 
@@ -276,12 +284,12 @@ Wos.prototype = {
         // Compute mouse position
         this.mouseX = mouseX;
         this.mouseY = mouseY;
-        this.curMouseX = ((this.mouseX/this.renderer.getWidth())*GameWidth);
-        this.curMouseY = ((this.mouseY/this.renderer.getHeight())*GameHeight);
+        this.curMouseX = ((this.mouseX/this.renderer.getWidth())*WOSWidth);
+        this.curMouseY = ((this.mouseY/this.renderer.getHeight())*WOSHeight);
         this.realMouseX = (this.mouseX-this.renderer.getViewportOffsetX())/
-                            this.renderer.getViewportWidth()*GameWidth;
+                            this.renderer.getViewportWidth()*WOSWidth;
         this.realMouseY = (this.mouseY-this.renderer.getViewportOffsetY())/
-                            this.renderer.getViewportHeight()*GameHeight;
+                            this.renderer.getViewportHeight()*WOSHeight;
     },
 
     ////////////////////////////////////////////////////////////////////////////
