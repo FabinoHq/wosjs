@@ -42,7 +42,7 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  wos : WOS Global instance                                                 //
+//  WOS Global instance                                                       //
 ////////////////////////////////////////////////////////////////////////////////
 var wos = null;
 
@@ -59,7 +59,7 @@ const WOSRatioYMax = 0.7;
 ////////////////////////////////////////////////////////////////////////////////
 //  Default callback timeout (60Hz)                                           //
 ////////////////////////////////////////////////////////////////////////////////
-const CallbackTimeout = 1000.0/60.0;
+const WOSDefaultCallbackTimeout = 1000.0/60.0;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,7 +95,7 @@ window.requestAnimFrame = (function(callback)
             window.oRequestAnimationFrame ||
             window.msRequestAnimationFrame ||
             function(callback) {
-                return window.setTimeout(callback, CallbackTimeout);
+                return window.setTimeout(callback, WOSDefaultCallbackTimeout);
             });
 })();
 
