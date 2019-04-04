@@ -217,7 +217,7 @@ function Wos()
 
 Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Start WOS Load basic system                                  //
+    //  init : Start WOS (load basic system)                                  //
     ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
