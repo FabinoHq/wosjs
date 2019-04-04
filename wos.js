@@ -223,7 +223,7 @@ Wos.prototype = {
     {
         // Init renderer
         this.renderer = new Renderer();
-        this.renderer.init("canvscreen");
+        this.renderer.init("woscreen");
         this.renderer.clear();
 
         // Init done
