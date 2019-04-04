@@ -46,18 +46,31 @@
 ////////////////////////////////////////////////////////////////////////////////
 function Renderer()
 {
+    // WOS loaded status
     this.loaded = false;
+
+    // WebGL contexts
     this.gl = null;
     this.context = null;
     this.ctx = null;
+
+    // WebGL offscreen contexts
     this.offCanvas = null;
     this.offContext = null;
+
+    // Size of the renderer
     this.width = 0;
     this.height = 0;
+
+    // Size of the viewport
     this.vpwidth = 0.0;
     this.vpheight = 0.0;
+
+    // Offset of the viewport
     this.vpoffx = 0.0;
     this.vpoffy = 0.0;
+
+    // Default graphic pipeline
     this.shader = null;
     this.projMatrix = null;
     this.view = null;
