@@ -175,7 +175,7 @@ window.onmousemove = function(event)
 ////////////////////////////////////////////////////////////////////////////////
 window.onmousedown = function(event)
 {
-    if (wos) wos.handleMouseDown(event.button);
+    if (wos) wos.handleMouseDown(event.button, event.clientX, event.clientY);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -183,7 +183,7 @@ window.onmousedown = function(event)
 ////////////////////////////////////////////////////////////////////////////////
 window.onmouseup = function(event)
 {
-    if (wos) wos.handleMouseUp(event.button);
+    if (wos) wos.handleMouseUp(event.button, event.clientX, event.clientY);
 }
 
 
@@ -290,33 +290,25 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     handleMouseMove: function(mouseX, mouseY)
     {
-        // Compute mouse position
-        this.mouseX = mouseX;
-        this.mouseY = mouseY;
-        this.curMouseX = ((this.mouseX/this.renderer.getWidth())*WOSWidth);
-        this.curMouseY = ((this.mouseY/this.renderer.getHeight())*WOSHeight);
-        this.realMouseX = (this.mouseX-this.renderer.getViewportOffsetX())/
-                            this.renderer.getViewportWidth()*WOSWidth;
-        this.realMouseY = (this.mouseY-this.renderer.getViewportOffsetY())/
-                            this.renderer.getViewportHeight()*WOSHeight;
+        this.updateMousePosition(mouseX, mouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  handleMouseMove : Handle mouse button pressed                         //
     //  param button : Mouse button pressed                                   //
     ////////////////////////////////////////////////////////////////////////////
-    handleMouseDown: function(button)
+    handleMouseDown: function(button, mouseX, mouseY)
     {
-
+        this.updateMousePosition(mouseX, mouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  handleMouseUp : Handle mouse button released                          //
     //  param button : Mouse button released                                  //
     ////////////////////////////////////////////////////////////////////////////
-    handleMouseUp: function(button)
+    handleMouseUp: function(button, mouseX, mouseY)
     {
-
+        this.updateMousePosition(mouseX, mouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -330,6 +322,24 @@ Wos.prototype = {
         // Compute frametime
         this.frametime = currentTime - this.lastTime;
         this.lastTime = currentTime;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  updateMousePosition : Compute current mouse position                  //
+    //  param mouseX : Mouse X position relative to web navigator's window    //
+    //  param mouseX : Mouse Y position relative to web navigator's window    //
+    ////////////////////////////////////////////////////////////////////////////
+    updateMousePosition: function(mouseX, mouseY)
+    {
+        // Compute mouse position
+        this.mouseX = mouseX;
+        this.mouseY = mouseY;
+        this.curMouseX = ((this.mouseX/this.renderer.getWidth())*WOSWidth);
+        this.curMouseY = ((this.mouseY/this.renderer.getHeight())*WOSHeight);
+        this.realMouseX = (this.mouseX-this.renderer.getViewportOffsetX())/
+                            this.renderer.getViewportWidth()*WOSWidth;
+        this.realMouseY = (this.mouseY-this.renderer.getViewportOffsetY())/
+                            this.renderer.getViewportHeight()*WOSHeight;
     },
 
     ////////////////////////////////////////////////////////////////////////////
