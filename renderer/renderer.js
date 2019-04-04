@@ -70,7 +70,7 @@ function Renderer()
     this.vpoffx = 0.0;
     this.vpoffy = 0.0;
 
-    // Default graphic pipeline
+    // Default graphics pipeline
     this.shader = null;
     this.projMatrix = null;
     this.view = null;
@@ -183,8 +183,13 @@ Renderer.prototype = {
             return false;
         }
 
-        // Set clear color
-        this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+        // Set default clear color
+        this.gl.clearColor(
+            WOSDefaultClearColorRed,
+            WOSDefaultClearColorGreen,
+            WOSDefaultClearColorBlue,
+            1.0
+        );
 
         // Aspect ratio clamping
         this.vpwidth = this.width;
