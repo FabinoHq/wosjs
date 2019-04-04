@@ -289,6 +289,7 @@ Renderer.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  handleContextLost : Handle renderer context lost                      //
+    //  param e : event                                                       //
     ////////////////////////////////////////////////////////////////////////////
     handleContextLost: function(e)
     {
@@ -306,6 +307,9 @@ Renderer.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getTextWidth : Get text width with tuffy font                         //
+    //  param text : Text to get width of                                     //
+    //  param fontsize : Size of the font used                                //
+    //  return : Width of the text in pixels                                  //
     ////////////////////////////////////////////////////////////////////////////
     getTextWidth: function(text, fontsize)
     {
@@ -316,7 +320,12 @@ Renderer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  renderText : Render text offscreen with tuffy font                    //
+    //  renderText : Render text offscreen into texture with tuffy font       //
+    //  param text : Text to render                                           //
+    //  param width : Width of the text texture to render                     //
+    //  param height : Height of the text texture to render                   //
+    //  param fontsize : Font size of the text to render                      //
+    //  return : Text texture pixels data                                     //
     ////////////////////////////////////////////////////////////////////////////
     renderText: function(text, width, height, fontsize)
     {
@@ -339,7 +348,11 @@ Renderer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  renderImage : Render image offscreen                                  //
+    //  renderImage : Render image offscreen into texture                     //
+    //  param image : Image to render                                         //
+    //  param width : Width of the image texture to render                    //
+    //  param height : Height of the image texture to render                  //
+    //  return : Image texture pixels data                                    //
     ////////////////////////////////////////////////////////////////////////////
     renderImage: function(image, width, height)
     {
@@ -362,6 +375,7 @@ Renderer.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getWidth : Get renderer's width                                       //
+    //  return : Width of the renderer in pixels                              //
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
@@ -370,6 +384,7 @@ Renderer.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getHeight : Get renderer's height                                     //
+    //  return : Height of the renderer in pixels                             //
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
@@ -378,6 +393,7 @@ Renderer.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getViewportWidth : Get renderer's viewport width                      //
+    //  return : Width of the viewport in pixels                              //
     ////////////////////////////////////////////////////////////////////////////
     getViewportWidth: function()
     {
@@ -386,6 +402,7 @@ Renderer.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getViewportHeight : Get renderer's viewport height                    //
+    //  return : Height of the viewport in pixels                             //
     ////////////////////////////////////////////////////////////////////////////
     getViewportHeight: function()
     {
@@ -394,6 +411,7 @@ Renderer.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getViewportHeight : Get renderer's viewport offset on X axis          //
+    //  return : X offset of the viewport in pixels                           //
     ////////////////////////////////////////////////////////////////////////////
     getViewportOffsetX: function()
     {
@@ -402,6 +420,7 @@ Renderer.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getViewportHeight : Get renderer's viewport offset on Y axis          //
+    //  return : Y offset of the viewport in pixels                           //
     ////////////////////////////////////////////////////////////////////////////
     getViewportOffsetY: function()
     {
