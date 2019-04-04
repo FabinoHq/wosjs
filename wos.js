@@ -192,17 +192,25 @@ window.onmouseup = function(event)
 ////////////////////////////////////////////////////////////////////////////////
 function Wos()
 {
+    // WOS loaded status
     this.loaded = false;
+
+    // Last clock time
     this.lastTime = 0.0;
+    // Frametime
     this.frametime = 0.0;
 
+    // Mouse position relative to web navigator's window
     this.mouseX = 0;
     this.mouseY = 0;
+    // Mouse position used for cursor
     this.curMouseX = 0.0;
     this.curMouseY = 0.0;
+    // Mouse position adjusted to WOS render size
     this.realMouseX = 0.0;
     this.realMouseY = 0.0;
 
+    // WOS renderer
     this.renderer = null;
 }
 
@@ -259,6 +267,7 @@ Wos.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  handleKeyDown : Handle key pressed                                    //
+    //  param key : Key pressed                                               //
     ////////////////////////////////////////////////////////////////////////////
     handleKeyDown: function(key)
     {
@@ -267,6 +276,7 @@ Wos.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  handleKeyUp : Handle key released                                     //
+    //  param key : Key released                                              //
     ////////////////////////////////////////////////////////////////////////////
     handleKeyUp: function(key)
     {
@@ -275,6 +285,8 @@ Wos.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  handleMouseMove : Handle mouse moved                                  //
+    //  param mouseX : Mouse X position relative to web navigator's window    //
+    //  param mouseX : Mouse Y position relative to web navigator's window    //
     ////////////////////////////////////////////////////////////////////////////
     handleMouseMove: function(mouseX, mouseY)
     {
@@ -291,16 +303,18 @@ Wos.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  handleMouseMove : Handle mouse button pressed                         //
+    //  param button : Mouse button pressed                                   //
     ////////////////////////////////////////////////////////////////////////////
-    handleMouseDown: function(btn)
+    handleMouseDown: function(button)
     {
 
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  handleMouseUp : Handle mouse button released                          //
+    //  param button : Mouse button released                                  //
     ////////////////////////////////////////////////////////////////////////////
-    handleMouseUp: function(btn)
+    handleMouseUp: function(button)
     {
 
     },

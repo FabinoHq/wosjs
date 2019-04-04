@@ -46,7 +46,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 function Renderer()
 {
-    // WOS loaded status
+    // Renderer loaded status
     this.loaded = false;
 
     // WebGL contexts
