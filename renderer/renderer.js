@@ -210,7 +210,7 @@ Renderer.prototype = {
         // Set viewport
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
 
-        // Init depth and blend function
+        // Init depth and blend functions
         this.gl.disable(this.gl.DEPTH_TEST);
         this.gl.enable(this.gl.BLEND);
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
@@ -258,6 +258,7 @@ Renderer.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setView : Set rendering view                                          //
+    //  param view : View matrix to use for rendering                         //
     ////////////////////////////////////////////////////////////////////////////
     setView: function(view)
     {
@@ -303,20 +304,6 @@ Renderer.prototype = {
     handleContextRestored: function()
     {
         console.log("context restored");
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getTextWidth : Get text width with tuffy font                         //
-    //  param text : Text to get width of                                     //
-    //  param fontsize : Size of the font used                                //
-    //  return : Width of the text in pixels                                  //
-    ////////////////////////////////////////////////////////////////////////////
-    getTextWidth: function(text, fontsize)
-    {
-        var textWidth = 1;
-        this.offContext.font = fontsize.toString() + "px tuffy";
-        textWidth = this.offContext.measureText(text).width;
-        return textWidth;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -371,6 +358,20 @@ Renderer.prototype = {
         imageData = this.offContext.getImageData(0, 0, width, height);
         pixelsData = new Uint8Array(imageData.data.buffer);
         return pixelsData;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getTextWidth : Get text width with tuffy font                         //
+    //  param text : Text to get width of                                     //
+    //  param fontsize : Size of the font used                                //
+    //  return : Width of the text in pixels                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    getTextWidth: function(text, fontsize)
+    {
+        var textWidth = 1;
+        this.offContext.font = fontsize.toString() + "px tuffy";
+        textWidth = this.offContext.measureText(text).width;
+        return textWidth;
     },
 
     ////////////////////////////////////////////////////////////////////////////
