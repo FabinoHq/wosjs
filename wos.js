@@ -231,7 +231,7 @@ Wos.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  initDone : All assets loaded                                          //
+    //  initDone : Basic system ready                                         //
     ////////////////////////////////////////////////////////////////////////////
     initDone: function()
     {
@@ -331,7 +331,6 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     updateMousePosition: function(mouseX, mouseY)
     {
-        // Compute mouse position
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         this.curMouseX = ((this.mouseX/this.renderer.getWidth())*WOSWidth);
@@ -351,7 +350,7 @@ Wos.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  render : Render to screen                                             //
+    //  render : WOS frame rendering                                          //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
