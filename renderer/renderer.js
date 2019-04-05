@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer.js : WOS Rendering management                                //
+//      renderer/renderer.js : WOS Rendering management                       //
 ////////////////////////////////////////////////////////////////////////////////
 
 
