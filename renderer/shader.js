@@ -41,6 +41,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////////////
+//  Default vertex shader                                                     //
+////////////////////////////////////////////////////////////////////////////////
 const defaultVertexShaderSrc = [
     "attribute vec3 vertexPos;",
     "attribute vec2 vertexColor;",
@@ -54,6 +57,9 @@ const defaultVertexShaderSrc = [
     "   gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
     "}" ].join("\n");
 
+////////////////////////////////////////////////////////////////////////////////
+//  Default fragment shader                                                   //
+////////////////////////////////////////////////////////////////////////////////
 const defaultFragmentShaderSrc = [
     "precision mediump float;",
     "uniform sampler2D texture;",
@@ -66,16 +72,26 @@ const defaultFragmentShaderSrc = [
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Shader class definition                                                   //
+//  param glPointer : WebGL functions pointer                                 //
 ////////////////////////////////////////////////////////////////////////////////
 function Shader(glPointer)
 {
+    // Shader loaded status
     this.loaded = false;
+
+    // WebGL functions pointer
     this.gl = glPointer;
+
+    // Shader sources
     this.vertexShaderSrc = null;
     this.fragmentShaderSrc = null;
+
+    // Shader programs
     this.vertexShader = null;
     this.fragmentShader = null;
     this.shaderProgram = null;
+
+    // Shader uniforms locations
     this.textureLocation = -1;
     this.projMatrixLocation = -1;
     this.viewMatrixLocation = -1;
@@ -83,8 +99,14 @@ function Shader(glPointer)
 }
 
 Shader.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  init : Init shader                                                    //
+    //  param vertexSrc: Vertex shader source                                 //
+    //  param fragmentSrc : Fragment shader source                            //
+    ////////////////////////////////////////////////////////////////////////////
     init: function(vertexSrc, fragmentSrc)
     {
+        // Reset shader
         this.loaded = false;
         this.vertexShaderSrc = null;
         this.fragmentShaderSrc = null;
