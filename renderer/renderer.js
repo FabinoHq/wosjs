@@ -222,6 +222,22 @@ Renderer.prototype = {
         // Set viewport
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
 
+        // Init projection matrix
+        this.projMatrix = new Matrix4x4();
+        if (!this.projMatrix)
+        {
+            return false;
+        }
+
+        // Set projection matrix
+        this.projMatrix.setOrthographic(
+            0, GameWidth,
+            0, GameHeight,
+            0.001, 5000.0
+        );
+        this.projMatrix.translateZ(-1.0);
+        this.shader.sendProjectionMatrix(this.projMatrix);
+
         // Init depth and blend functions
         this.gl.disable(this.gl.DEPTH_TEST);
         this.gl.enable(this.gl.BLEND);
