@@ -183,6 +183,18 @@ Renderer.prototype = {
             return false;
         }
 
+        // Init default shader
+        this.shader = new Shader(this.gl);
+        if (!this.shader)
+        {
+            return false;
+        }
+        if (!this.shader.init())
+        {
+            return false;
+        }
+        this.shader.bind();
+
         // Set default clear color
         this.gl.clearColor(
             WOSDefaultClearColorRed,
