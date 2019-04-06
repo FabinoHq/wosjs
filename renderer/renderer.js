@@ -238,6 +238,10 @@ Renderer.prototype = {
         this.projMatrix.translateZ(-1.0);
         this.shader.sendProjectionMatrix(this.projMatrix);
 
+        // Init view
+        this.view = new View();
+        this.shader.sendViewMatrix(this.view.viewMatrix);
+
         // Init depth and blend functions
         this.gl.disable(this.gl.DEPTH_TEST);
         this.gl.enable(this.gl.BLEND);
