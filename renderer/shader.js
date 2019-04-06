@@ -249,6 +249,9 @@ Shader.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  bind : Bind shader for rendering                                      //
+    ////////////////////////////////////////////////////////////////////////////
     bind: function()
     {
         if (this.loaded)
@@ -257,6 +260,9 @@ Shader.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  unbind : Unbind shader                                                //
+    ////////////////////////////////////////////////////////////////////////////
     unbind: function()
     {
         if (this.loaded)
@@ -265,6 +271,10 @@ Shader.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendProjectionMatrix : Send projection matrix to use with this shader //
+    //  param projectionMatrix : 4x4 Projection matrix to use                 //
+    ////////////////////////////////////////////////////////////////////////////
     sendProjectionMatrix: function(projectionMatrix)
     {
         if (this.loaded)
@@ -276,6 +286,10 @@ Shader.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendViewMatrix : Send view matrix to use with this shader             //
+    //  param viewMatrix : 4x4 View matrix to use                             //
+    ////////////////////////////////////////////////////////////////////////////
     sendViewMatrix: function(viewMatrix)
     {
         if (this.loaded)
@@ -287,6 +301,10 @@ Shader.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendModelMatrix : Send model matrix to use with this shader           //
+    //  param modelMatrix : 4x4 Model matrix to use                           //
+    ////////////////////////////////////////////////////////////////////////////
     sendModelMatrix: function(modelMatrix)
     {
         if (this.loaded)
@@ -298,6 +316,11 @@ Shader.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getUniform : Get shader uniform location index by uniform name        //
+    //  param uniformName : Name of the shader uniform                        //
+    //  return : Location index of the shader uniform                         //
+    ////////////////////////////////////////////////////////////////////////////
     getUniform: function(uniformName)
     {
         if (this.loaded)
@@ -310,11 +333,16 @@ Shader.prototype = {
         }
     },
 
-    sendUniform: function(uniformLoc, uniformVal)
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendUniform : Send shader uniform data                                //
+    //  param uniformLoc : Location index of the shader uniform               //
+    //  param uniformData : Uniform data to upload                            //
+    ////////////////////////////////////////////////////////////////////////////
+    sendUniform: function(uniformLoc, uniformData)
     {
         if (this.loaded)
         {
-            this.gl.uniform1f(uniformLoc, uniformVal);
+            this.gl.uniform1f(uniformLoc, uniformData);
         }
     }
 };
