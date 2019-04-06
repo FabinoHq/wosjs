@@ -41,32 +41,58 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////////////
+//  Default vertex buffer vertices                                            //
+////////////////////////////////////////////////////////////////////////////////
 var defaultVertices = new GLArrayDataType([
     0.0, 0.0,
     1.0, 0.0,
     1.0, 1.0,
-    0.0, 1.0]);
+    0.0, 1.0
+]);
 
+////////////////////////////////////////////////////////////////////////////////
+//  Default vertex buffer texture coordinates                                 //
+////////////////////////////////////////////////////////////////////////////////
 var defaultTexCoords = new GLArrayDataType([
     0.0, 1.0,
     1.0, 1.0,
     1.0, 0.0,
-    0.0, 0.0]);
+    0.0, 0.0
+]);
 
+////////////////////////////////////////////////////////////////////////////////
+//  Default vertex buffer indices                                             //
+////////////////////////////////////////////////////////////////////////////////
 var defaultIndices = new GLIndexDataType([
     0, 1, 2,
-    0, 2, 3]);
+    0, 2, 3
+]);
 
 
+////////////////////////////////////////////////////////////////////////////////
+//  VertexBuffer class definition                                             //
+////////////////////////////////////////////////////////////////////////////////
 function VertexBuffer(glPointer)
 {
+    // VBO loaded state
     this.loaded = false;
+
+    // WebGL functions pointer
     this.gl = glPointer;
+
+    // Vertex buffer object
     this.vertexBuffer = null;
+    // Element buffer object
     this.elementBuffer = null;
+
+    // Vertices
     this.vertices = null;
+    // Textures coordinates
     this.texCoords = null;
     this.texCoordsOffset = 0;
+
+    // Geometry data
     this.verticesData = null;
     this.texCoordsData = null;
     this.indicesData = null;
@@ -74,6 +100,9 @@ function VertexBuffer(glPointer)
 }
 
 VertexBuffer.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  init : Init vertex buffer object                                      //
+    ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
         // Check gl pointer
@@ -111,6 +140,9 @@ VertexBuffer.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  bind : Bind vertex buffer object to renderer                          //
+    ////////////////////////////////////////////////////////////////////////////
     bind: function()
     {
         if (this.loaded)
@@ -123,6 +155,9 @@ VertexBuffer.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  unbind : Bind vertex buffer object                                    //
+    ////////////////////////////////////////////////////////////////////////////
     unbind: function()
     {
         if (this.loaded)
@@ -132,6 +167,9 @@ VertexBuffer.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  updateBuffer : Update vertex buffer object                            //
+    ////////////////////////////////////////////////////////////////////////////
     updateBuffer: function()
     {
         // Send data to GPU
@@ -162,6 +200,11 @@ VertexBuffer.prototype = {
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPlane : Set vertex buffer object as a simple plane geometry        //
+    //  param width : Width of the plane                                      //
+    //  param height : Height of the plane                                    //
+    ////////////////////////////////////////////////////////////////////////////
     setPlane: function(width, height)
     {
         // Set plane geometry
@@ -202,6 +245,13 @@ VertexBuffer.prototype = {
         this.updateBuffer();
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  updateTexcoords : Set vertex buffer object texture coordinates        //
+    //  param x : Left X texture coordinate                                   //
+    //  param y : Top Y texture coordinate                                    //
+    //  param x2 : Right X texture coordinate                                 //
+    //  param y2 : Bottom Y texture coordinate                                //
+    ////////////////////////////////////////////////////////////////////////////
     updateTexcoords: function(x, y, x2, y2)
     {
         // Set texcoords
@@ -225,6 +275,9 @@ VertexBuffer.prototype = {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
     },
     
+    ////////////////////////////////////////////////////////////////////////////
+    //  draw : Render the vertex buffer object                                //
+    ////////////////////////////////////////////////////////////////////////////
     draw: function()
     {
         if (this.loaded)

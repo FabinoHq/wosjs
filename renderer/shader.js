@@ -55,7 +55,8 @@ const defaultVertexShaderSrc = [
     "{",
     "   texCoord = vertexColor;",
     "   gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
-    "}" ].join("\n");
+    "}"
+].join("\n");
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Default fragment shader                                                   //
@@ -67,7 +68,8 @@ const defaultFragmentShaderSrc = [
     "void main()",
     "{",
     "   gl_FragColor = texture2D(texture, texCoord);",
-    "}" ].join("\n");
+    "}"
+].join("\n");
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -250,7 +252,7 @@ Shader.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  bind : Bind shader for rendering                                      //
+    //  bind : Bind shader to renderer                                        //
     ////////////////////////////////////////////////////////////////////////////
     bind: function()
     {
