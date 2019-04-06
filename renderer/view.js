@@ -41,15 +41,26 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////////////
+//  View class definition                                                     //
+////////////////////////////////////////////////////////////////////////////////
 function View()
 {
+    // View matrix
     this.viewMatrix = new Matrix4x4();
+
+    // View position
     this.x = 0.0;
     this.y = 0.0;
+
+    // View angle
     this.angle = 0.0;
 }
 
 View.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  reset : Reset the view                                                //
+    ////////////////////////////////////////////////////////////////////////////
     reset: function()
     {
         this.viewMatrix.setIdentity();
@@ -58,6 +69,9 @@ View.prototype = {
         this.angle = 0.0;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  compute : Compute the view matrix                                     //
+    ////////////////////////////////////////////////////////////////////////////
     compute: function()
     {
         this.viewMatrix.setIdentity();
@@ -65,37 +79,66 @@ View.prototype = {
         this.viewMatrix.translate(this.x, this.y, 0.0);
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  move : Move the view                                                  //
+    //  param x : Value of the translation on the X axis                      //
+    //  param y : Value of the translation on the Y axis                      //
+    ////////////////////////////////////////////////////////////////////////////
     move: function(x, y)
     {
         this.x += x;
         this.y += y;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Move the view on the X axis                                   //
+    //  param x : Value of the translation on the X axis                      //
+    ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
         this.x += x;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Move the view on the Y axis                                   //
+    //  param y : Value of the translation on the Y axis                      //
+    ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
         this.y += y;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate the view along the Z axis                             //
+    //  param angle : Value of the rotation in degrees                        //
+    ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
         this.angle += angle;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getX : Get the view's X position                                      //
+    //  return : X position of the view                                       //
+    ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
         return this.x;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getY : Get the view's Y position                                      //
+    //  return : Y position of the view                                       //
+    ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
         return this.y;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngle : Get the view's rotation angle                              //
+    //  return : Rotation angle of the view                                   //
+    ////////////////////////////////////////////////////////////////////////////
     getAngle: function()
     {
         return this.angle;
