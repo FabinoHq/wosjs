@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      math/point_2.js : 2D point management                                 //
+//      math/vector_2.js : 2D point management                                //
 ////////////////////////////////////////////////////////////////////////////////
 
 
