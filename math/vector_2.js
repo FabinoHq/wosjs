@@ -37,23 +37,23 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      math/vector_2.js : 2D point management                                //
+//      math/vector_2.js : 2D vector management                               //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Point2D class definition                                                  //
+//  Vector2D class definition                                                 //
 ////////////////////////////////////////////////////////////////////////////////
-function Point2D()
+function Vector2D()
 {
-    // 2D point representation
+    // 2D vector representation
     this.x = 0.0;
     this.y = 0.0;
 }
 
 Point2D.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  reset : Reset point to zero                                           //
+    //  reset : Reset vector to zero                                          //
     ////////////////////////////////////////////////////////////////////////////
     reset: function()
     {
@@ -62,18 +62,19 @@ Point2D.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPoint : Set point position from a point                            //
+    //  setVector : Set vector components from a vector                       //
+    //  param vector : New vector components                                  //
     ////////////////////////////////////////////////////////////////////////////
-    setPoint: function(point)
+    setVector: function(vector)
     {
-        this.x = point.x;
-        this.y = point.y;
+        this.x = vector.x;
+        this.y = vector.y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setXY : Set point position from seperate coordinates                  //
-    //  param X : X position of the point                                     //
-    //  param Y : Y position of the point                                     //
+    //  setXY : Set vector values from seperate components                    //
+    //  param X : X value of the vector                                       //
+    //  param Y : Y value of the vector                                       //
     ////////////////////////////////////////////////////////////////////////////
     setXY: function(x, y)
     {
@@ -82,8 +83,8 @@ Point2D.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setX : Set point X position                                           //
-    //  param X : X position of the point                                     //
+    //  setX : Set vector X components                                        //
+    //  param X : X components of the vector                                  //
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
     {
@@ -91,8 +92,8 @@ Point2D.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setY : Set point Y position                                           //
-    //  param Y : Y position of the point                                     //
+    //  setY : Set vector Y position                                          //
+    //  param Y : Y position of the vector                                    //
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
     {
@@ -100,8 +101,8 @@ Point2D.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getX : Get point X position                                           //
-    //  return : X position of the point                                      //
+    //  getX : Get vector X position                                          //
+    //  return : X position of the vector                                     //
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
@@ -109,8 +110,8 @@ Point2D.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getY : Get point Y position                                           //
-    //  return : Y position of the point                                      //
+    //  getY : Get vector Y position                                          //
+    //  return : Y position of the vector                                     //
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
@@ -118,46 +119,46 @@ Point2D.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  move : Move point position                                            //
-    //  param point : Point coordinates of the movement                       //
+    //  add : Vectorial addition                                              //
+    //  param vector : Vector to add                                          //
     ////////////////////////////////////////////////////////////////////////////
-    move: function(point)
+    add: function(vector)
     {
-        this.x += this.point.x;
-        this.y += this.point.y;
+        this.x += this.vector.x;
+        this.y += this.vector.y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveXY : Move point XY position                                       //
-    //  param x : Point X translation value                                   //
-    //  param y : Point Y translation value                                   //
+    //  addXY : Vectorial addition from seperate components                   //
+    //  param x : Value to add to the vector's X component                    //
+    //  param y : Value to add to the vector's Y component                    //
     ////////////////////////////////////////////////////////////////////////////
-    moveXY: function(x, y)
+    addXY: function(x, y)
     {
         this.x += x;
         this.y += y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Move point X position                                         //
-    //  param x : Point X translation value                                   //
+    //  addX : Add a value to the vector's X component                        //
+    //  param x : Value to add to the vector's X component                    //
     ////////////////////////////////////////////////////////////////////////////
-    moveX: function(x)
+    addX: function(x)
     {
         this.x += x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Move point Y position                                         //
-    //  param y : Point Y translation value                                   //
+    //  addY : Add a value to the vector's Y component                        //
+    //  param y : Value to add to the vector's Y component                    //
     ////////////////////////////////////////////////////////////////////////////
-    moveY: function(y)
+    addY: function(y)
     {
         this.y += y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  normalize : Normalize point coordinates                               //
+    //  normalize : Normalize vector                                          //
     ////////////////////////////////////////////////////////////////////////////
     normalize: function()
     {
