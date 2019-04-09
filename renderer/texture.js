@@ -41,27 +41,45 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////////////
+//  Texture class definition                                                  //
+////////////////////////////////////////////////////////////////////////////////
 function Texture(renderer)
 {
+    // Texture loaded state
     this.loaded = false;
+
+    // Renderer pointer
     this.renderer = renderer;
+
+    // Image data
     this.image = null;
+    // Texture data
     this.tex = null;
-    this.smooth = true;
+
+    // Texture width
     this.width = 0;
+    // Texture height
     this.height = 0;
+    // Texture smooth attribute
+    this.smooth = true;
 }
 
 Texture.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  load : Load texture                                                   //
+    //  param src : URL of the source image                                   //
+    //  param smooth : Texture smooth attribute                               //
+    ////////////////////////////////////////////////////////////////////////////
     load: function(src, smooth)
     {
-        // Init texture
+        // Reset texture
         this.loaded = false;
         this.image = null;
         this.tex = null;
-        this.smooth = true;
         this.width = 0;
         this.height = 0;
+        this.smooth = true;
 
         // Check renderer
         if (!this.renderer)
@@ -112,7 +130,7 @@ Texture.prototype = {
         this.image.onload = function()
         {
             this.texture.handleImageLoaded();
-            this.texture.onTextureLoaded();
+            if (this.loaded) { this.texture.onTextureLoaded(); }
         }
 
         // Start loading image
@@ -120,6 +138,9 @@ Texture.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  handleImageLoaded : Source image is loaded                            //
+    ////////////////////////////////////////////////////////////////////////////
     handleImageLoaded: function()
     {
         var pixelsData = null;
@@ -190,11 +211,17 @@ Texture.prototype = {
         this.loaded = true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  onTextureLoaded : Called when texture is fully loaded                 //
+    ////////////////////////////////////////////////////////////////////////////
     onTextureLoaded: function()
     {
 
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  bind : Bind texture to renderer                                       //
+    ////////////////////////////////////////////////////////////////////////////
     bind: function()
     {
         if (this.loaded)
@@ -203,6 +230,9 @@ Texture.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  unbind : Unbind texture                                               //
+    ////////////////////////////////////////////////////////////////////////////
     unbind: function()
     {
         if (this.loaded)
@@ -211,14 +241,31 @@ Texture.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getWidth : Get texture width                                          //
+    //  return : Width of the texture                                         //
+    ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
         return this.width;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHeight : Get texture height                                        //
+    //  return : Height of the texture                                        //
+    ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
         return this.height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  isSmooth : Get the texture smooth attribute                           //
+    //  return : True if the texture is smoothed, false otherwise             //
+    ////////////////////////////////////////////////////////////////////////////
+    isSmooth: function()
+    {
+        return this.smooth;
     }
 };
 
