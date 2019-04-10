@@ -41,36 +41,49 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////////////
+//  Loader class definition                                                   //
+////////////////////////////////////////////////////////////////////////////////
 function Loader(renderer, audio)
 {
+    // Loader loaded state
     this.loaded = false;
+
+    // Renderer pointer
     this.renderer = renderer;
+    // Audio engine pointer
     this.audio = audio;
 
+    // Textures array
     this.textures = null;
     this.texturesLoaded = 0;
     this.allTexturesLoaded = false;
 
+    // Sounds array
     this.sounds = null;
     this.soundsLoaded = 0;
     this.allSoundsLoaded = false;
 }
 
 Loader.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  init : Init loader                                                    //
+    ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
+        // Reset loader
         this.loaded = false;
-
-        // Create assets array
         this.textures = new Array();
         this.sounds = new Array();
-
         this.texturesLoaded = 0;
         this.allTexturesLoaded = false;
         this.soundsLoaded = 0;
         this.allSoundsLoaded = false;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  loadFonts : Load all fonts                                            //
+    ////////////////////////////////////////////////////////////////////////////
     loadFonts: function()
     {
         // Check renderer
@@ -87,22 +100,25 @@ Loader.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  loadTextures : Load all textures                                      //
+    ////////////////////////////////////////////////////////////////////////////
     loadTextures: function()
     {
-        // Check renderer
+        // Check renderer pointer
         if (!this.renderer)
         {
-            this.allTexturesLoaded = true;
             return false;
         }
+        // Check WebGL pointer
         if (!this.renderer.gl)
         {
-            this.allTexturesLoaded = true;
             return false;
         }
 
-        var texlen = TexturesAssets.length;
-        for (var i = 0; i < texlen; ++i)
+        // Load all textures asynchronously
+        var sndlen = SoundsAssets.length;
+        for (var i = 0; i < sndlen; ++i)
         {
             this.textures[i] = new Texture(this.renderer);
             this.textures[i].loader = this;
@@ -112,40 +128,46 @@ Loader.prototype = {
             }
             this.textures[i].load("textures/" + TexturesAssets[i], true);
         }
-
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  handleTexturesLoaded : Called when a texture is loaded                //
+    ////////////////////////////////////////////////////////////////////////////
     handleTexturesLoaded: function()
     {
         ++this.texturesLoaded;
         if (this.texturesLoaded >= TexturesAssets.length)
         {
-            // All assets loaded
+            // All textures loaded
             this.allTexturesLoaded = true;
             if (this.allTexturesLoaded && this.allSoundsLoaded)
             {
+                // All assets loaded
                 this.onAssetsLoaded();
             }
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  loadSounds : Load all sounds                                          //
+    ////////////////////////////////////////////////////////////////////////////
     loadSounds: function()
     {
-        // Check audio
+        // Check audio engine pointer
         if (!this.audio)
         {
-            this.allSoundsLoaded = true;
             return false;
         }
+        // Check audio context pointer
         if (!this.audio.context)
         {
-            this.allSoundsLoaded = true;
             return false;
         }
 
-        var sndlen = SoundsAssets.length;
-        for (var i = 0; i < sndlen; ++i)
+        // Load all sounds asynchronously
+        var texlen = TexturesAssets.length;
+        for (var i = 0; i < texlen; ++i)
         {
             this.sounds[i] = new Sound(this.audio.context);
             this.sounds[i].loader = this;
@@ -159,25 +181,37 @@ Loader.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  handleSoundLoaded : Called when a sound is loaded                     //
+    ////////////////////////////////////////////////////////////////////////////
     handleSoundLoaded: function()
     {
         ++this.soundsLoaded;
         if (this.soundsLoaded >= SoundsAssets.length)
         {
-            // All assets loaded
+            // All sounds loaded
             this.allSoundsLoaded = true;
             if (this.allTexturesLoaded && this.allSoundsLoaded)
             {
+                // All assets loaded
                 this.onAssetsLoaded();
             }
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  onAssetsLoaded : Called when all assets are loaded                    //
+    ////////////////////////////////////////////////////////////////////////////
     onAssetsLoaded: function()
     {
 
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getTexture : Get a texture resource previously loaded                 //
+    //  param name : Name of the texture to get                               //
+    //  return : Texture data pointer                                         //
+    ////////////////////////////////////////////////////////////////////////////
     getTexture: function(name)
     {
         var texlen = TexturesAssets.length;
@@ -191,6 +225,11 @@ Loader.prototype = {
         return null;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getSound : Get a sound resource previously loaded                     //
+    //  param name : Name of the sound to get                                 //
+    //  return : Sound data pointer                                           //
+    ////////////////////////////////////////////////////////////////////////////
     getSound: function(name)
     {
         var sndlen = SoundsAssets.length;
