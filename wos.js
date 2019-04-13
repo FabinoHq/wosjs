@@ -374,6 +374,19 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
+        // Set default viewport
+        this.renderer.gl.viewport(
+            0.0, 0.0,
+            this.renderer.width, this.renderer.height
+        );
+
+        // Clear renderer
+        this.renderer.clear();
+
+        // Set default view
+        this.renderer.setView(this.view);
+
+        // Render cursor
         this.cursor.resetMatrix();
         this.cursor.moveX(this.curMouseX);
         this.cursor.moveY(this.curMouseY);
