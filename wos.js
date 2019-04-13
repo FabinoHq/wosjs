@@ -282,7 +282,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     handleOnResize: function()
     {
-
+        this.renderer.handleOnResize();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -374,17 +374,18 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-        // Set default viewport
-        this.renderer.gl.viewport(
-            0.0, 0.0,
-            this.renderer.width, this.renderer.height
-        );
-
         // Clear renderer
         this.renderer.clear();
 
         // Set default view
         this.renderer.setView(this.view);
+
+
+        // Set fullsize viewport
+        this.renderer.gl.viewport(
+            0.0, 0.0,
+            this.renderer.width, this.renderer.height
+        );
 
         // Render cursor
         this.cursor.resetMatrix();
