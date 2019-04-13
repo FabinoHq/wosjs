@@ -117,8 +117,8 @@ Loader.prototype = {
         }
 
         // Load all textures asynchronously
-        var sndlen = SoundsAssets.length;
-        for (var i = 0; i < sndlen; ++i)
+        var texlen = TexturesAssets.length;
+        for (var i = 0; i < texlen; ++i)
         {
             this.textures[i] = new Texture(this.renderer);
             this.textures[i].loader = this;
@@ -141,7 +141,7 @@ Loader.prototype = {
         {
             // All textures loaded
             this.allTexturesLoaded = true;
-            if (this.allTexturesLoaded && this.allSoundsLoaded)
+            if (this.allTexturesLoaded /*&& this.allSoundsLoaded*/)
             {
                 // All assets loaded
                 this.onAssetsLoaded();
@@ -166,8 +166,8 @@ Loader.prototype = {
         }
 
         // Load all sounds asynchronously
-        var texlen = TexturesAssets.length;
-        for (var i = 0; i < texlen; ++i)
+        var sndlen = SoundsAssets.length;
+        for (var i = 0; i < sndlen; ++i)
         {
             this.sounds[i] = new Sound(this.audio.context);
             this.sounds[i].loader = this;

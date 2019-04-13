@@ -214,6 +214,9 @@ function Wos()
     this.renderer = null;
     // WOS assets loader
     this.loader = null;
+
+    // WOS default cursor
+    this.cursor = null;
 }
 
 
@@ -241,9 +244,6 @@ Wos.prototype = {
         this.loader.loadFonts();
         this.loader.loadTextures();
         this.loader.loadSounds();
-
-        // Init done
-        //this.initDone();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -251,7 +251,6 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     initDone: function()
     {
-        console.log("initDone()");
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
         this.loaded = true;

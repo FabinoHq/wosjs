@@ -130,7 +130,7 @@ Texture.prototype = {
         this.image.onload = function()
         {
             this.texture.handleImageLoaded();
-            if (this.loaded) { this.texture.onTextureLoaded(); }
+            if (this.texture.loaded) { this.texture.onTextureLoaded(); }
         }
 
         // Start loading image
