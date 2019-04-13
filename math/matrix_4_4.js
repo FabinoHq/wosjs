@@ -644,7 +644,7 @@ Matrix4x4.prototype = {
                             + this.matrix[11]*mat4x4.matrix[14]
                             + this.matrix[15]*mat4x4.matrix[15]);
 
-        this.matirx = multMat.matrix;
+        this.matrix = multMat.matrix;
     }
 };
 
