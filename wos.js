@@ -251,6 +251,10 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     initDone: function()
     {
+        // Set default cursor sprite
+        this.cursor = new Sprite(this.renderer);
+        this.cursor.init(this.loader.getTexture("cursor.png"));
+
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
         this.loaded = true;
@@ -370,7 +374,10 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-
+        this.cursor.resetMatrix();
+        this.cursor.moveX(this.curMouseX);
+        this.cursor.moveY(this.curMouseY);
+        this.cursor.draw();
     }
 };
 
