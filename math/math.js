@@ -90,7 +90,6 @@ function pseudoRand(x, y)
     return (Math.sin((xrnd*yrnd*1848.41575)+58964.376)*2768.8745)%0.5+0.5;
 }
 
-// Fractal pseudo random heightmap
 ////////////////////////////////////////////////////////////////////////////////
 //  fractalHeigthmap : 2D Fractal pseudo random heightmap                     //
 //  param i : Integer I index (X) offset                                      //
