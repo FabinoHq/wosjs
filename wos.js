@@ -212,6 +212,8 @@ function Wos()
 
     // WOS renderer
     this.renderer = null;
+    // WOS assets loader
+    this.loader = null;
 }
 
 
@@ -225,6 +227,20 @@ Wos.prototype = {
         this.renderer = new Renderer();
         this.renderer.init("woscreen");
         this.renderer.clear();
+
+        // Init assets loader
+        this.loader = new Loader(this.renderer, null);
+        this.loader.init();
+
+        // Load basic system
+        this.loader.wos = this;
+        this.loader.onAssetsLoaded = function()
+        {
+            this.wos.initDone();
+        }
+        this.loader.loadFonts();
+        this.loader.loadTextures();
+        this.loader.loadSounds();
 
         // Init done
         this.initDone();
