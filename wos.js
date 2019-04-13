@@ -243,7 +243,7 @@ Wos.prototype = {
         this.loader.loadSounds();
 
         // Init done
-        this.initDone();
+        //this.initDone();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -251,6 +251,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     initDone: function()
     {
+        console.log("initDone()");
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
         this.loaded = true;
