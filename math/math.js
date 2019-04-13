@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      mathjs : Generic math functions                                       //
+//      math.js : Generic math functions                                      //
 ////////////////////////////////////////////////////////////////////////////////
 
 
