@@ -41,22 +41,44 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////////////
+//  Sprite class definition                                                   //
+////////////////////////////////////////////////////////////////////////////////
 function Sprite(renderer)
 {
+    // Sprite loaded state
     this.loaded = false;
+
+    // Renderer pointer
     this.renderer = renderer;
+
+    // Sprite VBO
     this.vertexBuffer = null;
+    // Sprite texture
     this.texture = null;
+    // Sprite model matrix
     this.modelMatrix = null;
+
+    // Sprite texture UV offset
     this.uoffset = 0.0;
     this.voffset = 0.0;
+    // Sprite texture UV size
     this.usize = 1.0;
     this.vsize = 1.0;
 }
 
 Sprite.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  init : Init sprite                                                    //
+    //  param tex : Texture pointer                                           //
+    //  param uoffset : Sprite texture U offset                               //
+    //  param voffset : Sprite texture V offset                               //
+    //  param usize : Sprite texture U size                                   //
+    //  param vsize : Sprite texture V size                                   //
+    ////////////////////////////////////////////////////////////////////////////
     init: function(tex, uoffset, voffset, usize, vsize)
     {
+        // Reset sprite
         this.loaded = false;
         this.vertexBuffer = null;
         this.texture = null;
@@ -110,41 +132,71 @@ Sprite.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  resetMatrix : Reset sprite model matrix                               //
+    ////////////////////////////////////////////////////////////////////////////
     resetMatrix: function()
     {
         this.modelMatrix.setIdentity();
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setMatrix : Set sprite model matrix                                   //
+    //  param modelMatrix : Sprite  model matrix                              //
+    ////////////////////////////////////////////////////////////////////////////
     setMatrix: function(modelMatrix)
     {
         this.modelMatrix = modelMatrix;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Translate sprite on X axis                                    //
+    //  param x : X axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
         this.modelMatrix.translateX(x);
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Translate sprite on Y axis                                    //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
         this.modelMatrix.translateY(y);
     },
 
-    scaleX: function(scaleX)
-    {
-        this.modelMatrix.scaleX(scaleX);
-    },
-
-    scaleY: function(scaleY)
-    {
-        this.modelMatrix.scaleY(scaleY);
-    },
-
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate sprite                                                //
+    //  param angle : Angle to rotate in degrees                              //
+    ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
         this.modelMatrix.rotateZ(-angle);
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  scaleX : Scale sprite along the X axis                                //
+    //  param scaleX : X factor to scale to                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    scaleX: function(scaleX)
+    {
+        this.modelMatrix.scaleX(scaleX);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  scaleY : Scale sprite along the Y axis                                //
+    //  param scaleY : Y factor to scale to                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    scaleY: function(scaleY)
+    {
+        this.modelMatrix.scaleY(scaleY);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  draw : Render sprite                                                  //
+    ////////////////////////////////////////////////////////////////////////////
     draw: function()
     {
         if (this.loaded)
