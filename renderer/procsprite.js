@@ -41,19 +41,37 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////////////
+//  ProcSprite class definition                                               //
+////////////////////////////////////////////////////////////////////////////////
 function ProcSprite(renderer)
 {
+    // Procedural sprite loaded state
     this.loaded = false;
+
+    // Renderer pointer
     this.renderer = renderer;
+
+    // Procedural sprite shader
     this.shader = null;
+    // Procedural sprite VBO
     this.vertexBuffer = null;
+    // Procedural sprite model matrix
     this.modelMatrix = null;
+
+    // Procedural sprite shader uniforms locations
     this.uniformTimer = -1;
     this.uniformOffsetX = -1;
     this.uniformOffsetY = -1;
 }
 
 ProcSprite.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  init : Init procedural sprite                                         //
+    //  param shaderSrc : Procedural sprite fragment shader source            //
+    //  param width : Procedural sprite width                                 //
+    //  param height : Procedural sprite height                               //
+    ////////////////////////////////////////////////////////////////////////////
     init: function(shaderSrc, width, height)
     {
         // Reset procedural sprite
@@ -116,32 +134,58 @@ ProcSprite.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSize : Set procedural sprite size                                  //
+    //  param width : Procedural sprite width to set                          //
+    //  param height : Procedural sprite height to set                        //
+    ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
         // Update vbo
         this.vertexBuffer.setPlane(width, height);
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  resetMatrix : Reset procedural sprite model matrix                    //
+    ////////////////////////////////////////////////////////////////////////////
     resetMatrix: function()
     {
         this.modelMatrix.setIdentity();
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setMatrix : Reset procedural sprite model matrix                      //
+    //  param modelMatrix : Procedural sprite model matrix to set             //
+    ////////////////////////////////////////////////////////////////////////////
     setMatrix: function(modelMatrix)
     {
         this.modelMatrix = modelMatrix;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Translate procedural sprite on X axis                         //
+    //  param x : X axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
         this.modelMatrix.translateX(x);
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Translate procedural sprite on Y axis                         //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
         this.modelMatrix.translateY(y);
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  draw : Render procedural sprite                                       //
+    //  param timer : Time offset for aniumated procedural generation         //
+    //  param offsetX : X position offset for procedural generation           //
+    //  param offsetY : Y position offset for procedural generation           //
+    ////////////////////////////////////////////////////////////////////////////
     draw: function(timer, offsetX, offsetY)
     {
         if (this.loaded)
