@@ -213,6 +213,8 @@ function Wos()
 
     // WOS renderer
     this.renderer = null;
+    // WOS audio engine
+    this.audio = null;
     // WOS assets loader
     this.loader = null;
 }
@@ -229,8 +231,12 @@ Wos.prototype = {
         this.renderer.init("woscreen");
         this.renderer.clear();
 
+        // Init audio engine
+        this.audio = new AudioEngine();
+        this.audio.init();
+
         // Init assets loader
-        this.loader = new Loader(this.renderer, null);
+        this.loader = new Loader(this.renderer, this.audio);
         this.loader.init();
 
         // Load basic system
@@ -330,7 +336,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     updateFrameTime: function()
     {
-        // Get current time
+        // Get current time in seconds
         var currentTime = window.performance.now()*0.001;
 
         // Compute frametime
