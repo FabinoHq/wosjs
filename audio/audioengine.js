@@ -68,7 +68,9 @@ AudioEngine.prototype = {
         // Create audio context
         try {
         this.context = new (window.AudioContext || window.webKitAudioContext)();
-        } catch(e) {}
+        } catch(e) {
+            this.context = null;
+        }
 
         // Check context
         if (!this.context)
