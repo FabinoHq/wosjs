@@ -79,7 +79,7 @@ function Renderer()
 Renderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init renderer                                                  //
-    //  param canvas : Renderer's canvas reference to init                    //
+    //  param canvas : Renderer's canvas name to init                         //
     ////////////////////////////////////////////////////////////////////////////
     init: function(canvas)
     {
