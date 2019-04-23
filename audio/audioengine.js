@@ -59,8 +59,10 @@ AudioEngine.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
+        // Reset audio engine
         this.loaded = false;
 
+        // Create audio context
         try {
         this.context = new (window.AudioContext || window.webKitAudioContext)();
         } catch(e) {}
