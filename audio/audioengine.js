@@ -49,6 +49,9 @@ function AudioEngine()
     // Audio engine loaded status
     this.loaded = false;
 
+    // Audio engine enabled status
+    this.enabled = false;
+
     // Audio engine context
     this.context = null;
 }
@@ -76,6 +79,24 @@ AudioEngine.prototype = {
         // Audio engine successfully loaded
         this.loaded = true;
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  enable : Enable audio engine                                          //
+    ////////////////////////////////////////////////////////////////////////////
+    enable: function()
+    {
+        // Enable audio engine if loaded
+        this.enabled = this.loaded;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  disable : Disable audio engine                                        //
+    ////////////////////////////////////////////////////////////////////////////
+    disable: function()
+    {
+        // Disable audio engine
+        this.enabled = false;
     }
 };
 

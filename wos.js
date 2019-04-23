@@ -234,6 +234,7 @@ Wos.prototype = {
         // Init audio engine
         this.audio = new AudioEngine();
         this.audio.init();
+        //this.audio.enable();
 
         // Init assets loader
         this.loader = new Loader(this.renderer, this.audio);
@@ -255,6 +256,11 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     initDone: function()
     {
+        if (this.audio.enabled)
+        {
+            this.loader.getSound("test.wav").play();
+        }
+
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
         this.loaded = true;
