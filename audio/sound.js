@@ -57,6 +57,10 @@ function Sound(audioContext)
 }
 
 Sound.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  load : Load sound                                                     //
+    //  param src : Sound source to load                                      //
+    ////////////////////////////////////////////////////////////////////////////
     load: function(src)
     {
         this.loaded = false;
@@ -89,8 +93,12 @@ Sound.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  handleSoundLoaded : Called when sound loading finished                //
+    ////////////////////////////////////////////////////////////////////////////
     handleSoundLoaded: function()
     {
+        // Connect sound to context
         this.sound.connect(this.audioContext.destination);
 
         // Sound loaded
@@ -98,11 +106,17 @@ Sound.prototype = {
         this.onSoundLoaded();
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  handleSoundLoaded : Called when sound is fully loaded                 //
+    ////////////////////////////////////////////////////////////////////////////
     onSoundLoaded: function()
     {
 
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  play : Play sound                                                     //
+    ////////////////////////////////////////////////////////////////////////////
     play: function()
     {
         if (this.loaded)
