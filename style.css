@@ -8,7 +8,6 @@
 /******************************************************************************/
 *
 {
-    cursor: none;
     position: absolute;
     top: 0px;
     left: 0px;
@@ -21,7 +20,6 @@
 /******************************************************************************/
 html
 {
-    cursor: none;
     position: absolute;
     top: 0px;
     left: 0px;
@@ -37,7 +35,6 @@ html
 /******************************************************************************/
 body
 {
-    cursor: none;
     position: absolute;
     top: 0px;
     left: 0px;
@@ -54,7 +51,7 @@ body
 /******************************************************************************/
 canvas
 {
-    cursor: none;
+    cursor: url("textures/cursor.png"), auto;
     position: absolute;
     top: 0px;
     left: 0px;
