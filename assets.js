@@ -48,6 +48,6 @@ var TexturesAssets = [
 
 // WOS sounds assets
 var SoundsAssets = [
-    ""
+    "test.wav"
 ];
 
