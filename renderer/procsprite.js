@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/procsprite.js : WOS Procedural sprite management             //
+//      renderer/procsprite.js : Procedural sprite management                 //
 ////////////////////////////////////////////////////////////////////////////////
 
 
