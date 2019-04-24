@@ -40,7 +40,10 @@
 //      renderer/guitext.js : GUI Text management                             //
 ////////////////////////////////////////////////////////////////////////////////
 
-// Default text fragment shader
+
+////////////////////////////////////////////////////////////////////////////////
+//  GUI Text fragment shader                                                  //
+////////////////////////////////////////////////////////////////////////////////
 const textFragmentShaderSrc = [
     "precision mediump float;",
     "uniform sampler2D texture;",
@@ -51,32 +54,61 @@ const textFragmentShaderSrc = [
     "   gl_FragColor = vec4(0.9, 0.9, 0.9, textAlpha*0.9);",
     "}" ].join("\n");
 
+////////////////////////////////////////////////////////////////////////////////
+//  Default hidden pass character (unicode dot)                               //
+////////////////////////////////////////////////////////////////////////////////
 const HiddenTextPassCharacter = "\u2022";
 
+
+////////////////////////////////////////////////////////////////////////////////
+//  GuiText class definition                                                  //
+////////////////////////////////////////////////////////////////////////////////
 function GuiText(renderer)
 {
+    // GuiText loaded state
     this.loaded = false;
+
+    // Renderer pointer
     this.renderer = renderer;
+
+    // GuiText VBO
     this.vertexBuffer = null;
+    // GuiText generated texture
     this.texture = null;
+    // GuiText model matrix
     this.modelMatrix = null;
+    // GuiText shader
     this.shader = null;
+
+    // GuiText parameters
     this.text = "";
     this.fontsize = 20.0;
     this.width = 1;
     this.height = 1;
     this.textLength = 0;
+
+    // Characters sizes array
     this.charsizes = null;
+
+    // Hidden text mode
     this.hidden = false;
     this.hidetext = "";
 }
 
 GuiText.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  init : Init GUI Text                                                  //
+    //  param text : Text to set                                              //
+    //  param height : Text field height                                      //
+    //  param hide : Text hide mode                                           //
+    //  param shaderSrc : Text fragment shader source to use                  //
+    ////////////////////////////////////////////////////////////////////////////
     init: function(text, height, hide, shaderSrc)
     {
         var i = 0;
         var pixelsData = null;
 
+        // Reset GuiText
         this.loaded = false;
         this.vertexBuffer = null;
         this.texture = null;
@@ -91,7 +123,7 @@ GuiText.prototype = {
         this.hidden = false;
         this.hidetext = "";
 
-        // Set hidden
+        // Set hidden mode
         if (hide !== undefined)
         {
             this.hidden = hide;
@@ -118,15 +150,16 @@ GuiText.prototype = {
             }
         }
 
-        // Set height
+        // Set text field height
         if (height !== undefined)
         {
             this.height = Math.ceil(height);
         }
+        // Clamp to minimum and maximum text field height
         if (this.height <= 20) { this.height = 20; }
         if (this.height >= 240) { this.height = 240; }
 
-        // Set font size
+        // Set font size based on text field height
         this.fontsize = this.height*0.8;
         if (this.fontsize <= 10.0) { this.fontsize = 10.0; }
         if (this.fontsize >= 200.0) { this.fontsize = 200.0; }
@@ -239,6 +272,10 @@ GuiText.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setText : Set GuiText internal text string                            //
+    //  param text : Text to set                                              //
+    ////////////////////////////////////////////////////////////////////////////
     setText: function(text)
     {
         var pixelsData = null;
@@ -303,12 +340,20 @@ GuiText.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  addCharacter : Add character to text at given index                   //
+    //  param index : Index to add character at                               //
+    //  param character : Character to add at specified index                 //
+    ////////////////////////////////////////////////////////////////////////////
     addCharacter: function(index, character)
     {
         if (this.loaded)
         {
+            // Clamp index into text length range
             if (index <= 0) { index = 0; }
             if (index >= this.textLength) { index = this.textLength; }
+
+            // Insert character
             this.setText(
                 this.text.substring(0, index) + character +
                 this.text.substring(index, this.textLength)
@@ -316,12 +361,19 @@ GuiText.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  eraseCharacter : Erase text character at given index                  //
+    //  param index : Index to erase character at                             //
+    ////////////////////////////////////////////////////////////////////////////
     eraseCharacter: function(index)
     {
         if (this.loaded && this.textLength > 0)
         {
-            if (index <= 0) { index = 0; }
+            // Clamp index into text length range
+            if (index <= 1) { index = 1; }
             if (index >= this.textLength) { index = this.textLength; }
+
+            // Erase character
             this.setText(
                 this.text.substring(0, index-1) +
                 this.text.substring(index, this.textLength)
@@ -329,6 +381,11 @@ GuiText.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  eraseSelection : Erase text characters between start and end indexes  //
+    //  param start : Start index to erase characters from                    //
+    //  param end : Start index to erase characters to                        //
+    ////////////////////////////////////////////////////////////////////////////
     eraseSelection: function(start, end)
     {
         var selStart = 0;
@@ -336,25 +393,32 @@ GuiText.prototype = {
 
         if (this.loaded)
         {
+            // Check indexes ordering
             if (start == end)
             {
+                // Nothing to erase
                 return;
             }
             else if (start < end)
             {
+                // Normal indexes order
                 selStart = start;
                 selEnd = end;
             }
             else
             {
+                // Inverted indexes order
                 selStart = end;
                 selEnd = start;
             }
 
+            // Clamp indexes into text length range
             if (selStart <= 0) { selStart = 0; }
             if (selStart >= this.textLength) { selStart = this.textLength; }
             if (selEnd <= 0) { selEnd = 0; }
             if (selEnd >= this.textLength) { selEnd = this.textLength; }
+
+            // Erase characters selection
             this.setText(
                 this.text.substring(0, selStart) +
                 this.text.substring(selEnd, this.textLength)
