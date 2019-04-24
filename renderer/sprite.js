@@ -142,7 +142,7 @@ Sprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setMatrix : Set sprite model matrix                                   //
-    //  param modelMatrix : Sprite  model matrix                              //
+    //  param modelMatrix : Sprite model matrix                               //
     ////////////////////////////////////////////////////////////////////////////
     setMatrix: function(modelMatrix)
     {

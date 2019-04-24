@@ -426,83 +426,155 @@ GuiText.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getCharPos : Get character position offset at given index             //
+    //  param index : Index to get character position at                      //
+    //  return : character position offset                                    //
+    ////////////////////////////////////////////////////////////////////////////
     getCharPos: function(index)
     {
         if (this.loaded)
         {
+            // Clamp index into text length range
             if (index <= 0) { index = 0; }
             if (index >= this.textLength) { index = this.textLength; }
+
+            // Return character size at given index
             return this.charsizes[index];
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getNextWidth : Get text next width when a given character is inserted //
+    //  param character : Character willing to be inserted                    //
+    //  return : Text width when new character is inserted                    //
+    ////////////////////////////////////////////////////////////////////////////
     getNextWidth: function(character)
     {
+        // Get current text width
         var width = this.width;
         if (this.loaded)
         {
+            // Add new character width
             if (this.hidden) { character = HiddenTextPassCharacter; }
             width += this.renderer.getTextWidth(character, this.fontsize);
         }
+
+        // Return total width
         return width;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getText : Get text internal string                                    //
+    //  return : Text internal string                                         //
+    ////////////////////////////////////////////////////////////////////////////
     getText: function()
     {
         if (this.hidden) { return this.hidetext; }
         else { return this.text; }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getLength : Get text characters length                                //
+    //  return : Text length                                                  //
+    ////////////////////////////////////////////////////////////////////////////
     getLength: function()
     {
         return this.textLength;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getWidth : Get text width                                             //
+    //  return : Text width                                                   //
+    ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
         return this.width;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHeight : Get text height                                           //
+    //  return : Text height                                                  //
+    ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
         return this.height;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getFontsize : Get text font size                                      //
+    //  return : Text font size                                               //
+    ////////////////////////////////////////////////////////////////////////////
     getFontsize: function()
     {
         return this.fontsize;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  resetMatrix : Reset text model matrix                                 //
+    ////////////////////////////////////////////////////////////////////////////
     resetMatrix: function()
     {
         this.modelMatrix.setIdentity();
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setMatrix : Set text model matrix                                     //
+    //  param modelMatrix : Text model matrix                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    setMatrix: function(modelMatrix)
+    {
+        this.modelMatrix = modelMatrix;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Translate text on X axis                                      //
+    //  param x : X axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
         this.modelMatrix.translateX(x);
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Translate text on Y axis                                      //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
         this.modelMatrix.translateY(y);
     },
 
-    scaleX: function(scaleX)
-    {
-        this.modelMatrix.scaleX(scaleX);
-    },
-
-    scaleY: function(scaleY)
-    {
-        this.modelMatrix.scaleY(scaleY);
-    },
-
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate text                                                  //
+    //  param angle : Angle to rotate in degrees                              //
+    ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
         this.modelMatrix.rotateZ(-angle);
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  scaleX : Scale text along the X axis                                  //
+    //  param scaleX : X factor to scale to                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    scaleX: function(scaleX)
+    {
+        this.modelMatrix.scaleX(scaleX);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  scaleY : Scale text along the Y axis                                  //
+    //  param scaleY : Y factor to scale to                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    scaleY: function(scaleY)
+    {
+        this.modelMatrix.scaleY(scaleY);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  draw : Render text                                                    //
+    ////////////////////////////////////////////////////////////////////////////
     draw: function()
     {
         if (this.loaded)
