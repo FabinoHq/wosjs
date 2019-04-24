@@ -141,7 +141,7 @@ Loader.prototype = {
         {
             // All textures loaded
             this.allTexturesLoaded = true;
-            if (this.allTexturesLoaded /*&& this.allSoundsLoaded*/)
+            if (this.allTexturesLoaded && this.allSoundsLoaded)
             {
                 // All assets loaded
                 this.onAssetsLoaded();
