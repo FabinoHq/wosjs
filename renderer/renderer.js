@@ -357,7 +357,7 @@ Renderer.prototype = {
 
         // Draw text
         this.offContext.scale(1.0, -1.0);
-        this.offContext.font = fontsize.toString() + "px default";
+        this.offContext.font = fontsize.toString() + "px defaultfont";
         this.offContext.fillText(text, 0, (-0.27*fontsize));
 
         // Get pixels data
@@ -401,7 +401,7 @@ Renderer.prototype = {
     getTextWidth: function(text, fontsize)
     {
         var textWidth = 1;
-        this.offContext.font = fontsize.toString() + "px default";
+        this.offContext.font = fontsize.toString() + "px defaultfont";
         textWidth = this.offContext.measureText(text).width;
         return textWidth;
     },

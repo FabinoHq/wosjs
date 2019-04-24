@@ -197,7 +197,7 @@ GuiText.prototype = {
             this.renderer.getTextWidth(this.text, this.fontsize)
         );
         if (this.width <= 1) { this.width = 1; }
-        if (this.width >= GameWidth) { this.width = GameWidth; }
+        if (this.width >= WOSWidth) { this.width = WOSWidth; }
 
         // Get char sizes
         this.charsizes = new Array();
