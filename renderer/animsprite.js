@@ -251,7 +251,7 @@ AnimSprite.prototype = {
     {
         if (this.loaded)
         {
-            // Bind shader
+            // Bind default shader
             this.renderer.shader.bind();
 
             // Send shader uniforms
@@ -270,7 +270,7 @@ AnimSprite.prototype = {
             // Unbind texture
             this.texture.unbind();
 
-            // Unbind shader
+            // Unbind default shader
             this.renderer.shader.unbind();
         }
     }

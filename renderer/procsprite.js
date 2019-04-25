@@ -190,7 +190,7 @@ ProcSprite.prototype = {
     {
         if (this.loaded)
         {
-            // Bind shader
+            // Bind procedural shader
             this.shader.bind();
 
             // Send shader uniforms
@@ -206,7 +206,7 @@ ProcSprite.prototype = {
             this.vertexBuffer.draw();
             this.vertexBuffer.unbind();
 
-            // Unbind shader
+            // Unbind procedural shader
             this.shader.unbind();
         }
     }

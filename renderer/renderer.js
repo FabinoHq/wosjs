@@ -252,6 +252,9 @@ Renderer.prototype = {
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
         this.gl.blendEquation(this.gl.FUNC_ADD);
 
+        // Unbind default shader
+        this.shader.unbind();
+
         // WebGL successfully loaded
         this.loaded = true;
         return true;
@@ -310,6 +313,9 @@ Renderer.prototype = {
             // Update view matrix
             this.view.compute();
             this.shader.sendViewMatrix(this.view.viewMatrix);
+
+            // Unbind shader
+            this.shader.unbind();
         }
     },
 

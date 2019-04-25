@@ -579,7 +579,7 @@ GuiText.prototype = {
     {
         if (this.loaded)
         {
-            // Bind shader
+            // Bind text shader
             this.shader.bind();
 
             // Send shader uniforms
@@ -601,7 +601,7 @@ GuiText.prototype = {
             // Unbind texture
             this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
-            // Unbind shader
+            // Unbind text shader
             this.shader.unbind();
         }
     }
