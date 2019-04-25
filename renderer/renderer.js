@@ -339,7 +339,7 @@ Renderer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  renderText : Render text offscreen into texture with default font     //
+    //  renderText : Render text offscreen into texture with WOS default font //
     //  param text : Text to render                                           //
     //  param width : Width of the text texture to render                     //
     //  param height : Height of the text texture to render                   //
@@ -357,7 +357,7 @@ Renderer.prototype = {
 
         // Draw text
         this.offContext.scale(1.0, -1.0);
-        this.offContext.font = fontsize.toString() + "px defaultfont";
+        this.offContext.font = fontsize.toString() + "px wosfont";
         this.offContext.fillText(text, 0, (-0.27*fontsize));
 
         // Get pixels data
@@ -393,7 +393,7 @@ Renderer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getTextWidth : Get text width with default font                       //
+    //  getTextWidth : Get text width with WOS default font                   //
     //  param text : Text to get width of                                     //
     //  param fontsize : Size of the font used                                //
     //  return : Width of the text in pixels                                  //
@@ -401,7 +401,7 @@ Renderer.prototype = {
     getTextWidth: function(text, fontsize)
     {
         var textWidth = 1;
-        this.offContext.font = fontsize.toString() + "px defaultfont";
+        this.offContext.font = fontsize.toString() + "px wosfont";
         textWidth = this.offContext.measureText(text).width;
         return textWidth;
     },
