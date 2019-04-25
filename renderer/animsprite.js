@@ -41,26 +41,52 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 
+////////////////////////////////////////////////////////////////////////////////
+//  AnimSprite class definition                                               //
+////////////////////////////////////////////////////////////////////////////////
 function AnimSprite(renderer)
 {
+    // Animated sprite loaded state
     this.loaded = false;
+
+    // Renderer pointer
     this.renderer = renderer;
+
+    // Animated sprite VBO
     this.vertexBuffer = null;
+    // Animated sprite texture
     this.texture = null;
+    // Animated sprite model matrix
     this.modelMatrix = null;
+
+    // Animated sprite texture UV size
     this.usize = 1.0;
     this.vsize = 1.0;
+    // Animated sprite frame count
     this.countX = 1;
     this.countY = 1;
-    this.timing = 0.1;
+    // Animated sprite frametime in seconds
+    this.timing = 1.0;
+
+    // Animated sprite current states
     this.currentX = 0;
     this.currentY = 0;
     this.currentTime = 0.0;
 }
 
 AnimSprite.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  init : Init animated sprite                                           //
+    //  param tex : Texture pointer                                           //
+    //  param usize : Animated sprite texture U size                          //
+    //  param vsize : Animated sprite texture V size                          //
+    //  param countX : Animated sprite frames count in U texture axis         //
+    //  param countY : Animated sprite frames count in V texture axis         //
+    //  param timing : Animated sprite frametime in seconds                   //
+    ////////////////////////////////////////////////////////////////////////////
     init: function(tex, usize, vsize, countX, countY, timing)
     {
+        // Reset animated sprite
         this.loaded = false;
         this.vertexBuffer = null;
         this.texture = null;
@@ -117,43 +143,74 @@ AnimSprite.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  resetMatrix : Reset animated sprite model matrix                      //
+    ////////////////////////////////////////////////////////////////////////////
     resetMatrix: function()
     {
         this.modelMatrix.setIdentity();
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setMatrix : Set animated sprite model matrix                          //
+    //  param modelMatrix : Animated sprite model matrix                      //
+    ////////////////////////////////////////////////////////////////////////////
     setMatrix: function(modelMatrix)
     {
         this.modelMatrix = modelMatrix;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Translate animated sprite on X axis                           //
+    //  param x : X axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
         this.modelMatrix.translateX(x);
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Translate animated sprite on Y axis                           //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
         this.modelMatrix.translateY(y);
     },
 
-    scaleX: function(scaleX)
-    {
-        this.modelMatrix.scaleX(scaleX);
-    },
-
-    scaleY: function(scaleY)
-    {
-        this.modelMatrix.scaleY(scaleY);
-    },
-
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate animated sprite                                       //
+    //  param angle : Angle to rotate in degrees                              //
+    ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
         this.modelMatrix.rotateZ(-angle);
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  scaleX : Scale animated sprite along the X axis                       //
+    //  param scaleX : X factor to scale to                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    scaleX: function(scaleX)
+    {
+        this.modelMatrix.scaleX(scaleX);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  scaleY : Scale animated sprite along the Y axis                       //
+    //  param scaleY : Y factor to scale to                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    scaleY: function(scaleY)
+    {
+        this.modelMatrix.scaleY(scaleY);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  compute : Compute animated sprite                                     //
+    ////////////////////////////////////////////////////////////////////////////
     compute: function(frametime)
     {
+        // Update current animation time
         this.currentTime += frametime;
         if (this.currentTime >= this.timing)
         {
@@ -176,7 +233,7 @@ AnimSprite.prototype = {
                 }
             }
 
-            // Update vertex buffer     
+            // Update vertex buffer texture coordinates     
             this.vertexBuffer.updateTexcoords(
                 this.currentX*this.usize, 1.0-((this.currentY+1)*this.vsize),
                 (this.currentX+1)*this.usize, 1.0-(this.currentY*this.vsize)
@@ -187,6 +244,9 @@ AnimSprite.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  render : Render animated sprite                                       //
+    ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
         if (this.loaded)
