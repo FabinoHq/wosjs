@@ -275,12 +275,12 @@ Wos.prototype = {
         // Compute frametime
         this.updateFrameTime();
 
-        // Request new frame
-        requestAnimFrame(handleAnimFrame);
-
         // Update WOS
         this.compute();
         this.render();
+
+        // Request new frame
+        requestAnimFrame(handleAnimFrame);
     },
 
     ////////////////////////////////////////////////////////////////////////////
