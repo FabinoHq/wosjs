@@ -128,8 +128,12 @@ Renderer.prototype = {
         for (i = 0; i < glContextNames.length; ++i)
         {
             try {
-            this.gl = this.context.getContext(glContextNames[i]);
-            } catch(e) {}
+                this.gl = this.context.getContext(
+                    glContextNames[i], { alpha: false }
+                );
+            } catch(e) {
+                this.gl = null;
+            }
             
             if (this.gl)
             {
@@ -246,6 +250,7 @@ Renderer.prototype = {
         this.gl.disable(this.gl.DEPTH_TEST);
         this.gl.enable(this.gl.BLEND);
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+        this.gl.blendEquation(this.gl.FUNC_ADD);
 
         // WebGL successfully loaded
         this.loaded = true;
