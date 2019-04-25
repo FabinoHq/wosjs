@@ -181,12 +181,12 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  draw : Render procedural sprite                                       //
+    //  render : Render procedural sprite                                     //
     //  param timer : Time offset for aniumated procedural generation         //
     //  param offsetX : X position offset for procedural generation           //
     //  param offsetY : Y position offset for procedural generation           //
     ////////////////////////////////////////////////////////////////////////////
-    draw: function(timer, offsetX, offsetY)
+    render: function(timer, offsetX, offsetY)
     {
         if (this.loaded)
         {

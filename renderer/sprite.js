@@ -195,9 +195,9 @@ Sprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  draw : Render sprite                                                  //
+    //  render : Render sprite                                                //
     ////////////////////////////////////////////////////////////////////////////
-    draw: function()
+    render: function()
     {
         if (this.loaded)
         {
