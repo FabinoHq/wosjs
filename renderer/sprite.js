@@ -58,6 +58,8 @@ function Sprite(renderer)
     this.texture = null;
     // Sprite model matrix
     this.modelMatrix = null;
+    // Sprite alpha
+    this.alpha = 1.0;
 
     // Sprite texture UV offset
     this.uoffset = 0.0;
@@ -150,6 +152,15 @@ Sprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set sprite alpha                                           //
+    //  param alpha : Sprite alpha to set                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setAlpha: function(alpha)
+    {
+        this.alpha = alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  moveX : Translate sprite on X axis                                    //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -208,6 +219,7 @@ Sprite.prototype = {
             this.renderer.shader.sendProjectionMatrix(this.renderer.projMatrix);
             this.renderer.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.renderer.shader.sendModelMatrix(this.modelMatrix);
+            this.renderer.shader.sendAlphaValue(this.alpha);
 
             // Bind texture
             this.texture.bind();

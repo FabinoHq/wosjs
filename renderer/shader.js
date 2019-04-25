@@ -50,10 +50,13 @@ const defaultVertexShaderSrc = [
     "uniform mat4 projMatrix;",
     "uniform mat4 viewMatrix;",
     "uniform mat4 modelMatrix;",
+    "uniform float alphaUniform;",
     "varying vec2 texCoord;",
+    "varying float alphaValue;",
     "void main()",
     "{",
     "   texCoord = vertexColor;",
+    "   alphaValue = alphaUniform;",
     "   gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
     "}"
 ].join("\n");
@@ -65,9 +68,11 @@ const defaultFragmentShaderSrc = [
     "precision mediump float;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
+    "varying float alphaValue;",
     "void main()",
     "{",
-    "   gl_FragColor = texture2D(texture, texCoord);",
+    "   vec4 texColor = texture2D(texture, texCoord);",
+    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
     "}"
 ].join("\n");
 
@@ -98,6 +103,7 @@ function Shader(glPointer)
     this.projMatrixLocation = -1;
     this.viewMatrixLocation = -1;
     this.modelMatrixLocation = -1;
+    this.alphaLocation = -1;
 }
 
 Shader.prototype = {
@@ -119,6 +125,7 @@ Shader.prototype = {
         this.projMatrixLocation = -1;
         this.viewMatrixLocation = -1;
         this.modelMatrixLocation = -1;
+        this.alphaLocation = -1;
 
         // Check gl pointer
         if (!this.gl)
@@ -127,8 +134,8 @@ Shader.prototype = {
         }
 
         // Set shader sources
-        this.vertexShaderSrc = vertexSrc;
-        this.fragmentShaderSrc = fragmentSrc;
+        if (vertexSrc !== undefined) this.vertexShaderSrc = vertexSrc;
+        if (fragmentSrc !== undefined) this.fragmentShaderSrc = fragmentSrc;
 
         // Init vertex shader
         if (!this.vertexShaderSrc)
@@ -244,6 +251,13 @@ Shader.prototype = {
         );
         if (this.modelMatrixLocation == -1) return false;
 
+        // Get alpha value location
+        this.alphaLocation = this.gl.getUniformLocation(
+            this.shaderProgram,
+            "alphaUniform"
+        );
+        if (this.alphaLocation == -1) return false;
+
         this.gl.useProgram(null);
 
         // Shader successfully loaded
@@ -315,6 +329,18 @@ Shader.prototype = {
                 this.modelMatrixLocation,
                 false, modelMatrix.matrix
             );
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendAlphaValue : Send alpha value to use with this shader             //
+    //  param alphaValue : Alpha value to use                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    sendAlphaValue: function(alphaValue)
+    {
+        if (this.loaded)
+        {
+            this.gl.uniform1f(this.alphaLocation, alphaValue);
         }
     },
 
