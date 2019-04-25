@@ -66,7 +66,7 @@ function AnimSprite(renderer)
     this.countX = 1;
     this.countY = 1;
     // Animated sprite frametime in seconds
-    this.timing = 1.0;
+    this.frametime = 1.0;
 
     // Animated sprite current states
     this.currentX = 0;
@@ -82,9 +82,9 @@ AnimSprite.prototype = {
     //  param vsize : Animated sprite texture V size                          //
     //  param countX : Animated sprite frames count in U texture axis         //
     //  param countY : Animated sprite frames count in V texture axis         //
-    //  param timing : Animated sprite frametime in seconds                   //
+    //  param frametime : Animated sprite frametime in seconds                //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(tex, usize, vsize, countX, countY, timing)
+    init: function(tex, usize, vsize, countX, countY, frametime)
     {
         // Reset animated sprite
         this.loaded = false;
@@ -95,7 +95,7 @@ AnimSprite.prototype = {
         if (vsize !== undefined) { this.vsize = vsize; }
         if (countX !== undefined) { this.countX = countX; }
         if (countY !== undefined) { this.countY = countY; }
-        if (timing !== undefined) { this.timing = timing; }
+        if (frametime !== undefined) { this.frametime = frametime; }
         this.currentX = 0;
         this.currentY = 0;
         this.currentTime = 0.0;
@@ -212,7 +212,7 @@ AnimSprite.prototype = {
     {
         // Update current animation time
         this.currentTime += frametime;
-        if (this.currentTime >= this.timing)
+        if (this.currentTime >= this.frametime)
         {
             // Compute frame offset
             if (this.currentX < (this.countX-1))
