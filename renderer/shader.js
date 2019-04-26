@@ -362,15 +362,41 @@ Shader.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  sendUniform : Send shader uniform data                                //
+    //  sendUniform : Send shader uniform single data                         //
     //  param uniformLoc : Location index of the shader uniform               //
-    //  param uniformData : Uniform data to upload                            //
+    //  param uniformData : Uniform single data to upload                     //
     ////////////////////////////////////////////////////////////////////////////
     sendUniform: function(uniformLoc, uniformData)
     {
         if (this.loaded)
         {
             this.gl.uniform1f(uniformLoc, uniformData);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendUniformVec2 : Send shader uniform 2 components vector             //
+    //  param uniformLoc : Location index of the shader uniform               //
+    //  param uniformVec2 : Uniform 2 components vector to upload             //
+    ////////////////////////////////////////////////////////////////////////////
+    sendUniformVec2: function(uniformLoc, uniformVec2)
+    {
+        if (this.loaded)
+        {
+            this.gl.uniform2fv(uniformLoc, uniformVec2);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendUniformVec3 : Send shader uniform 3 components vector             //
+    //  param uniformLoc : Location index of the shader uniform               //
+    //  param uniformVec3 : Uniform 3 components vector to upload             //
+    ////////////////////////////////////////////////////////////////////////////
+    sendUniformVec3: function(uniformLoc, uniformVec3)
+    {
+        if (this.loaded)
+        {
+            this.gl.uniform3fv(uniformLoc, uniformVec3);
         }
     }
 };
