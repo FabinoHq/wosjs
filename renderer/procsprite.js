@@ -58,6 +58,8 @@ function ProcSprite(renderer)
     this.vertexBuffer = null;
     // Procedural sprite model matrix
     this.modelMatrix = null;
+    // Procedural sprite alpha
+    this.alpha = 1.0;
 
     // Procedural sprite shader uniforms locations
     this.uniformTimer = -1;
@@ -163,6 +165,15 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set procedural sprite alpha                                //
+    //  param alpha : Procedural sprite alpha to set                          //
+    ////////////////////////////////////////////////////////////////////////////
+    setAlpha: function(alpha)
+    {
+        this.alpha = alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  moveX : Translate procedural sprite on X axis                         //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -197,6 +208,7 @@ ProcSprite.prototype = {
             this.shader.sendProjectionMatrix(this.renderer.projMatrix);
             this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.shader.sendModelMatrix(this.modelMatrix);
+            this.shader.sendAlphaValue(this.alpha);
             this.shader.sendUniform(this.uniformTimer, timer);
             this.shader.sendUniform(this.uniformOffsetX, offsetX);
             this.shader.sendUniform(this.uniformOffsetY, offsetY);
