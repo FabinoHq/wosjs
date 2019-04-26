@@ -44,12 +44,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Vector2D class definition                                                 //
 ////////////////////////////////////////////////////////////////////////////////
-function Vector2D()
+function Vector2D(x, y)
 {
     // 2 components vector representation
     this.vec = new GLArrayDataType(2);
-    this.vec[0] = 0.0;
-    this.vec[1] = 0.0;
+    this.vec[0] = x;
+    this.vec[1] = y;
 }
 
 Vector2D.prototype = {

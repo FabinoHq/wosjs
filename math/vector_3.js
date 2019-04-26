@@ -44,13 +44,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Vector3D class definition                                                 //
 ////////////////////////////////////////////////////////////////////////////////
-function Vector3D()
+function Vector3D(x, y, z)
 {
     // 3 components vector representation
     this.vec = new GLArrayDataType(3);
-    this.vec[0] = 0.0;
-    this.vec[1] = 0.0;
-    this.vec[2] = 0.0;
+    this.vec[0] = x;
+    this.vec[1] = y;
+    this.vec[2] = z;
 }
 
 Vector3D.prototype = {
