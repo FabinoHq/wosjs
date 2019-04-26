@@ -51,12 +51,15 @@ const textVertexShaderSrc = [
     "uniform mat4 viewMatrix;",
     "uniform mat4 modelMatrix;",
     "uniform float alphaUniform;",
+    "uniform vec3 colorUniform;",
     "varying vec2 texCoord;",
     "varying float alphaValue;",
+    "varying vec3 colorValue;",
     "void main()",
     "{",
     "   texCoord = vertexColor;",
     "   alphaValue = alphaUniform;",
+    "   colorValue = colorUniform;",
     "   gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
     "}"
 ].join("\n");
@@ -69,10 +72,11 @@ const textFragmentShaderSrc = [
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "varying float alphaValue;",
+    "varying vec3 colorValue;",
     "void main()",
     "{",
     "   float textAlpha = texture2D(texture, texCoord).a;",
-    "   gl_FragColor = vec4(0.9, 0.9, 0.9, textAlpha*alphaValue);",
+    "   gl_FragColor = vec4(colorValue, textAlpha*alphaValue);",
     "}" ].join("\n");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -100,11 +104,20 @@ function GuiText(renderer)
     this.modelMatrix = null;
     // GuiText shader
     this.shader = null;
+    // GuiText shader color uniform location
+    this.colorUniform = -1;
+
+    // GuiText internal string
+    this.text = "";
+
     // GuiText alpha
     this.alpha = 1.0;
+    // GuiText color
+    this.colorR = 1.0;
+    this.colorG = 1.0;
+    this.colorB = 1.0;
 
     // GuiText parameters
-    this.text = "";
     this.fontsize = 20.0;
     this.width = 1;
     this.height = 1;
@@ -137,7 +150,12 @@ GuiText.prototype = {
         this.texture = null;
         this.modelMatrix = null;
         this.shader = null;
+        this.colorUniform = -1;
         this.text = "";
+        this.alpha = 1.0;
+        this.colorR = 1.0;
+        this.colorG = 1.0;
+        this.colorB = 1.0;
         this.fontsize = 20.0;
         this.width = 1;
         this.height = 1;
@@ -289,6 +307,9 @@ GuiText.prototype = {
         {
             this.shader.init(textVertexShaderSrc, textFragmentShaderSrc);
         }
+
+        // Init shader color uniform
+        //
 
         // Text loaded
         this.loaded = true;
