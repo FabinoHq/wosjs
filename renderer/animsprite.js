@@ -54,6 +54,8 @@ function AnimSprite(renderer)
 
     // Animated sprite VBO
     this.vertexBuffer = null;
+    // Animated sprite next frame VBO
+    this.nextVertexBuffer = null;
     // Animated sprite texture
     this.texture = null;
     // Animated sprite model matrix
@@ -74,6 +76,8 @@ function AnimSprite(renderer)
     this.currentX = 0;
     this.currentY = 0;
     this.currentTime = 0.0;
+    this.interTime = 0.0;
+    this.interpolation = true;
 }
 
 AnimSprite.prototype = {
@@ -86,11 +90,15 @@ AnimSprite.prototype = {
     //  param countY : Animated sprite frames count in V texture axis         //
     //  param frametime : Animated sprite frametime in seconds                //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(tex, usize, vsize, countX, countY, frametime)
+    init: function(tex, usize, vsize, countX, countY, frametime, interpolation)
     {
+        var nextFrameX = 0.0;
+        var nextFrameY = 0.0;
+
         // Reset animated sprite
         this.loaded = false;
         this.vertexBuffer = null;
+        this.nextVertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
         if (usize !== undefined) { this.usize = usize; }
@@ -98,6 +106,7 @@ AnimSprite.prototype = {
         if (countX !== undefined) { this.countX = countX; }
         if (countY !== undefined) { this.countY = countY; }
         if (frametime !== undefined) { this.frametime = frametime; }
+        if (interpolation !== undefined) { this.interpolation = interpolation; }
         this.currentX = 0;
         this.currentY = 0;
         this.currentTime = 0.0;
@@ -124,6 +133,19 @@ AnimSprite.prototype = {
             return false;
         }
 
+        // Create next frame vbo
+        this.nextVertexBuffer = new VertexBuffer(this.renderer.gl);
+        if (!this.nextVertexBuffer)
+        {
+            // Could not create next frame vbo
+            return false;
+        }
+        if (!this.nextVertexBuffer.init())
+        {
+            // Could not init next frame vbo
+            return false;
+        }
+
         // Set texture
         this.texture = tex;
         if (!this.texture)
@@ -139,6 +161,41 @@ AnimSprite.prototype = {
         this.vertexBuffer.updateTexcoords(
             0.0, 1.0-this.vsize, this.usize, 1.0
         );
+
+        if (this.interpolation)
+        {
+            // Update next frame vertex buffer     
+            this.nextVertexBuffer.setPlane(
+                this.texture.width*this.usize, this.texture.height*this.vsize
+            );
+
+            // Compute next frame offset
+            nextFrameX = this.currentX;
+            nextFrameY = this.currentY;
+            if (nextFrameX < (this.countX-1))
+            {
+                ++nextFrameX;
+            }
+            else
+            {
+                if (nextFrameY < (this.countY-1))
+                {
+                    nextFrameX = 0;
+                    ++nextFrameY;
+                }
+                else
+                {
+                    nextFrameX = 0;
+                    nextFrameY = 0;
+                }
+            }
+
+            // Update next vertex buffer texture coordinates     
+            this.nextVertexBuffer.updateTexcoords(
+                nextFrameX*this.usize,1.0-((nextFrameY+1)*this.vsize),
+                (nextFrameX+1)*this.usize,1.0-(nextFrameY*this.vsize)
+            );
+        }
 
         // Sprite loaded
         this.loaded = true;
@@ -222,12 +279,30 @@ AnimSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function(frametime)
     {
+        var nextFrameX = 0;
+        var nextFrameY = 0;
+        var cubicInterp = 0.0;
+        var smoothInterp = 0.0;
+
         if (this.loaded)
         {
             // Update current animation time
             this.currentTime += frametime;
+            if (this.frametime > 0.0)
+            {
+                this.interTime += frametime/this.frametime;
+            }
+            else
+            {
+                this.interTime += frametime;
+            }
+
+            // Update VBOs if needed
             if (this.currentTime >= this.frametime)
             {
+                // Reset interpolation timer
+                this.interTime = 0.0;
+
                 // Compute frame offset
                 if (this.currentX < (this.countX-1))
                 {
@@ -249,9 +324,39 @@ AnimSprite.prototype = {
 
                 // Update vertex buffer texture coordinates     
                 this.vertexBuffer.updateTexcoords(
-                    this.currentX*this.usize, 1.0-((this.currentY+1)*this.vsize),
-                    (this.currentX+1)*this.usize, 1.0-(this.currentY*this.vsize)
+                    this.currentX*this.usize,1.0-((this.currentY+1)*this.vsize),
+                    (this.currentX+1)*this.usize,1.0-(this.currentY*this.vsize)
                 );
+
+                if (this.interpolation)
+                {
+                    // Compute next frame offset
+                    nextFrameX = this.currentX;
+                    nextFrameY = this.currentY;
+                    if (nextFrameX < (this.countX-1))
+                    {
+                        ++nextFrameX;
+                    }
+                    else
+                    {
+                        if (nextFrameY < (this.countY-1))
+                        {
+                            nextFrameX = 0;
+                            ++nextFrameY;
+                        }
+                        else
+                        {
+                            nextFrameX = 0;
+                            nextFrameY = 0;
+                        }
+                    }
+
+                    // Update next vertex buffer texture coordinates     
+                    this.nextVertexBuffer.updateTexcoords(
+                        nextFrameX*this.usize,1.0-((nextFrameY+1)*this.vsize),
+                        (nextFrameX+1)*this.usize,1.0-(nextFrameY*this.vsize)
+                    );
+                }
 
                 // Reset timer
                 this.currentTime = 0.0;
@@ -264,7 +369,22 @@ AnimSprite.prototype = {
             this.renderer.shader.sendProjectionMatrix(this.renderer.projMatrix);
             this.renderer.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.renderer.shader.sendModelMatrix(this.modelMatrix);
-            this.renderer.shader.sendAlphaValue(this.alpha);
+            if (this.interpolation)
+            {
+                cubicInterp = (this.interTime * this.interTime *
+                    (3.0-2.0 * this.interTime)
+                );
+                smoothInterp = this.interTime + (this.interTime - cubicInterp);
+
+                this.renderer.shader.sendAlphaValue(
+                    this.alpha*((1.0-smoothInterp) +
+                    (0.5 - Math.abs(0.5-this.interTime))*0.3)
+                );
+            }
+            else
+            {
+                this.renderer.shader.sendAlphaValue(this.alpha);
+            }
 
             // Bind texture
             this.texture.bind();
@@ -273,6 +393,21 @@ AnimSprite.prototype = {
             this.vertexBuffer.bind();
             this.vertexBuffer.draw();
             this.vertexBuffer.unbind();
+
+            if (this.interpolation)
+            {
+                //this.modelMatrix.translateX(-128.0);
+                //this.renderer.shader.sendModelMatrix(this.modelMatrix);
+                this.renderer.shader.sendAlphaValue(
+                    this.alpha*(smoothInterp +
+                    (0.5 - Math.abs(0.5-this.interTime))*0.3)
+                );
+
+                // Render next frame VBO
+                this.nextVertexBuffer.bind();
+                this.nextVertexBuffer.draw();
+                this.nextVertexBuffer.unbind();
+            }
 
             // Unbind texture
             this.texture.unbind();
