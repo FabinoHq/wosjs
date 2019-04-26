@@ -261,6 +261,9 @@ Wos.prototype = {
             this.loader.getSound("test.wav").play();
         }
 
+        this.test = new GuiText(this.renderer);
+        this.test.init("Test", 80);
+
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
         this.loaded = true;
@@ -382,6 +385,10 @@ Wos.prototype = {
     {
         // Clear renderer
         this.renderer.clear();
+
+        this.test.resetMatrix();
+        this.test.setAlpha(0.94);
+        this.test.render();
     }
 };
 

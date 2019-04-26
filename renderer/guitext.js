@@ -42,16 +42,37 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+//  GUI Text default vertex shader                                            //
+////////////////////////////////////////////////////////////////////////////////
+const textVertexShaderSrc = [
+    "attribute vec3 vertexPos;",
+    "attribute vec2 vertexColor;",
+    "uniform mat4 projMatrix;",
+    "uniform mat4 viewMatrix;",
+    "uniform mat4 modelMatrix;",
+    "uniform float alphaUniform;",
+    "varying vec2 texCoord;",
+    "varying float alphaValue;",
+    "void main()",
+    "{",
+    "   texCoord = vertexColor;",
+    "   alphaValue = alphaUniform;",
+    "   gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
+    "}"
+].join("\n");
+
+////////////////////////////////////////////////////////////////////////////////
 //  GUI Text default fragment shader                                          //
 ////////////////////////////////////////////////////////////////////////////////
 const textFragmentShaderSrc = [
     "precision mediump float;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
+    "varying float alphaValue;",
     "void main()",
     "{",
     "   float textAlpha = texture2D(texture, texCoord).a;",
-    "   gl_FragColor = vec4(0.9, 0.9, 0.9, textAlpha*0.9);",
+    "   gl_FragColor = vec4(0.9, 0.9, 0.9, textAlpha*alphaValue);",
     "}" ].join("\n");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -79,6 +100,8 @@ function GuiText(renderer)
     this.modelMatrix = null;
     // GuiText shader
     this.shader = null;
+    // GuiText alpha
+    this.alpha = 1.0;
 
     // GuiText parameters
     this.text = "";
@@ -260,11 +283,11 @@ GuiText.prototype = {
         this.shader = new Shader(this.renderer.gl);
         if (shaderSrc)
         {
-            this.shader.init(defaultVertexShaderSrc, shaderSrc);
+            this.shader.init(textVertexShaderSrc, shaderSrc);
         }
         else
         {
-            this.shader.init(defaultVertexShaderSrc, textFragmentShaderSrc);
+            this.shader.init(textVertexShaderSrc, textFragmentShaderSrc);
         }
 
         // Text loaded
@@ -528,6 +551,15 @@ GuiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set text alpha                                             //
+    //  param alpha : Text alpha to set                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    setAlpha: function(alpha)
+    {
+        this.alpha = alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  moveX : Translate text on X axis                                      //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -586,6 +618,7 @@ GuiText.prototype = {
             this.shader.sendProjectionMatrix(this.renderer.projMatrix);
             this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.shader.sendModelMatrix(this.modelMatrix);
+            this.shader.sendAlphaValue(this.alpha);
 
             // Bind texture
             this.renderer.gl.bindTexture(
