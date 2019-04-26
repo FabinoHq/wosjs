@@ -387,7 +387,8 @@ Wos.prototype = {
         this.renderer.clear();
 
         this.test.resetMatrix();
-        this.test.setAlpha(0.94);
+        this.test.setColor(0.9, 0.9, 0.9);
+        this.test.setAlpha(0.9);
         this.test.render();
     }
 };

@@ -582,6 +582,19 @@ GuiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setColor : Set text color                                             //
+    //  param r : Text red color channel to set                               //
+    //  param g : Text blue color channel to set                              //
+    //  param b : Text green color channel to set                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setColor: function(r, g, b)
+    {
+        this.color.vec[0] = r;
+        this.color.vec[1] = g;
+        this.color.vec[2] = b;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  moveX : Translate text on X axis                                      //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -641,6 +654,7 @@ GuiText.prototype = {
             this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.shader.sendModelMatrix(this.modelMatrix);
             this.shader.sendAlphaValue(this.alpha);
+            this.shader.sendUniformVec3(this.colorUniform, this.color.vec);
 
             // Bind texture
             this.renderer.gl.bindTexture(
