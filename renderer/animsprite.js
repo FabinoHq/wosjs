@@ -58,6 +58,8 @@ function AnimSprite(renderer)
     this.texture = null;
     // Animated sprite model matrix
     this.modelMatrix = null;
+    // Animated sprite alpha
+    this.alpha = 1.0;
 
     // Animated sprite texture UV size
     this.usize = 1.0;
@@ -161,6 +163,15 @@ AnimSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set animated sprite alpha                                  //
+    //  param alpha : Animated sprite alpha to set                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setAlpha: function(alpha)
+    {
+        this.alpha = alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  moveX : Translate animated sprite on X axis                           //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -258,6 +269,7 @@ AnimSprite.prototype = {
             this.renderer.shader.sendProjectionMatrix(this.renderer.projMatrix);
             this.renderer.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.renderer.shader.sendModelMatrix(this.modelMatrix);
+            this.renderer.shader.sendAlphaValue(this.alpha);
 
             // Bind texture
             this.texture.bind();
