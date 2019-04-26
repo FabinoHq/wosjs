@@ -37,14 +37,14 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      math/vector_2.js : 2D vector management                               //
+//      math/vector_2.js : 2 components vector management                     //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Vector2D class definition                                                 //
+//  Vector2 class definition                                                  //
 ////////////////////////////////////////////////////////////////////////////////
-function Vector2D(x, y)
+function Vector2(x, y)
 {
     // 2 components vector representation
     this.vec = new GLArrayDataType(2);
@@ -52,7 +52,7 @@ function Vector2D(x, y)
     this.vec[1] = y;
 }
 
-Vector2D.prototype = {
+Vector2.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  reset : Reset vector to zero                                          //
     ////////////////////////////////////////////////////////////////////////////

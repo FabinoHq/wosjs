@@ -37,14 +37,14 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      math/vector_3.js : 3D vector management                               //
+//      math/vector_3.js : 3 components vector management                     //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Vector3D class definition                                                 //
+//  Vector3 class definition                                                  //
 ////////////////////////////////////////////////////////////////////////////////
-function Vector3D(x, y, z)
+function Vector3(x, y, z)
 {
     // 3 components vector representation
     this.vec = new GLArrayDataType(3);
@@ -53,7 +53,7 @@ function Vector3D(x, y, z)
     this.vec[2] = z;
 }
 
-Vector3D.prototype = {
+Vector3.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  reset : Reset vector to zero                                          //
     ////////////////////////////////////////////////////////////////////////////

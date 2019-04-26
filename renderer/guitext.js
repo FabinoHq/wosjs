@@ -113,7 +113,7 @@ function GuiText(renderer)
     // GuiText alpha
     this.alpha = 1.0;
     // GuiText color
-    this.color = new Vector3D(1.0, 1.0, 1.0);
+    this.color = new Vector3(1.0, 1.0, 1.0);
 
     // GuiText parameters
     this.fontsize = 20.0;
