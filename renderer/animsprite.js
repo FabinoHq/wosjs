@@ -217,51 +217,46 @@ AnimSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  compute : Compute animated sprite                                     //
-    ////////////////////////////////////////////////////////////////////////////
-    compute: function(frametime)
-    {
-        // Update current animation time
-        this.currentTime += frametime;
-        if (this.currentTime >= this.frametime)
-        {
-            // Compute frame offset
-            if (this.currentX < (this.countX-1))
-            {
-                ++this.currentX;
-            }
-            else
-            {
-                if (this.currentY < (this.countY-1))
-                {
-                    this.currentX = 0;
-                    ++this.currentY;
-                }
-                else
-                {
-                    this.currentX = 0;
-                    this.currentY = 0;
-                }
-            }
-
-            // Update vertex buffer texture coordinates     
-            this.vertexBuffer.updateTexcoords(
-                this.currentX*this.usize, 1.0-((this.currentY+1)*this.vsize),
-                (this.currentX+1)*this.usize, 1.0-(this.currentY*this.vsize)
-            );
-
-            // Reset timer
-            this.currentTime = 0.0;
-        }
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  render : Render animated sprite                                       //
+    //  param frametime : Frametime for animation update                      //
     ////////////////////////////////////////////////////////////////////////////
-    render: function()
+    render: function(frametime)
     {
         if (this.loaded)
         {
+            // Update current animation time
+            this.currentTime += frametime;
+            if (this.currentTime >= this.frametime)
+            {
+                // Compute frame offset
+                if (this.currentX < (this.countX-1))
+                {
+                    ++this.currentX;
+                }
+                else
+                {
+                    if (this.currentY < (this.countY-1))
+                    {
+                        this.currentX = 0;
+                        ++this.currentY;
+                    }
+                    else
+                    {
+                        this.currentX = 0;
+                        this.currentY = 0;
+                    }
+                }
+
+                // Update vertex buffer texture coordinates     
+                this.vertexBuffer.updateTexcoords(
+                    this.currentX*this.usize, 1.0-((this.currentY+1)*this.vsize),
+                    (this.currentX+1)*this.usize, 1.0-(this.currentY*this.vsize)
+                );
+
+                // Reset timer
+                this.currentTime = 0.0;
+            }
+
             // Bind default shader
             this.renderer.shader.bind();
 
