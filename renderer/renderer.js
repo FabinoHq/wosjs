@@ -235,8 +235,8 @@ Renderer.prototype = {
 
         // Set projection matrix
         this.projMatrix.setOrthographic(
-            0, WOSWidth,
-            0, WOSHeight,
+            -1.0, 1.0,
+            -1.0, 1.0,
             0.001, 5000.0
         );
         this.projMatrix.translateZ(-1.0);

@@ -47,12 +47,8 @@
 var wos = null;
 
 ////////////////////////////////////////////////////////////////////////////////
-//  WOS Global frame size                                                     //
+//  WOS frame maximum ratio                                                   //
 ////////////////////////////////////////////////////////////////////////////////
-const WOSWidth = 2048;
-const WOSHeight = 1152;
-const WOSInvWidth = (1.0/WOSWidth);
-const WOSInvHeight = (1.0/WOSHeight);
 const WOSRatioXMax = 2.0;
 const WOSRatioYMax = 0.7;
 
@@ -359,12 +355,12 @@ Wos.prototype = {
     {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
-        this.curMouseX = ((this.mouseX/this.renderer.getWidth())*WOSWidth);
-        this.curMouseY = ((this.mouseY/this.renderer.getHeight())*WOSHeight);
+        this.curMouseX = ((this.mouseX/this.renderer.getWidth())*2.0);
+        this.curMouseY = ((this.mouseY/this.renderer.getHeight())*2.0);
         this.realMouseX = (this.mouseX-this.renderer.getViewportOffsetX())/
-                            this.renderer.getViewportWidth()*WOSWidth;
+                            this.renderer.getViewportWidth()*2.0;
         this.realMouseY = (this.mouseY-this.renderer.getViewportOffsetY())/
-                            this.renderer.getViewportHeight()*WOSHeight;
+                            this.renderer.getViewportHeight()*2.0;
     },
 
     ////////////////////////////////////////////////////////////////////////////
