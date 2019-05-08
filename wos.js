@@ -47,10 +47,12 @@
 var wos = null;
 
 ////////////////////////////////////////////////////////////////////////////////
-//  WOS frame maximum ratio                                                   //
+//  WOS frame ratios                                                          //
 ////////////////////////////////////////////////////////////////////////////////
 const WOSRatioXMax = 2.0;
 const WOSRatioYMax = 0.7;
+const WOSRatioInvX = 0.0010;
+const WOSRatioInvY = 0.0018;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Default callback timeout (60Hz)                                           //

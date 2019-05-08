@@ -195,13 +195,13 @@ GuiText.prototype = {
             this.height = Math.ceil(height);
         }
         // Clamp to minimum and maximum text field height
-        if (this.height <= 20) { this.height = 20; }
+        if (this.height <= 15) { this.height = 15; }
         if (this.height >= 240) { this.height = 240; }
 
         // Set font size based on text field height
         this.fontsize = this.height*0.8;
-        if (this.fontsize <= 10.0) { this.fontsize = 10.0; }
-        if (this.fontsize >= 200.0) { this.fontsize = 200.0; }
+        if (this.fontsize <= 12.0) { this.fontsize = 12.0; }
+        if (this.fontsize >= 192.0) { this.fontsize = 192.0; }
 
         // Check renderer pointer
         if (!this.renderer)
@@ -235,8 +235,9 @@ GuiText.prototype = {
         this.width = Math.ceil(
             this.renderer.getTextWidth(this.text, this.fontsize)
         );
+        // Clamp text width
         if (this.width <= 1) { this.width = 1; }
-        if (this.width >= WOSWidth) { this.width = WOSWidth; }
+        if (this.width >= 2048) { this.width = 2048; }
 
         // Get char sizes
         this.charsizes = new Array();
@@ -293,7 +294,9 @@ GuiText.prototype = {
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
         // Update vertex buffer     
-        this.vertexBuffer.setPlane(this.width, this.height);
+        this.vertexBuffer.setPlane(
+            this.width*WOSRatioInvX, this.height*WOSRatioInvY
+        );
 
         // Init shader
         this.shader = new Shader(this.renderer.gl);
