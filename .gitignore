@@ -4,6 +4,7 @@
 # Global files
 !.gitignore
 !README.md
+!LICENSE
 
 # Sources files
 !index.html
