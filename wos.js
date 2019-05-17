@@ -365,11 +365,11 @@ Wos.prototype = {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         this.curMouseX = ((this.mouseX/this.renderer.getWidth())*2.0)-1.0;
-        this.curMouseY = ((this.mouseY/this.renderer.getHeight())*2.0)-1.0;
+        this.curMouseY = -((this.mouseY/this.renderer.getHeight())*2.0)+1.0;
         this.realMouseX = ((this.mouseX-this.renderer.getViewportOffsetX())/
                             this.renderer.getViewportWidth()*2.0)-1.0;
-        this.realMouseY = ((this.mouseY-this.renderer.getViewportOffsetY())/
-                            this.renderer.getViewportHeight()*2.0)-1.0;
+        this.realMouseY = -((this.mouseY-this.renderer.getViewportOffsetY())/
+                            this.renderer.getViewportHeight()*2.0)+1.0;
     },
 
     ////////////////////////////////////////////////////////////////////////////
