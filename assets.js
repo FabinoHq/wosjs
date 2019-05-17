@@ -43,7 +43,8 @@
 
 // WOS textures assets
 var TexturesAssets = [
-    "cursor.png"
+    "cursor.png",
+    "testsprite.png"
 ];
 
 // WOS sounds assets

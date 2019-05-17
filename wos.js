@@ -215,6 +215,9 @@ function Wos()
     this.audio = null;
     // WOS assets loader
     this.loader = null;
+
+    // Test sprite
+    this.testsprite = null;
 }
 
 
@@ -254,10 +257,15 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     initDone: function()
     {
+        // Play test sound
         if (this.audio.enabled)
         {
             this.loader.getSound("test.wav").play();
         }
+
+        // Init test sprite
+        this.testsprite = new Sprite(this.renderer);
+        this.testsprite.init(this.loader.getTexture("testsprite.png"));
 
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
@@ -380,6 +388,9 @@ Wos.prototype = {
     {
         // Clear renderer
         this.renderer.clear();
+
+        // Render test sprite
+        this.testsprite.render();
     }
 };
 
