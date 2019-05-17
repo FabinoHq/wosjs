@@ -40,7 +40,9 @@
 !fonts/wosfont.otf
 
 # Textures files
+!textures
 !textures/cursor.png
+!textures/testsprite.png
 
 # Sounds files
 !sounds/test.wav
