@@ -390,6 +390,7 @@ Wos.prototype = {
         this.renderer.clear();
 
         // Render test sprite
+        this.testsprite.resetMatrix();
         this.testsprite.render();
     }
 };
