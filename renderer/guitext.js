@@ -295,7 +295,7 @@ GuiText.prototype = {
 
         // Update vertex buffer     
         this.vertexBuffer.setPlane(
-            this.width*WOSRatioInvX, this.height*WOSRatioInvY
+            this.width, this.height
         );
 
         // Init shader

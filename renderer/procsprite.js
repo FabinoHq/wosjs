@@ -108,7 +108,7 @@ ProcSprite.prototype = {
         }
 
         // Update vbo
-        this.vertexBuffer.setPlane(width*WOSRatioInvX, height*WOSRatioInvY);
+        this.vertexBuffer.setPlane(width, height);
 
         // Init shader
         this.shader = new Shader(this.renderer.gl);
@@ -144,7 +144,7 @@ ProcSprite.prototype = {
     setSize: function(width, height)
     {
         // Update vbo
-        this.vertexBuffer.setPlane(width*WOSRatioInvX, height*WOSRatioInvY);
+        this.vertexBuffer.setPlane(width, height);
     },
 
     ////////////////////////////////////////////////////////////////////////////
