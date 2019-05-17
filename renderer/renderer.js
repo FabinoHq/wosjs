@@ -210,13 +210,16 @@ Renderer.prototype = {
         // Aspect ratio clamping
         this.vpwidth = this.width;
         this.vpheight = this.height;
-        if (this.vpwidth >= this.vpheight*WOSRatioXMax)
+        if (WOSRatioMaxClamping)
         {
-            this.vpwidth = this.vpheight*WOSRatioXMax;
-        }
-        if (this.vpheight >= this.vpwidth*WOSRatioYMax)
-        {
-            this.vpheight = this.vpwidth*WOSRatioYMax;
+            if (this.vpwidth >= this.vpheight*WOSRatioXMax)
+            {
+                this.vpwidth = this.vpheight*WOSRatioXMax;
+            }
+            if (this.vpheight >= this.vpwidth*WOSRatioYMax)
+            {
+                this.vpheight = this.vpwidth*WOSRatioYMax;
+            }
         }
         if (this.vpwidth <= 1.0) { this.vpwidth = 1.0; }
         if (this.vpheight <= 1.0) { this.vpheight = 1.0; }
@@ -273,13 +276,16 @@ Renderer.prototype = {
         // Aspect ratio clamping
         this.vpwidth = this.width;
         this.vpheight = this.height;
-        if (this.vpwidth >= this.vpheight*WOSRatioXMax)
+        if (WOSRatioMaxClamping)
         {
-            this.vpwidth = this.vpheight*WOSRatioXMax;
-        }
-        if (this.vpheight >= this.vpwidth*WOSRatioYMax)
-        {
-            this.vpheight = this.vpwidth*WOSRatioYMax;
+            if (this.vpwidth >= this.vpheight*WOSRatioXMax)
+            {
+                this.vpwidth = this.vpheight*WOSRatioXMax;
+            }
+            if (this.vpheight >= this.vpwidth*WOSRatioYMax)
+            {
+                this.vpheight = this.vpwidth*WOSRatioYMax;
+            }
         }
         if (this.vpwidth <= 1.0) { this.vpwidth = 1.0; }
         if (this.vpheight <= 1.0) { this.vpheight = 1.0; }
