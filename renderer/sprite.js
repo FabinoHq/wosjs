@@ -122,8 +122,8 @@ Sprite.prototype = {
 
         // Update vertex buffer     
         this.vertexBuffer.setPlane(
-            this.texture.width*this.usize*WOSRatioInvX,
-            this.texture.height*this.vsize*WOSRatioInvY
+            this.usize,
+            this.vsize
         );
         this.vertexBuffer.updateTexcoords(
             this.uoffset, 1.0-(this.voffset+this.vsize),

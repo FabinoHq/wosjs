@@ -236,7 +236,7 @@ Renderer.prototype = {
         // Set projection matrix
         this.projMatrix.setOrthographic(
             -1.0, 1.0,
-            -1.0, 1.0,
+            1.0, -1.0,
             0.001, 5000.0
         );
         this.projMatrix.translateZ(-1.0);
@@ -368,9 +368,8 @@ Renderer.prototype = {
         this.offCanvas.height = height;
 
         // Draw text
-        this.offContext.scale(1.0, -1.0);
         this.offContext.font = fontsize.toString() + "px wosfont";
-        this.offContext.fillText(text, 0, (-0.27*fontsize));
+        this.offContext.fillText(text, 0, 0);
 
         // Get pixels data
         textData = this.offContext.getImageData(0, 0, width, height);
@@ -395,8 +394,7 @@ Renderer.prototype = {
         this.offCanvas.height = height;
 
         // Create image context
-        this.offContext.scale(1.0, -1.0);
-        this.offContext.drawImage(image, 0, -height);
+        this.offContext.drawImage(image, 0, 0);
 
         // Get pixels data
         imageData = this.offContext.getImageData(0, 0, width, height);
