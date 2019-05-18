@@ -776,13 +776,13 @@ GuiTextBox.prototype = {
             this.textbox.resetMatrix();
             this.textbox.moveX(this.posx);
             this.textbox.moveY(this.posy);
-            this.textbox.draw(0.0, 0.0, 0.0);
+            this.textbox.render(0.0, 0.0, 0.0);
 
             // Render text
             this.guitext.resetMatrix();
             this.guitext.moveX(this.posx+(this.height*0.04));
             this.guitext.moveY(this.posy+(this.height*0.05));
-            this.guitext.draw();
+            this.guitext.render();
 
             if (this.selected)
             {
@@ -795,7 +795,7 @@ GuiTextBox.prototype = {
                         Math.min(this.selStartOffset, this.selEndOffset)
                     );
                     this.textsel.moveY(this.posy);
-                    this.textsel.draw(0.0, 0.0, 0.0);
+                    this.textsel.render(0.0, 0.0, 0.0);
                 }
                 else
                 {
@@ -805,7 +805,7 @@ GuiTextBox.prototype = {
                         this.posx+this.cursorOffset+(this.height*0.01)
                     );
                     this.textcursor.moveY(this.posy+(this.height*0.02));
-                    this.textcursor.draw(0.0, 0.0, 0.0);
+                    this.textcursor.render(0.0, 0.0, 0.0);
                 }
             }
         }

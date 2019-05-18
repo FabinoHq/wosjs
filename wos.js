@@ -280,6 +280,10 @@ Wos.prototype = {
         this.testtext = new GuiText(this.renderer);
         this.testtext.init("Test text");
 
+        // init test text box
+        this.testtextbox = new GuiTextBox(this.renderer);
+        this.testtextbox.init(0.5, 0.2, "Test");
+
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
         this.loaded = true;
@@ -419,6 +423,9 @@ Wos.prototype = {
         //this.testtext.moveX(-this.testtext.getWidth()/2.0);
         //this.testtext.moveY(-this.testtext.getHeight()/2.0);
         //this.testtext.render();
+
+        // Render test text box
+        this.testtextbox.render();
     }
 };
 
