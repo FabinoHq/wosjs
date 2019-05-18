@@ -180,7 +180,7 @@ GuiTextBox.prototype = {
         this.guitext.init(text, this.height*0.9, hide, textShader);
 
         // Check text size
-        if (this.guitext.getWidth() > this.width-(2.0+this.height*0.08))
+        if (this.guitext.getWidth() > this.width-(0.002+this.height*0.008))
         {
             this.guitext.setText("");
         }
@@ -197,7 +197,7 @@ GuiTextBox.prototype = {
         this.textcursor = new ProcSprite(this.renderer);
         this.textcursor.init(
             textcursorFragmentShaderSrc,
-            (1.0+this.height*0.05), (this.height*0.96)
+            (0.001+this.height*0.0005), (this.height*0.0096)
         );
 
         // Get initial cursor position
@@ -219,7 +219,7 @@ GuiTextBox.prototype = {
         {
             this.guitext.setText(text);
             // Check text size
-            if (this.guitext.getWidth() > this.width-(2.0+this.height*0.08))
+            if (this.guitext.getWidth() > this.width-(0.002+this.height*0.008))
             {
                 this.guitext.setText("");
             }
@@ -424,7 +424,7 @@ GuiTextBox.prototype = {
             }
 
             if (this.guitext.getNextWidth(character)
-                <= this.width-(2.0+this.height*0.08))
+                <= this.width-(0.002+this.height*0.008))
             {
                 this.guitext.addCharacter(this.cursorPos, character);
                 ++this.cursorPos;
@@ -499,7 +499,7 @@ GuiTextBox.prototype = {
             case "Shift":
                 this.holdShift = true;
                 break;
-            case ' ': case "Spacebar":
+            case "Spacebar": case ' ':
                 this.addCharacter(' ');
                 break;
             case "ArrowLeft": case "Left":
