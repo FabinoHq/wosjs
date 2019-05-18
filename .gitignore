@@ -22,6 +22,7 @@
 !math/vector_3.js
 !math/matrix_4_4.js
 
+!renderer/
 !renderer/animsprite.js
 !renderer/renderer.js
 !renderer/vertexbuffer.js
@@ -32,6 +33,7 @@
 !renderer/procsprite.js
 !renderer/view.js
 !renderer/guitext.js
+!renderer/guitextbox.js
 
 !audio/audioengine.js
 !audio/sound.js
