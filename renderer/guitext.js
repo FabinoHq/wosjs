@@ -245,7 +245,7 @@ GuiText.prototype = {
 
         // Clamp text width
         if (this.width <= 0.001) { this.width = 0.001; }
-        if (this.width >= 2.0) { this.width = 2.0; }
+        if (this.width >= 1.8) { this.width = 1.8; }
 
         // Get char sizes
         this.charsizes = new Array();
