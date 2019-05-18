@@ -84,6 +84,11 @@ const textFragmentShaderSrc = [
 ////////////////////////////////////////////////////////////////////////////////
 const HiddenTextPassCharacter = "\u2022";
 
+////////////////////////////////////////////////////////////////////////////////
+//  Default font settings                                                     //
+////////////////////////////////////////////////////////////////////////////////
+const WOSDefaultFontCharsizeFactor = 0.00092;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  GuiText class definition                                                  //
@@ -232,9 +237,9 @@ GuiText.prototype = {
         }
 
         // Set text width
-        this.width = 0.00092*this.renderer.getTextWidth(
+        this.width = this.renderer.getTextWidth(
             this.text, this.fontsize
-        );
+        )*WOSDefaultFontCharsizeFactor;
 
         // Clamp text width
         if (this.width <= 0.001) { this.width = 0.001; }
@@ -244,9 +249,9 @@ GuiText.prototype = {
         this.charsizes = new Array();
         for (i = 0; i <= this.textLength; ++i)
         {
-            this.charsizes[i] = 0.00092*this.renderer.getTextWidth(
+            this.charsizes[i] = this.renderer.getTextWidth(
                 this.text.substring(0, i), this.fontsize
-            );
+            )*WOSDefaultFontCharsizeFactor;
         }
 
         // Render text
@@ -356,9 +361,9 @@ GuiText.prototype = {
         }
 
         // Set text width
-        this.width = 0.00092*this.renderer.getTextWidth(
+        this.width = this.renderer.getTextWidth(
             this.text, this.fontsize
-        );
+        )*WOSDefaultFontCharsizeFactor;
 
         // Clamp text width
         if (this.width <= 0.001) { this.width = 0.001; }
@@ -368,9 +373,9 @@ GuiText.prototype = {
         this.charsizes = new Array();
         for (i = 0; i <= this.textLength; ++i)
         {
-            this.charsizes[i] = 0.00092*this.renderer.getTextWidth(
+            this.charsizes[i] = this.renderer.getTextWidth(
                 this.text.substring(0, i), this.fontsize
-            );
+            )*WOSDefaultFontCharsizeFactor;
         }
 
         // Render text
