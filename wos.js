@@ -283,6 +283,7 @@ Wos.prototype = {
         // init test text box
         this.testtextbox = new GuiTextBox(this.renderer);
         this.testtextbox.init(0.5, 0.2, "Test");
+        this.testtextbox.setSelected(true);
 
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
@@ -320,7 +321,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     handleKeyDown: function(key)
     {
-
+        if (this.testtextbox) this.testtextbox.keyPress(key);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -329,7 +330,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     handleKeyUp: function(key)
     {
-
+        if (this.testtextbox) this.testtextbox.keyRelease(key);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -340,6 +341,7 @@ Wos.prototype = {
     handleMouseMove: function(mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
+        if (this.testtextbox) this.testtextbox.mouseMove(mouseX, mouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -349,6 +351,7 @@ Wos.prototype = {
     handleMouseDown: function(button, mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
+        if (this.testtextbox) this.testtextbox.mousePress(mouseX, mouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -358,6 +361,7 @@ Wos.prototype = {
     handleMouseUp: function(button, mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
+        if (this.testtextbox) this.testtextbox.mouseRelease(mouseX, mouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////

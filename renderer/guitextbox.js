@@ -110,8 +110,8 @@ function GuiTextBox(renderer)
     this.selEndOffset = 0.0;
 
     // GuiTextBox size
-    this.width = 1;
-    this.height = 1;
+    this.width = 1.0;
+    this.height = 1.0;
     // GuiTextBox position
     this.posx = 0.0;
     this.posy = 0.0;
@@ -423,7 +423,7 @@ GuiTextBox.prototype = {
                 this.selection = false;
             }
 
-            if (this.guitext.getNextWidth(character)
+            if ((this.guitext.getNextWidth(character)*0.005)
                 <= this.width-(0.002+this.height*0.008))
             {
                 this.guitext.addCharacter(this.cursorPos, character);
