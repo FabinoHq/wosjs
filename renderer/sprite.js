@@ -127,7 +127,7 @@ Sprite.prototype = {
             return false;
         }
 
-        // Update vertex buffer     
+        // Update vertex buffer
         this.vertexBuffer.setPlane(
             this.width*this.usize,
             this.height*this.vsize
@@ -140,6 +140,22 @@ Sprite.prototype = {
         // Sprite loaded
         this.loaded = true;
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSize : Set sprite size                                             //
+    //  param width : Sprite width to set                                     //
+    //  param height : Sprite height to set                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setSize: function(width, height)
+    {
+        // Update vertex buffer
+        if (width !== undefined) { this.width = width; }
+        if (height !== undefined) { this.height = height; }
+        this.vertexBuffer.setPlane(
+            this.width*this.usize,
+            this.height*this.vsize
+        );
     },
 
     ////////////////////////////////////////////////////////////////////////////

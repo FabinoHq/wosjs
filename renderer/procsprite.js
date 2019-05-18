@@ -61,6 +61,9 @@ function ProcSprite(renderer)
     // Procedural sprite alpha
     this.alpha = 1.0;
 
+    // Procedural sprite size
+    this.width = 1.0;
+    this.height = 1.0;
     // Procedural sprite shader uniforms locations
     this.uniformTimer = -1;
     this.uniformOffsetX = -1;
@@ -81,6 +84,8 @@ ProcSprite.prototype = {
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
+        if (width !== undefined) { this.width = width; }
+        if (height !== undefined) { this.height = height; }
         this.uniformTimer = -1;
         this.uniformOffsetX = -1;
         this.uniformOffsetY = -1;
@@ -108,7 +113,7 @@ ProcSprite.prototype = {
         }
 
         // Update vbo
-        this.vertexBuffer.setPlane(width, height);
+        this.vertexBuffer.setPlane(this.width, this.height);
 
         // Init shader
         this.shader = new Shader(this.renderer.gl);
@@ -143,8 +148,28 @@ ProcSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
-        // Update vbo
-        this.vertexBuffer.setPlane(width, height);
+        // Update vertex buffer
+        if (width !== undefined) { this.width = width; }
+        if (height !== undefined) { this.height = height; }
+        this.vertexBuffer.setPlane(this.width, this.height);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getWidth : Get procedural sprite width                                //
+    //  return : Procedural sprite width                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    getWidth: function()
+    {
+        return this.width;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHeight : Get procedural sprite height                              //
+    //  return : Procedural sprite height                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    getHeight: function()
+    {
+        return this.height;
     },
 
     ////////////////////////////////////////////////////////////////////////////
