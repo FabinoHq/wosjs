@@ -270,7 +270,7 @@ Wos.prototype = {
 
         // Init test text
         this.testtext = new GuiText(this.renderer);
-        this.testtext.init("Test text", 0.2);
+        this.testtext.init("Test text");
 
         // Run WOS
         this.lastTime = window.performance.now()*0.001;

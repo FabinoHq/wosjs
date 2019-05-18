@@ -123,9 +123,9 @@ function GuiText(renderer)
     this.color = new Vector3(1.0, 1.0, 1.0);
 
     // GuiText parameters
-    this.fontsize = 20.0;
-    this.width = 1;
-    this.height = 1;
+    this.fontsize = 40.0;
+    this.width = 0.05;
+    this.height = 0.05;
     this.textLength = 0;
 
     // Characters sizes array
@@ -161,9 +161,9 @@ GuiText.prototype = {
         this.colorR = 1.0;
         this.colorG = 1.0;
         this.colorB = 1.0;
-        this.fontsize = 20.0;
-        this.width = 1.0;
-        this.height = 1.0;
+        this.fontsize = 40.0;
+        this.width = 0.05;
+        this.height = 0.05;
         this.textLength = 0;
         this.charsizes = null;
         this.hidden = false;
