@@ -155,8 +155,8 @@ GuiText.prototype = {
         this.colorG = 1.0;
         this.colorB = 1.0;
         this.fontsize = 20.0;
-        this.width = 1;
-        this.height = 1;
+        this.width = 1.0;
+        this.height = 1.0;
         this.textLength = 0;
         this.charsizes = null;
         this.hidden = false;
@@ -192,16 +192,16 @@ GuiText.prototype = {
         // Set text field height
         if (height !== undefined)
         {
-            this.height = Math.ceil(height);
+            this.height = height;
         }
         // Clamp to minimum and maximum text field height
-        if (this.height <= 15) { this.height = 15; }
-        if (this.height >= 240) { this.height = 240; }
+        if (this.height <= 0.015) { this.height = 0.015; }
+        if (this.height >= 0.5) { this.height = 0.5; }
 
         // Set font size based on text field height
-        this.fontsize = this.height*0.8;
+        this.fontsize = this.height*800.0;
         if (this.fontsize <= 12.0) { this.fontsize = 12.0; }
-        if (this.fontsize >= 192.0) { this.fontsize = 192.0; }
+        if (this.fontsize >= 400.0) { this.fontsize = 400.0; }
 
         // Check renderer pointer
         if (!this.renderer)
@@ -232,25 +232,26 @@ GuiText.prototype = {
         }
 
         // Set text width
-        this.width = Math.ceil(
-            this.renderer.getTextWidth(this.text, this.fontsize)
+        this.width = 0.00092*this.renderer.getTextWidth(
+            this.text, this.fontsize
         );
+
         // Clamp text width
-        if (this.width <= 1) { this.width = 1; }
-        if (this.width >= 2048) { this.width = 2048; }
+        if (this.width <= 0.001) { this.width = 0.001; }
+        if (this.width >= 2.0) { this.width = 2.0; }
 
         // Get char sizes
         this.charsizes = new Array();
         for (i = 0; i <= this.textLength; ++i)
         {
-            this.charsizes[i] = this.renderer.getTextWidth(
+            this.charsizes[i] = 0.00092*this.renderer.getTextWidth(
                 this.text.substring(0, i), this.fontsize
             );
         }
 
         // Render text
         pixelsData = this.renderer.renderText(
-            this.text, this.width, this.height, this.fontsize
+            this.text, this.width*1100.0, this.height*920.0, this.fontsize
         );
 
         // Create texture
@@ -263,7 +264,7 @@ GuiText.prototype = {
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
         this.renderer.gl.texImage2D(
             this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            this.width, this.height, 0,
+            this.width*1100.0, this.height*920.0, 0,
             this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
         );
 
@@ -355,30 +356,33 @@ GuiText.prototype = {
         }
 
         // Set text width
-        this.width = Math.ceil(
-            this.renderer.getTextWidth(this.text, this.fontsize)
+        this.width = 0.00092*this.renderer.getTextWidth(
+            this.text, this.fontsize
         );
-        if (this.width <= 1) { this.width = 1; }
+
+        // Clamp text width
+        if (this.width <= 0.001) { this.width = 0.001; }
+        if (this.width >= 2.0) { this.width = 2.0; }
 
         // Get char sizes
         this.charsizes = new Array();
         for (i = 0; i <= this.textLength; ++i)
         {
-            this.charsizes[i] = this.renderer.getTextWidth(
+            this.charsizes[i] = 0.00092*this.renderer.getTextWidth(
                 this.text.substring(0, i), this.fontsize
             );
         }
 
         // Render text
         pixelsData = this.renderer.renderText(
-            this.text, this.width, this.height, this.fontsize
+            this.text, this.width*1100.0, this.height*920.0, this.fontsize
         );
 
         // Update texture data
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
         this.renderer.gl.texImage2D(
             this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            this.width, this.height, 0,
+            this.width*1100.0, this.height*920.0, 0,
             this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
         );
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);

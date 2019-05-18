@@ -217,6 +217,8 @@ function Wos()
 
     // Test sprite
     this.testsprite = null;
+    // Test text
+    this.testtext = null;
 }
 
 
@@ -265,6 +267,10 @@ Wos.prototype = {
         // Init test sprite
         this.testsprite = new Sprite(this.renderer);
         this.testsprite.init(this.loader.getTexture("testsprite.png"));
+
+        // Init test text
+        this.testtext = new GuiText(this.renderer);
+        this.testtext.init("Test text", 0.2);
 
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
@@ -390,7 +396,11 @@ Wos.prototype = {
 
         // Render test sprite
         this.testsprite.resetMatrix();
-        this.testsprite.render();
+        //this.testsprite.render();
+
+        // Render test text
+        this.testtext.resetMatrix();
+        this.testtext.render();
     }
 };
 

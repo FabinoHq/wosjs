@@ -375,7 +375,7 @@ Renderer.prototype = {
 
         // Draw text
         this.offContext.font = fontsize.toString() + "px wosfont";
-        this.offContext.fillText(text, 0, 0);
+        this.offContext.fillText(text, 0, (0.84*fontsize));
 
         // Get pixels data
         textData = this.offContext.getImageData(0, 0, width, height);
