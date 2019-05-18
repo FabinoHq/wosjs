@@ -266,7 +266,9 @@ Wos.prototype = {
 
         // Init test sprite
         this.testsprite = new Sprite(this.renderer);
-        this.testsprite.init(this.loader.getTexture("testsprite.png"));
+        this.testsprite.init(
+            this.loader.getTexture("testsprite.png"), 0.05, 0.09
+        );
 
         // Init test text
         this.testtext = new GuiText(this.renderer);
@@ -396,11 +398,15 @@ Wos.prototype = {
 
         // Render test sprite
         this.testsprite.resetMatrix();
-        //this.testsprite.render();
+        this.testsprite.moveX(-this.testsprite.getWidth()/2.0);
+        this.testsprite.moveY(-this.testsprite.getHeight()/2.0);
+        this.testsprite.render();
 
         // Render test text
         this.testtext.resetMatrix();
-        this.testtext.render();
+        //this.testtext.moveX(-this.testtext.getWidth()/2.0);
+        //this.testtext.moveY(-this.testtext.getHeight()/2.0);
+        //this.testtext.render();
     }
 };
 

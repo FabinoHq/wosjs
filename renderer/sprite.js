@@ -61,6 +61,9 @@ function Sprite(renderer)
     // Sprite alpha
     this.alpha = 1.0;
 
+    // Sprite size
+    this.width = 1.0;
+    this.height = 1.0;
     // Sprite texture UV offset
     this.uoffset = 0.0;
     this.voffset = 0.0;
@@ -73,18 +76,22 @@ Sprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init sprite                                                    //
     //  param tex : Texture pointer                                           //
+    //  param width : Sprite width                                            //
+    //  param height : Sprite height                                          //
     //  param uoffset : Sprite texture U offset                               //
     //  param voffset : Sprite texture V offset                               //
     //  param usize : Sprite texture U size                                   //
     //  param vsize : Sprite texture V size                                   //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(tex, uoffset, voffset, usize, vsize)
+    init: function(tex, width, height, uoffset, voffset, usize, vsize)
     {
         // Reset sprite
         this.loaded = false;
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
+        if (width !== undefined) { this.width = width; }
+        if (height !== undefined) { this.height = height; }
         if (uoffset !== undefined) { this.uoffset = uoffset; }
         if (voffset !== undefined) { this.voffset = voffset; }
         if (usize !== undefined) { this.usize = usize; }
@@ -122,8 +129,8 @@ Sprite.prototype = {
 
         // Update vertex buffer     
         this.vertexBuffer.setPlane(
-            this.usize,
-            this.vsize
+            this.width*this.usize,
+            this.height*this.vsize
         );
         this.vertexBuffer.updateTexcoords(
             this.uoffset, 1.0-(this.voffset+this.vsize),
@@ -133,6 +140,24 @@ Sprite.prototype = {
         // Sprite loaded
         this.loaded = true;
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getWidth : Get sprite width                                           //
+    //  return : Sprite width                                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    getWidth: function()
+    {
+        return this.width;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHeight : Get sprite height                                         //
+    //  return : Sprite height                                                //
+    ////////////////////////////////////////////////////////////////////////////
+    getHeight: function()
+    {
+        return this.height;
     },
 
     ////////////////////////////////////////////////////////////////////////////
