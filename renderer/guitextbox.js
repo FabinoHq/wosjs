@@ -80,14 +80,26 @@ const textcursorFragmentShaderSrc = [
 ////////////////////////////////////////////////////////////////////////////////
 function GuiTextBox(renderer)
 {
+    // GuiTextBox loaded state
     this.loaded = false;
+
+    // Renderer pointer
     this.renderer = renderer;
+
+    // GuiText pointer
     this.guitext = null;
+
+    // Procedural sprites
     this.textbox = null;
     this.textsel = null;
     this.textcursor = null;
+
+    // Cursor position
     this.cursorPos = 0;
+    // Cursor offset
     this.cursorOffset = 0.0;
+
+    // GuiTextBox states
     this.selected = false;
     this.pressed = false;
     this.selection = false;
@@ -96,15 +108,27 @@ function GuiTextBox(renderer)
     this.selStartOffset = 0.0;
     this.selEnd = 0;
     this.selEndOffset = 0.0;
+
+    // GuiTextBox size
     this.width = 1;
     this.height = 1;
+    // GuiTextBox position
     this.posx = 0.0;
     this.posy = 0.0;
 }
 
 GuiTextBox.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  init : Init GUI TextBox                                               //
+    //  param width : TextBox field width                                     //
+    //  param height : TextBox field height                                   //
+    //  param text : Text to set                                              //
+    //  param hide : Text hide mode                                           //
+    //  param textShader : Text fragment shader source to use                 //
+    ////////////////////////////////////////////////////////////////////////////
     init: function(width, height, text, hide, textShader)
     {
+        // Reset GuiTextBox
         this.loaded = false;
         this.guitext = null;
         this.textbox = null;
@@ -120,24 +144,24 @@ GuiTextBox.prototype = {
         this.selStartOffset = 0.0;
         this.selEnd = 0;
         this.selEndOffset = 0.0;
-        this.width = 1;
-        this.height = 1;
+        this.width = 1.0;
+        this.height = 1.0;
         this.posx = 0.0;
         this.posy = 0.0;
 
         // Set width and height
         if (width !== undefined)
         {
-            this.width = Math.ceil(width);
+            this.width = width;
         }
-        if (this.width <= 20) { this.width = 20; }
-        if (this.width >= GameWidth) { this.width = GameWidth; }
+        if (this.width <= 0.001) { this.width = 0.001; }
+        if (this.width >= 1.8) { this.width = 1.8; }
         if (height !== undefined)
         {
-            this.height = Math.ceil(height);
+            this.height = height;
         }
-        if (this.height <= 20) { this.height = 20; }
-        if (this.height >= 240) { this.height = 240; }
+        if (this.height <= 0.015) { this.height = 0.015; }
+        if (this.height >= 0.55) { this.height = 0.55; }
 
         // Check renderer pointer
         if (!this.renderer)
@@ -185,6 +209,10 @@ GuiTextBox.prototype = {
         return true;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setText : Set GuiTextBox internal text string                         //
+    //  param text : Text to set                                              //
+    ////////////////////////////////////////////////////////////////////////////
     setText: function(text)
     {
         if (this.loaded)
@@ -202,6 +230,10 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSelected : Set GuiTextBox selected state                           //
+    //  param selected : GuiTextBox active selected state                     //
+    ////////////////////////////////////////////////////////////////////////////
     setSelected: function(selected)
     {
         if (selected)
@@ -214,6 +246,9 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveCursorLeft : Move GuiTextBox cursor to the left                   //
+    ////////////////////////////////////////////////////////////////////////////
     moveCursorLeft: function()
     {
         if (this.loaded && this.selected)
@@ -291,6 +326,9 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveCursorRight : Move GuiTextBox cursor to the right                 //
+    ////////////////////////////////////////////////////////////////////////////
     moveCursorRight: function()
     {
         if (this.loaded && this.selected)
@@ -368,6 +406,10 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  addCharacter : Add character to GuiTextBox                            //
+    //  param character : Character to add                                    //
+    ////////////////////////////////////////////////////////////////////////////
     addCharacter: function(character)
     {
         if (this.loaded && this.selected)
@@ -392,6 +434,9 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  eraseLeft : Erase character at left                                   //
+    ////////////////////////////////////////////////////////////////////////////
     eraseLeft: function()
     {
         if (this.loaded && this.selected)
@@ -417,6 +462,9 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  eraseRight : Erase character at right                                 //
+    ////////////////////////////////////////////////////////////////////////////
     eraseRight: function()
     {
         if (this.loaded && this.selected)
@@ -440,6 +488,10 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  keyPress : Handle key pressed event                                   //
+    //  param key : Key pressed                                               //
+    ////////////////////////////////////////////////////////////////////////////
     keyPress: function(key)
     {
         switch (key)
@@ -471,6 +523,10 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  keyPress : Handle key released event                                  //
+    //  param key : Key released                                              //
+    ////////////////////////////////////////////////////////////////////////////
     keyRelease: function(key)
     {
         if (key == "Shift")
@@ -479,6 +535,11 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  mousePress : Handle mouse press event                                 //
+    //  param mouseX : Cursor X position                                      //
+    //  param mouseY : Cursor Y position                                      //
+    ////////////////////////////////////////////////////////////////////////////
     mousePress: function(mouseX, mouseY)
     {
         var i = 0;
@@ -523,6 +584,11 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  mouseRelease : Handle mouse release event                             //
+    //  param mouseX : Cursor X position                                      //
+    //  param mouseY : Cursor Y position                                      //
+    ////////////////////////////////////////////////////////////////////////////
     mouseRelease: function(mouseX, mouseY)
     {
         var i = 0;
@@ -568,6 +634,11 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  mouseMove : Handle mouse move event                                   //
+    //  param mouseX : Cursor X position                                      //
+    //  param mouseY : Cursor Y position                                      //
+    ////////////////////////////////////////////////////////////////////////////
     mouseMove: function(mouseX, mouseY)
     {
         var i = 0;
@@ -617,50 +688,87 @@ GuiTextBox.prototype = {
         }
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  getText : Get text internal string                                    //
+    //  return : Text internal string                                         //
+    ////////////////////////////////////////////////////////////////////////////
     getText: function()
     {
         if (this.loaded) { return this.guitext.getText(); }
         else { return ""; }
     },
 
-    getSelected: function()
+    ////////////////////////////////////////////////////////////////////////////
+    //  isSelected : Get GuiTextBox selected state                            //
+    //  return : True if the text box is selected, false otherwise            //
+    ////////////////////////////////////////////////////////////////////////////
+    isSelected: function()
     {
         return this.selected;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPosition : Set GuiTextBox position                                 //
+    //  param x : X position to set                                           //
+    //  param y : Y position to set                                           //
+    ////////////////////////////////////////////////////////////////////////////
     setPosition: function(x, y)
     {
         this.posx = x;
         this.posy = y;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setX : Set GuiTextBox X position                                      //
+    //  param x : X position to set                                           //
+    ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
     {
         this.posx = x;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  setY : Set GuiTextBox Y position                                      //
+    //  param y : Y position to set                                           //
+    ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
     {
         this.posy = y;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  move : Move GuiTextBox                                                //
+    //  param x : X amount value                                              //
+    //  param y : Y amount value                                              //
+    ////////////////////////////////////////////////////////////////////////////
     move: function(x, y)
     {
         this.posx += x;
         this.posy += y;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Move GuiTextBox along X axis                                  //
+    //  param x : X amount value                                              //
+    ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
         this.posx += x;
     },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Move GuiTextBox along Y axis                                  //
+    //  param x : Y amount value                                              //
+    ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
         this.posy += y;
     },
 
-    draw: function()
+    ////////////////////////////////////////////////////////////////////////////
+    //  render : Render GuiTextBox                                            //
+    ////////////////////////////////////////////////////////////////////////////
+    render: function()
     {
         if (this.loaded)
         {
