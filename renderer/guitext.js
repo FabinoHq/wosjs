@@ -88,6 +88,8 @@ const HiddenTextPassCharacter = "\u2022";
 //  Default font settings                                                     //
 ////////////////////////////////////////////////////////////////////////////////
 const WOSDefaultFontCharsizeFactor = 0.00092;
+const WOSDefaultFontScaleXFactor = 1100.0;
+const WOSDefaultFontScaleYFactor = 920.0;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -256,7 +258,10 @@ GuiText.prototype = {
 
         // Render text
         pixelsData = this.renderer.renderText(
-            this.text, this.width*1100.0, this.height*920.0, this.fontsize
+            this.text,
+            this.width*WOSDefaultFontScaleXFactor,
+            this.height*WOSDefaultFontScaleYFactor,
+            this.fontsize
         );
 
         // Create texture
@@ -269,7 +274,8 @@ GuiText.prototype = {
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
         this.renderer.gl.texImage2D(
             this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            this.width*1100.0, this.height*920.0, 0,
+            this.width*WOSDefaultFontScaleXFactor,
+            this.height*WOSDefaultFontScaleYFactor, 0,
             this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
         );
 
@@ -380,14 +386,18 @@ GuiText.prototype = {
 
         // Render text
         pixelsData = this.renderer.renderText(
-            this.text, this.width*1100.0, this.height*920.0, this.fontsize
+            this.text,
+            this.width*WOSDefaultFontScaleXFactor,
+            this.height*WOSDefaultFontScaleYFactor,
+            this.fontsize
         );
 
         // Update texture data
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
         this.renderer.gl.texImage2D(
             this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            this.width*1100.0, this.height*920.0, 0,
+            this.width*WOSDefaultFontScaleXFactor,
+            this.height*WOSDefaultFontScaleYFactor, 0,
             this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
         );
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
