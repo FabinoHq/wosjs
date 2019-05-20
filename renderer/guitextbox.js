@@ -76,6 +76,13 @@ const textcursorFragmentShaderSrc = [
 
 
 ////////////////////////////////////////////////////////////////////////////////
+//  Default textbox settings                                                  //
+////////////////////////////////////////////////////////////////////////////////
+const WOSDefaultTextBoxCursorWidthFactor = 0.04;
+const WOSDefaultTextBoxCursorHeightFactor = 0.96;
+
+
+////////////////////////////////////////////////////////////////////////////////
 //  GuiTextBox class definition                                               //
 ////////////////////////////////////////////////////////////////////////////////
 function GuiTextBox(renderer)
@@ -197,7 +204,8 @@ GuiTextBox.prototype = {
         this.textcursor = new ProcSprite(this.renderer);
         this.textcursor.init(
             textcursorFragmentShaderSrc,
-            (0.001+this.height*0.0005), (this.height*0.0096)
+            (this.height*WOSDefaultTextBoxCursorWidthFactor),
+            (this.height*WOSDefaultTextBoxCursorHeightFactor)
         );
 
         // Get initial cursor position
