@@ -789,8 +789,8 @@ GuiTextBox.prototype = {
 
             // Render text
             this.guitext.resetMatrix();
-            this.guitext.moveX(this.posx+(this.height*0.0004));
-            this.guitext.moveY(this.posy+(this.height*0.0005));
+            this.guitext.moveX(this.posx);
+            this.guitext.moveY(this.posy);
             this.guitext.render();
 
             if (this.selected)
@@ -800,7 +800,7 @@ GuiTextBox.prototype = {
                     // Render selection
                     this.textsel.resetMatrix();
                     this.textsel.moveX(
-                        this.posx + (this.height*0.0003) +
+                        this.posx+
                         Math.min(this.selStartOffset, this.selEndOffset)
                     );
                     this.textsel.moveY(this.posy);
