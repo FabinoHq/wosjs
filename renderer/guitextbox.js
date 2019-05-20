@@ -80,6 +80,7 @@ const textcursorFragmentShaderSrc = [
 ////////////////////////////////////////////////////////////////////////////////
 const WOSDefaultTextBoxCursorWidthFactor = 0.04;
 const WOSDefaultTextBoxCursorHeightFactor = 0.96;
+const WOSDefaultTextBoxCursorOffsetFactor = -0.02;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -810,9 +811,13 @@ GuiTextBox.prototype = {
                     // Render cursor
                     this.textcursor.resetMatrix();
                     this.textcursor.moveX(
-                        this.posx+this.cursorOffset+(this.height*0.0001)
+                        this.posx+this.cursorOffset+
+                        (this.height*WOSDefaultTextBoxCursorOffsetFactor)
                     );
-                    this.textcursor.moveY(this.posy+(this.height*0.0002));
+                    this.textcursor.moveY(
+                        this.posy+(this.height*
+                        (1.0-WOSDefaultTextBoxCursorHeightFactor)*0.5)
+                    );
                     this.textcursor.render(0.0, 0.0, 0.0);
                 }
             }
