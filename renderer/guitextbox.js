@@ -81,8 +81,8 @@ const textcursorFragmentShaderSrc = [
 const WOSDefaultTextBoxCursorWidthFactor = 0.04;
 const WOSDefaultTextBoxCursorHeightFactor = 0.96;
 const WOSDefaultTextBoxCursorOffsetFactor = -0.02;
-const WOSDefaultTextBoxCheckWidthFactor = 0.008;
-const WOSDefaultTextBoxCheckWidthOffset = 0.002;
+const WOSDefaultTextBoxCheckWidthFactor = 0.02;
+const WOSDefaultTextBoxCheckWidthOffset = 0.001;
 
 
 ////////////////////////////////////////////////////////////////////////////////
