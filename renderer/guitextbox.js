@@ -82,6 +82,7 @@ const WOSDefaultTextBoxCursorWidthFactor = 0.04;
 const WOSDefaultTextBoxCursorHeightFactor = 0.96;
 const WOSDefaultTextBoxCursorOffsetFactor = -0.02;
 const WOSDefaultTextBoxCheckWidthFactor = 0.008;
+const WOSDefaultTextBoxCheckWidthOffset = 0.002;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -190,7 +191,8 @@ GuiTextBox.prototype = {
 
         // Check text size
         if (this.guitext.getWidth() >
-            this.width-(0.002+this.height*WOSDefaultTextBoxCheckWidthFactor))
+            this.width-(WOSDefaultTextBoxCheckWidthOffset+
+            this.height*WOSDefaultTextBoxCheckWidthFactor))
         {
             this.guitext.setText("");
         }
@@ -230,8 +232,9 @@ GuiTextBox.prototype = {
         {
             this.guitext.setText(text);
             // Check text size
-            if (this.guitext.getWidth() > this.width-
-                (0.002+this.height*WOSDefaultTextBoxCheckWidthFactor))
+            if (this.guitext.getWidth() >
+                this.width-(WOSDefaultTextBoxCheckWidthOffset+
+                this.height*WOSDefaultTextBoxCheckWidthFactor))
             {
                 this.guitext.setText("");
             }
@@ -435,8 +438,9 @@ GuiTextBox.prototype = {
                 this.selection = false;
             }
 
-            if ((this.guitext.getNextWidth(character)) <= this.width-
-                (0.002+this.height*WOSDefaultTextBoxCheckWidthFactor))
+            if ((this.guitext.getNextWidth(character)) <=
+                this.width-(WOSDefaultTextBoxCheckWidthOffset+
+                this.height*WOSDefaultTextBoxCheckWidthFactor))
             {
                 this.guitext.addCharacter(this.cursorPos, character);
                 ++this.cursorPos;
