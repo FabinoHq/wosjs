@@ -81,8 +81,9 @@ const textcursorFragmentShaderSrc = [
 const WOSDefaultTextBoxCursorWidthFactor = 0.04;
 const WOSDefaultTextBoxCursorHeightFactor = 0.96;
 const WOSDefaultTextBoxCursorOffsetFactor = -0.02;
+const WOSDefaultTextBoxTextOffsetFactor = 0.025;
 const WOSDefaultTextBoxCheckWidthFactor = 0.02;
-const WOSDefaultTextBoxCheckWidthOffset = 0.001;
+const WOSDefaultTextBoxCheckWidthOffset = 0.005;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -796,7 +797,9 @@ GuiTextBox.prototype = {
 
             // Render text
             this.guitext.resetMatrix();
-            this.guitext.moveX(this.posx);
+            this.guitext.moveX(
+                this.posx+(this.height*WOSDefaultTextBoxTextOffsetFactor)
+            );
             this.guitext.moveY(this.posy);
             this.guitext.render();
 
@@ -808,6 +811,7 @@ GuiTextBox.prototype = {
                     this.textsel.resetMatrix();
                     this.textsel.moveX(
                         this.posx+
+                        (this.height*WOSDefaultTextBoxTextOffsetFactor)+
                         Math.min(this.selStartOffset, this.selEndOffset)
                     );
                     this.textsel.moveY(this.posy);
@@ -818,7 +822,9 @@ GuiTextBox.prototype = {
                     // Render cursor
                     this.textcursor.resetMatrix();
                     this.textcursor.moveX(
-                        this.posx+this.cursorOffset+
+                        this.posx+
+                        (this.height*WOSDefaultTextBoxTextOffsetFactor)+
+                        this.cursorOffset+
                         (this.height*WOSDefaultTextBoxCursorOffsetFactor)
                     );
                     this.textcursor.moveY(
