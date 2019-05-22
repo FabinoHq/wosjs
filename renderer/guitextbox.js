@@ -435,7 +435,7 @@ GuiTextBox.prototype = {
                 this.selection = false;
             }
 
-            if ((this.guitext.getNextWidth(character)*0.005) <= this.width-
+            if ((this.guitext.getNextWidth(character)) <= this.width-
                 (0.002+this.height*WOSDefaultTextBoxCheckWidthFactor))
             {
                 this.guitext.addCharacter(this.cursorPos, character);

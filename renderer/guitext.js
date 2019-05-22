@@ -524,7 +524,8 @@ GuiText.prototype = {
         {
             // Add new character width
             if (this.hidden) { character = HiddenTextPassCharacter; }
-            width += this.renderer.getTextWidth(character, this.fontsize);
+            width += this.renderer.getTextWidth(character, this.fontsize)/
+                        WOSDefaultFontScaleXFactor;
         }
 
         // Return total width
