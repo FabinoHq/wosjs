@@ -341,7 +341,8 @@ Wos.prototype = {
     handleMouseMove: function(mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
-        if (this.testtextbox) this.testtextbox.mouseMove(mouseX, mouseY);
+        if (this.testtextbox)
+            this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -351,7 +352,8 @@ Wos.prototype = {
     handleMouseDown: function(button, mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
-        if (this.testtextbox) this.testtextbox.mousePress(mouseX, mouseY);
+        if (this.testtextbox)
+            this.testtextbox.mousePress(this.realMouseX, this.realMouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -361,7 +363,8 @@ Wos.prototype = {
     handleMouseUp: function(button, mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
-        if (this.testtextbox) this.testtextbox.mouseRelease(mouseX, mouseY);
+        if (this.testtextbox)
+            this.testtextbox.mouseRelease(this.realMouseX, this.realMouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
