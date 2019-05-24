@@ -242,6 +242,56 @@ Texture.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setSmooth : Set texture smooth attribute                              //
+    //  param smooth : Texture smooth attribute                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setSmooth: function(smooth)
+    {
+        // Set texture smoothness
+        if (smooth !== undefined)
+        {
+            this.smooth = smooth;
+        }
+        
+        if (this.loaded)
+        {
+            // Bind texture
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.tex);
+
+            // Set texture min and mag filters
+            if (this.smooth)
+            {
+                this.renderer.gl.texParameteri(
+                    this.renderer.gl.TEXTURE_2D,
+                    this.renderer.gl.TEXTURE_MIN_FILTER,
+                    this.renderer.gl.LINEAR
+                );
+                this.renderer.gl.texParameteri(
+                    this.renderer.gl.TEXTURE_2D,
+                    this.renderer.gl.TEXTURE_MAG_FILTER,
+                    this.renderer.gl.LINEAR
+                );
+            }
+            else
+            {
+                this.renderer.gl.texParameteri(
+                    this.renderer.gl.TEXTURE_2D,
+                    this.renderer.gl.TEXTURE_MIN_FILTER,
+                    this.renderer.gl.NEAREST
+                );
+                this.renderer.gl.texParameteri(
+                    this.renderer.gl.TEXTURE_2D,
+                    this.renderer.gl.TEXTURE_MAG_FILTER,
+                    this.renderer.gl.NEAREST
+                );
+            }
+
+            // Unbind texture
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  getWidth : Get texture width                                          //
     //  return : Width of the texture                                         //
     ////////////////////////////////////////////////////////////////////////////
