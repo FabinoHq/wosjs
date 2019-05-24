@@ -126,7 +126,7 @@ Loader.prototype = {
             {
                 this.loader.handleTexturesLoaded();
             }
-            this.textures[i].load("textures/" + TexturesAssets[i], true);
+            this.textures[i].load("textures/" + TexturesAssets[i], false);
         }
         return true;
     },
