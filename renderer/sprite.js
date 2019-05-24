@@ -128,10 +128,7 @@ Sprite.prototype = {
         }
 
         // Update vertex buffer
-        this.vertexBuffer.setPlane(
-            this.width*this.usize,
-            this.height*this.vsize
-        );
+        this.vertexBuffer.setPlane(this.width, this.height);
         this.vertexBuffer.updateTexcoords(
             this.uoffset, 1.0-(this.voffset+this.vsize),
             this.uoffset+this.usize, 1.0-this.voffset
@@ -152,10 +149,7 @@ Sprite.prototype = {
         // Update vertex buffer
         if (width !== undefined) { this.width = width; }
         if (height !== undefined) { this.height = height; }
-        this.vertexBuffer.setPlane(
-            this.width*this.usize,
-            this.height*this.vsize
-        );
+        this.vertexBuffer.setPlane(this.width, this.height);
     },
 
     ////////////////////////////////////////////////////////////////////////////
