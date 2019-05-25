@@ -79,15 +79,17 @@ function linearInterp(x, y, t)
 
 ////////////////////////////////////////////////////////////////////////////////
 //  pseudoRand : 2D based pseudo-random value                                 //
+//  param seed : Normalized seed of the pseudo-random generation              //
 //  param x : X offset                                                        //
 //  param y : Y offset                                                        //
 //  return : Generated pseudo-random value                                    //
 ////////////////////////////////////////////////////////////////////////////////
-function pseudoRand(x, y)
+function pseudoRand(seed, x, y)
 {
-    var xrnd = (Math.sin(x+7163.148)*4414.5787)%0.5+0.5;
-    var yrnd = (Math.sin(y+3578.735)*7648.3458)%0.5+0.5;
-    return (Math.sin((xrnd*yrnd*1848.41575)+58964.376)*2768.8745)%0.5+0.5;
+    seed = (seed%1.0)*12458.0+31.45;
+    var xrnd = (Math.sin(x+713.148*seed)*4414.5787*seed)%0.5+0.5;
+    var yrnd = (Math.sin(y+358.735*seed)*7648.3458*seed)%0.5+0.5;
+    return (Math.sin((xrnd*yrnd*188.45*seed)+594.76*seed)*278.845*seed)%0.5+0.5;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
