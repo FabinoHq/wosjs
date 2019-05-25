@@ -207,10 +207,7 @@ window.onmouseup = function(event)
 }
 window.addEventListener('touchend', function()
 {
-    if (wos && event.targetTouches.length >= 1)
-    {
-        wos.handleMouseUp(0, 0, 0);
-    }
+    if (wos) wos.handleMouseUp(0, 0, 0);
 }, false);
 
 
