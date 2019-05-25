@@ -374,6 +374,8 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  handleMouseMove : Handle mouse button pressed                         //
     //  param button : Mouse button pressed                                   //
+    //  param mouseX : Mouse X position relative to web navigator's window    //
+    //  param mouseX : Mouse Y position relative to web navigator's window    //
     ////////////////////////////////////////////////////////////////////////////
     handleMouseDown: function(button, mouseX, mouseY)
     {
@@ -385,6 +387,8 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  handleMouseUp : Handle mouse button released                          //
     //  param button : Mouse button released                                  //
+    //  param mouseX : Mouse X position relative to web navigator's window    //
+    //  param mouseX : Mouse Y position relative to web navigator's window    //
     ////////////////////////////////////////////////////////////////////////////
     handleMouseUp: function(button, mouseX, mouseY)
     {
