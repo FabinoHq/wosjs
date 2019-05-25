@@ -167,6 +167,17 @@ window.onmousemove = function(event)
 {
     if (wos) wos.handleMouseMove(event.clientX, event.clientY);
 }
+window.addEventListener('touchmove', function(event)
+{
+    if (wos && event.targetTouches.length >= 1)
+    {
+        wos.handleMouseMove(
+            event.targetTouches[0].pageX,
+            event.targetTouches[0].pageY
+        );
+    }
+    event.preventDefault();
+}, false);
 
 ////////////////////////////////////////////////////////////////////////////////
 //  window.onmousedown : Triggered when a mouse button is pressed             //
@@ -175,6 +186,17 @@ window.onmousedown = function(event)
 {
     if (wos) wos.handleMouseDown(event.button, event.clientX, event.clientY);
 }
+window.addEventListener('touchstart', function(event)
+{
+    if (wos && event.targetTouches.length >= 1)
+    {
+        wos.handleMouseDown(0,
+            event.targetTouches[0].pageX,
+            event.targetTouches[0].pageY
+        );
+    }
+    event.preventDefault();
+}, false);
 
 ////////////////////////////////////////////////////////////////////////////////
 //  window.onmouseup : Triggered when a mouse button is released              //
@@ -183,6 +205,13 @@ window.onmouseup = function(event)
 {
     if (wos) wos.handleMouseUp(event.button, event.clientX, event.clientY);
 }
+window.addEventListener('touchend', function()
+{
+    if (wos && event.targetTouches.length >= 1)
+    {
+        wos.handleMouseUp(0, 0, 0);
+    }
+}, false);
 
 
 ////////////////////////////////////////////////////////////////////////////////
