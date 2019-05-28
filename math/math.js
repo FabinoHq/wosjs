@@ -78,6 +78,19 @@ function linearInterp(x, y, t)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+//  distance : Distance between two points                                    //
+//  param x1 : X position of the first point                                  //
+//  param y1 : Y position of the first point                                  //
+//  param x2 : X position of the second point                                 //
+//  param y2 : Y position of the second point                                 //
+//  return : Distance between the two given points                            //
+////////////////////////////////////////////////////////////////////////////////
+function distance(x1, y1, x2, y2)
+{
+    return Math.sqrt(((x2-x1)*(x2-x1))+((y2-y1)*(y2-y1)));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 //  pseudoRand : 2D based pseudo-random value                                 //
 //  param seed : Normalized seed of the pseudo-random generation              //
 //  param x : X offset                                                        //
@@ -94,11 +107,12 @@ function pseudoRand(seed, x, y)
 
 ////////////////////////////////////////////////////////////////////////////////
 //  fractalHeigthmap : 2D Fractal pseudo random heightmap                     //
+//  param seed : Normalized seed of the pseudo-random generation              //
 //  param i : Integer I index (X) offset                                      //
 //  param j : Integer J index (Y) offset                                      //
 //  return : Generated fractal heightmap value at (i,j) coordinates           //
 ////////////////////////////////////////////////////////////////////////////////
-function fractalHeigthmap(i, j)
+function fractalHeigthmap(seed, i, j)
 {
     var ix = i;
     var jy = j;
@@ -125,48 +139,48 @@ function fractalHeigthmap(i, j)
 
     // Fondamental noise
     var rnd = pseudoRand(
-        Math.floor(ix/freq), Math.floor(jy/freq)
+        seed, Math.floor(ix/freq), Math.floor(jy/freq)
     );
     var rnd2 = pseudoRand(
-        Math.floor(ix/freq), Math.floor((jy+freq)/freq)
+        seed, Math.floor(ix/freq), Math.floor((jy+freq)/freq)
     );
     var rnd3 = pseudoRand(
-        Math.floor((ix+freq)/freq), Math.floor(jy/freq)
+        seed, Math.floor((ix+freq)/freq), Math.floor(jy/freq)
     );
     var rnd4 = pseudoRand(
-        Math.floor((ix+freq)/freq), Math.floor((jy+freq)/freq)
+        seed, Math.floor((ix+freq)/freq), Math.floor((jy+freq)/freq)
     );
     var bilinear1 = rnd + (rnd3-rnd)*ix1 +
                     (rnd2-rnd)*jy1 + ((rnd4+rnd)-(rnd3+rnd2))*ix1*jy1;
 
     // Second harmonic noise
     var brnd = pseudoRand(
-        Math.floor(ix/freq2), Math.floor(jy/freq2)
+        seed, Math.floor(ix/freq2), Math.floor(jy/freq2)
     );
     var brnd2 = pseudoRand(
-        Math.floor(ix/freq2), Math.floor((jy+freq2)/freq2)
+        seed, Math.floor(ix/freq2), Math.floor((jy+freq2)/freq2)
     );
     var brnd3 = pseudoRand(
-        Math.floor((ix+freq2)/freq2), Math.floor(jy/freq2)
+        seed, Math.floor((ix+freq2)/freq2), Math.floor(jy/freq2)
     );
     var brnd4 = pseudoRand(
-        Math.floor((ix+freq2)/freq2), Math.floor((jy+freq2)/freq2)
+        seed, Math.floor((ix+freq2)/freq2), Math.floor((jy+freq2)/freq2)
     );
     var bilinear2 = brnd + (brnd3-brnd)*ix2 +
                     (brnd2-brnd)*jy2 + ((brnd4+brnd)-(brnd3+brnd2))*ix2*jy2;
 
     // Third harmonic noise
     var crnd = pseudoRand(
-        Math.floor(ix/freq3), Math.floor(jy/freq3)
+        seed, Math.floor(ix/freq3), Math.floor(jy/freq3)
     );
     var crnd2 = pseudoRand(
-        Math.floor(ix/freq3), Math.floor((jy+freq3)/freq3)
+        seed, Math.floor(ix/freq3), Math.floor((jy+freq3)/freq3)
     );
     var crnd3 = pseudoRand(
-        Math.floor((ix+freq3)/freq3), Math.floor(jy/freq3)
+        seed, Math.floor((ix+freq3)/freq3), Math.floor(jy/freq3)
     );
     var crnd4 = pseudoRand(
-        Math.floor((ix+freq3)/freq3), Math.floor((jy+freq3)/freq3)
+        seed, Math.floor((ix+freq3)/freq3), Math.floor((jy+freq3)/freq3)
     );
     var bilinear3 = crnd + (crnd3-crnd)*ix3 +
                     (crnd2-crnd)*jy3 + ((crnd4+crnd)-(crnd3+crnd2))*ix3*jy3;
