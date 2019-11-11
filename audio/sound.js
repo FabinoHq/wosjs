@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      sound.js : WOS sound management                                       //
+//      audio/sound.js : WOS sound management                                 //
 ////////////////////////////////////////////////////////////////////////////////
 
 
