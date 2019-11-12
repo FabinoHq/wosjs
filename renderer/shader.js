@@ -83,7 +83,7 @@ const defaultFragmentShaderSrc = [
 ////////////////////////////////////////////////////////////////////////////////
 function Shader(glPointer)
 {
-    // Shader loaded status
+    // Shader loaded state
     this.loaded = false;
 
     // WebGL functions pointer
