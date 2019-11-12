@@ -86,10 +86,7 @@ function VertexBuffer(glPointer)
     // Element buffer object
     this.elementBuffer = null;
 
-    // Vertices
-    this.vertices = null;
-    // Textures coordinates
-    this.texCoords = null;
+    // Textures coordinates offset
     this.texCoordsOffset = 0;
 
     // Geometry data
