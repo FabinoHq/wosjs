@@ -125,10 +125,11 @@ VertexBuffer.prototype = {
             return false;
         }
 
+        // Create EBO
         this.elementBuffer = this.gl.createBuffer();
         if (!this.elementBuffer)
         {
-            // Could not create index buffer
+            // Could not create EBO
             return false;
         }
 
@@ -156,7 +157,7 @@ VertexBuffer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  unbind : Bind vertex buffer object                                    //
+    //  unbind : Unbind vertex buffer object                                  //
     ////////////////////////////////////////////////////////////////////////////
     unbind: function()
     {
