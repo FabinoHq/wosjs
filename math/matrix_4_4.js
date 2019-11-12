@@ -347,10 +347,10 @@ Matrix4x4.prototype = {
                         + this.matrix[7]*rot9
                         + this.matrix[11]*rot10);
 
-        rotMat.matrix[12] = (this.matrix[12]*1.0);
-        rotMat.matrix[13] = (this.matrix[13]*1.0);
-        rotMat.matrix[14] = (this.matrix[14]*1.0);
-        rotMat.matrix[15] = (this.matrix[15]*1.0);
+        rotMat.matrix[12] = this.matrix[12];
+        rotMat.matrix[13] = this.matrix[13];
+        rotMat.matrix[14] = this.matrix[14];
+        rotMat.matrix[15] = this.matrix[15];
 
         this.matrix = rotMat.matrix;
     },
@@ -366,10 +366,10 @@ Matrix4x4.prototype = {
 
         var rotMat = new Matrix4x4();
 
-        rotMat.matrix[0] = (this.matrix[0]*1.0);
-        rotMat.matrix[1] = (this.matrix[1]*1.0);
-        rotMat.matrix[2] = (this.matrix[2]*1.0);
-        rotMat.matrix[3] = (this.matrix[3]*1.0);
+        rotMat.matrix[0] = this.matrix[0];
+        rotMat.matrix[1] = this.matrix[1];
+        rotMat.matrix[2] = this.matrix[2];
+        rotMat.matrix[3] = this.matrix[3];
 
         rotMat.matrix[4] = (this.matrix[4]*cosAngle
                             + this.matrix[8]*-sinAngle);
@@ -395,10 +395,10 @@ Matrix4x4.prototype = {
         rotMat.matrix[11] = (this.matrix[7]*sinAngle
                             + this.matrix[11]*cosAngle);
 
-        rotMat.matrix[12] = (this.matrix[12]*1.0);
-        rotMat.matrix[13] = (this.matrix[13]*1.0);
-        rotMat.matrix[14] = (this.matrix[14]*1.0);
-        rotMat.matrix[15] = (this.matrix[15]*1.0);
+        rotMat.matrix[12] = this.matrix[12];
+        rotMat.matrix[13] = this.matrix[13];
+        rotMat.matrix[14] = this.matrix[14];
+        rotMat.matrix[15] = this.matrix[15];
 
         this.matrix = rotMat.matrix;
     },
@@ -426,10 +426,10 @@ Matrix4x4.prototype = {
         rotMat.matrix[3] = (this.matrix[3]*cosAngle
                             + this.matrix[11]*sinAngle);
 
-        rotMat.matrix[4] = (this.matrix[4]*1.0);
-        rotMat.matrix[5] = (this.matrix[5]*1.0);
-        rotMat.matrix[6] = (this.matrix[6]*1.0);
-        rotMat.matrix[7] = (this.matrix[7]*1.0);
+        rotMat.matrix[4] = this.matrix[4];
+        rotMat.matrix[5] = this.matrix[5];
+        rotMat.matrix[6] = this.matrix[6];
+        rotMat.matrix[7] = this.matrix[7];
 
         rotMat.matrix[8] = (this.matrix[0]*-sinAngle
                             + this.matrix[8]*cosAngle);
@@ -443,10 +443,10 @@ Matrix4x4.prototype = {
         rotMat.matrix[11] = (this.matrix[3]*-sinAngle
                             + this.matrix[11]*cosAngle);
 
-        rotMat.matrix[12] = (this.matrix[12]*1.0);
-        rotMat.matrix[13] = (this.matrix[13]*1.0);
-        rotMat.matrix[14] = (this.matrix[14]*1.0);
-        rotMat.matrix[15] = (this.matrix[15]*1.0);
+        rotMat.matrix[12] = this.matrix[12];
+        rotMat.matrix[13] = this.matrix[13];
+        rotMat.matrix[14] = this.matrix[14];
+        rotMat.matrix[15] = this.matrix[15];
 
         this.matrix = rotMat.matrix;
     },
@@ -486,14 +486,14 @@ Matrix4x4.prototype = {
         rotMat.matrix[7] = (this.matrix[3]*sinAngle
                             + this.matrix[7]*cosAngle);
 
-        rotMat.matrix[8] = (this.matrix[8]*1.0);
-        rotMat.matrix[9] = (this.matrix[9]*1.0);
-        rotMat.matrix[10] = (this.matrix[10]*1.0);
-        rotMat.matrix[11] = (this.matrix[11]*1.0);
-        rotMat.matrix[12] = (this.matrix[12]*1.0);
-        rotMat.matrix[13] = (this.matrix[13]*1.0);
-        rotMat.matrix[14] = (this.matrix[14]*1.0);
-        rotMat.matrix[15] = (this.matrix[15]*1.0);
+        rotMat.matrix[8] = this.matrix[8];
+        rotMat.matrix[9] = this.matrix[9];
+        rotMat.matrix[10] = this.matrix[10];
+        rotMat.matrix[11] = this.matrix[11];
+        rotMat.matrix[12] = this.matrix[12];
+        rotMat.matrix[13] = this.matrix[13];
+        rotMat.matrix[14] = this.matrix[14];
+        rotMat.matrix[15] = this.matrix[15];
 
         this.matrix = rotMat.matrix;
     },
