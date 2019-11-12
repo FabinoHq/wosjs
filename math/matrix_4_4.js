@@ -558,91 +558,91 @@ Matrix4x4.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  multiply : Multiply 4x4 matrix by another 4x4 matrix                  //
-    //  param mat4x4 : 4x4 matrix to multiply                                 //
+    //  param mat : 4x4 matrix to multiply                                    //
     ////////////////////////////////////////////////////////////////////////////
-    multiply: function(mat4x4)
+    multiply: function(mat)
     {
         var multMat = new Matrix4x4();
 
-        multMat.matrix[0] = (this.matrix[0]*mat4x4.matrix[0]
-                            + this.matrix[4]*mat4x4.matrix[1]
-                            + this.matrix[8]*mat4x4.matrix[2]
-                            + this.matrix[12]*mat4x4.matrix[3]);
+        multMat.matrix[0] = (this.matrix[0]*mat.matrix[0]
+                            + this.matrix[4]*mat.matrix[1]
+                            + this.matrix[8]*mat.matrix[2]
+                            + this.matrix[12]*mat.matrix[3]);
 
-        multMat.matrix[1] = (this.matrix[1]*mat4x4.matrix[0]
-                            + this.matrix[5]*mat4x4.matrix[1]
-                            + this.matrix[9]*mat4x4.matrix[2]
-                            + this.matrix[13]*mat4x4.matrix[3]);
+        multMat.matrix[1] = (this.matrix[1]*mat.matrix[0]
+                            + this.matrix[5]*mat.matrix[1]
+                            + this.matrix[9]*mat.matrix[2]
+                            + this.matrix[13]*mat.matrix[3]);
 
-        multMat.matrix[2] = (this.matrix[2]*mat4x4.matrix[0]
-                            + this.matrix[6]*mat4x4.matrix[1]
-                            + this.matrix[10]*mat4x4.matrix[2]
-                            + this.matrix[14]*mat4x4.matrix[3]);
+        multMat.matrix[2] = (this.matrix[2]*mat.matrix[0]
+                            + this.matrix[6]*mat.matrix[1]
+                            + this.matrix[10]*mat.matrix[2]
+                            + this.matrix[14]*mat.matrix[3]);
 
-        multMat.matrix[3] = (this.matrix[3]*mat4x4.matrix[0]
-                            + this.matrix[7]*mat4x4.matrix[1]
-                            + this.matrix[11]*mat4x4.matrix[2]
-                            + this.matrix[15]*mat4x4.matrix[3]);
+        multMat.matrix[3] = (this.matrix[3]*mat.matrix[0]
+                            + this.matrix[7]*mat.matrix[1]
+                            + this.matrix[11]*mat.matrix[2]
+                            + this.matrix[15]*mat.matrix[3]);
 
-        multMat.matrix[4] = (this.matrix[0]*mat4x4.matrix[4]
-                            + this.matrix[4]*mat4x4.matrix[5]
-                            + this.matrix[8]*mat4x4.matrix[6]
-                            + this.matrix[12]*mat4x4.matrix[7]);
+        multMat.matrix[4] = (this.matrix[0]*mat.matrix[4]
+                            + this.matrix[4]*mat.matrix[5]
+                            + this.matrix[8]*mat.matrix[6]
+                            + this.matrix[12]*mat.matrix[7]);
 
-        multMat.matrix[5] = (this.matrix[1]*mat4x4.matrix[4]
-                            + this.matrix[5]*mat4x4.matrix[5]
-                            + this.matrix[9]*mat4x4.matrix[6]
-                            + this.matrix[13]*mat4x4.matrix[7]);
+        multMat.matrix[5] = (this.matrix[1]*mat.matrix[4]
+                            + this.matrix[5]*mat.matrix[5]
+                            + this.matrix[9]*mat.matrix[6]
+                            + this.matrix[13]*mat.matrix[7]);
 
-        multMat.matrix[6] = (this.matrix[2]*mat4x4.matrix[4]
-                            + this.matrix[6]*mat4x4.matrix[5]
-                            + this.matrix[10]*mat4x4.matrix[6]
-                            + this.matrix[14]*mat4x4.matrix[7]);
+        multMat.matrix[6] = (this.matrix[2]*mat.matrix[4]
+                            + this.matrix[6]*mat.matrix[5]
+                            + this.matrix[10]*mat.matrix[6]
+                            + this.matrix[14]*mat.matrix[7]);
 
-        multMat.matrix[7] = (this.matrix[3]*mat4x4.matrix[4]
-                            + this.matrix[7]*mat4x4.matrix[5]
-                            + this.matrix[11]*mat4x4.matrix[6]
-                            + this.matrix[15]*mat4x4.matrix[7]);
+        multMat.matrix[7] = (this.matrix[3]*mat.matrix[4]
+                            + this.matrix[7]*mat.matrix[5]
+                            + this.matrix[11]*mat.matrix[6]
+                            + this.matrix[15]*mat.matrix[7]);
 
-        multMat.matrix[8] = (this.matrix[0]*mat4x4.matrix[8]
-                            + this.matrix[4]*mat4x4.matrix[9]
-                            + this.matrix[8]*mat4x4.matrix[10]
-                            + this.matrix[12]*mat4x4.matrix[11]);
+        multMat.matrix[8] = (this.matrix[0]*mat.matrix[8]
+                            + this.matrix[4]*mat.matrix[9]
+                            + this.matrix[8]*mat.matrix[10]
+                            + this.matrix[12]*mat.matrix[11]);
 
-        multMat.matrix[9] = (this.matrix[1]*mat4x4.matrix[8]
-                            + this.matrix[5]*mat4x4.matrix[9]
-                            + this.matrix[9]*mat4x4.matrix[10]
-                            + this.matrix[13]*mat4x4.matrix[11]);
+        multMat.matrix[9] = (this.matrix[1]*mat.matrix[8]
+                            + this.matrix[5]*mat.matrix[9]
+                            + this.matrix[9]*mat.matrix[10]
+                            + this.matrix[13]*mat.matrix[11]);
 
-        multMat.matrix[10] = (this.matrix[2]*mat4x4.matrix[8]
-                            + this.matrix[6]*mat4x4.matrix[9]
-                            + this.matrix[10]*mat4x4.matrix[10]
-                            + this.matrix[14]*mat4x4.matrix[11]);
+        multMat.matrix[10] = (this.matrix[2]*mat.matrix[8]
+                            + this.matrix[6]*mat.matrix[9]
+                            + this.matrix[10]*mat.matrix[10]
+                            + this.matrix[14]*mat.matrix[11]);
 
-        multMat.matrix[11] = (this.matrix[3]*mat4x4.matrix[8]
-                            + this.matrix[7]*mat4x4.matrix[9]
-                            + this.matrix[11]*mat4x4.matrix[10]
-                            + this.matrix[15]*mat4x4.matrix[11]);
+        multMat.matrix[11] = (this.matrix[3]*mat.matrix[8]
+                            + this.matrix[7]*mat.matrix[9]
+                            + this.matrix[11]*mat.matrix[10]
+                            + this.matrix[15]*mat.matrix[11]);
 
-        multMat.matrix[12] = (this.matrix[0]*mat4x4.matrix[12]
-                            + this.matrix[4]*mat4x4.matrix[13]
-                            + this.matrix[8]*mat4x4.matrix[14]
-                            + this.matrix[12]*mat4x4.matrix[15]);
+        multMat.matrix[12] = (this.matrix[0]*mat.matrix[12]
+                            + this.matrix[4]*mat.matrix[13]
+                            + this.matrix[8]*mat.matrix[14]
+                            + this.matrix[12]*mat.matrix[15]);
 
-        multMat.matrix[13] = (this.matrix[1]*mat4x4.matrix[12]
-                            + this.matrix[5]*mat4x4.matrix[13]
-                            + this.matrix[9]*mat4x4.matrix[14]
-                            + this.matrix[13]*mat4x4.matrix[15]);
+        multMat.matrix[13] = (this.matrix[1]*mat.matrix[12]
+                            + this.matrix[5]*mat.matrix[13]
+                            + this.matrix[9]*mat.matrix[14]
+                            + this.matrix[13]*mat.matrix[15]);
 
-        multMat.matrix[14] = (this.matrix[2]*mat4x4.matrix[12]
-                            + this.matrix[6]*mat4x4.matrix[13]
-                            + this.matrix[10]*mat4x4.matrix[14]
-                            + this.matrix[14]*mat4x4.matrix[15]);
+        multMat.matrix[14] = (this.matrix[2]*mat.matrix[12]
+                            + this.matrix[6]*mat.matrix[13]
+                            + this.matrix[10]*mat.matrix[14]
+                            + this.matrix[14]*mat.matrix[15]);
 
-        multMat.matrix[15] = (this.matrix[3]*mat4x4.matrix[12]
-                            + this.matrix[7]*mat4x4.matrix[13]
-                            + this.matrix[11]*mat4x4.matrix[14]
-                            + this.matrix[15]*mat4x4.matrix[15]);
+        multMat.matrix[15] = (this.matrix[3]*mat.matrix[12]
+                            + this.matrix[7]*mat.matrix[13]
+                            + this.matrix[11]*mat.matrix[14]
+                            + this.matrix[15]*mat.matrix[15]);
 
         this.matrix = multMat.matrix;
     }
