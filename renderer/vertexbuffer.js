@@ -279,23 +279,28 @@ VertexBuffer.prototype = {
     
     ////////////////////////////////////////////////////////////////////////////
     //  render : Render the vertex buffer object                              //
+    //  param shader : Shader program to render with                          //
     ////////////////////////////////////////////////////////////////////////////
-    render: function()
+    render: function(shader)
     {
-        if (this.loaded)
+        if (this.loaded && shader)
         {
+            // Get shader attributes locations
+            var vertexLocation = shader.getVertexPosLocation();
+            var texCoordsLocation = shader.getTexCoordsLocation();
+
             // Enable vertices array
-            this.gl.enableVertexAttribArray(0);
+            this.gl.enableVertexAttribArray(vertexLocation);
             this.gl.vertexAttribPointer(
-                0, 2,
+                vertexLocation, 2,
                 this.gl.FLOAT, this.gl.FALSE,
                 0, 0
             );
 
             // Enable texcoords array
-            this.gl.enableVertexAttribArray(1);
+            this.gl.enableVertexAttribArray(texCoordsLocation);
             this.gl.vertexAttribPointer(
-                1, 2,
+                texCoordsLocation, 2,
                 this.gl.FLOAT, this.gl.FALSE,
                 0, this.texCoordsOffset
             );

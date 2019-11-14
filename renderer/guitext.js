@@ -687,7 +687,7 @@ GuiText.prototype = {
 
             // Render VBO
             this.vertexBuffer.bind();
-            this.vertexBuffer.render();
+            this.vertexBuffer.render(this.shader);
             this.vertexBuffer.unbind();
 
             // Unbind texture

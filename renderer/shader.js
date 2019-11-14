@@ -98,6 +98,10 @@ function Shader(glPointer)
     this.fragmentShader = null;
     this.shaderProgram = null;
 
+    // Shader attributes locations
+    this.vertexLocation = -1;
+    this.texCoordsLocation = -1;
+
     // Shader uniforms locations
     this.textureLocation = -1;
     this.projMatrixLocation = -1;
@@ -121,6 +125,8 @@ Shader.prototype = {
         this.vertexShader = null;
         this.fragmentShader = null;
         this.shaderProgram = null;
+        this.vertexLocation = -1;
+        this.texCoordsLocation = -1;
         this.textureLocation = -1;
         this.projMatrixLocation = -1;
         this.viewMatrixLocation = -1;
@@ -223,6 +229,20 @@ Shader.prototype = {
         // Use shader program
         this.gl.useProgram(this.shaderProgram);
 
+        // Get vertex attribute location
+        this.vertexLocation = this.gl.getAttribLocation(
+            this.shaderProgram,
+            "vertexPos"
+        );
+        if (this.vertexLocation == -1) return false;
+
+        // Get texture coords attribute location
+        this.texCoordsLocation = this.gl.getAttribLocation(
+            this.shaderProgram,
+            "vertexColor"
+        );
+        if (this.texCoordsLocation == -1) return false;
+
         // Get texture location
         this.textureLocation = this.gl.getUniformLocation(
             this.shaderProgram,
@@ -285,6 +305,24 @@ Shader.prototype = {
         {
             this.gl.useProgram(null);
         }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getVertexPosLocation : Get vertex position attribute location         //
+    //  return : Vertex position attribute location                           //
+    ////////////////////////////////////////////////////////////////////////////
+    getVertexPosLocation: function()
+    {
+        return this.vertexLocation;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getTexCoordsLocation : Get texture coords attribute location          //
+    //  return : Texture coords attribute location                            //
+    ////////////////////////////////////////////////////////////////////////////
+    getTexCoordsLocation: function()
+    {
+        return this.texCoordsLocation;
     },
 
     ////////////////////////////////////////////////////////////////////////////

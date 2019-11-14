@@ -240,7 +240,7 @@ ProcSprite.prototype = {
             
             // Render VBO
             this.vertexBuffer.bind();
-            this.vertexBuffer.render();
+            this.vertexBuffer.render(this.shader);
             this.vertexBuffer.unbind();
 
             // Unbind procedural shader
