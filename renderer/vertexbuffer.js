@@ -179,7 +179,10 @@ VertexBuffer.prototype = {
             this.gl.STATIC_DRAW
         );
         
+        // Send vertices data
         this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, this.verticesData);
+
+        // Send texcoords data
         this.gl.bufferSubData(
             this.gl.ARRAY_BUFFER,
             this.texCoordsOffset,
@@ -188,6 +191,7 @@ VertexBuffer.prototype = {
 
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
 
+        // Send indexes data
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.elementBuffer);
         this.gl.bufferData(
             this.gl.ELEMENT_ARRAY_BUFFER,
@@ -274,13 +278,13 @@ VertexBuffer.prototype = {
     },
     
     ////////////////////////////////////////////////////////////////////////////
-    //  draw : Render the vertex buffer object                                //
+    //  render : Render the vertex buffer object                              //
     ////////////////////////////////////////////////////////////////////////////
-    draw: function()
+    render: function()
     {
         if (this.loaded)
         {
-            // Send vertices data
+            // Enable vertices array
             this.gl.enableVertexAttribArray(0);
             this.gl.vertexAttribPointer(
                 0, 2,
@@ -288,7 +292,7 @@ VertexBuffer.prototype = {
                 0, 0
             );
 
-            // Send texcoords data
+            // Enable texcoords array
             this.gl.enableVertexAttribArray(1);
             this.gl.vertexAttribPointer(
                 1, 2,
@@ -296,7 +300,7 @@ VertexBuffer.prototype = {
                 0, this.texCoordsOffset
             );
 
-            // Draw arrays
+            // Draw triangles
             this.gl.drawElements(
                 this.gl.TRIANGLES,
                 this.vertCount,

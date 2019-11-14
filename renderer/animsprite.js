@@ -391,13 +391,11 @@ AnimSprite.prototype = {
 
             // Render VBO
             this.vertexBuffer.bind();
-            this.vertexBuffer.draw();
+            this.vertexBuffer.render();
             this.vertexBuffer.unbind();
 
             if (this.interpolation)
             {
-                //this.modelMatrix.translateX(-128.0);
-                //this.renderer.shader.sendModelMatrix(this.modelMatrix);
                 this.renderer.shader.sendAlphaValue(
                     this.alpha*(smoothInterp +
                     (0.5 - Math.abs(0.5-this.interTime))*0.3)
@@ -405,7 +403,7 @@ AnimSprite.prototype = {
 
                 // Render next frame VBO
                 this.nextVertexBuffer.bind();
-                this.nextVertexBuffer.draw();
+                this.nextVertexBuffer.render();
                 this.nextVertexBuffer.unbind();
             }
 

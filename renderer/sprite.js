@@ -262,7 +262,7 @@ Sprite.prototype = {
 
             // Render VBO
             this.vertexBuffer.bind();
-            this.vertexBuffer.draw();
+            this.vertexBuffer.render();
             this.vertexBuffer.unbind();
 
             // Unbind texture
