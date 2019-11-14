@@ -285,22 +285,18 @@ VertexBuffer.prototype = {
     {
         if (this.loaded && shader)
         {
-            // Get shader attributes locations
-            var vertexLocation = shader.getVertexPosLocation();
-            var texCoordsLocation = shader.getTexCoordsLocation();
-
             // Enable vertices array
-            this.gl.enableVertexAttribArray(vertexLocation);
+            this.gl.enableVertexAttribArray(shader.vertexLocation);
             this.gl.vertexAttribPointer(
-                vertexLocation, 2,
+                shader.vertexLocation, 2,
                 this.gl.FLOAT, this.gl.FALSE,
                 0, 0
             );
 
             // Enable texcoords array
-            this.gl.enableVertexAttribArray(texCoordsLocation);
+            this.gl.enableVertexAttribArray(shader.texCoordsLocation);
             this.gl.vertexAttribPointer(
-                texCoordsLocation, 2,
+                shader.texCoordsLocation, 2,
                 this.gl.FLOAT, this.gl.FALSE,
                 0, this.texCoordsOffset
             );

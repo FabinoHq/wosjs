@@ -308,24 +308,6 @@ Shader.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getVertexPosLocation : Get vertex position attribute location         //
-    //  return : Vertex position attribute location                           //
-    ////////////////////////////////////////////////////////////////////////////
-    getVertexPosLocation: function()
-    {
-        return this.vertexLocation;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getTexCoordsLocation : Get texture coords attribute location          //
-    //  return : Texture coords attribute location                            //
-    ////////////////////////////////////////////////////////////////////////////
-    getTexCoordsLocation: function()
-    {
-        return this.texCoordsLocation;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  sendProjectionMatrix : Send projection matrix to use with this shader //
     //  param projectionMatrix : 4x4 Projection matrix to use                 //
     ////////////////////////////////////////////////////////////////////////////
