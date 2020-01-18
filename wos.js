@@ -245,6 +245,8 @@ function Wos()
     this.testsprite = null;
     // Test procedural sprite
     this.testproc = null;
+    // Test anim
+    this.testanim = null;
     // Test text
     this.testtext = null;
 }
@@ -301,6 +303,12 @@ Wos.prototype = {
         // Init test procedural sprite
         this.testproc = new ProcSprite(this.renderer);
         this.testproc.init();
+
+        // Init test anim
+        this.testanim = new AnimSprite(this.renderer);
+        this.testanim.init(
+            this.loader.getTexture("testsprite.png"), 1.0, 1.0
+        );
 
         // Init test text
         this.testtext = new GuiText(this.renderer);
@@ -455,6 +463,12 @@ Wos.prototype = {
         //this.testproc.moveY(-this.testproc.getHeight()/2.0);
         //this.testproc.render();
 
+        // Render test anim
+        this.testanim.resetMatrix();
+        this.testanim.moveX(-this.testanim.getWidth()/2.0);
+        this.testanim.moveY(-this.testanim.getHeight()/2.0);
+        this.testanim.render();
+
         // Render test text
         this.testtext.resetMatrix();
         //this.testtext.moveX(-this.testtext.getWidth()/2.0);
@@ -462,7 +476,7 @@ Wos.prototype = {
         //this.testtext.render();
 
         // Render test text box
-        this.testtextbox.render();
+        //this.testtextbox.render();
     }
 };
 
