@@ -42,6 +42,21 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+//  Animated sprite fragment shader                                           //
+////////////////////////////////////////////////////////////////////////////////
+const animspriteFragmentShaderSrc = [
+    "precision mediump float;",
+    "uniform sampler2D texture;",
+    "varying vec2 texCoord;",
+    "varying float alphaValue;",
+    "void main()",
+    "{",
+    "   vec4 texColor = texture2D(texture, texCoord);",
+    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
+    "}"
+].join("\n");
+
+////////////////////////////////////////////////////////////////////////////////
 //  AnimSprite class definition                                               //
 ////////////////////////////////////////////////////////////////////////////////
 function AnimSprite(renderer)
@@ -52,6 +67,8 @@ function AnimSprite(renderer)
     // Renderer pointer
     this.renderer = renderer;
 
+    // Animated sprite shader
+    this.shader = null;
     // Animated sprite VBO
     this.vertexBuffer = null;
     // Animated sprite texture
@@ -124,6 +141,18 @@ AnimSprite.prototype = {
         if (!this.vertexBuffer.init())
         {
             // Could not init vbo
+            return false;
+        }
+
+        // Init shader
+        this.shader = new Shader(this.renderer.gl);
+        if (!this.shader)
+        {
+            return false;
+        }
+        if (!this.shader.init(
+            defaultVertexShaderSrc, animspriteFragmentShaderSrc))
+        {
             return false;
         }
 
@@ -253,28 +282,28 @@ AnimSprite.prototype = {
     {
         if (this.loaded)
         {
-            // Bind default shader
-            this.renderer.shader.bind();
+            // Bind shader
+            this.shader.bind();
 
             // Send shader uniforms
-            this.renderer.shader.sendProjectionMatrix(this.renderer.projMatrix);
-            this.renderer.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-            this.renderer.shader.sendModelMatrix(this.modelMatrix);
-            this.renderer.shader.sendAlphaValue(this.alpha);
+            this.shader.sendProjectionMatrix(this.renderer.projMatrix);
+            this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
+            this.shader.sendModelMatrix(this.modelMatrix);
+            this.shader.sendAlphaValue(this.alpha);
 
             // Bind texture
             this.texture.bind();
 
             // Render VBO
             this.vertexBuffer.bind();
-            this.vertexBuffer.render(this.renderer.shader);
+            this.vertexBuffer.render(this.shader);
             this.vertexBuffer.unbind();
 
             // Unbind texture
             this.texture.unbind();
 
-            // Unbind default shader
-            this.renderer.shader.unbind();
+            // Unbind shader
+            this.shader.unbind();
         }
     }
 };
