@@ -32,7 +32,6 @@
 !renderer/procsprite.js
 !renderer/view.js
 
-!interface/
 !interface/guitext.js
 !interface/guitextbox.js
 
