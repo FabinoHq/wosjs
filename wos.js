@@ -355,7 +355,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     handleKeyDown: function(key)
     {
-        if (this.testtextbox) this.testtextbox.keyPress(key);
+        //if (this.testtextbox) this.testtextbox.keyPress(key);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -364,7 +364,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     handleKeyUp: function(key)
     {
-        if (this.testtextbox) this.testtextbox.keyRelease(key);
+        //if (this.testtextbox) this.testtextbox.keyRelease(key);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -375,8 +375,8 @@ Wos.prototype = {
     handleMouseMove: function(mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
-        if (this.testtextbox)
-            this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);
+        /*if (this.testtextbox)
+            this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -388,8 +388,8 @@ Wos.prototype = {
     handleMouseDown: function(button, mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
-        if (this.testtextbox)
-            this.testtextbox.mousePress(this.realMouseX, this.realMouseY);
+        /*if (this.testtextbox)
+            this.testtextbox.mousePress(this.realMouseX, this.realMouseY);*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -401,8 +401,8 @@ Wos.prototype = {
     handleMouseUp: function(button, mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
-        if (this.testtextbox)
-            this.testtextbox.mouseRelease(this.realMouseX, this.realMouseY);
+        /*if (this.testtextbox)
+            this.testtextbox.mouseRelease(this.realMouseX, this.realMouseY);*/
     },
 
     ////////////////////////////////////////////////////////////////////////////

@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/guitext.js : GUI Text management                             //
+//      interface/guitext.js : GUI Text management                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 

@@ -31,8 +31,10 @@
 !renderer/animsprite.js
 !renderer/procsprite.js
 !renderer/view.js
-!renderer/guitext.js
-!renderer/guitextbox.js
+
+!interface/
+!interface/guitext.js
+!interface/guitextbox.js
 
 !audio/audioengine.js
 !audio/sound.js
