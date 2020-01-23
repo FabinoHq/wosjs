@@ -49,9 +49,12 @@ const animspriteFragmentShaderSrc = [
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "varying float alphaValue;",
+    "uniform float countX;",
+    "uniform float countY;",
     "void main()",
     "{",
-    "   vec4 texColor = texture2D(texture, texCoord);",
+    "   vec2 coords = vec2(texCoord.x/countX, texCoord.y/countY);",
+    "   vec4 texColor = texture2D(texture, coords);",
     "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
     "}"
 ].join("\n");
@@ -77,6 +80,10 @@ function AnimSprite(renderer)
     this.modelMatrix = null;
     // Animated sprite alpha
     this.alpha = 1.0;
+
+    // Shader uniforms locations
+    this.countXuniform = -1;
+    this.countYuniform = -1;
 
     // Animated sprite size
     this.width = 1.0;
@@ -112,6 +119,8 @@ AnimSprite.prototype = {
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
+        this.countXuniform = -1;
+        this.countYuniform = -1;
         if (width !== undefined) { this.width = width; }
         if (height !== undefined) { this.height = height; }
         if (countX !== undefined) { this.countX = countX; }
@@ -155,6 +164,18 @@ AnimSprite.prototype = {
         {
             return false;
         }
+        
+        this.shader.bind();
+
+        // Get shader uniforms locations
+        this.countXuniform = this.shader.getUniform("countX");
+        this.countYuniform = this.shader.getUniform("countY");
+
+        // Set shader countX and countY
+        this.shader.sendUniform(this.countXuniform, this.countX);
+        this.shader.sendUniform(this.countYuniform, this.countY);
+
+        this.shader.unbind();
 
         // Set texture
         this.texture = tex;
