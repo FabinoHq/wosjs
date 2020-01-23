@@ -51,9 +51,13 @@ const animspriteFragmentShaderSrc = [
     "varying float alphaValue;",
     "uniform float countX;",
     "uniform float countY;",
+    "uniform float currentX;",
+    "uniform float currentY;",
     "void main()",
     "{",
     "   vec2 coords = vec2(texCoord.x/countX, texCoord.y/countY);",
+    "   coords.x += currentX/countX;",
+    "   coords.y += currentY/countY;",
     "   vec4 texColor = texture2D(texture, coords);",
     "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
     "}"
@@ -84,6 +88,8 @@ function AnimSprite(renderer)
     // Shader uniforms locations
     this.countXuniform = -1;
     this.countYuniform = -1;
+    this.currentXuniform = -1;
+    this.currentYuniform = -1;
 
     // Animated sprite size
     this.width = 1.0;
@@ -121,6 +127,8 @@ AnimSprite.prototype = {
         this.modelMatrix = null;
         this.countXuniform = -1;
         this.countYuniform = -1;
+        this.currentXuniform = -1;
+        this.currentYuniform = -1;
         if (width !== undefined) { this.width = width; }
         if (height !== undefined) { this.height = height; }
         if (countX !== undefined) { this.countX = countX; }
@@ -164,17 +172,23 @@ AnimSprite.prototype = {
         {
             return false;
         }
-        
-        this.shader.bind();
 
         // Get shader uniforms locations
+        this.shader.bind();
         this.countXuniform = this.shader.getUniform("countX");
+        if (this.countXuniform == -1) { return false; }
         this.countYuniform = this.shader.getUniform("countY");
+        if (this.countYuniform == -1) { return false; }
+        this.currentXuniform = this.shader.getUniform("currentX");
+        if (this.currentXuniform == -1) { return false; }
+        this.currentYuniform = this.shader.getUniform("currentY");
+        if (this.currentYuniform == -1) { return false; }
 
-        // Set shader countX and countY
+        // Set shader uniforms
         this.shader.sendUniform(this.countXuniform, this.countX);
         this.shader.sendUniform(this.countYuniform, this.countY);
-
+        this.shader.sendUniform(this.currentXuniform, this.currentX);
+        this.shader.sendUniform(this.currentYuniform, this.currentY);
         this.shader.unbind();
 
         // Set texture
@@ -303,6 +317,42 @@ AnimSprite.prototype = {
     {
         if (this.loaded)
         {
+            // Update current animation time
+            this.currentTime += frametime;
+            if (this.frametime > 0.0)
+            {
+                this.interTime += frametime/this.frametime;
+            }
+            else
+            {
+                this.interTime += frametime;
+            }
+
+            if (this.currentTime >= this.frametime)
+            {
+                // Compute frame offset
+                if (this.currentX < (this.countX-1))
+                {
+                    ++this.currentX;
+                }
+                else
+                {
+                    if (this.currentY < (this.countY-1))
+                    {
+                        this.currentX = 0;
+                        ++this.currentY;
+                    }
+                    else
+                    {
+                        this.currentX = 0;
+                        this.currentY = 0;
+                    }
+                }
+
+                // Reset timer
+                this.currentTime = 0.0;
+            }
+
             // Bind shader
             this.shader.bind();
 
@@ -311,6 +361,9 @@ AnimSprite.prototype = {
             this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.shader.sendModelMatrix(this.modelMatrix);
             this.shader.sendAlphaValue(this.alpha);
+
+            this.shader.sendUniform(this.currentXuniform, this.currentX);
+            this.shader.sendUniform(this.currentYuniform, this.currentY);
 
             // Bind texture
             this.texture.bind();

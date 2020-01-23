@@ -307,7 +307,7 @@ Wos.prototype = {
         // Init test anim
         this.testanim = new AnimSprite(this.renderer);
         this.testanim.init(
-            this.loader.getTexture("testsprite.png"), 1.0, 1.0
+            this.loader.getTexture("testsprite.png"), 1.0, 1.0, 1, 1, 1.0
         );
 
         // Init test text
@@ -467,7 +467,7 @@ Wos.prototype = {
         this.testanim.resetMatrix();
         this.testanim.moveX(-this.testanim.getWidth()/2.0);
         this.testanim.moveY(-this.testanim.getHeight()/2.0);
-        this.testanim.render();
+        this.testanim.render(this.frametime);
 
         // Render test text
         this.testtext.resetMatrix();
