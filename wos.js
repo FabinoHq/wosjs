@@ -309,6 +309,9 @@ Wos.prototype = {
         this.testanim.init(
             this.loader.getTexture("testsprite.png"), 1.0, 1.0, 1, 1, 1.0
         );
+        this.testanim.setStart(0, 0);
+        this.testanim.setEnd(0, 0);
+        this.testanim.resetAnim();
 
         // Init test text
         this.testtext = new GuiText(this.renderer);

@@ -97,6 +97,12 @@ function AnimSprite(renderer)
     // Animated sprite frame count
     this.countX = 1;
     this.countY = 1;
+    // Animated sprite start frame
+    this.startX = 0;
+    this.startY = 0;
+    // Animated sprite end frame
+    this.endX = 0;
+    this.endY = 0;
     // Animated sprite frametime in seconds
     this.frametime = 1.0;
 
@@ -105,7 +111,6 @@ function AnimSprite(renderer)
     this.currentY = 0;
     this.currentTime = 0.0;
     this.interTime = 0.0;
-    this.interpolation = true;
 }
 
 AnimSprite.prototype = {
@@ -118,7 +123,7 @@ AnimSprite.prototype = {
     //  param countY : Animated sprite frames count in V texture axis         //
     //  param frametime : Animated sprite frametime in seconds                //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(tex, width, height, countX, countY, frametime, interpolation)
+    init: function(tex, width, height, countX, countY, frametime)
     {
         // Reset animated sprite
         this.loaded = false;
@@ -134,7 +139,10 @@ AnimSprite.prototype = {
         if (countX !== undefined) { this.countX = countX; }
         if (countY !== undefined) { this.countY = countY; }
         if (frametime !== undefined) { this.frametime = frametime; }
-        if (interpolation !== undefined) { this.interpolation = interpolation; }
+        this.startX = 0;
+        this.startY = 0;
+        this.endX = 0;
+        this.endY = 0;
         this.currentX = 0;
         this.currentY = 0;
         this.currentTime = 0.0;
@@ -215,9 +223,31 @@ AnimSprite.prototype = {
     setSize: function(width, height)
     {
         // Update vertex buffer
-        if (width !== undefined) { this.width = width; }
-        if (height !== undefined) { this.height = height; }
+        this.width = width;
+        this.height = height;
         this.vertexBuffer.setPlane(this.width, this.height);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setStart : Set animation start frame                                  //
+    //  param startX : Animation start frame X position to set                //
+    //  param startY : Animation start frame Y position to set                //
+    ////////////////////////////////////////////////////////////////////////////
+    setStart: function(startX, startY)
+    {
+        this.startX = startX;
+        this.startY = startY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setEnd : Set animation end frame                                      //
+    //  param endX : Animation end frame X position to set                    //
+    //  param endY : Animation end frame Y position to set                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setEnd: function(endX, endY)
+    {
+        this.endX = endX;
+        this.endY = endY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -310,6 +340,16 @@ AnimSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  resetAnim : Reset current animation frame                             //
+    ////////////////////////////////////////////////////////////////////////////
+    resetAnim: function()
+    {
+        this.currentTime = 0.0;
+        this.currentX = this.startX;
+        this.currentY = this.startY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  render : Render animated sprite                                       //
     //  param frametime : Frametime for animation update                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -333,19 +373,42 @@ AnimSprite.prototype = {
                 // Compute frame offset
                 if (this.currentX < (this.countX-1))
                 {
-                    ++this.currentX;
+                    // Check end frame
+                    if ((this.currentX >= this.endX) &&
+                        (this.currentY >= this.endY))
+                    {
+                        // End frame reached
+                        this.currentX = this.startX;
+                        this.currentY = this.startY;
+                    }
+                    else
+                    {
+                        ++this.currentX;
+                    }
                 }
                 else
                 {
                     if (this.currentY < (this.countY-1))
                     {
-                        this.currentX = 0;
-                        ++this.currentY;
+                        // Check end frame
+                        if ((this.currentX >= this.endX) &&
+                            (this.currentY >= this.endY))
+                        {
+                            // End frame reached
+                            this.currentX = this.startX;
+                            this.currentY = this.startY;
+                        }
+                        else
+                        {
+                            this.currentX = 0;
+                            ++this.currentY;
+                        }
                     }
                     else
                     {
-                        this.currentX = 0;
-                        this.currentY = 0;
+                        // Last frame reached
+                        this.currentX = this.startX;
+                        this.currentY = this.startY;
                     }
                 }
 
