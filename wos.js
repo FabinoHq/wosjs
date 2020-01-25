@@ -456,9 +456,9 @@ Wos.prototype = {
 
         // Render test sprite
         this.testsprite.resetMatrix();
-        //this.testsprite.moveX(-this.testsprite.getWidth()/2.0);
-        //this.testsprite.moveY(-this.testsprite.getHeight()/2.0);
-        //this.testsprite.render();
+        this.testsprite.moveX(-this.testsprite.getWidth()/2.0);
+        this.testsprite.moveY(-this.testsprite.getHeight()/2.0);
+        this.testsprite.render();
 
         // Render procedural test sprite
         this.testproc.resetMatrix();
@@ -468,9 +468,9 @@ Wos.prototype = {
 
         // Render test anim
         this.testanim.resetMatrix();
-        this.testanim.moveX(-this.testanim.getWidth()/2.0);
-        this.testanim.moveY(-this.testanim.getHeight()/2.0);
-        this.testanim.render(this.frametime);
+        //this.testanim.moveX(-this.testanim.getWidth()/2.0);
+        //this.testanim.moveY(-this.testanim.getHeight()/2.0);
+        //this.testanim.render(this.frametime);
 
         // Render test text
         this.testtext.resetMatrix();
