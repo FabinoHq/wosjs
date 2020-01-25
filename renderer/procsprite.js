@@ -46,9 +46,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 function ProcSprite(renderer)
 {
-    // Procedural sprite loaded state
-    this.loaded = false;
-
     // Renderer pointer
     this.renderer = renderer;
 
@@ -64,12 +61,13 @@ function ProcSprite(renderer)
     // Procedural sprite size
     this.width = 1.0;
     this.height = 1.0;
+    // Procedural sprite offset
+    this.offset = null;
 
     // Procedural sprite shader uniforms locations
     this.alphaUniform = -1;
-    this.uniformTimer = -1;
-    this.uniformOffsetX = -1;
-    this.uniformOffsetY = -1;
+    this.timerUniform = -1;
+    this.offsetUniform = -1;
 }
 
 ProcSprite.prototype = {
@@ -82,15 +80,15 @@ ProcSprite.prototype = {
     init: function(shaderSrc, width, height)
     {
         // Reset procedural sprite
-        this.loaded = false;
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
         if (width !== undefined) { this.width = width; }
         if (height !== undefined) { this.height = height; }
-        this.uniformTimer = -1;
-        this.uniformOffsetX = -1;
-        this.uniformOffsetY = -1;
+        this.offset = new Vector2(0.0, 0.0);
+        this.alphaUniform = -1;
+        this.timerUniform = -1;
+        this.offsetUniform = -1;
 
         // Check gl pointer
         if (!this.renderer.gl)
@@ -131,17 +129,11 @@ ProcSprite.prototype = {
         // Get uniforms locations
         this.shader.bind();
         this.alphaUniform = this.shader.getUniform("alpha");
-        if (this.alphaUniform == -1) return false;
-        this.uniformTimer = this.shader.getUniform("timer");
-        if (this.uniformTimer == -1) return false;
-        this.uniformOffsetX = this.shader.getUniform("offsetX");
-        if (this.uniformOffsetX == -1) return false;
-        this.uniformOffsetY = this.shader.getUniform("offsetY");
-        if (this.uniformOffsetY == -1) return false;
+        this.timerUniform = this.shader.getUniform("timer");
+        this.offsetUniform = this.shader.getUniform("offset");
         this.shader.unbind();
 
         // Sprite loaded
-        this.loaded = true;
         return true;
     },
 
@@ -228,28 +220,27 @@ ProcSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function(timer, offsetX, offsetY)
     {
-        if (this.loaded)
-        {
-            // Bind procedural shader
-            this.shader.bind();
+        // Set procedural sprite offset
+        this.offset.setXY(offsetX, offsetY);
 
-            // Send shader uniforms
-            this.shader.sendProjectionMatrix(this.renderer.projMatrix);
-            this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-            this.shader.sendModelMatrix(this.modelMatrix);
-            this.shader.sendUniform(this.alphaUniform, this.alpha);
-            this.shader.sendUniform(this.uniformTimer, timer);
-            this.shader.sendUniform(this.uniformOffsetX, offsetX);
-            this.shader.sendUniform(this.uniformOffsetY, offsetY);
-            
-            // Render VBO
-            this.vertexBuffer.bind();
-            this.vertexBuffer.render(this.shader);
-            this.vertexBuffer.unbind();
+        // Bind procedural shader
+        this.shader.bind();
 
-            // Unbind procedural shader
-            this.shader.unbind();
-        }
+        // Send shader uniforms
+        this.shader.sendProjectionMatrix(this.renderer.projMatrix);
+        this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.shader.sendModelMatrix(this.modelMatrix);
+        this.shader.sendUniform(this.alphaUniform, this.alpha);
+        this.shader.sendUniform(this.timerUniform, timer);
+        this.shader.sendUniformVec2(this.offsetUniform, this.offset);
+        
+        // Render VBO
+        this.vertexBuffer.bind();
+        this.vertexBuffer.render(this.shader);
+        this.vertexBuffer.unbind();
+
+        // Unbind procedural shader
+        this.shader.unbind();
     }
 };
 

@@ -484,7 +484,8 @@ Wos.prototype = {
         this.testproc.resetMatrix();
         //this.testproc.moveX(-this.testproc.getWidth()/2.0);
         //this.testproc.moveY(-this.testproc.getHeight()/2.0);
-        //this.testproc.render();
+        //this.testproc.render(0.0, 0.0, 0.0);
+
 
         // Render test anim
         this.testanim.resetMatrix();
@@ -499,9 +500,9 @@ Wos.prototype = {
         //this.testtext.render();
 
         // Render test text box
-        this.testtextbox.setX(-this.testtextbox.getWidth()/2.0);
-        this.testtextbox.setY(-this.testtextbox.getHeight()/2.0);
-        this.testtextbox.render();
+        //this.testtextbox.setX(-this.testtextbox.getWidth()/2.0);
+        //this.testtextbox.setY(-this.testtextbox.getHeight()/2.0);
+        //this.testtextbox.render();
     }
 };
 
