@@ -168,12 +168,12 @@ Texture.prototype = {
         this.renderer.gl.texParameteri(
             this.renderer.gl.TEXTURE_2D,
             this.renderer.gl.TEXTURE_WRAP_S,
-            this.renderer.gl.CLAMP_TO_EDGE
+            this.renderer.gl.REPEAT
         );
         this.renderer.gl.texParameteri(
             this.renderer.gl.TEXTURE_2D,
             this.renderer.gl.TEXTURE_WRAP_T,
-            this.renderer.gl.CLAMP_TO_EDGE
+            this.renderer.gl.REPEAT
         );
 
         // Set texture min and mag filters
