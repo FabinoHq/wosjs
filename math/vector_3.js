@@ -48,9 +48,12 @@ function Vector3(x, y, z)
 {
     // 3 components vector representation
     this.vec = new GLArrayDataType(3);
-    this.vec[0] = x;
-    this.vec[1] = y;
-    this.vec[2] = z;
+    if (x !== undefined) { this.vec[0] = x; }
+    else { this.vec[0] = 0.0; }
+    if (y !== undefined) { this.vec[1] = y; }
+    else { this.vec[1] = 0.0; }
+    if (z !== undefined) { this.vec[2] = z; }
+    else { this.vec[2] = 0.0; }
 }
 
 Vector3.prototype = {
