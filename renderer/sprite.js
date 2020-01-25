@@ -49,16 +49,11 @@ const spriteFragmentShaderSrc = [
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "varying float alphaValue;",
-    "uniform float usize;",
-    "uniform float vsize;",
-    "uniform float uoffset;",
-    "uniform float voffset;",
+    "uniform vec2 uvOffset;",
+    "uniform vec2 uvSize;",
     "void main()",
     "{",
-    "   vec2 coords = vec2(texCoord.x*usize, texCoord.y*vsize);",
-    "   coords.x += uoffset;",
-    "   coords.y += voffset;",
-    "   vec4 texColor = texture2D(texture, coords);",
+    "   vec4 texColor = texture2D(texture, (texCoord*uvSize)+uvOffset);",
     "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
     "}"
 ].join("\n");
@@ -87,20 +82,16 @@ function Sprite(renderer)
     this.alpha = 1.0;
 
     // Shader uniforms locations
-    this.usizeUniform = -1;
-    this.vsizeUniform = -1;
-    this.uoffsetUniform = -1;
-    this.voffsetUniform = -1;
+    this.uvSizeUniform = -1;
+    this.uvOffsetUniform = -1;
 
     // Sprite size
     this.width = 1.0;
     this.height = 1.0;
     // Sprite texture UV offset
-    this.uoffset = 0.0;
-    this.voffset = 0.0;
+    this.uvOffset = null;
     // Sprite texture UV size
-    this.usize = 1.0;
-    this.vsize = 1.0;
+    this.uvSize = null;
 }
 
 Sprite.prototype = {
@@ -121,12 +112,14 @@ Sprite.prototype = {
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
+        this.uvSize = new Vector2(1.0, 1.0);
+        this.uvOffset = new Vector2(0.0, 0.0);
         if (width !== undefined) { this.width = width; }
         if (height !== undefined) { this.height = height; }
-        if (uoffset !== undefined) { this.uoffset = uoffset; }
-        if (voffset !== undefined) { this.voffset = voffset; }
-        if (usize !== undefined) { this.usize = usize; }
-        if (vsize !== undefined) { this.vsize = vsize; }
+        if (uoffset !== undefined) { this.uvOffset.setX(uoffset); }
+        if (voffset !== undefined) { this.uvOffset.setY(voffset); }
+        if (usize !== undefined) { this.uvSize.setX(usize); }
+        if (vsize !== undefined) { this.uvSize.setY(vsize); }
 
         // Check gl pointer
         if (!this.renderer.gl)
@@ -163,20 +156,14 @@ Sprite.prototype = {
 
         // Get shader uniforms locations
         this.shader.bind();
-        this.usizeUniform = this.shader.getUniform("usize");
-        if (this.usizeUniform == -1) { return false; }
-        this.vsizeUniform = this.shader.getUniform("vsize");
-        if (this.vsizeUniform == -1) { return false; }
-        this.uoffsetUniform = this.shader.getUniform("uoffset");
-        if (this.uoffsetUniform == -1) { return false; }
-        this.voffsetUniform = this.shader.getUniform("voffset");
-        if (this.voffsetUniform == -1) { return false; }
+        this.uvOffsetUniform = this.shader.getUniform("uvOffset");
+        if (this.uvOffsetUniform == -1) { return false; }
+        this.uvSizeUniform = this.shader.getUniform("uvSize");
+        if (this.uvSizeUniform == -1) { return false; }
 
         // Set shader uniforms
-        this.shader.sendUniform(this.usizeUniform, this.usize);
-        this.shader.sendUniform(this.vsizeUniform, this.vsize);
-        this.shader.sendUniform(this.uoffsetUniform, this.uoffset);
-        this.shader.sendUniform(this.voffsetUniform, this.voffset);
+        this.shader.sendUniformVec2(this.uvOffsetUniform, this.uvOffset);
+        this.shader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
         this.shader.unbind();
 
         // Set texture
@@ -217,11 +204,11 @@ Sprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSubrect: function(uoffset, voffset, usize, vsize)
     {
-        // Update vertex buffer
-        this.uoffset = uoffset;
-        this.voffset = voffset;
-        this.usize = usize;
-        this.vsize = vsize;
+        // Update sprite subrect
+        this.uvOffset.x = uoffset;
+        this.uvOffset.y = voffset;
+        this.uvSize.x = usize;
+        this.uvSize.y = vsize;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -328,10 +315,8 @@ Sprite.prototype = {
             this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.shader.sendModelMatrix(this.modelMatrix);
             this.shader.sendAlphaValue(this.alpha);
-            this.shader.sendUniform(this.usizeUniform, this.usize);
-            this.shader.sendUniform(this.vsizeUniform, this.vsize);
-            this.shader.sendUniform(this.uoffsetUniform, this.uoffset);
-            this.shader.sendUniform(this.voffsetUniform, this.voffset);
+            this.shader.sendUniformVec2(this.uvOffsetUniform, this.uvOffset);
+            this.shader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
 
             // Bind texture
             this.texture.bind();

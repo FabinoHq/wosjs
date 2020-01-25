@@ -324,7 +324,7 @@ GuiText.prototype = {
 
         // Init shader color uniform
         this.colorUniform = this.shader.getUniform("colorUniform");
-        this.shader.sendUniformVec3(this.colorUniform, this.color.vec);
+        this.shader.sendUniformVec3(this.colorUniform, this.color);
 
         // Text loaded
         this.shader.unbind();
@@ -677,7 +677,7 @@ GuiText.prototype = {
             this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.shader.sendModelMatrix(this.modelMatrix);
             this.shader.sendAlphaValue(this.alpha);
-            this.shader.sendUniformVec3(this.colorUniform, this.color.vec);
+            this.shader.sendUniformVec3(this.colorUniform, this.color);
 
             // Bind texture
             this.renderer.gl.bindTexture(

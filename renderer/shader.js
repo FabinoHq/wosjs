@@ -403,7 +403,7 @@ Shader.prototype = {
     {
         if (this.loaded)
         {
-            this.gl.uniform2fv(uniformLoc, uniformVec2);
+            this.gl.uniform2fv(uniformLoc, uniformVec2.vec);
         }
     },
 
@@ -416,7 +416,7 @@ Shader.prototype = {
     {
         if (this.loaded)
         {
-            this.gl.uniform3fv(uniformLoc, uniformVec3);
+            this.gl.uniform3fv(uniformLoc, uniformVec3.vec);
         }
     }
 };
