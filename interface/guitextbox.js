@@ -42,40 +42,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GUI Textbox default fragment shader                                       //
-////////////////////////////////////////////////////////////////////////////////
-const textboxFragmentShaderSrc = [
-    "precision mediump float;",
-    "varying vec2 texCoord;",
-    "void main()",
-    "{",
-    "   gl_FragColor = vec4(0.2, 0.2, 0.2, 0.8);",
-    "}" ].join("\n");
-
-////////////////////////////////////////////////////////////////////////////////
-//  GUI Textbox selection default fragment shader                             //
-////////////////////////////////////////////////////////////////////////////////
-const textselectionFragmentShaderSrc = [
-    "precision mediump float;",
-    "varying vec2 texCoord;",
-    "void main()",
-    "{",
-    "   gl_FragColor = vec4(0.0, 0.0, 0.8, 0.3);",
-    "}" ].join("\n");
-
-////////////////////////////////////////////////////////////////////////////////
-//  GUI Textbox cursor default fragment shader                                //
-////////////////////////////////////////////////////////////////////////////////
-const textcursorFragmentShaderSrc = [
-    "precision mediump float;",
-    "varying vec2 texCoord;",
-    "void main()",
-    "{",
-    "   gl_FragColor = vec4(0.8, 0.8, 0.8, 0.8);",
-    "}" ].join("\n");
-
-
-////////////////////////////////////////////////////////////////////////////////
 //  Default textbox settings                                                  //
 ////////////////////////////////////////////////////////////////////////////////
 const WOSDefaultTextBoxCursorWidthFactor = 0.04;
@@ -695,12 +661,39 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getText : Get text internal string                                    //
-    //  return : Text internal string                                         //
+    //  getText : Get textbox internal text string                            //
+    //  return : Textbox internal text string                                 //
     ////////////////////////////////////////////////////////////////////////////
     getText: function()
     {
         return this.guitext.getText();
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getLength : Get textbox internal text characters length               //
+    //  return : Textbox internal text length                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    getLength: function()
+    {
+        return this.guitext.getLength();
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getWidth : Get textbox width                                          //
+    //  return : Textbox width                                                //
+    ////////////////////////////////////////////////////////////////////////////
+    getWidth: function()
+    {
+        return this.width;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHeight : Get textbox height                                        //
+    //  return : Textbox height                                               //
+    ////////////////////////////////////////////////////////////////////////////
+    getHeight: function()
+    {
+        return this.height;
     },
 
     ////////////////////////////////////////////////////////////////////////////

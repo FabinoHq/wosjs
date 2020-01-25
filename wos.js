@@ -378,7 +378,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     handleKeyDown: function(key)
     {
-        //if (this.testtextbox) this.testtextbox.keyPress(key);
+        if (this.testtextbox) this.testtextbox.keyPress(key);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -387,7 +387,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     handleKeyUp: function(key)
     {
-        //if (this.testtextbox) this.testtextbox.keyRelease(key);
+        if (this.testtextbox) this.testtextbox.keyRelease(key);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -398,8 +398,8 @@ Wos.prototype = {
     handleMouseMove: function(mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
-        /*if (this.testtextbox)
-            this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);*/
+        if (this.testtextbox)
+            this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -411,8 +411,8 @@ Wos.prototype = {
     handleMouseDown: function(button, mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
-        /*if (this.testtextbox)
-            this.testtextbox.mousePress(this.realMouseX, this.realMouseY);*/
+        if (this.testtextbox)
+            this.testtextbox.mousePress(this.realMouseX, this.realMouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -424,8 +424,8 @@ Wos.prototype = {
     handleMouseUp: function(button, mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
-        /*if (this.testtextbox)
-            this.testtextbox.mouseRelease(this.realMouseX, this.realMouseY);*/
+        if (this.testtextbox)
+            this.testtextbox.mouseRelease(this.realMouseX, this.realMouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -494,12 +494,14 @@ Wos.prototype = {
 
         // Render test text
         this.testtext.resetMatrix();
-        this.testtext.moveX(-this.testtext.getWidth()/2.0);
-        this.testtext.moveY(-this.testtext.getHeight()/2.0);
-        this.testtext.render();
+        //this.testtext.moveX(-this.testtext.getWidth()/2.0);
+        //this.testtext.moveY(-this.testtext.getHeight()/2.0);
+        //this.testtext.render();
 
         // Render test text box
-        //this.testtextbox.render();
+        this.testtextbox.setX(-this.testtextbox.getWidth()/2.0);
+        this.testtextbox.setY(-this.testtextbox.getHeight()/2.0);
+        this.testtextbox.render();
     }
 };
 

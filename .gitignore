@@ -30,6 +30,7 @@
 !renderer/spriteshader.js
 !renderer/animspriteshader.js
 !renderer/textshader.js
+!renderer/textboxshader.js
 !renderer/texture.js
 !renderer/sprite.js
 !renderer/animsprite.js
