@@ -246,13 +246,7 @@ Texture.prototype = {
     //  param smooth : Texture smooth attribute                               //
     ////////////////////////////////////////////////////////////////////////////
     setSmooth: function(smooth)
-    {
-        // Set texture smoothness
-        if (smooth !== undefined)
-        {
-            this.smooth = smooth;
-        }
-        
+    {        
         if (this.loaded)
         {
             // Bind texture
