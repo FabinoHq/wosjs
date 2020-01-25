@@ -48,13 +48,13 @@ const spriteFragmentShaderSrc = [
     "precision mediump float;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
-    "varying float alphaValue;",
+    "uniform float alpha;",
     "uniform vec2 uvOffset;",
     "uniform vec2 uvSize;",
     "void main()",
     "{",
     "   vec4 texColor = texture2D(texture, (texCoord*uvSize)+uvOffset);",
-    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
+    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
     "}"
 ].join("\n");
 
@@ -72,6 +72,7 @@ function SpriteShader(glPointer)
     this.shader = null;
 
     // Sprite shader uniforms locations
+    this.alphaUniform = -1;
     this.uvSizeUniform = -1;
     this.uvOffsetUniform = -1;
 }
@@ -83,6 +84,7 @@ SpriteShader.prototype = {
     init: function()
     {
         // Reset sprite shader
+        this.alphaUniform = -1;
         this.uvSizeUniform = -1;
         this.uvOffsetUniform = -1;
 
@@ -105,6 +107,8 @@ SpriteShader.prototype = {
 
         // Get sprite shader uniforms locations
         this.shader.bind();
+        this.alphaUniform = this.shader.getUniform("alpha");
+        if (this.alphaUniform == -1) { return false; }
         this.uvOffsetUniform = this.shader.getUniform("uvOffset");
         if (this.uvOffsetUniform == -1) { return false; }
         this.uvSizeUniform = this.shader.getUniform("uvSize");

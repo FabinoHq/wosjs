@@ -50,13 +50,10 @@ const defaultVertexShaderSrc = [
     "uniform mat4 projMatrix;",
     "uniform mat4 viewMatrix;",
     "uniform mat4 modelMatrix;",
-    "uniform float alphaUniform;",
     "varying vec2 texCoord;",
-    "varying float alphaValue;",
     "void main()",
     "{",
     "   texCoord = vertexColor;",
-    "   alphaValue = alphaUniform;",
     "   gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
     "}"
 ].join("\n");
@@ -68,11 +65,10 @@ const defaultFragmentShaderSrc = [
     "precision mediump float;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
-    "varying float alphaValue;",
     "void main()",
     "{",
     "   vec4 texColor = texture2D(texture, texCoord);",
-    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
+    "   gl_FragColor = vec4(texColor.rgb, texColor.a);",
     "}"
 ].join("\n");
 
@@ -104,7 +100,6 @@ function Shader(glPointer)
     this.projMatrixLocation = -1;
     this.viewMatrixLocation = -1;
     this.modelMatrixLocation = -1;
-    this.alphaLocation = -1;
 }
 
 Shader.prototype = {
@@ -127,7 +122,6 @@ Shader.prototype = {
         this.projMatrixLocation = -1;
         this.viewMatrixLocation = -1;
         this.modelMatrixLocation = -1;
-        this.alphaLocation = -1;
 
         // Check gl pointer
         if (!this.gl)
@@ -227,52 +221,39 @@ Shader.prototype = {
 
         // Get vertex attribute location
         this.vertexLocation = this.gl.getAttribLocation(
-            this.shaderProgram,
-            "vertexPos"
+            this.shaderProgram, "vertexPos"
         );
         if (this.vertexLocation == -1) return false;
 
         // Get texture coords attribute location
         this.texCoordsLocation = this.gl.getAttribLocation(
-            this.shaderProgram,
-            "vertexColor"
+            this.shaderProgram, "vertexColor"
         );
         if (this.texCoordsLocation == -1) return false;
 
         // Get texture location
         this.textureLocation = this.gl.getUniformLocation(
-            this.shaderProgram,
-            "texture"
+            this.shaderProgram, "texture"
         );
         if (this.textureLocation == -1) return false;
 
         // Get projection matrix location
         this.projMatrixLocation = this.gl.getUniformLocation(
-            this.shaderProgram,
-            "projMatrix"
+            this.shaderProgram, "projMatrix"
         );
         if (this.projMatrixLocation == -1) return false;
 
         // Get view matrix location
         this.viewMatrixLocation = this.gl.getUniformLocation(
-            this.shaderProgram,
-            "viewMatrix"
+            this.shaderProgram, "viewMatrix"
         );
         if (this.viewMatrixLocation == -1) return false;
 
         // Get model matrix location
         this.modelMatrixLocation = this.gl.getUniformLocation(
-            this.shaderProgram,
-            "modelMatrix"
+            this.shaderProgram, "modelMatrix"
         );
         if (this.modelMatrixLocation == -1) return false;
-
-        // Get alpha value location
-        this.alphaLocation = this.gl.getUniformLocation(
-            this.shaderProgram,
-            "alphaUniform"
-        );
-        if (this.alphaLocation == -1) return false;
 
         this.gl.useProgram(null);
 
@@ -330,15 +311,6 @@ Shader.prototype = {
             this.modelMatrixLocation,
             false, modelMatrix.matrix
         );
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  sendAlphaValue : Send alpha value to use with this shader             //
-    //  param alphaValue : Alpha value to use                                 //
-    ////////////////////////////////////////////////////////////////////////////
-    sendAlphaValue: function(alphaValue)
-    {
-        this.gl.uniform1f(this.alphaLocation, alphaValue);
     },
 
     ////////////////////////////////////////////////////////////////////////////

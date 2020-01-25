@@ -269,7 +269,9 @@ Sprite.prototype = {
         this.spriteShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
         this.spriteShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
         this.spriteShader.shader.sendModelMatrix(this.modelMatrix);
-        this.spriteShader.shader.sendAlphaValue(this.alpha);
+        this.spriteShader.shader.sendUniform(
+            this.spriteShader.alphaUniform, this.alpha
+        );
         this.spriteShader.shader.sendUniformVec2(
             this.spriteShader.uvOffsetUniform, this.uvOffset
         );

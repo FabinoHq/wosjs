@@ -369,7 +369,9 @@ AnimSprite.prototype = {
         this.animShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
         this.animShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
         this.animShader.shader.sendModelMatrix(this.modelMatrix);
-        this.animShader.shader.sendAlphaValue(this.alpha);
+        this.animShader.shader.sendUniform(
+            this.animShader.alphaUniform, this.alpha
+        );
         this.animShader.shader.sendUniformVec2(
             this.animShader.countUniform, this.count
         );

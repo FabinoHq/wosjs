@@ -254,7 +254,6 @@ Renderer.prototype = {
         this.gl.enable(this.gl.BLEND);
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
         this.gl.blendEquation(this.gl.FUNC_ADD);
-        this.shader.sendAlphaValue(1.0);
 
         // Unbind default shader
         this.shader.unbind();

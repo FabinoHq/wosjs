@@ -64,7 +64,9 @@ function ProcSprite(renderer)
     // Procedural sprite size
     this.width = 1.0;
     this.height = 1.0;
+
     // Procedural sprite shader uniforms locations
+    this.alphaUniform = -1;
     this.uniformTimer = -1;
     this.uniformOffsetX = -1;
     this.uniformOffsetY = -1;
@@ -128,6 +130,8 @@ ProcSprite.prototype = {
 
         // Get uniforms locations
         this.shader.bind();
+        this.alphaUniform = this.shader.getUniform("alpha");
+        if (this.alphaUniform == -1) return false;
         this.uniformTimer = this.shader.getUniform("timer");
         if (this.uniformTimer == -1) return false;
         this.uniformOffsetX = this.shader.getUniform("offsetX");
@@ -233,7 +237,7 @@ ProcSprite.prototype = {
             this.shader.sendProjectionMatrix(this.renderer.projMatrix);
             this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.shader.sendModelMatrix(this.modelMatrix);
-            this.shader.sendAlphaValue(this.alpha);
+            this.shader.sendUniform(this.alphaUniform, this.alpha);
             this.shader.sendUniform(this.uniformTimer, timer);
             this.shader.sendUniform(this.uniformOffsetX, offsetX);
             this.shader.sendUniform(this.uniformOffsetY, offsetY);

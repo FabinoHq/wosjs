@@ -48,7 +48,7 @@ const animspriteFragmentShaderSrc = [
     "precision mediump float;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
-    "varying float alphaValue;",
+    "uniform float alpha;",
     "uniform vec2 count;",
     "uniform vec2 current;",
     "uniform vec2 next;",
@@ -57,7 +57,7 @@ const animspriteFragmentShaderSrc = [
     "{",
     "   vec4 texColor = texture2D(texture, (texCoord+current)/count)*",
     "     (1.0-interp)+texture2D(texture, (texCoord+next)/count)*interp;",
-    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
+    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
     "}"
 ].join("\n");
 
@@ -75,6 +75,7 @@ function AnimSpriteShader(glPointer)
     this.shader = null;
 
     // Animated sprite shader uniforms locations
+    this.alphaUniform = -1;
     this.countUniform = -1;
     this.currentUniform = -1;
     this.nextUniform = -1;
@@ -88,6 +89,7 @@ AnimSpriteShader.prototype = {
     init: function()
     {
         // Reset animated sprite shader
+        this.alphaUniform = -1;
         this.countUniform = -1;
         this.currentUniform = -1;
         this.nextUniform = -1;
@@ -113,6 +115,8 @@ AnimSpriteShader.prototype = {
 
         // Get animated sprite shader uniforms locations
         this.shader.bind();
+        this.alphaUniform = this.shader.getUniform("alpha");
+        if (this.alphaUniform == -1) { return false; }
         this.countUniform = this.shader.getUniform("count");
         if (this.countUniform == -1) { return false; }
         this.currentUniform = this.shader.getUniform("current");
