@@ -42,52 +42,18 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Animated sprite fragment shader                                           //
-////////////////////////////////////////////////////////////////////////////////
-const animspriteFragmentShaderSrc = [
-    "precision mediump float;",
-    "uniform sampler2D texture;",
-    "varying vec2 texCoord;",
-    "varying float alphaValue;",
-    "uniform float countX;",
-    "uniform float countY;",
-    "uniform float currentX;",
-    "uniform float currentY;",
-    "uniform float nextX;",
-    "uniform float nextY;",
-    "uniform float interp;",
-    "void main()",
-    "{",
-    "   vec2 coords = vec2(texCoord.x/countX, texCoord.y/countY);",
-    "   vec2 coords2 = coords;",
-    "   coords.x += currentX/countX;",
-    "   coords.y += currentY/countY;",
-    "   coords2.x += nextX/countX;",
-    "   coords2.y += nextY/countY;",
-    "   vec4 tc1 = texture2D(texture, coords);",
-    "   vec4 tc2 = texture2D(texture, coords2);",
-    "   vec4 texColor = vec4(",
-    "     tc1.r*(1.0-interp)+tc2.r*interp, tc1.g*(1.0-interp)+tc2.g*interp,",
-    "     tc1.b*(1.0-interp)+tc2.b*interp, tc1.a*(1.0-interp)+tc2.a*interp",
-    "   );",
-    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
-    "}"
-].join("\n");
-
-
-////////////////////////////////////////////////////////////////////////////////
 //  AnimSprite class definition                                               //
+//  param renderer : Renderer pointer                                         //
+//  param animSpriteShader : Animated sprite shader pointer                   //
 ////////////////////////////////////////////////////////////////////////////////
-function AnimSprite(renderer)
+function AnimSprite(renderer, animSpriteShader)
 {
-    // Animated sprite loaded state
-    this.loaded = false;
-
     // Renderer pointer
     this.renderer = renderer;
 
-    // Animated sprite shader
-    this.shader = null;
+    // Animated sprite shader pointer
+    this.animShader = animSpriteShader;
+
     // Animated sprite VBO
     this.vertexBuffer = null;
     // Animated sprite texture
@@ -96,15 +62,6 @@ function AnimSprite(renderer)
     this.modelMatrix = null;
     // Animated sprite alpha
     this.alpha = 1.0;
-
-    // Shader uniforms locations
-    this.countXuniform = -1;
-    this.countYuniform = -1;
-    this.currentXuniform = -1;
-    this.currentYuniform = -1;
-    this.nextXuniform = -1;
-    this.nextYuniform = -1;
-    this.interpUniform = -1;
 
     // Animated sprite size
     this.width = 1.0;
@@ -143,14 +100,9 @@ AnimSprite.prototype = {
     init: function(tex, width, height, countX, countY, frametime)
     {
         // Reset animated sprite
-        this.loaded = false;
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
-        this.countXuniform = -1;
-        this.countYuniform = -1;
-        this.currentXuniform = -1;
-        this.currentYuniform = -1;
         if (width !== undefined) { this.width = width; }
         if (height !== undefined) { this.height = height; }
         if (countX !== undefined) { this.countX = countX; }
@@ -171,6 +123,12 @@ AnimSprite.prototype = {
             return false;
         }
 
+        // Check animated sprite shader pointer
+        if (!this.animShader)
+        {
+            return false;
+        }
+
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
 
@@ -187,45 +145,6 @@ AnimSprite.prototype = {
             return false;
         }
 
-        // Init shader
-        this.shader = new Shader(this.renderer.gl);
-        if (!this.shader)
-        {
-            return false;
-        }
-        if (!this.shader.init(
-            defaultVertexShaderSrc, animspriteFragmentShaderSrc))
-        {
-            return false;
-        }
-
-        // Get shader uniforms locations
-        this.shader.bind();
-        this.countXuniform = this.shader.getUniform("countX");
-        if (this.countXuniform == -1) { return false; }
-        this.countYuniform = this.shader.getUniform("countY");
-        if (this.countYuniform == -1) { return false; }
-        this.currentXuniform = this.shader.getUniform("currentX");
-        if (this.currentXuniform == -1) { return false; }
-        this.currentYuniform = this.shader.getUniform("currentY");
-        if (this.currentYuniform == -1) { return false; }
-        this.nextXuniform = this.shader.getUniform("nextX");
-        if (this.nextXuniform == -1) { return false; }
-        this.nextYuniform = this.shader.getUniform("nextY");
-        if (this.nextYuniform == -1) { return false; }
-        this.interpUniform = this.shader.getUniform("interp");
-        if (this.interpUniform == -1) { return false; }
-
-        // Set shader uniforms
-        this.shader.sendUniform(this.countXuniform, this.countX);
-        this.shader.sendUniform(this.countYuniform, this.countY);
-        this.shader.sendUniform(this.currentXuniform, this.currentX);
-        this.shader.sendUniform(this.currentYuniform, this.currentY);
-        this.shader.sendUniform(this.nextXuniform, this.currentX);
-        this.shader.sendUniform(this.nextYuniform, this.currentY);
-        this.shader.sendUniform(this.interpUniform, this.interpOffset);
-        this.shader.unbind();
-
         // Set texture
         this.texture = tex;
         if (!this.texture)
@@ -238,7 +157,6 @@ AnimSprite.prototype = {
         this.vertexBuffer.setPlane(this.width, this.height);
 
         // Sprite loaded
-        this.loaded = true;
         return true;
     },
 
@@ -434,59 +352,72 @@ AnimSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function(frametime)
     {
-        if (this.loaded)
+        // Update current animation time
+        this.currentTime += frametime;
+        if (this.frametime > 0.0)
         {
-            // Update current animation time
-            this.currentTime += frametime;
-            if (this.frametime > 0.0)
-            {
-                this.interpOffset += frametime/this.frametime;
-            }
-            else
-            {
-                this.interpOffset += frametime;
-            }
-
-            if (this.currentTime >= this.frametime)
-            {
-                // Reset interpolation timer
-                this.interpOffset = 0.0;
-
-                // Compute frame offets
-                this.computeFrame();
-
-                // Reset timer
-                this.currentTime = 0.0;
-            }
-
-            // Bind shader
-            this.shader.bind();
-
-            // Send shader uniforms
-            this.shader.sendProjectionMatrix(this.renderer.projMatrix);
-            this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-            this.shader.sendModelMatrix(this.modelMatrix);
-            this.shader.sendAlphaValue(this.alpha);
-            this.shader.sendUniform(this.currentXuniform, this.currentX);
-            this.shader.sendUniform(this.currentYuniform, this.currentY);
-            this.shader.sendUniform(this.nextXuniform, this.nextX);
-            this.shader.sendUniform(this.nextYuniform, this.nextY);
-            this.shader.sendUniform(this.interpUniform, this.interpOffset);
-
-            // Bind texture
-            this.texture.bind();
-
-            // Render VBO
-            this.vertexBuffer.bind();
-            this.vertexBuffer.render(this.shader);
-            this.vertexBuffer.unbind();
-
-            // Unbind texture
-            this.texture.unbind();
-
-            // Unbind shader
-            this.shader.unbind();
+            this.interpOffset += frametime/this.frametime;
         }
+        else
+        {
+            this.interpOffset += frametime;
+        }
+
+        if (this.currentTime >= this.frametime)
+        {
+            // Reset interpolation timer
+            this.interpOffset = 0.0;
+
+            // Compute frame offets
+            this.computeFrame();
+
+            // Reset timer
+            this.currentTime = 0.0;
+        }
+
+        // Bind shader
+        this.animShader.shader.bind();
+
+        // Send shader uniforms
+        this.animShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
+        this.animShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.animShader.shader.sendModelMatrix(this.modelMatrix);
+        this.animShader.shader.sendAlphaValue(this.alpha);
+        this.animShader.shader.sendUniform(
+            this.animShader.countXuniform, this.countX
+        );
+        this.animShader.shader.sendUniform(
+            this.animShader.countYuniform, this.countY
+        );
+        this.animShader.shader.sendUniform(
+            this.animShader.currentXuniform, this.currentX
+        );
+        this.animShader.shader.sendUniform(
+            this.animShader.currentYuniform, this.currentY
+        );
+        this.animShader.shader.sendUniform(
+            this.animShader.nextXuniform, this.nextX
+        );
+        this.animShader.shader.sendUniform(
+            this.animShader.nextYuniform, this.nextY
+        );
+        this.animShader.shader.sendUniform(
+            this.animShader.interpUniform, this.interpOffset
+        );
+
+        // Bind texture
+        this.texture.bind();
+
+        // Render VBO
+        this.vertexBuffer.bind();
+        this.vertexBuffer.render(this.animShader.shader);
+        this.vertexBuffer.unbind();
+
+        // Unbind texture
+        this.texture.unbind();
+
+        // Unbind shader
+        this.animShader.shader.unbind();
     }
 };
 

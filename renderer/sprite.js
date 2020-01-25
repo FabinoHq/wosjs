@@ -44,15 +44,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Sprite class definition                                                   //
 //  param renderer : Renderer pointer                                         //
-//  param shader : Sprite shader pointer                                      //
+//  param spriteShader : Sprite shader pointer                                //
 ////////////////////////////////////////////////////////////////////////////////
-function Sprite(renderer, shader)
+function Sprite(renderer, spriteShader)
 {
     // Renderer pointer
     this.renderer = renderer;
 
     // Sprite shader pointer
-    this.spriteShader = shader;
+    this.spriteShader = spriteShader;
 
     // Sprite VBO
     this.vertexBuffer = null;

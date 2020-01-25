@@ -27,6 +27,7 @@
 !renderer/vertexbuffer.js
 !renderer/shader.js
 !renderer/spriteshader.js
+!renderer/animspriteshader.js
 !renderer/texture.js
 !renderer/sprite.js
 !renderer/animsprite.js

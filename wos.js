@@ -243,6 +243,8 @@ function Wos()
 
     // Sprite shader
     this.spriteShader = null;
+    // Animated sprite shader
+    this.animSpriteShader = null;
 
     // Test sprite
     this.testsprite = null;
@@ -301,6 +303,11 @@ Wos.prototype = {
         this.spriteShader = new SpriteShader(this.renderer.gl);
         this.spriteShader.init();
 
+        // Init animated sprite shader
+        this.animSpriteShader = new AnimSpriteShader(this.renderer.gl);
+        this.animSpriteShader.init();
+
+
         // Init test sprite
         this.testsprite = new Sprite(this.renderer, this.spriteShader);
         this.testsprite.init(
@@ -312,7 +319,7 @@ Wos.prototype = {
         this.testproc.init();
 
         // Init test anim
-        this.testanim = new AnimSprite(this.renderer);
+        this.testanim = new AnimSprite(this.renderer, this.animSpriteShader);
         this.testanim.init(
             this.loader.getTexture("testsprite.png"), 1.0, 1.0, 1, 1, 1.0
         );
@@ -463,9 +470,9 @@ Wos.prototype = {
 
         // Render test sprite
         this.testsprite.resetMatrix();
-        this.testsprite.moveX(-this.testsprite.getWidth()/2.0);
-        this.testsprite.moveY(-this.testsprite.getHeight()/2.0);
-        this.testsprite.render();
+        //this.testsprite.moveX(-this.testsprite.getWidth()/2.0);
+        //this.testsprite.moveY(-this.testsprite.getHeight()/2.0);
+        //this.testsprite.render();
 
         // Render procedural test sprite
         this.testproc.resetMatrix();
@@ -475,9 +482,9 @@ Wos.prototype = {
 
         // Render test anim
         this.testanim.resetMatrix();
-        //this.testanim.moveX(-this.testanim.getWidth()/2.0);
-        //this.testanim.moveY(-this.testanim.getHeight()/2.0);
-        //this.testanim.render(this.frametime);
+        this.testanim.moveX(-this.testanim.getWidth()/2.0);
+        this.testanim.moveY(-this.testanim.getHeight()/2.0);
+        this.testanim.render(this.frametime);
 
         // Render test text
         this.testtext.resetMatrix();
