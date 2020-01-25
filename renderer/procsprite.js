@@ -113,7 +113,7 @@ ProcSprite.prototype = {
         }
 
         // Update vbo
-        this.vertexBuffer.setPlane(this.width, this.height);
+        this.vertexBuffer.setPlane2D(this.width, this.height);
 
         // Init shader
         this.shader = new Shader(this.renderer.gl);
@@ -149,9 +149,9 @@ ProcSprite.prototype = {
     setSize: function(width, height)
     {
         // Update vertex buffer
-        if (width !== undefined) { this.width = width; }
-        if (height !== undefined) { this.height = height; }
-        this.vertexBuffer.setPlane(this.width, this.height);
+        this.width = width;
+        this.height = height;
+        this.vertexBuffer.setPlane2D(this.width, this.height);
     },
 
     ////////////////////////////////////////////////////////////////////////////

@@ -203,11 +203,11 @@ VertexBuffer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPlane : Set vertex buffer object as a simple plane geometry        //
-    //  param width : Width of the plane                                      //
-    //  param height : Height of the plane                                    //
+    //  setPlane2D : Set vertex buffer object as a simple 2D plane geometry   //
+    //  param width : Width of the 2D plane                                   //
+    //  param height : Height of the 2D plane                                 //
     ////////////////////////////////////////////////////////////////////////////
-    setPlane: function(width, height)
+    setPlane2D: function(width, height)
     {
         // Set plane geometry
         this.vertCount = 6;
@@ -245,36 +245,6 @@ VertexBuffer.prototype = {
 
         // Update VBO
         this.updateBuffer();
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  updateTexcoords : Set vertex buffer object texture coordinates        //
-    //  param x : Left X texture coordinate                                   //
-    //  param y : Top Y texture coordinate                                    //
-    //  param x2 : Right X texture coordinate                                 //
-    //  param y2 : Bottom Y texture coordinate                                //
-    ////////////////////////////////////////////////////////////////////////////
-    updateTexcoords: function(x, y, x2, y2)
-    {
-        // Set texcoords
-        this.texCoordsData[0] = x;
-        this.texCoordsData[1] = y2;
-        this.texCoordsData[2] = x2;
-        this.texCoordsData[3] = y2;
-        this.texCoordsData[4] = x2;
-        this.texCoordsData[5] = y;
-        this.texCoordsData[6] = x;
-        this.texCoordsData[7] = y;
-
-        // Update VBO
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-        this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, this.verticesData);
-        this.gl.bufferSubData(
-            this.gl.ARRAY_BUFFER,
-            this.texCoordsOffset,
-            this.texCoordsData
-        );
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
     },
     
     ////////////////////////////////////////////////////////////////////////////

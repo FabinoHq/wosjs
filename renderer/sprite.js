@@ -135,7 +135,7 @@ Sprite.prototype = {
         }
 
         // Update vertex buffer
-        this.vertexBuffer.setPlane(this.width, this.height);
+        this.vertexBuffer.setPlane2D(this.width, this.height);
 
         // Sprite loaded
         return true;
@@ -151,7 +151,7 @@ Sprite.prototype = {
         // Update vertex buffer
         this.width = width;
         this.height = height;
-        this.vertexBuffer.setPlane(this.width, this.height);
+        this.vertexBuffer.setPlane2D(this.width, this.height);
     },
 
     ////////////////////////////////////////////////////////////////////////////

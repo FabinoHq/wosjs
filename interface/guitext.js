@@ -306,7 +306,7 @@ GuiText.prototype = {
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
         // Update vertex buffer     
-        this.vertexBuffer.setPlane(
+        this.vertexBuffer.setPlane2D(
             this.width, this.height
         );
 
@@ -403,7 +403,7 @@ GuiText.prototype = {
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
         // Update vertex buffer     
-        this.vertexBuffer.setPlane(this.width, this.height);
+        this.vertexBuffer.setPlane2D(this.width, this.height);
         return true;
     },
 
