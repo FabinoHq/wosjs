@@ -205,10 +205,8 @@ Sprite.prototype = {
     setSubrect: function(uoffset, voffset, usize, vsize)
     {
         // Update sprite subrect
-        this.uvOffset.x = uoffset;
-        this.uvOffset.y = voffset;
-        this.uvSize.x = usize;
-        this.uvSize.y = vsize;
+        this.uvOffset.setXY(uoffset, voffset);
+        this.uvSize.setXY(usize, vsize);
     },
 
     ////////////////////////////////////////////////////////////////////////////
