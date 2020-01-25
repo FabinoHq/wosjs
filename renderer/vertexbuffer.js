@@ -75,9 +75,6 @@ var defaultIndices = new GLIndexDataType([
 ////////////////////////////////////////////////////////////////////////////////
 function VertexBuffer(glPointer)
 {
-    // VBO loaded state
-    this.loaded = false;
-
     // WebGL functions pointer
     this.gl = glPointer;
 
@@ -134,7 +131,6 @@ VertexBuffer.prototype = {
         this.updateBuffer();
 
         // VBO successfully loaded
-        this.loaded = true;
         return true;
     },
 
@@ -143,14 +139,11 @@ VertexBuffer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     bind: function()
     {
-        if (this.loaded)
-        {
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-            this.gl.bindBuffer(
-                this.gl.ELEMENT_ARRAY_BUFFER,
-                this.elementBuffer
-            );
-        }
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
+        this.gl.bindBuffer(
+            this.gl.ELEMENT_ARRAY_BUFFER,
+            this.elementBuffer
+        );
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -158,11 +151,8 @@ VertexBuffer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     unbind: function()
     {
-        if (this.loaded)
-        {
-            this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
-        }
+        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -253,31 +243,28 @@ VertexBuffer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function(shader)
     {
-        if (this.loaded && shader)
-        {
-            // Enable vertices array
-            this.gl.enableVertexAttribArray(shader.vertexLocation);
-            this.gl.vertexAttribPointer(
-                shader.vertexLocation, 2,
-                this.gl.FLOAT, this.gl.FALSE,
-                0, 0
-            );
+        // Enable vertices array
+        this.gl.enableVertexAttribArray(shader.vertexLocation);
+        this.gl.vertexAttribPointer(
+            shader.vertexLocation, 2,
+            this.gl.FLOAT, this.gl.FALSE,
+            0, 0
+        );
 
-            // Enable texcoords array
-            this.gl.enableVertexAttribArray(shader.texCoordsLocation);
-            this.gl.vertexAttribPointer(
-                shader.texCoordsLocation, 2,
-                this.gl.FLOAT, this.gl.FALSE,
-                0, this.texCoordsOffset
-            );
+        // Enable texcoords array
+        this.gl.enableVertexAttribArray(shader.texCoordsLocation);
+        this.gl.vertexAttribPointer(
+            shader.texCoordsLocation, 2,
+            this.gl.FLOAT, this.gl.FALSE,
+            0, this.texCoordsOffset
+        );
 
-            // Draw triangles
-            this.gl.drawElements(
-                this.gl.TRIANGLES,
-                this.vertCount,
-                this.gl.UNSIGNED_SHORT, 0
-            );
-        }
+        // Draw triangles
+        this.gl.drawElements(
+            this.gl.TRIANGLES,
+            this.vertCount,
+            this.gl.UNSIGNED_SHORT, 0
+        );
     }
 };
 
