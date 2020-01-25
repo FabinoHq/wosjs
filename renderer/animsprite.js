@@ -53,12 +53,23 @@ const animspriteFragmentShaderSrc = [
     "uniform float countY;",
     "uniform float currentX;",
     "uniform float currentY;",
+    "uniform float nextX;",
+    "uniform float nextY;",
+    "uniform float interp;",
     "void main()",
     "{",
     "   vec2 coords = vec2(texCoord.x/countX, texCoord.y/countY);",
+    "   vec2 coords2 = coords;",
     "   coords.x += currentX/countX;",
     "   coords.y += currentY/countY;",
-    "   vec4 texColor = texture2D(texture, coords);",
+    "   coords2.x += nextX/countX;",
+    "   coords2.y += nextY/countY;",
+    "   vec4 tc1 = texture2D(texture, coords);",
+    "   vec4 tc2 = texture2D(texture, coords2);",
+    "   vec4 texColor = vec4(",
+    "     tc1.r*(1.0-interp)+tc2.r*interp, tc1.g*(1.0-interp)+tc2.g*interp,",
+    "     tc1.b*(1.0-interp)+tc2.b*interp, tc1.a*(1.0-interp)+tc2.a*interp",
+    "   );",
     "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
     "}"
 ].join("\n");
@@ -90,6 +101,9 @@ function AnimSprite(renderer)
     this.countYuniform = -1;
     this.currentXuniform = -1;
     this.currentYuniform = -1;
+    this.nextXuniform = -1;
+    this.nextYuniform = -1;
+    this.interpUniform = -1;
 
     // Animated sprite size
     this.width = 1.0;
@@ -109,8 +123,10 @@ function AnimSprite(renderer)
     // Animated sprite current states
     this.currentX = 0;
     this.currentY = 0;
+    this.nextX = 0;
+    this.nextY = 0;
     this.currentTime = 0.0;
-    this.interTime = 0.0;
+    this.interpOffset = 0.0;
 }
 
 AnimSprite.prototype = {
@@ -146,6 +162,7 @@ AnimSprite.prototype = {
         this.currentX = 0;
         this.currentY = 0;
         this.currentTime = 0.0;
+        this.interpOffset = 0.0;
 
         // Check gl pointer
         if (!this.renderer.gl)
@@ -191,12 +208,21 @@ AnimSprite.prototype = {
         if (this.currentXuniform == -1) { return false; }
         this.currentYuniform = this.shader.getUniform("currentY");
         if (this.currentYuniform == -1) { return false; }
+        this.nextXuniform = this.shader.getUniform("nextX");
+        if (this.nextXuniform == -1) { return false; }
+        this.nextYuniform = this.shader.getUniform("nextY");
+        if (this.nextYuniform == -1) { return false; }
+        this.interpUniform = this.shader.getUniform("interp");
+        if (this.interpUniform == -1) { return false; }
 
         // Set shader uniforms
         this.shader.sendUniform(this.countXuniform, this.countX);
         this.shader.sendUniform(this.countYuniform, this.countY);
         this.shader.sendUniform(this.currentXuniform, this.currentX);
         this.shader.sendUniform(this.currentYuniform, this.currentY);
+        this.shader.sendUniform(this.nextXuniform, this.currentX);
+        this.shader.sendUniform(this.nextYuniform, this.currentY);
+        this.shader.sendUniform(this.interpUniform, this.interpOffset);
         this.shader.unbind();
 
         // Set texture
@@ -345,8 +371,60 @@ AnimSprite.prototype = {
     resetAnim: function()
     {
         this.currentTime = 0.0;
-        this.currentX = this.startX;
-        this.currentY = this.startY;
+        this.interpOffset = 0.0;
+        this.nextX = this.startX;
+        this.nextY = this.startY;
+        this.computeFrame();
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  computeFrame : Compute current and next frame offsets                 //
+    ////////////////////////////////////////////////////////////////////////////
+    computeFrame: function()
+    {
+        // Compute next frame offset
+        this.currentX = this.nextX;
+        this.currentY = this.nextY;
+        if (this.nextX < (this.countX-1))
+        {
+            // Check end frame
+            if ((this.nextX >= this.endX) &&
+                (this.nextY >= this.endY))
+            {
+                // End frame reached
+                this.nextX = this.startX;
+                this.nextY = this.startY;
+            }
+            else
+            {
+                ++this.nextX;
+            }
+        }
+        else
+        {
+            if (this.nextY < (this.nextY-1))
+            {
+                // Check end frame
+                if ((this.nextX >= this.endX) &&
+                    (this.nextY >= this.endY))
+                {
+                    // End frame reached
+                    this.nextX = this.startX;
+                    this.nextY = this.startY;
+                }
+                else
+                {
+                    this.nextX = 0;
+                    ++this.nextY;
+                }
+            }
+            else
+            {
+                // Last frame reached
+                this.nextX = this.startX;
+                this.nextY = this.startY;
+            }
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -361,56 +439,20 @@ AnimSprite.prototype = {
             this.currentTime += frametime;
             if (this.frametime > 0.0)
             {
-                this.interTime += frametime/this.frametime;
+                this.interpOffset += frametime/this.frametime;
             }
             else
             {
-                this.interTime += frametime;
+                this.interpOffset += frametime;
             }
 
             if (this.currentTime >= this.frametime)
             {
-                // Compute frame offset
-                if (this.currentX < (this.countX-1))
-                {
-                    // Check end frame
-                    if ((this.currentX >= this.endX) &&
-                        (this.currentY >= this.endY))
-                    {
-                        // End frame reached
-                        this.currentX = this.startX;
-                        this.currentY = this.startY;
-                    }
-                    else
-                    {
-                        ++this.currentX;
-                    }
-                }
-                else
-                {
-                    if (this.currentY < (this.countY-1))
-                    {
-                        // Check end frame
-                        if ((this.currentX >= this.endX) &&
-                            (this.currentY >= this.endY))
-                        {
-                            // End frame reached
-                            this.currentX = this.startX;
-                            this.currentY = this.startY;
-                        }
-                        else
-                        {
-                            this.currentX = 0;
-                            ++this.currentY;
-                        }
-                    }
-                    else
-                    {
-                        // Last frame reached
-                        this.currentX = this.startX;
-                        this.currentY = this.startY;
-                    }
-                }
+                // Reset interpolation timer
+                this.interpOffset = 0.0;
+
+                // Compute frame offets
+                this.computeFrame();
 
                 // Reset timer
                 this.currentTime = 0.0;
@@ -424,9 +466,11 @@ AnimSprite.prototype = {
             this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.shader.sendModelMatrix(this.modelMatrix);
             this.shader.sendAlphaValue(this.alpha);
-
             this.shader.sendUniform(this.currentXuniform, this.currentX);
             this.shader.sendUniform(this.currentYuniform, this.currentY);
+            this.shader.sendUniform(this.nextXuniform, this.nextX);
+            this.shader.sendUniform(this.nextYuniform, this.nextY);
+            this.shader.sendUniform(this.interpUniform, this.interpOffset);
 
             // Bind texture
             this.texture.bind();
