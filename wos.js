@@ -321,10 +321,10 @@ Wos.prototype = {
         // Init test anim
         this.testanim = new AnimSprite(this.renderer, this.animSpriteShader);
         this.testanim.init(
-            this.loader.getTexture("testsprite.png"), 1.0, 1.0, 1, 1, 1.0
+            this.loader.getTexture("testsprite.png"), 1.0, 1.0, 2, 2, 1.0
         );
         this.testanim.setStart(0, 0);
-        this.testanim.setEnd(0, 0);
+        this.testanim.setEnd(1, 1);
         this.testanim.resetAnim();
 
         // Init test text

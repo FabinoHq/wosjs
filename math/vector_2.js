@@ -63,10 +63,10 @@ Vector2.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setVector : Set vector components from a vector                       //
+    //  set : Set vector components from a vector                             //
     //  param vector : New vector components                                  //
     ////////////////////////////////////////////////////////////////////////////
-    setVector: function(vector)
+    set: function(vector)
     {
         this.vec[0] = vector.vec[0];
         this.vec[1] = vector.vec[1];

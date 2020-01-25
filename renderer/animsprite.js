@@ -67,22 +67,17 @@ function AnimSprite(renderer, animSpriteShader)
     this.width = 1.0;
     this.height = 1.0;
     // Animated sprite frame count
-    this.countX = 1;
-    this.countY = 1;
+    this.count = null;
     // Animated sprite start frame
-    this.startX = 0;
-    this.startY = 0;
+    this.start = null;
     // Animated sprite end frame
-    this.endX = 0;
-    this.endY = 0;
+    this.end = null;
     // Animated sprite frametime in seconds
     this.frametime = 1.0;
 
     // Animated sprite current states
-    this.currentX = 0;
-    this.currentY = 0;
-    this.nextX = 0;
-    this.nextY = 0;
+    this.current = null;
+    this.next = null;
     this.currentTime = 0.0;
     this.interpOffset = 0.0;
 }
@@ -103,17 +98,16 @@ AnimSprite.prototype = {
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
+        this.count = new Vector2(0, 0);
+        this.start = new Vector2(0, 0);
+        this.end = new Vector2(0, 0);
+        this.current = new Vector2(0, 0);
+        this.next = new Vector2(0, 0);
         if (width !== undefined) { this.width = width; }
         if (height !== undefined) { this.height = height; }
-        if (countX !== undefined) { this.countX = countX; }
-        if (countY !== undefined) { this.countY = countY; }
+        if (countX !== undefined) { this.count.setX(countX); }
+        if (countY !== undefined) { this.count.setY(countY); }
         if (frametime !== undefined) { this.frametime = frametime; }
-        this.startX = 0;
-        this.startY = 0;
-        this.endX = 0;
-        this.endY = 0;
-        this.currentX = 0;
-        this.currentY = 0;
         this.currentTime = 0.0;
         this.interpOffset = 0.0;
 
@@ -180,8 +174,7 @@ AnimSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setStart: function(startX, startY)
     {
-        this.startX = startX;
-        this.startY = startY;
+        this.start.setXY(startX, startY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -191,8 +184,7 @@ AnimSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setEnd: function(endX, endY)
     {
-        this.endX = endX;
-        this.endY = endY;
+        this.end.setXY(endX, endY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -291,8 +283,7 @@ AnimSprite.prototype = {
     {
         this.currentTime = 0.0;
         this.interpOffset = 0.0;
-        this.nextX = this.startX;
-        this.nextY = this.startY;
+        this.next.set(this.start);
         this.computeFrame();
     },
 
@@ -302,46 +293,42 @@ AnimSprite.prototype = {
     computeFrame: function()
     {
         // Compute next frame offset
-        this.currentX = this.nextX;
-        this.currentY = this.nextY;
-        if (this.nextX < (this.countX-1))
+        this.current.set(this.next);
+        if (this.next.getX() < (this.count.getX()-1))
         {
             // Check end frame
-            if ((this.nextX >= this.endX) &&
-                (this.nextY >= this.endY))
+            if ((this.next.getX() >= this.end.getX()) &&
+                (this.next.getY() >= this.end.getY()))
             {
                 // End frame reached
-                this.nextX = this.startX;
-                this.nextY = this.startY;
+                this.next.set(this.start);
             }
             else
             {
-                ++this.nextX;
+                this.next.addX(1);
             }
         }
         else
         {
-            if (this.nextY < (this.nextY-1))
+            if (this.next.getY() < (this.count.getY()-1))
             {
                 // Check end frame
-                if ((this.nextX >= this.endX) &&
-                    (this.nextY >= this.endY))
+                if ((this.next.getX() >= this.end.getX()) &&
+                    (this.next.getY() >= this.end.getY()))
                 {
                     // End frame reached
-                    this.nextX = this.startX;
-                    this.nextY = this.startY;
+                    this.next.set(this.start);
                 }
                 else
                 {
-                    this.nextX = 0;
-                    ++this.nextY;
+                    this.next.setX(0);
+                    this.next.addY(1);
                 }
             }
             else
             {
                 // Last frame reached
-                this.nextX = this.startX;
-                this.nextY = this.startY;
+                this.next.set(this.start);
             }
         }
     },
@@ -383,23 +370,14 @@ AnimSprite.prototype = {
         this.animShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
         this.animShader.shader.sendModelMatrix(this.modelMatrix);
         this.animShader.shader.sendAlphaValue(this.alpha);
-        this.animShader.shader.sendUniform(
-            this.animShader.countXuniform, this.countX
+        this.animShader.shader.sendUniformVec2(
+            this.animShader.countUniform, this.count
         );
-        this.animShader.shader.sendUniform(
-            this.animShader.countYuniform, this.countY
+        this.animShader.shader.sendUniformVec2(
+            this.animShader.currentUniform, this.current
         );
-        this.animShader.shader.sendUniform(
-            this.animShader.currentXuniform, this.currentX
-        );
-        this.animShader.shader.sendUniform(
-            this.animShader.currentYuniform, this.currentY
-        );
-        this.animShader.shader.sendUniform(
-            this.animShader.nextXuniform, this.nextX
-        );
-        this.animShader.shader.sendUniform(
-            this.animShader.nextYuniform, this.nextY
+        this.animShader.shader.sendUniformVec2(
+            this.animShader.nextUniform, this.next
         );
         this.animShader.shader.sendUniform(
             this.animShader.interpUniform, this.interpOffset
