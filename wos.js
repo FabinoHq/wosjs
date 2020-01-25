@@ -338,7 +338,7 @@ Wos.prototype = {
         this.testtext.init("Test text");
 
         // init test text box
-        this.testtextbox = new GuiTextBox(this.renderer);
+        this.testtextbox = new GuiTextBox(this.renderer, this.textShader);
         this.testtextbox.init(0.5, 0.2, "Test");
         this.testtextbox.setSelected(true);
 

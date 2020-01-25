@@ -88,16 +88,18 @@ const WOSDefaultTextBoxCheckWidthOffset = 0.005;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  GuiTextBox class definition                                               //
+//  param renderer : Renderer pointer                                         //
+//  param textShader : Text shader pointer                                    //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiTextBox(renderer)
+function GuiTextBox(renderer, textShader)
 {
-    // GuiTextBox loaded state
-    this.loaded = false;
-
     // Renderer pointer
     this.renderer = renderer;
 
-    // GuiText pointer
+    // Text shader pointer
+    this.textShader = textShader;
+
+    // GuiText
     this.guitext = null;
 
     // Procedural sprites
@@ -140,7 +142,6 @@ GuiTextBox.prototype = {
     init: function(width, height, text, hide, textShader)
     {
         // Reset GuiTextBox
-        this.loaded = false;
         this.guitext = null;
         this.textbox = null;
         this.textsel = null;
@@ -187,7 +188,7 @@ GuiTextBox.prototype = {
         }
 
         // Init text
-        this.guitext = new GuiText(this.renderer);
+        this.guitext = new GuiText(this.renderer, this.textShader);
         this.guitext.init(text, this.height*0.9, hide, textShader);
 
         // Check text size
@@ -219,7 +220,6 @@ GuiTextBox.prototype = {
         this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
 
         // Textbox loaded
-        this.loaded = true;
         return true;
     },
 
@@ -229,21 +229,19 @@ GuiTextBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setText: function(text)
     {
-        if (this.loaded)
-        {
-            this.guitext.setText(text);
-            // Check text size
-            if (this.guitext.getWidth() >
-                this.width-(WOSDefaultTextBoxCheckWidthOffset+
-                this.height*WOSDefaultTextBoxCheckWidthFactor))
-            {
-                this.guitext.setText("");
-            }
+        this.guitext.setText(text);
 
-            // Update cursor
-            this.cursorPos = this.guitext.getLength();
-            this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
+        // Check text size
+        if (this.guitext.getWidth() >
+            this.width-(WOSDefaultTextBoxCheckWidthOffset+
+            this.height*WOSDefaultTextBoxCheckWidthFactor))
+        {
+            this.guitext.setText("");
         }
+
+        // Update cursor
+        this.cursorPos = this.guitext.getLength();
+        this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -267,7 +265,7 @@ GuiTextBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveCursorLeft: function()
     {
-        if (this.loaded && this.selected)
+        if (this.selected)
         { 
             if (this.selection)
             {
@@ -347,7 +345,7 @@ GuiTextBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveCursorRight: function()
     {
-        if (this.loaded && this.selected)
+        if (this.selected)
         {
             if (this.selection)
             {
@@ -428,7 +426,7 @@ GuiTextBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     addCharacter: function(character)
     {
-        if (this.loaded && this.selected)
+        if (this.selected)
         {
             if (this.selection)
             {
@@ -456,7 +454,7 @@ GuiTextBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     eraseLeft: function()
     {
-        if (this.loaded && this.selected)
+        if (this.selected)
         {
             if (this.selection)
             {
@@ -484,7 +482,7 @@ GuiTextBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     eraseRight: function()
     {
-        if (this.loaded && this.selected)
+        if (this.selected)
         {
             if (this.selection)
             {
@@ -563,41 +561,38 @@ GuiTextBox.prototype = {
         var mouseOffX = 0.0;
         var curOffset = 0.0;
 
-        if (this.loaded)
+        if (mouseX >= this.posx && mouseX <= (this.posx+this.width) &&
+            mouseY >= this.posy && mouseY <= (this.posy+this.height))
         {
-            if (mouseX >= this.posx && mouseX <= (this.posx+this.width) &&
-                mouseY >= this.posy && mouseY <= (this.posy+this.height))
-            {
-                // Compute mouse x offset
-                mouseOffX = mouseX-this.posx;
-                if (mouseOffX <= 0.0) { mouseOffX = 0.0; }
-                if (mouseOffX >= this.width) { mouseOffX = this.width; }
+            // Compute mouse x offset
+            mouseOffX = mouseX-this.posx;
+            if (mouseOffX <= 0.0) { mouseOffX = 0.0; }
+            if (mouseOffX >= this.width) { mouseOffX = this.width; }
 
-                // Get current character position
-                for (i = 0; i <= this.guitext.getLength(); ++i)
-                {
-                    curOffset = this.guitext.getCharPos(i);
-                    if (mouseOffX >= curOffset)
-                    {
-                        this.cursorPos = i;
-                        this.cursorOffset = curOffset;
-                        this.selStart = i;
-                        this.selStartOffset = curOffset;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                this.textsel.setSize(0, this.height);
-                this.selection = false;
-                this.pressed = true;
-                this.selected = true;
-            }
-            else
+            // Get current character position
+            for (i = 0; i <= this.guitext.getLength(); ++i)
             {
-                this.selected = false;
+                curOffset = this.guitext.getCharPos(i);
+                if (mouseOffX >= curOffset)
+                {
+                    this.cursorPos = i;
+                    this.cursorOffset = curOffset;
+                    this.selStart = i;
+                    this.selStartOffset = curOffset;
+                }
+                else
+                {
+                    break;
+                }
             }
+            this.textsel.setSize(0, this.height);
+            this.selection = false;
+            this.pressed = true;
+            this.selected = true;
+        }
+        else
+        {
+            this.selected = false;
         }
     },
 
@@ -612,60 +607,10 @@ GuiTextBox.prototype = {
         var mouseOffX = 0.0;
         var curOffset = 0.0;
 
-        if (this.loaded)
+        if (this.pressed)
         {
-            if (this.pressed)
-            {
-                if (mouseX >= this.posx && mouseX <= (this.posx+this.width) &&
-                    mouseY >= this.posy && mouseY <= (this.posy+this.height))
-                {
-                    // Compute mouse x offset
-                    mouseOffX = mouseX-this.posx;
-                    if (mouseOffX <= 0.0) { mouseOffX = 0.0; }
-                    if (mouseOffX >= this.width) { mouseOffX = this.width; }
-
-                    // Get current character position
-                    for (i = 0; i <= this.guitext.getLength(); ++i)
-                    {
-                        curOffset = this.guitext.getCharPos(i);
-                        if (mouseOffX >= curOffset)
-                        {
-                            this.cursorPos = i;
-                            this.cursorOffset = curOffset;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-
-                    // Update selection
-                    if (this.cursorPos == this.selStart)
-                    {
-                        this.textsel.setSize(0, this.height);
-                        this.selection = false;
-                    }
-                }
-            }
-            this.pressed = false;
-        }
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  mouseMove : Handle mouse move event                                   //
-    //  param mouseX : Cursor X position                                      //
-    //  param mouseY : Cursor Y position                                      //
-    ////////////////////////////////////////////////////////////////////////////
-    mouseMove: function(mouseX, mouseY)
-    {
-        var i = 0;
-        var mouseOffX = 0.0;
-        var curOffset = 0.0;
-        var selSize = 0.0;
-
-        if (this.loaded)
-        {
-            if (this.pressed)
+            if (mouseX >= this.posx && mouseX <= (this.posx+this.width) &&
+                mouseY >= this.posy && mouseY <= (this.posy+this.height))
             {
                 // Compute mouse x offset
                 mouseOffX = mouseX-this.posx;
@@ -693,14 +638,58 @@ GuiTextBox.prototype = {
                     this.textsel.setSize(0, this.height);
                     this.selection = false;
                 }
+            }
+        }
+        this.pressed = false;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  mouseMove : Handle mouse move event                                   //
+    //  param mouseX : Cursor X position                                      //
+    //  param mouseY : Cursor Y position                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    mouseMove: function(mouseX, mouseY)
+    {
+        var i = 0;
+        var mouseOffX = 0.0;
+        var curOffset = 0.0;
+        var selSize = 0.0;
+
+        if (this.pressed)
+        {
+            // Compute mouse x offset
+            mouseOffX = mouseX-this.posx;
+            if (mouseOffX <= 0.0) { mouseOffX = 0.0; }
+            if (mouseOffX >= this.width) { mouseOffX = this.width; }
+
+            // Get current character position
+            for (i = 0; i <= this.guitext.getLength(); ++i)
+            {
+                curOffset = this.guitext.getCharPos(i);
+                if (mouseOffX >= curOffset)
+                {
+                    this.cursorPos = i;
+                    this.cursorOffset = curOffset;
+                }
                 else
                 {
-                    this.selEnd = this.cursorPos;
-                    this.selEndOffset = this.cursorOffset;
-                    selSize = Math.abs(this.selEndOffset-this.selStartOffset);
-                    this.textsel.setSize(selSize, this.height);
-                    this.selection = true;
+                    break;
                 }
+            }
+
+            // Update selection
+            if (this.cursorPos == this.selStart)
+            {
+                this.textsel.setSize(0, this.height);
+                this.selection = false;
+            }
+            else
+            {
+                this.selEnd = this.cursorPos;
+                this.selEndOffset = this.cursorOffset;
+                selSize = Math.abs(this.selEndOffset-this.selStartOffset);
+                this.textsel.setSize(selSize, this.height);
+                this.selection = true;
             }
         }
     },
@@ -711,8 +700,7 @@ GuiTextBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getText: function()
     {
-        if (this.loaded) { return this.guitext.getText(); }
-        else { return ""; }
+        return this.guitext.getText();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -787,52 +775,49 @@ GuiTextBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-        if (this.loaded)
+        // Render box
+        this.textbox.resetMatrix();
+        this.textbox.moveX(this.posx);
+        this.textbox.moveY(this.posy);
+        this.textbox.render(0.0, 0.0, 0.0);
+
+        // Render text
+        this.guitext.resetMatrix();
+        this.guitext.moveX(
+            this.posx+(this.height*WOSDefaultTextBoxTextOffsetFactor)
+        );
+        this.guitext.moveY(this.posy);
+        this.guitext.render();
+
+        if (this.selected)
         {
-            // Render box
-            this.textbox.resetMatrix();
-            this.textbox.moveX(this.posx);
-            this.textbox.moveY(this.posy);
-            this.textbox.render(0.0, 0.0, 0.0);
-
-            // Render text
-            this.guitext.resetMatrix();
-            this.guitext.moveX(
-                this.posx+(this.height*WOSDefaultTextBoxTextOffsetFactor)
-            );
-            this.guitext.moveY(this.posy);
-            this.guitext.render();
-
-            if (this.selected)
+            if (this.selection)
             {
-                if (this.selection)
-                {
-                    // Render selection
-                    this.textsel.resetMatrix();
-                    this.textsel.moveX(
-                        this.posx+
-                        (this.height*WOSDefaultTextBoxTextOffsetFactor)+
-                        Math.min(this.selStartOffset, this.selEndOffset)
-                    );
-                    this.textsel.moveY(this.posy);
-                    this.textsel.render(0.0, 0.0, 0.0);
-                }
-                else
-                {
-                    // Render cursor
-                    this.textcursor.resetMatrix();
-                    this.textcursor.moveX(
-                        this.posx+
-                        (this.height*WOSDefaultTextBoxTextOffsetFactor)+
-                        this.cursorOffset+
-                        (this.height*WOSDefaultTextBoxCursorOffsetFactor)
-                    );
-                    this.textcursor.moveY(
-                        this.posy+(this.height*
-                        (1.0-WOSDefaultTextBoxCursorHeightFactor)*0.5)
-                    );
-                    this.textcursor.render(0.0, 0.0, 0.0);
-                }
+                // Render selection
+                this.textsel.resetMatrix();
+                this.textsel.moveX(
+                    this.posx+
+                    (this.height*WOSDefaultTextBoxTextOffsetFactor)+
+                    Math.min(this.selStartOffset, this.selEndOffset)
+                );
+                this.textsel.moveY(this.posy);
+                this.textsel.render(0.0, 0.0, 0.0);
+            }
+            else
+            {
+                // Render cursor
+                this.textcursor.resetMatrix();
+                this.textcursor.moveX(
+                    this.posx+
+                    (this.height*WOSDefaultTextBoxTextOffsetFactor)+
+                    this.cursorOffset+
+                    (this.height*WOSDefaultTextBoxCursorOffsetFactor)
+                );
+                this.textcursor.moveY(
+                    this.posy+(this.height*
+                    (1.0-WOSDefaultTextBoxCursorHeightFactor)*0.5)
+                );
+                this.textcursor.render(0.0, 0.0, 0.0);
             }
         }
     }

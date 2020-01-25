@@ -61,9 +61,6 @@ const WOSDefaultFontScaleYFactor = 920.0;
 ////////////////////////////////////////////////////////////////////////////////
 function GuiText(renderer, textShader)
 {
-    // GuiText loaded state
-    this.loaded = false;
-
     // Renderer pointer
     this.renderer = renderer;
 
@@ -113,7 +110,6 @@ GuiText.prototype = {
         var pixelsData = null;
 
         // Reset GuiText
-        this.loaded = false;
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
@@ -278,7 +274,6 @@ GuiText.prototype = {
         );
 
         // Text loaded
-        this.loaded = true;
         return true;
     },
 
@@ -309,11 +304,6 @@ GuiText.prototype = {
                 this.hidetext = "";
                 this.text = text;
             }
-        }
-
-        if (!this.loaded)
-        {
-            return false;
         }
 
         // Set text width
@@ -364,18 +354,15 @@ GuiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     addCharacter: function(index, character)
     {
-        if (this.loaded)
-        {
-            // Clamp index into text length range
-            if (index <= 0) { index = 0; }
-            if (index >= this.textLength) { index = this.textLength; }
+        // Clamp index into text length range
+        if (index <= 0) { index = 0; }
+        if (index >= this.textLength) { index = this.textLength; }
 
-            // Insert character
-            this.setText(
-                this.text.substring(0, index) + character +
-                this.text.substring(index, this.textLength)
-            );
-        }
+        // Insert character
+        this.setText(
+            this.text.substring(0, index) + character +
+            this.text.substring(index, this.textLength)
+        );
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -384,7 +371,7 @@ GuiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     eraseCharacter: function(index)
     {
-        if (this.loaded && this.textLength > 0)
+        if (this.textLength > 0)
         {
             // Clamp index into text length range
             if (index <= 1) { index = 1; }
@@ -408,39 +395,36 @@ GuiText.prototype = {
         var selStart = 0;
         var selEnd = 0;
 
-        if (this.loaded)
+        // Check indexes ordering
+        if (start == end)
         {
-            // Check indexes ordering
-            if (start == end)
-            {
-                // Nothing to erase
-                return;
-            }
-            else if (start < end)
-            {
-                // Normal indexes order
-                selStart = start;
-                selEnd = end;
-            }
-            else
-            {
-                // Inverted indexes order
-                selStart = end;
-                selEnd = start;
-            }
-
-            // Clamp indexes into text length range
-            if (selStart <= 0) { selStart = 0; }
-            if (selStart >= this.textLength) { selStart = this.textLength; }
-            if (selEnd <= 0) { selEnd = 0; }
-            if (selEnd >= this.textLength) { selEnd = this.textLength; }
-
-            // Erase characters selection
-            this.setText(
-                this.text.substring(0, selStart) +
-                this.text.substring(selEnd, this.textLength)
-            );
+            // Nothing to erase
+            return;
         }
+        else if (start < end)
+        {
+            // Normal indexes order
+            selStart = start;
+            selEnd = end;
+        }
+        else
+        {
+            // Inverted indexes order
+            selStart = end;
+            selEnd = start;
+        }
+
+        // Clamp indexes into text length range
+        if (selStart <= 0) { selStart = 0; }
+        if (selStart >= this.textLength) { selStart = this.textLength; }
+        if (selEnd <= 0) { selEnd = 0; }
+        if (selEnd >= this.textLength) { selEnd = this.textLength; }
+
+        // Erase characters selection
+        this.setText(
+            this.text.substring(0, selStart) +
+            this.text.substring(selEnd, this.textLength)
+        );
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -450,15 +434,12 @@ GuiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getCharPos: function(index)
     {
-        if (this.loaded)
-        {
-            // Clamp index into text length range
-            if (index <= 0) { index = 0; }
-            if (index >= this.textLength) { index = this.textLength; }
+        // Clamp index into text length range
+        if (index <= 0) { index = 0; }
+        if (index >= this.textLength) { index = this.textLength; }
 
-            // Return character size at given index
-            return this.charsizes[index];
-        }
+        // Return character size at given index
+        return this.charsizes[index];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -470,13 +451,11 @@ GuiText.prototype = {
     {
         // Get current text width
         var width = this.width;
-        if (this.loaded)
-        {
-            // Add new character width
-            if (this.hidden) { character = HiddenTextPassCharacter; }
-            width += this.renderer.getTextWidth(character, this.fontsize)/
-                        WOSDefaultFontScaleXFactor;
-        }
+
+        // Add new character width
+        if (this.hidden) { character = HiddenTextPassCharacter; }
+        width += this.renderer.getTextWidth(character, this.fontsize)/
+                    WOSDefaultFontScaleXFactor;
 
         // Return total width
         return width;
@@ -617,43 +596,36 @@ GuiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-        if (this.loaded)
-        {
-            // Bind text shader
-            this.textShader.shader.bind();
+        // Bind text shader
+        this.textShader.shader.bind();
 
-            // Send shader uniforms
-            this.textShader.shader.sendProjectionMatrix(
-                this.renderer.projMatrix
-            );
-            this.textShader.shader.sendViewMatrix(
-                this.renderer.view.viewMatrix
-            );
-            this.textShader.shader.sendModelMatrix(this.modelMatrix);
-            this.textShader.shader.sendUniform(
-                this.textShader.alphaUniform, this.alpha
-            );
-            this.textShader.shader.sendUniformVec3(
-                this.textShader.colorUniform, this.color
-            );
+        // Send shader uniforms
+        this.textShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
+        this.textShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.textShader.shader.sendModelMatrix(this.modelMatrix);
+        this.textShader.shader.sendUniform(
+            this.textShader.alphaUniform, this.alpha
+        );
+        this.textShader.shader.sendUniformVec3(
+            this.textShader.colorUniform, this.color
+        );
 
-            // Bind texture
-            this.renderer.gl.bindTexture(
-                this.renderer.gl.TEXTURE_2D,
-                this.texture
-            );
+        // Bind texture
+        this.renderer.gl.bindTexture(
+            this.renderer.gl.TEXTURE_2D,
+            this.texture
+        );
 
-            // Render VBO
-            this.vertexBuffer.bind();
-            this.vertexBuffer.render(this.textShader.shader);
-            this.vertexBuffer.unbind();
+        // Render VBO
+        this.vertexBuffer.bind();
+        this.vertexBuffer.render(this.textShader.shader);
+        this.vertexBuffer.unbind();
 
-            // Unbind texture
-            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+        // Unbind texture
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
-            // Unbind text shader
-            this.textShader.shader.unbind();
-        }
+        // Unbind text shader
+        this.textShader.shader.unbind();
     }
 };
 
