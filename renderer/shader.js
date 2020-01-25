@@ -83,9 +83,6 @@ const defaultFragmentShaderSrc = [
 ////////////////////////////////////////////////////////////////////////////////
 function Shader(glPointer)
 {
-    // Shader loaded state
-    this.loaded = false;
-
     // WebGL functions pointer
     this.gl = glPointer;
 
@@ -119,7 +116,6 @@ Shader.prototype = {
     init: function(vertexSrc, fragmentSrc)
     {
         // Reset shader
-        this.loaded = false;
         this.vertexShaderSrc = null;
         this.fragmentShaderSrc = null;
         this.vertexShader = null;
@@ -281,7 +277,6 @@ Shader.prototype = {
         this.gl.useProgram(null);
 
         // Shader successfully loaded
-        this.loaded = true;
         return true;
     },
 
@@ -290,10 +285,7 @@ Shader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     bind: function()
     {
-        if (this.loaded)
-        {
-            this.gl.useProgram(this.shaderProgram);
-        }
+        this.gl.useProgram(this.shaderProgram);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -301,10 +293,7 @@ Shader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     unbind: function()
     {
-        if (this.loaded)
-        {
-            this.gl.useProgram(null);
-        }
+        this.gl.useProgram(null);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -313,13 +302,10 @@ Shader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     sendProjectionMatrix: function(projectionMatrix)
     {
-        if (this.loaded)
-        {
-            this.gl.uniformMatrix4fv(
-                this.projMatrixLocation,
-                false, projectionMatrix.matrix
-            );
-        }
+        this.gl.uniformMatrix4fv(
+            this.projMatrixLocation,
+            false, projectionMatrix.matrix
+        );
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -328,13 +314,10 @@ Shader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     sendViewMatrix: function(viewMatrix)
     {
-        if (this.loaded)
-        {
-            this.gl.uniformMatrix4fv(
-                this.viewMatrixLocation,
-                false, viewMatrix.matrix
-            );
-        }
+        this.gl.uniformMatrix4fv(
+            this.viewMatrixLocation,
+            false, viewMatrix.matrix
+        );
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -343,13 +326,10 @@ Shader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     sendModelMatrix: function(modelMatrix)
     {
-        if (this.loaded)
-        {
-            this.gl.uniformMatrix4fv(
-                this.modelMatrixLocation,
-                false, modelMatrix.matrix
-            );
-        }
+        this.gl.uniformMatrix4fv(
+            this.modelMatrixLocation,
+            false, modelMatrix.matrix
+        );
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -358,10 +338,7 @@ Shader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     sendAlphaValue: function(alphaValue)
     {
-        if (this.loaded)
-        {
-            this.gl.uniform1f(this.alphaLocation, alphaValue);
-        }
+        this.gl.uniform1f(this.alphaLocation, alphaValue);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -371,14 +348,7 @@ Shader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getUniform: function(uniformName)
     {
-        if (this.loaded)
-        {
-            return this.gl.getUniformLocation(this.shaderProgram, uniformName);
-        }
-        else
-        {
-            return -1;
-        }
+        return this.gl.getUniformLocation(this.shaderProgram, uniformName);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -388,10 +358,7 @@ Shader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     sendUniform: function(uniformLoc, uniformData)
     {
-        if (this.loaded)
-        {
-            this.gl.uniform1f(uniformLoc, uniformData);
-        }
+        this.gl.uniform1f(uniformLoc, uniformData);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -401,10 +368,7 @@ Shader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     sendUniformVec2: function(uniformLoc, uniformVec2)
     {
-        if (this.loaded)
-        {
-            this.gl.uniform2fv(uniformLoc, uniformVec2.vec);
-        }
+        this.gl.uniform2fv(uniformLoc, uniformVec2.vec);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -414,9 +378,6 @@ Shader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     sendUniformVec3: function(uniformLoc, uniformVec3)
     {
-        if (this.loaded)
-        {
-            this.gl.uniform3fv(uniformLoc, uniformVec3.vec);
-        }
+        this.gl.uniform3fv(uniformLoc, uniformVec3.vec);
     }
 };

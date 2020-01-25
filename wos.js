@@ -241,6 +241,9 @@ function Wos()
     // WOS assets loader
     this.loader = null;
 
+    // Sprite shader
+    this.spriteShader = null;
+
     // Test sprite
     this.testsprite = null;
     // Test procedural sprite
@@ -294,8 +297,12 @@ Wos.prototype = {
             this.loader.getSound("test.wav").play();
         }
 
+        // Init sprite shader
+        this.spriteShader = new SpriteShader(this.renderer.gl);
+        this.spriteShader.init();
+
         // Init test sprite
-        this.testsprite = new Sprite(this.renderer);
+        this.testsprite = new Sprite(this.renderer, this.spriteShader);
         this.testsprite.init(
             this.loader.getTexture("testsprite.png"), 0.05, 0.09
         );

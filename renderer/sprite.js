@@ -42,36 +42,18 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Sprite fragment shader                                                    //
-////////////////////////////////////////////////////////////////////////////////
-const spriteFragmentShaderSrc = [
-    "precision mediump float;",
-    "uniform sampler2D texture;",
-    "varying vec2 texCoord;",
-    "varying float alphaValue;",
-    "uniform vec2 uvOffset;",
-    "uniform vec2 uvSize;",
-    "void main()",
-    "{",
-    "   vec4 texColor = texture2D(texture, (texCoord*uvSize)+uvOffset);",
-    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
-    "}"
-].join("\n");
-
-
-////////////////////////////////////////////////////////////////////////////////
 //  Sprite class definition                                                   //
+//  param renderer : Renderer pointer                                         //
+//  param shader : Sprite shader pointer                                      //
 ////////////////////////////////////////////////////////////////////////////////
-function Sprite(renderer)
+function Sprite(renderer, shader)
 {
-    // Sprite loaded state
-    this.loaded = false;
-
     // Renderer pointer
     this.renderer = renderer;
 
-    // Sprite shader
-    this.shader = null;
+    // Sprite shader pointer
+    this.spriteShader = shader;
+
     // Sprite VBO
     this.vertexBuffer = null;
     // Sprite texture
@@ -80,10 +62,6 @@ function Sprite(renderer)
     this.modelMatrix = null;
     // Sprite alpha
     this.alpha = 1.0;
-
-    // Shader uniforms locations
-    this.uvSizeUniform = -1;
-    this.uvOffsetUniform = -1;
 
     // Sprite size
     this.width = 1.0;
@@ -108,7 +86,6 @@ Sprite.prototype = {
     init: function(tex, width, height, uoffset, voffset, usize, vsize)
     {
         // Reset sprite
-        this.loaded = false;
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
@@ -123,6 +100,12 @@ Sprite.prototype = {
 
         // Check gl pointer
         if (!this.renderer.gl)
+        {
+            return false;
+        }
+
+        // Check sprite shader pointer
+        if (!this.spriteShader)
         {
             return false;
         }
@@ -143,29 +126,6 @@ Sprite.prototype = {
             return false;
         }
 
-        // Init shader
-        this.shader = new Shader(this.renderer.gl);
-        if (!this.shader)
-        {
-            return false;
-        }
-        if (!this.shader.init(defaultVertexShaderSrc, spriteFragmentShaderSrc))
-        {
-            return false;
-        }
-
-        // Get shader uniforms locations
-        this.shader.bind();
-        this.uvOffsetUniform = this.shader.getUniform("uvOffset");
-        if (this.uvOffsetUniform == -1) { return false; }
-        this.uvSizeUniform = this.shader.getUniform("uvSize");
-        if (this.uvSizeUniform == -1) { return false; }
-
-        // Set shader uniforms
-        this.shader.sendUniformVec2(this.uvOffsetUniform, this.uvOffset);
-        this.shader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
-        this.shader.unbind();
-
         // Set texture
         this.texture = tex;
         if (!this.texture)
@@ -178,7 +138,6 @@ Sprite.prototype = {
         this.vertexBuffer.setPlane(this.width, this.height);
 
         // Sprite loaded
-        this.loaded = true;
         return true;
     },
 
@@ -303,33 +262,34 @@ Sprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-        if (this.loaded)
-        {
-            // Bind default shader
-            this.shader.bind();
+        // Bind sprite shader
+        this.spriteShader.shader.bind();
 
-            // Send shader uniforms
-            this.shader.sendProjectionMatrix(this.renderer.projMatrix);
-            this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-            this.shader.sendModelMatrix(this.modelMatrix);
-            this.shader.sendAlphaValue(this.alpha);
-            this.shader.sendUniformVec2(this.uvOffsetUniform, this.uvOffset);
-            this.shader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
+        // Send shader uniforms
+        this.spriteShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
+        this.spriteShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.spriteShader.shader.sendModelMatrix(this.modelMatrix);
+        this.spriteShader.shader.sendAlphaValue(this.alpha);
+        this.spriteShader.shader.sendUniformVec2(
+            this.spriteShader.uvOffsetUniform, this.uvOffset
+        );
+        this.spriteShader.shader.sendUniformVec2(
+            this.spriteShader.uvSizeUniform, this.uvSize
+        );
 
-            // Bind texture
-            this.texture.bind();
+        // Bind texture
+        this.texture.bind();
 
-            // Render VBO
-            this.vertexBuffer.bind();
-            this.vertexBuffer.render(this.shader);
-            this.vertexBuffer.unbind();
+        // Render VBO
+        this.vertexBuffer.bind();
+        this.vertexBuffer.render(this.spriteShader.shader);
+        this.vertexBuffer.unbind();
 
-            // Unbind texture
-            this.texture.unbind();
+        // Unbind texture
+        this.texture.unbind();
 
-            // Unbind default shader
-            this.shader.unbind();
-        }
+        // Unbind sprite shader
+        this.spriteShader.shader.unbind();
     }
 };
 
