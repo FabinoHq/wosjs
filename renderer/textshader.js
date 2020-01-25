@@ -37,63 +37,52 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/animspriteshader.js : Animated sprite shader management      //
+//      renderer/textshader.js : Text shader management                       //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Animated sprite fragment shader                                           //
+//  Text default fragment shader                                              //
 ////////////////////////////////////////////////////////////////////////////////
-const animspriteFragmentShaderSrc = [
+const textFragmentShaderSrc = [
     "precision mediump float;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "uniform float alpha;",
-    "uniform vec2 count;",
-    "uniform vec2 current;",
-    "uniform vec2 next;",
-    "uniform float interp;",
+    "uniform vec3 color;",
     "void main()",
     "{",
-    "   vec4 texColor = texture2D(texture, (texCoord+current)/count)*",
-    "     (1.0-interp)+texture2D(texture, (texCoord+next)/count)*interp;",
-    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
-    "}"
-].join("\n");
+    "   float textAlpha = texture2D(texture, texCoord).a;",
+    "   gl_FragColor = vec4(color, textAlpha*alpha);",
+    "}" ].join("\n");
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  AnimSpriteShader class definition                                         //
+//  TextShader class definition                                               //
 //  param glPointer : WebGL functions pointer                                 //
 ////////////////////////////////////////////////////////////////////////////////
-function AnimSpriteShader(glPointer)
+function TextShader(glPointer)
 {
     // WebGL functions pointer
     this.gl = glPointer;
 
-    // Animated sprite shader
+    // Text shader
     this.shader = null;
 
-    // Animated sprite shader uniforms locations
+    // Text shader uniforms locations
     this.alphaUniform = -1;
-    this.countUniform = -1;
-    this.currentUniform = -1;
-    this.nextUniform = -1;
-    this.interpUniform = -1;
+    this.colorUniform = -1;
 }
 
-AnimSpriteShader.prototype = {
+TextShader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init animated sprite shader                                    //
+    //  init : Init text shader                                               //
     ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
-        // Reset animated sprite shader
+        // Reset text shader
         this.alphaUniform = -1;
-        this.countUniform = -1;
-        this.currentUniform = -1;
-        this.nextUniform = -1;
-        this.interpUniform = -1;
+        this.colorUniform = -1;
 
         // Check gl pointer
         if (!this.gl)
@@ -101,28 +90,24 @@ AnimSpriteShader.prototype = {
             return false;
         }
 
-        // Init animated sprite shader
+        // Init text shader
         this.shader = new Shader(this.gl);
         if (!this.shader)
         {
             return false;
         }
-        if (!this.shader.init(
-            defaultVertexShaderSrc, animspriteFragmentShaderSrc))
+        if (!this.shader.init(defaultVertexShaderSrc, textFragmentShaderSrc))
         {
             return false;
         }
 
-        // Get animated sprite shader uniforms locations
+        // Get text shader uniforms locations
         this.shader.bind();
         this.alphaUniform = this.shader.getUniform("alpha");
-        this.countUniform = this.shader.getUniform("count");
-        this.currentUniform = this.shader.getUniform("current");
-        this.nextUniform = this.shader.getUniform("next");
-        this.interpUniform = this.shader.getUniform("interp");
+        this.colorUniform = this.shader.getUniform("color");
         this.shader.unbind();
 
-        // Animated sprite shader successfully loaded
+        // Text shader successfully loaded
         return true;
     }
 };

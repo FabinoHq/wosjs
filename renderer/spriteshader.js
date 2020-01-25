@@ -108,11 +108,8 @@ SpriteShader.prototype = {
         // Get sprite shader uniforms locations
         this.shader.bind();
         this.alphaUniform = this.shader.getUniform("alpha");
-        if (this.alphaUniform == -1) { return false; }
         this.uvOffsetUniform = this.shader.getUniform("uvOffset");
-        if (this.uvOffsetUniform == -1) { return false; }
         this.uvSizeUniform = this.shader.getUniform("uvSize");
-        if (this.uvSizeUniform == -1) { return false; }
         this.shader.unbind();
 
         // Sprite shader successfully loaded

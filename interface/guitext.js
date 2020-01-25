@@ -42,21 +42,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GUI Text default fragment shader                                          //
-////////////////////////////////////////////////////////////////////////////////
-const textFragmentShaderSrc = [
-    "precision mediump float;",
-    "uniform sampler2D texture;",
-    "varying vec2 texCoord;",
-    "uniform float alpha;",
-    "uniform vec3 color;",
-    "void main()",
-    "{",
-    "   float textAlpha = texture2D(texture, texCoord).a;",
-    "   gl_FragColor = vec4(color, textAlpha*alpha);",
-    "}" ].join("\n");
-
-////////////////////////////////////////////////////////////////////////////////
 //  Default hidden pass character (unicode dot)                               //
 ////////////////////////////////////////////////////////////////////////////////
 const HiddenTextPassCharacter = "\u2022";
@@ -71,8 +56,10 @@ const WOSDefaultFontScaleYFactor = 920.0;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  GuiText class definition                                                  //
+//  param renderer : Renderer pointer                                         //
+//  param textShader : Text shader pointer                                    //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiText(renderer)
+function GuiText(renderer, textShader)
 {
     // GuiText loaded state
     this.loaded = false;
@@ -80,18 +67,15 @@ function GuiText(renderer)
     // Renderer pointer
     this.renderer = renderer;
 
+    // Text shader pointer
+    this.textShader = textShader;
+
     // GuiText VBO
     this.vertexBuffer = null;
     // GuiText generated texture
     this.texture = null;
     // GuiText model matrix
     this.modelMatrix = null;
-    // GuiText shader
-    this.shader = null;
-
-    // GuiText shader uniforms locations
-    this.alphaUniform = -1;
-    this.colorUniform = -1;
 
     // GuiText internal string
     this.text = "";
@@ -133,9 +117,6 @@ GuiText.prototype = {
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
-        this.shader = null;
-        this.alphaUniform = -1;
-        this.colorUniform = -1;
         this.text = "";
         this.alpha = 1.0;
         this.colorR = 1.0;
@@ -198,6 +179,12 @@ GuiText.prototype = {
 
         // Check gl pointer
         if (!this.renderer.gl)
+        {
+            return false;
+        }
+
+        // Check text shader pointer
+        if (!this.textShader)
         {
             return false;
         }
@@ -290,28 +277,7 @@ GuiText.prototype = {
             this.width, this.height
         );
 
-        // Init shader
-        this.shader = new Shader(this.renderer.gl);
-        if (shaderSrc)
-        {
-            this.shader.init(defaultVertexShaderSrc, shaderSrc);
-        }
-        else
-        {
-            this.shader.init(defaultVertexShaderSrc, textFragmentShaderSrc);
-        }
-        this.shader.bind();
-
-        // Init shader color uniform
-        this.alphaUniform = this.shader.getUniform("alpha");
-        if (this.alphaUniform == -1) { return false; }
-        this.colorUniform = this.shader.getUniform("color");
-        if (this.colorUniform == -1) { return false; }
-        this.shader.sendUniform(this.alphaUniform, this.alpha);
-        this.shader.sendUniformVec3(this.colorUniform, this.color);
-
         // Text loaded
-        this.shader.unbind();
         this.loaded = true;
         return true;
     },
@@ -654,14 +620,22 @@ GuiText.prototype = {
         if (this.loaded)
         {
             // Bind text shader
-            this.shader.bind();
+            this.textShader.shader.bind();
 
             // Send shader uniforms
-            this.shader.sendProjectionMatrix(this.renderer.projMatrix);
-            this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-            this.shader.sendModelMatrix(this.modelMatrix);
-            this.shader.sendUniform(this.alphaUniform, this.alpha);
-            this.shader.sendUniformVec3(this.colorUniform, this.color);
+            this.textShader.shader.sendProjectionMatrix(
+                this.renderer.projMatrix
+            );
+            this.textShader.shader.sendViewMatrix(
+                this.renderer.view.viewMatrix
+            );
+            this.textShader.shader.sendModelMatrix(this.modelMatrix);
+            this.textShader.shader.sendUniform(
+                this.textShader.alphaUniform, this.alpha
+            );
+            this.textShader.shader.sendUniformVec3(
+                this.textShader.colorUniform, this.color
+            );
 
             // Bind texture
             this.renderer.gl.bindTexture(
@@ -671,14 +645,14 @@ GuiText.prototype = {
 
             // Render VBO
             this.vertexBuffer.bind();
-            this.vertexBuffer.render(this.shader);
+            this.vertexBuffer.render(this.textShader.shader);
             this.vertexBuffer.unbind();
 
             // Unbind texture
             this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
             // Unbind text shader
-            this.shader.unbind();
+            this.textShader.shader.unbind();
         }
     }
 };

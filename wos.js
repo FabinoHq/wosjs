@@ -245,6 +245,8 @@ function Wos()
     this.spriteShader = null;
     // Animated sprite shader
     this.animSpriteShader = null;
+    // Text shader
+    this.textShader = null;
 
     // Test sprite
     this.testsprite = null;
@@ -307,6 +309,10 @@ Wos.prototype = {
         this.animSpriteShader = new AnimSpriteShader(this.renderer.gl);
         this.animSpriteShader.init();
 
+        // Init text shader
+        this.textShader = new TextShader(this.renderer.gl);
+        this.textShader.init();
+
 
         // Init test sprite
         this.testsprite = new Sprite(this.renderer, this.spriteShader);
@@ -328,7 +334,7 @@ Wos.prototype = {
         this.testanim.resetAnim();
 
         // Init test text
-        this.testtext = new GuiText(this.renderer);
+        this.testtext = new GuiText(this.renderer, this.textShader);
         this.testtext.init("Test text");
 
         // init test text box
@@ -488,9 +494,9 @@ Wos.prototype = {
 
         // Render test text
         this.testtext.resetMatrix();
-        //this.testtext.moveX(-this.testtext.getWidth()/2.0);
-        //this.testtext.moveY(-this.testtext.getHeight()/2.0);
-        //this.testtext.render();
+        this.testtext.moveX(-this.testtext.getWidth()/2.0);
+        this.testtext.moveY(-this.testtext.getHeight()/2.0);
+        this.testtext.render();
 
         // Render test text box
         //this.testtextbox.render();
