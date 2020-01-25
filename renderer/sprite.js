@@ -49,9 +49,16 @@ const spriteFragmentShaderSrc = [
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "varying float alphaValue;",
+    "uniform float usize;",
+    "uniform float vsize;",
+    "uniform float uoffset;",
+    "uniform float voffset;",
     "void main()",
     "{",
-    "   vec4 texColor = texture2D(texture, texCoord);",
+    "   vec2 coords = vec2(texCoord.x*usize, texCoord.y*vsize);",
+    "   coords.x += uoffset;",
+    "   coords.y += voffset;",
+    "   vec4 texColor = texture2D(texture, coords);",
     "   gl_FragColor = vec4(texColor.rgb, texColor.a*alphaValue);",
     "}"
 ].join("\n");
@@ -78,6 +85,12 @@ function Sprite(renderer)
     this.modelMatrix = null;
     // Sprite alpha
     this.alpha = 1.0;
+
+    // Shader uniforms locations
+    this.usizeUniform = -1;
+    this.vsizeUniform = -1;
+    this.uoffsetUniform = -1;
+    this.voffsetUniform = -1;
 
     // Sprite size
     this.width = 1.0;
@@ -148,6 +161,24 @@ Sprite.prototype = {
             return false;
         }
 
+        // Get shader uniforms locations
+        this.shader.bind();
+        this.usizeUniform = this.shader.getUniform("usize");
+        if (this.usizeUniform == -1) { return false; }
+        this.vsizeUniform = this.shader.getUniform("vsize");
+        if (this.vsizeUniform == -1) { return false; }
+        this.uoffsetUniform = this.shader.getUniform("uoffset");
+        if (this.uoffsetUniform == -1) { return false; }
+        this.voffsetUniform = this.shader.getUniform("voffset");
+        if (this.voffsetUniform == -1) { return false; }
+
+        // Set shader uniforms
+        this.shader.sendUniform(this.usizeUniform, this.usize);
+        this.shader.sendUniform(this.vsizeUniform, this.vsize);
+        this.shader.sendUniform(this.uoffsetUniform, this.uoffset);
+        this.shader.sendUniform(this.voffsetUniform, this.voffset);
+        this.shader.unbind();
+
         // Set texture
         this.texture = tex;
         if (!this.texture)
@@ -158,10 +189,6 @@ Sprite.prototype = {
 
         // Update vertex buffer
         this.vertexBuffer.setPlane(this.width, this.height);
-        this.vertexBuffer.updateTexcoords(
-            this.uoffset, 1.0-(this.voffset+this.vsize),
-            this.uoffset+this.usize, 1.0-this.voffset
-        );
 
         // Sprite loaded
         this.loaded = true;
@@ -176,9 +203,25 @@ Sprite.prototype = {
     setSize: function(width, height)
     {
         // Update vertex buffer
-        if (width !== undefined) { this.width = width; }
-        if (height !== undefined) { this.height = height; }
+        this.width = width;
+        this.height = height;
         this.vertexBuffer.setPlane(this.width, this.height);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSubrect : Set sprite render subrectangle                           //
+    //  param uoffset : Sprite texture U offset                               //
+    //  param voffset : Sprite texture V offset                               //
+    //  param usize : Sprite texture U size                                   //
+    //  param vsize : Sprite texture V size                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setSubrect: function(uoffset, voffset, usize, vsize)
+    {
+        // Update vertex buffer
+        this.uoffset = uoffset;
+        this.voffset = voffset;
+        this.usize = usize;
+        this.vsize = vsize;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -285,6 +328,10 @@ Sprite.prototype = {
             this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
             this.shader.sendModelMatrix(this.modelMatrix);
             this.shader.sendAlphaValue(this.alpha);
+            this.shader.sendUniform(this.usizeUniform, this.usize);
+            this.shader.sendUniform(this.vsizeUniform, this.vsize);
+            this.shader.sendUniform(this.uoffsetUniform, this.uoffset);
+            this.shader.sendUniform(this.voffsetUniform, this.voffset);
 
             // Bind texture
             this.texture.bind();
