@@ -241,6 +241,8 @@ function Wos()
     // WOS assets loader
     this.loader = null;
 
+    // Line shader
+    this.lineShader = null;
     // Sprite shader
     this.spriteShader = null;
     // Animated sprite shader
@@ -248,6 +250,8 @@ function Wos()
     // Text shader
     this.textShader = null;
 
+    // Test line
+    this.testline = null;
     // Test sprite
     this.testsprite = null;
     // Test procedural sprite
@@ -301,6 +305,10 @@ Wos.prototype = {
             this.loader.getSound("test.wav").play();
         }
 
+        // Init line shader
+        this.lineShader = new LineShader(this.renderer.gl);
+        this.lineShader.init();
+
         // Init sprite shader
         this.spriteShader = new SpriteShader(this.renderer.gl);
         this.spriteShader.init();
@@ -313,6 +321,10 @@ Wos.prototype = {
         this.textShader = new TextShader(this.renderer.gl);
         this.textShader.init();
 
+
+        // Init test line
+        this.testline = new Line(this.renderer, this.lineShader);
+        this.testline.init(-0.5, -0.5, 0.5, 0.5);
 
         // Init test sprite
         this.testsprite = new Sprite(this.renderer, this.spriteShader);
@@ -474,6 +486,10 @@ Wos.prototype = {
         // Clear renderer
         this.renderer.clear();
 
+        // Render test line
+        this.testline.resetMatrix();
+        this.testline.render();
+
         // Render test sprite
         this.testsprite.resetMatrix();
         //this.testsprite.moveX(-this.testsprite.getWidth()/2.0);
@@ -485,7 +501,6 @@ Wos.prototype = {
         //this.testproc.moveX(-this.testproc.getWidth()/2.0);
         //this.testproc.moveY(-this.testproc.getHeight()/2.0);
         //this.testproc.render(0.0, 0.0, 0.0);
-
 
         // Render test anim
         this.testanim.resetMatrix();

@@ -22,15 +22,17 @@
 !math/vector_3.js
 !math/matrix_4_4.js
 
+!renderer/
 !renderer/animsprite.js
 !renderer/renderer.js
 !renderer/vertexbuffer.js
 !renderer/shader.js
+!renderer/lineshader.js
 !renderer/spriteshader.js
 !renderer/animspriteshader.js
 !renderer/textshader.js
-!renderer/textboxshader.js
 !renderer/texture.js
+!renderer/line.js
 !renderer/sprite.js
 !renderer/animsprite.js
 !renderer/procsprite.js
