@@ -42,6 +42,39 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+//  GUI Textbox default fragment shader                                       //
+////////////////////////////////////////////////////////////////////////////////
+const textboxFragmentShaderSrc = [
+    "precision mediump float;",
+    "varying vec2 texCoord;",
+    "void main()",
+    "{",
+    "   gl_FragColor = vec4(0.2, 0.2, 0.2, 0.8);",
+    "}" ].join("\n");
+
+////////////////////////////////////////////////////////////////////////////////
+//  GUI Textbox selection default fragment shader                             //
+////////////////////////////////////////////////////////////////////////////////
+const textselectionFragmentShaderSrc = [
+    "precision mediump float;",
+    "varying vec2 texCoord;",
+    "void main()",
+    "{",
+    "   gl_FragColor = vec4(0.0, 0.0, 0.8, 0.3);",
+    "}" ].join("\n");
+
+////////////////////////////////////////////////////////////////////////////////
+//  GUI Textbox cursor default fragment shader                                //
+////////////////////////////////////////////////////////////////////////////////
+const textcursorFragmentShaderSrc = [
+    "precision mediump float;",
+    "varying vec2 texCoord;",
+    "void main()",
+    "{",
+    "   gl_FragColor = vec4(0.8, 0.8, 0.8, 0.8);",
+    "}" ].join("\n");
+
+////////////////////////////////////////////////////////////////////////////////
 //  Default textbox settings                                                  //
 ////////////////////////////////////////////////////////////////////////////////
 const WOSDefaultTextBoxCursorWidthFactor = 0.04;
