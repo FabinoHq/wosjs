@@ -241,15 +241,6 @@ function Wos()
     // WOS assets loader
     this.loader = null;
 
-    // Line shader
-    this.lineShader = null;
-    // Sprite shader
-    this.spriteShader = null;
-    // Animated sprite shader
-    this.animSpriteShader = null;
-    // Text shader
-    this.textShader = null;
-
     // Test line
     this.testline = null;
     // Test sprite
@@ -289,6 +280,7 @@ Wos.prototype = {
         {
             this.wos.initDone();
         }
+        this.loader.loadShaders();
         this.loader.loadFonts();
         this.loader.loadTextures();
         this.loader.loadSounds();
@@ -305,32 +297,15 @@ Wos.prototype = {
             this.loader.getSound("test.wav").play();
         }
 
-        // Init line shader
-        this.lineShader = new LineShader(this.renderer.gl);
-        this.lineShader.init();
-
-        // Init sprite shader
-        this.spriteShader = new SpriteShader(this.renderer.gl);
-        this.spriteShader.init();
-
-        // Init animated sprite shader
-        this.animSpriteShader = new AnimSpriteShader(this.renderer.gl);
-        this.animSpriteShader.init();
-
-        // Init text shader
-        this.textShader = new TextShader(this.renderer.gl);
-        this.textShader.init();
-
-
         // Init test line
-        this.testline = new Line(this.renderer, this.lineShader);
+        this.testline = new Line(this.renderer, this.loader.lineShader);
         this.testline.init(0.1, -0.5, -0.5, 0.5, 0.5);
         this.testline.setColor(0.4, 0.0, 0.8);
         this.testline.setAlpha(0.7);
         this.testline.setSmoothness(0.4);
 
         // Init test sprite
-        this.testsprite = new Sprite(this.renderer, this.spriteShader);
+        this.testsprite = new Sprite(this.renderer, this.loader.spriteShader);
         this.testsprite.init(
             this.loader.getTexture("testsprite.png"), 0.05, 0.09
         );
@@ -340,7 +315,9 @@ Wos.prototype = {
         this.testproc.init();
 
         // Init test anim
-        this.testanim = new AnimSprite(this.renderer, this.animSpriteShader);
+        this.testanim = new AnimSprite(
+            this.renderer, this.loader.animSpriteShader
+        );
         this.testanim.init(
             this.loader.getTexture("testsprite.png"), 1.0, 1.0, 2, 2, 1.0
         );
@@ -349,11 +326,13 @@ Wos.prototype = {
         this.testanim.resetAnim();
 
         // Init test text
-        this.testtext = new GuiText(this.renderer, this.textShader);
+        this.testtext = new GuiText(this.renderer, this.loader.textShader);
         this.testtext.init("Test text");
 
         // init test text box
-        this.testtextbox = new GuiTextBox(this.renderer, this.textShader);
+        this.testtextbox = new GuiTextBox(
+            this.renderer, this.loader.textShader
+        );
         this.testtextbox.init(0.5, 0.2, "Test");
         this.testtextbox.setSelected(true);
 
