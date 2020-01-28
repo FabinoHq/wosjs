@@ -339,7 +339,7 @@ AnimSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function(frametime)
     {
-        var interp = this.interpOffset;
+        var interp = 0.0;
 
         // Update current animation time
         this.currentTime += frametime;
@@ -364,6 +364,7 @@ AnimSprite.prototype = {
             this.currentTime = 0.0;
         }
 
+        // Compute cubic interpolation
         interp = this.interpOffset + (this.interpOffset - 
             this.interpOffset*this.interpOffset*(3.0-2.0*this.interpOffset));
 
