@@ -53,8 +53,8 @@ const spriteFragmentShaderSrc = [
     "uniform vec2 uvSize;",
     "void main()",
     "{",
-    "   vec4 texColor = texture2D(texture, (texCoord*uvSize)+uvOffset);",
-    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
+    "    vec4 texColor = texture2D(texture, (texCoord*uvSize)+uvOffset);",
+    "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
     "}"
 ].join("\n");
 

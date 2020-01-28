@@ -55,9 +55,9 @@ const animspriteFragmentShaderSrc = [
     "uniform float interp;",
     "void main()",
     "{",
-    "   vec4 texColor = texture2D(texture, (texCoord+current)/count)*",
-    "     (1.0-interp)+texture2D(texture, (texCoord+next)/count)*interp;",
-    "   gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
+    "    vec4 texColor = texture2D(texture, (texCoord+current)/count)*",
+    "        (1.0-interp)+texture2D(texture, (texCoord+next)/count)*interp;",
+    "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
     "}"
 ].join("\n");
 

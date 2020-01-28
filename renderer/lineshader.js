@@ -53,9 +53,9 @@ const lineFragmentShaderSrc = [
     "uniform float smooth;",
     "void main()",
     "{",
-    "   vec2 smoothed = clamp(abs(1.0-(abs(texCoord-0.5)*2.0))*",
-    "     (vec2(ratio, 1.0)/smooth), 0.0, 1.0);",
-    "   gl_FragColor = vec4(color, smoothed.x*smoothed.y*alpha);",
+    "    vec2 smoothed = clamp(abs(1.0-(abs(texCoord-0.5)*2.0))*",
+    "        (vec2(ratio, 1.0)/smooth), 0.0, 1.0);",
+    "    gl_FragColor = vec4(color, smoothed.x*smoothed.y*alpha);",
     "}"
 ].join("\n");
 

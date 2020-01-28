@@ -53,8 +53,8 @@ const defaultVertexShaderSrc = [
     "varying vec2 texCoord;",
     "void main()",
     "{",
-    "   texCoord = vertexColor;",
-    "   gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
+    "    texCoord = vertexColor;",
+    "    gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
     "}"
 ].join("\n");
 
@@ -67,8 +67,8 @@ const defaultFragmentShaderSrc = [
     "varying vec2 texCoord;",
     "void main()",
     "{",
-    "   vec4 texColor = texture2D(texture, texCoord);",
-    "   gl_FragColor = vec4(texColor.rgb, texColor.a);",
+    "    vec4 texColor = texture2D(texture, texCoord);",
+    "    gl_FragColor = vec4(texColor.rgb, texColor.a);",
     "}"
 ].join("\n");
 
