@@ -130,7 +130,7 @@ Line.prototype = {
         }
 
         // Update vbo
-        this.vertexBuffer.setPlane2D(this.length, this.thickness);
+        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Line loaded
         return true;
@@ -224,15 +224,13 @@ Line.prototype = {
         var crossY = -Math.cos(angle)*this.thickness*0.5;
         this.length = Math.sqrt(dx*dx+dy*dy);
 
-        // Update vbo
-        this.vertexBuffer.setPlane2D(this.length, this.thickness);
-
         // Render line
         this.modelMatrix.setIdentity();
         this.modelMatrix.translate(
             this.origin.getX()+crossX, this.origin.getY()+crossY, 0.0
         );
         this.modelMatrix.rotateZ(degAngle);
+        this.modelMatrix.scale(this.length, this.thickness, 0.0);
 
         // Bind line shader
         this.lineShader.shader.bind();
