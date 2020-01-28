@@ -218,16 +218,20 @@ Line.prototype = {
         // Compute line length and angle
         var dx = this.target.getX()-this.origin.getX();
         var dy = this.target.getY()-this.origin.getY();
-        this.length = Math.sqrt(dx*dx+dy*dy);
         var angle = Math.atan2(dy, dx);
         var degAngle = -((angle/Math.PI)*180.0);
+        var crossX = Math.sin(angle)*this.thickness*0.5;
+        var crossY = -Math.cos(angle)*this.thickness*0.5;
+        this.length = Math.sqrt(dx*dx+dy*dy);
 
         // Update vbo
         this.vertexBuffer.setPlane2D(this.length, this.thickness);
 
         // Render line
         this.modelMatrix.setIdentity();
-        this.modelMatrix.translate(this.origin.getX(), this.origin.getY(), 0.0);
+        this.modelMatrix.translate(
+            this.origin.getX()+crossX, this.origin.getY()+crossY, 0.0
+        );
         this.modelMatrix.rotateZ(degAngle);
 
         // Bind line shader

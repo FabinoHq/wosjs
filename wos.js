@@ -324,7 +324,7 @@ Wos.prototype = {
 
         // Init test line
         this.testline = new Line(this.renderer, this.lineShader);
-        this.testline.init(0.01, -0.0, -0.0, -0.8, 0.5);
+        this.testline.init(0.04, -0.5, -0.5, 0.5, 0.5);
 
         // Init test sprite
         this.testsprite = new Sprite(this.renderer, this.spriteShader);
@@ -487,7 +487,7 @@ Wos.prototype = {
         this.renderer.clear();
 
         // Render test line
-        this.testline.setTarget(this.realMouseX, this.realMouseY);
+        //this.testline.setTarget(this.realMouseX, this.realMouseY);
         this.testline.render();
 
         // Render test sprite
