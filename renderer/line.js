@@ -235,12 +235,13 @@ Line.prototype = {
         var crossY = -Math.cos(angle)*this.thickness*0.5;
         var offsetX = Math.cos(angle)*this.smoothness*0.5*this.thickness;
         var offsetY = Math.sin(angle)*this.smoothness*0.5*this.thickness;
-        var ratio = this.length+this.smoothness*this.thickness;
+        var ratio = 1.0;
+        this.length = Math.sqrt(dx*dx+dy*dy);
+        this.length+this.smoothness*this.thickness
         if (this.thickness > 0.0)
         {
             ratio = (this.length+this.smoothness*this.thickness)/this.thickness;
         }
-        this.length = Math.sqrt(dx*dx+dy*dy);
 
         // Set line model matrix
         this.modelMatrix.setIdentity();
