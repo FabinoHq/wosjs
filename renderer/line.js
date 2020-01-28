@@ -58,6 +58,8 @@ function Line(renderer, lineShader)
     this.vertexBuffer = null;
     // Line model matrix
     this.modelMatrix = null;
+    // Line color
+    this.color = new Vector3(1.0, 1.0, 1.0);
     // Line alpha
     this.alpha = 1.0;
 
@@ -173,6 +175,19 @@ Line.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setColor : Set line color                                             //
+    //  param r : Line red color channel to set                               //
+    //  param g : Line blue color channel to set                              //
+    //  param b : Line green color channel to set                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setColor: function(r, g, b)
+    {
+        this.color.vec[0] = r;
+        this.color.vec[1] = g;
+        this.color.vec[2] = b;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setAlpha : Set line alpha                                             //
     //  param alpha : Line alpha to set                                       //
     ////////////////////////////////////////////////////////////////////////////
@@ -261,6 +276,9 @@ Line.prototype = {
         this.lineShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
         this.lineShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
         this.lineShader.shader.sendModelMatrix(this.modelMatrix);
+        this.lineShader.shader.sendUniformVec3(
+            this.lineShader.colorUniform, this.color
+        );
         this.lineShader.shader.sendUniform(
             this.lineShader.alphaUniform, this.alpha
         );
