@@ -48,9 +48,14 @@ const lineFragmentShaderSrc = [
     "precision mediump float;",
     "varying vec2 texCoord;",
     "uniform float alpha;",
+    "uniform float ratio;",
+    "uniform float smooth;",
     "void main()",
     "{",
-    "   gl_FragColor = vec4(1.0, 1.0, 1.0, alpha);",
+    "   vec3 color = vec3(1.0, 1.0, 1.0);",
+    "   vec2 smoothed = clamp(abs(1.0-(abs(texCoord-0.5)*2.0))*",
+    "     (vec2(ratio, 1.0)/smooth), 0.0, 1.0);",
+    "   gl_FragColor = vec4(color, smoothed.x*smoothed.y*alpha);",
     "}"
 ].join("\n");
 
@@ -69,6 +74,8 @@ function LineShader(glPointer)
 
     // Line shader uniforms locations
     this.alphaUniform = -1;
+    this.ratioUniform = -1;
+    this.smoothUniform = -1;
 }
 
 LineShader.prototype = {
@@ -79,6 +86,8 @@ LineShader.prototype = {
     {
         // Reset line shader
         this.alphaUniform = -1;
+        this.ratioUniform = -1;
+        this.offsetUniform = -1;
 
         // Check gl pointer
         if (!this.gl)
@@ -100,6 +109,8 @@ LineShader.prototype = {
         // Get line shader uniforms locations
         this.shader.bind();
         this.alphaUniform = this.shader.getUniform("alpha");
+        this.ratioUniform = this.shader.getUniform("ratio");
+        this.smoothUniform = this.shader.getUniform("smooth");
         this.shader.unbind();
 
         // Line shader successfully loaded
