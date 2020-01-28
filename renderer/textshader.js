@@ -48,8 +48,8 @@ const textFragmentShaderSrc = [
     "precision mediump float;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
-    "uniform float alpha;",
     "uniform vec3 color;",
+    "uniform float alpha;",
     "void main()",
     "{",
     "   float textAlpha = texture2D(texture, texCoord).a;",
@@ -70,8 +70,8 @@ function TextShader(glPointer)
     this.shader = null;
 
     // Text shader uniforms locations
-    this.alphaUniform = -1;
     this.colorUniform = -1;
+    this.alphaUniform = -1;
 }
 
 TextShader.prototype = {
@@ -81,8 +81,8 @@ TextShader.prototype = {
     init: function()
     {
         // Reset text shader
-        this.alphaUniform = -1;
         this.colorUniform = -1;
+        this.alphaUniform = -1;
 
         // Check gl pointer
         if (!this.gl)
@@ -103,8 +103,8 @@ TextShader.prototype = {
 
         // Get text shader uniforms locations
         this.shader.bind();
-        this.alphaUniform = this.shader.getUniform("alpha");
         this.colorUniform = this.shader.getUniform("color");
+        this.alphaUniform = this.shader.getUniform("alpha");
         this.shader.unbind();
 
         // Text shader successfully loaded
