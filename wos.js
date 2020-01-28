@@ -486,9 +486,9 @@ Wos.prototype = {
 
         // Render test anim
         this.testanim.resetMatrix();
-        this.testanim.moveX(-this.testanim.getWidth()/2.0);
-        this.testanim.moveY(-this.testanim.getHeight()/2.0);
-        this.testanim.render(this.frametime);
+        //this.testanim.moveX(-this.testanim.getWidth()/2.0);
+        //this.testanim.moveY(-this.testanim.getHeight()/2.0);
+        //this.testanim.render(this.frametime);
 
         // Render test text
         this.testtext.resetMatrix();

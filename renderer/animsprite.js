@@ -339,6 +339,8 @@ AnimSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function(frametime)
     {
+        var interp = this.interpOffset;
+
         // Update current animation time
         this.currentTime += frametime;
         if (this.frametime > 0.0)
@@ -362,6 +364,9 @@ AnimSprite.prototype = {
             this.currentTime = 0.0;
         }
 
+        interp = this.interpOffset + (this.interpOffset - 
+            this.interpOffset*this.interpOffset*(3.0-2.0*this.interpOffset));
+
         // Bind shader
         this.animShader.shader.bind();
 
@@ -382,7 +387,7 @@ AnimSprite.prototype = {
             this.animShader.nextUniform, this.next
         );
         this.animShader.shader.sendUniform(
-            this.animShader.interpUniform, this.interpOffset
+            this.animShader.interpUniform, interp
         );
 
         // Bind texture
