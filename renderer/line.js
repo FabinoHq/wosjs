@@ -233,17 +233,26 @@ Line.prototype = {
         var degAngle = -((angle/Math.PI)*180.0);
         var crossX = Math.sin(angle)*this.thickness*0.5;
         var crossY = -Math.cos(angle)*this.thickness*0.5;
-        var ratio = this.length;
-        if (this.thickness > 0.0) { ratio = this.length/this.thickness; }
+        var offsetX = Math.cos(angle)*this.smoothness*0.5*this.thickness;
+        var offsetY = Math.sin(angle)*this.smoothness*0.5*this.thickness;
+        var ratio = this.length+this.smoothness*this.thickness;
+        if (this.thickness > 0.0)
+        {
+            ratio = (this.length+this.smoothness*this.thickness)/this.thickness;
+        }
         this.length = Math.sqrt(dx*dx+dy*dy);
 
-        // Render line
+        // Set line model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translate(
-            this.origin.getX()+crossX, this.origin.getY()+crossY, 0.0
+            this.origin.getX()+crossX-offsetX,
+            this.origin.getY()+crossY-offsetY, 0.0
         );
         this.modelMatrix.rotateZ(degAngle);
-        this.modelMatrix.scale(this.length, this.thickness, 0.0);
+        this.modelMatrix.scale(
+            this.length+this.smoothness*this.thickness,
+            this.thickness, 0.0
+        );
 
         // Bind line shader
         this.lineShader.shader.bind();
