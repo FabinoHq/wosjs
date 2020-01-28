@@ -91,6 +91,16 @@ View.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  moveVec2 : Move the view with a 2 components vector                   //
+    //  param vector : 2 components vector to move the view by                //
+    ////////////////////////////////////////////////////////////////////////////
+    moveVec2: function(vector)
+    {
+        this.x += vector.vec[0];
+        this.y += vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  moveX : Move the view on the X axis                                   //
     //  param x : Value of the translation on the X axis                      //
     ////////////////////////////////////////////////////////////////////////////
