@@ -77,10 +77,10 @@ function GuiText(renderer, textShader)
     // GuiText internal string
     this.text = "";
 
-    // GuiText alpha
-    this.alpha = 1.0;
     // GuiText color
     this.color = new Vector3(1.0, 1.0, 1.0);
+    // GuiText alpha
+    this.alpha = 1.0;
 
     // GuiText parameters
     this.fontsize = 40.0;
@@ -114,10 +114,10 @@ GuiText.prototype = {
         this.texture = null;
         this.modelMatrix = null;
         this.text = "";
-        this.alpha = 1.0;
         this.colorR = 1.0;
         this.colorG = 1.0;
         this.colorB = 1.0;
+        this.alpha = 1.0;
         this.fontsize = 40.0;
         this.width = 0.05;
         this.height = 0.05;
@@ -525,15 +525,6 @@ GuiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set text alpha                                             //
-    //  param alpha : Text alpha to set                                       //
-    ////////////////////////////////////////////////////////////////////////////
-    setAlpha: function(alpha)
-    {
-        this.alpha = alpha;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setColor : Set text color                                             //
     //  param r : Text red color channel to set                               //
     //  param g : Text blue color channel to set                              //
@@ -544,6 +535,15 @@ GuiText.prototype = {
         this.color.vec[0] = r;
         this.color.vec[1] = g;
         this.color.vec[2] = b;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set text alpha                                             //
+    //  param alpha : Text alpha to set                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    setAlpha: function(alpha)
+    {
+        this.alpha = alpha;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -603,11 +603,11 @@ GuiText.prototype = {
         this.textShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
         this.textShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
         this.textShader.shader.sendModelMatrix(this.modelMatrix);
-        this.textShader.shader.sendUniform(
-            this.textShader.alphaUniform, this.alpha
-        );
         this.textShader.shader.sendUniformVec3(
             this.textShader.colorUniform, this.color
+        );
+        this.textShader.shader.sendUniform(
+            this.textShader.alphaUniform, this.alpha
         );
 
         // Bind texture
