@@ -56,6 +56,8 @@ function Loader(renderer, audio)
 
     // Line shader
     this.lineShader = null;
+    // Rect shader
+    this.rectShader = null;
     // Sprite shader
     this.spriteShader = null;
     // Animated sprite shader
@@ -113,6 +115,10 @@ Loader.prototype = {
         // Init line shader
         this.lineShader = new LineShader(this.renderer.gl);
         this.lineShader.init();
+
+        // Init rect shader
+        this.rectShader = new RectShader(this.renderer.gl);
+        this.rectShader.init();
 
         // Init sprite shader
         this.spriteShader = new SpriteShader(this.renderer.gl);

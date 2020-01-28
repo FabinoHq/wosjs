@@ -37,61 +37,62 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/procsprite.js : Procedural sprite management                 //
+//      renderer/rect.js : Rect rendering management                          //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  ProcSprite class definition                                               //
+//  Rect class definition                                                     //
+//  param renderer : Renderer pointer                                         //
+//  param rectShader : Rect shader pointer                                    //
 ////////////////////////////////////////////////////////////////////////////////
-function ProcSprite(renderer)
+function Rect(renderer, rectShader)
 {
     // Renderer pointer
     this.renderer = renderer;
 
-    // Procedural sprite shader
-    this.shader = null;
-    // Procedural sprite VBO
+    // Rect shader pointer
+    this.rectShader = rectShader;
+
+    // Rect VBO
     this.vertexBuffer = null;
-    // Procedural sprite model matrix
+    // Rect model matrix
     this.modelMatrix = null;
-    // Procedural sprite alpha
+    // Rect color
+    this.color = new Vector3(1.0, 1.0, 1.0);
+    // Rect alpha
     this.alpha = 1.0;
 
-    // Procedural sprite size
+    // Rect width
     this.width = 1.0;
+    // Rect height
     this.height = 1.0;
-    // Procedural sprite offset
-    this.offset = null;
-
-    // Procedural sprite shader uniforms locations
-    this.alphaUniform = -1;
-    this.timerUniform = -1;
-    this.offsetUniform = -1;
 }
 
-ProcSprite.prototype = {
+Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init procedural sprite                                         //
-    //  param shaderSrc : Procedural sprite fragment shader source            //
-    //  param width : Procedural sprite width                                 //
-    //  param height : Procedural sprite height                               //
+    //  init : Init rect                                                      //
+    //  param width : Rect width                                              //
+    //  param height : Rect height                                            //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(shaderSrc, width, height)
+    init: function(width, height)
     {
-        // Reset procedural sprite
+        // Reset rect
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
-        if (width !== undefined) { this.width = width; }
-        if (height !== undefined) { this.height = height; }
-        this.offset = new Vector2(0.0, 0.0);
-        this.alphaUniform = -1;
-        this.timerUniform = -1;
-        this.offsetUniform = -1;
+        this.alpha = 1.0;
+        this.width = width;
+        this.height = height;
 
         // Check gl pointer
         if (!this.renderer.gl)
+        {
+            return false;
+        }
+
+        // Check rect shader pointer
+        if (!this.rectShader)
         {
             return false;
         }
@@ -115,32 +116,14 @@ ProcSprite.prototype = {
         // Update vbo
         this.vertexBuffer.setPlane2D(this.width, this.height);
 
-        // Init shader
-        this.shader = new Shader(this.renderer.gl);
-        if (!this.shader)
-        {
-            return false;
-        }
-        if (!this.shader.init(defaultVertexShaderSrc, shaderSrc))
-        {
-            return false;
-        }
-
-        // Get uniforms locations
-        this.shader.bind();
-        this.alphaUniform = this.shader.getUniform("alpha");
-        this.timerUniform = this.shader.getUniform("timer");
-        this.offsetUniform = this.shader.getUniform("offset");
-        this.shader.unbind();
-
-        // Procedural sprite loaded
+        // Rect loaded
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSize : Set procedural sprite size                                  //
-    //  param width : Procedural sprite width to set                          //
-    //  param height : Procedural sprite height to set                        //
+    //  setSize : Set rect size                                               //
+    //  param width : Rect width to set                                       //
+    //  param height : Rect height to set                                     //
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
@@ -151,8 +134,8 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get procedural sprite width                                //
-    //  return : Procedural sprite width                                      //
+    //  getWidth : Get rect width                                             //
+    //  return : Rect width                                                   //
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
@@ -160,8 +143,8 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get procedural sprite height                              //
-    //  return : Procedural sprite height                                     //
+    //  getHeight : Get rect height                                           //
+    //  return : Rect height                                                  //
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
@@ -169,7 +152,7 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  resetMatrix : Reset procedural sprite model matrix                    //
+    //  resetMatrix : Reset rect model matrix                                 //
     ////////////////////////////////////////////////////////////////////////////
     resetMatrix: function()
     {
@@ -177,8 +160,8 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setMatrix : Set procedural sprite model matrix                        //
-    //  param modelMatrix : Procedural sprite model matrix to set             //
+    //  setMatrix : Set rect model matrix                                     //
+    //  param modelMatrix : Rect model matrix to set                          //
     ////////////////////////////////////////////////////////////////////////////
     setMatrix: function(modelMatrix)
     {
@@ -186,8 +169,21 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set procedural sprite alpha                                //
-    //  param alpha : Procedural sprite alpha to set                          //
+    //  setColor : Set rect color                                             //
+    //  param r : Rect red color channel to set                               //
+    //  param g : Rect blue color channel to set                              //
+    //  param b : Rect green color channel to set                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setColor: function(r, g, b)
+    {
+        this.color.vec[0] = r;
+        this.color.vec[1] = g;
+        this.color.vec[2] = b;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set rect alpha                                             //
+    //  param alpha : Rect alpha to set                                       //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
     {
@@ -195,7 +191,7 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate procedural sprite on X axis                         //
+    //  moveX : Translate rect sprite on X axis                               //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
@@ -204,7 +200,7 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate procedural sprite on Y axis                         //
+    //  moveY : Translate rect on Y axis                                      //
     //  param y : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
@@ -213,34 +209,31 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  render : Render procedural sprite                                     //
-    //  param timer : Time offset for animated procedural generation          //
-    //  param offsetX : X position offset for procedural generation           //
-    //  param offsetY : Y position offset for procedural generation           //
+    //  render : Render line                                                  //
     ////////////////////////////////////////////////////////////////////////////
-    render: function(timer, offsetX, offsetY)
+    render: function()
     {
-        // Set procedural sprite offset
-        this.offset.setXY(offsetX, offsetY);
+        // Bind rect shader
+        this.rectShader.shader.bind();
 
-        // Bind procedural shader
-        this.shader.bind();
+        // Send rect shader uniforms
+        this.rectShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
+        this.rectShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.rectShader.shader.sendModelMatrix(this.modelMatrix);
+        this.rectShader.shader.sendUniformVec3(
+            this.rectShader.colorUniform, this.color
+        );
+        this.rectShader.shader.sendUniform(
+            this.rectShader.alphaUniform, this.alpha
+        );
 
-        // Send shader uniforms
-        this.shader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.shader.sendModelMatrix(this.modelMatrix);
-        this.shader.sendUniform(this.alphaUniform, this.alpha);
-        this.shader.sendUniform(this.timerUniform, timer);
-        this.shader.sendUniformVec2(this.offsetUniform, this.offset);
-        
         // Render VBO
         this.vertexBuffer.bind();
-        this.vertexBuffer.render(this.shader);
+        this.vertexBuffer.render(this.rectShader.shader);
         this.vertexBuffer.unbind();
 
-        // Unbind procedural shader
-        this.shader.unbind();
+        // Unbind rect shader
+        this.rectShader.shader.unbind();
     }
 };
 

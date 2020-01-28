@@ -28,11 +28,13 @@
 !renderer/vertexbuffer.js
 !renderer/shader.js
 !renderer/lineshader.js
+!renderer/rectshader.js
 !renderer/spriteshader.js
 !renderer/animspriteshader.js
 !renderer/textshader.js
 !renderer/texture.js
 !renderer/line.js
+!renderer/rect.js
 !renderer/sprite.js
 !renderer/animsprite.js
 !renderer/procsprite.js

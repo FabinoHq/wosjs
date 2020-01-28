@@ -243,6 +243,8 @@ function Wos()
 
     // Test line
     this.testline = null;
+    // Test rect
+    this.testrect = null;
     // Test sprite
     this.testsprite = null;
     // Test procedural sprite
@@ -303,6 +305,12 @@ Wos.prototype = {
         this.testline.setColor(0.4, 0.0, 0.8);
         this.testline.setAlpha(0.7);
         this.testline.setSmoothness(0.4);
+
+        // Init test rect
+        this.testrect = new Rect(this.renderer, this.loader.rectShader);
+        this.testrect.init(0.5, 0.5);
+        this.testrect.setColor(0.0, 0.2, 0.8);
+        this.testrect.setAlpha(0.9);
 
         // Init test sprite
         this.testsprite = new Sprite(this.renderer, this.loader.spriteShader);
@@ -471,6 +479,12 @@ Wos.prototype = {
         // Render test line
         //this.testline.setTarget(this.realMouseX, this.realMouseY);
         //this.testline.render();
+
+        // Render test rect
+        this.testrect.resetMatrix();
+        this.testrect.moveX(-this.testrect.getWidth()/2.0);
+        this.testrect.moveY(-this.testrect.getHeight()/2.0);
+        this.testrect.render();
 
         // Render test sprite
         this.testsprite.resetMatrix();
