@@ -294,35 +294,35 @@ AnimSprite.prototype = {
     {
         // Compute next frame offset
         this.current.set(this.next);
-        if (this.next.getX() < (this.count.getX()-1))
+        if (this.next.vec[0] < (this.count.vec[0]-1))
         {
             // Check end frame
-            if ((this.next.getX() >= this.end.getX()) &&
-                (this.next.getY() >= this.end.getY()))
+            if ((this.next.vec[0] >= this.end.vec[0]) &&
+                (this.next.vec[1] >= this.end.vec[1]))
             {
                 // End frame reached
                 this.next.set(this.start);
             }
             else
             {
-                this.next.addX(1);
+                ++this.next.vec[0];
             }
         }
         else
         {
-            if (this.next.getY() < (this.count.getY()-1))
+            if (this.next.vec[1] < (this.count.vec[1]-1))
             {
                 // Check end frame
-                if ((this.next.getX() >= this.end.getX()) &&
-                    (this.next.getY() >= this.end.getY()))
+                if ((this.next.vec[0] >= this.end.vec[0]) &&
+                    (this.next.vec[1] >= this.end.vec[1]))
                 {
                     // End frame reached
                     this.next.set(this.start);
                 }
                 else
                 {
-                    this.next.setX(0);
-                    this.next.addY(1);
+                    this.next.vec[0] = 0;
+                    ++this.next.vec[1];
                 }
             }
             else

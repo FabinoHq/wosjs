@@ -95,12 +95,12 @@ Line.prototype = {
         this.alpha = 1.0;
         this.origin = new Vector2(0.0, 0.0);
         this.target = new Vector2(0.0, 0.0);
-        if (originX !== undefined) { this.origin.setX(originX); }
-        if (originY !== undefined) { this.origin.setY(originY); }
-        if (targetX !== undefined) { this.target.setX(targetX); }
-        if (targetY !== undefined) { this.target.setY(targetY); }
-        dx = this.target.getX()-this.origin.getX();
-        dy = this.target.getY()-this.origin.getY();
+        if (originX !== undefined) { this.origin.vec[0] = originX; }
+        if (originY !== undefined) { this.origin.vec[1] = originY; }
+        if (targetX !== undefined) { this.target.vec[0] = targetX; }
+        if (targetY !== undefined) { this.target.vec[1] = targetY; }
+        dx = this.target.vec[0]-this.origin.vec[0];
+        dy = this.target.vec[1]-this.origin.vec[1];
         this.length = Math.sqrt(dx*dx+dy*dy);
         this.thickness = 0.01;
         if (thickness !== undefined) { this.thickness = thickness; }
@@ -160,18 +160,44 @@ Line.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setOrigin : Set line origin position                                  //
+    //  param originX : Line origin X position                                //
+    //  param originY : Line origin Y position                                //
     ////////////////////////////////////////////////////////////////////////////
     setOrigin: function(originX, originY)
     {
-        this.origin.setXY(originX, originY);
+        this.origin.vec[0] = originX;
+        this.origin.vec[1] = originY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setOriginVec2 : Set line origin position from a 2 components vector   //
+    //  param vector : Line origin position vector                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setOriginVec2: function(vector)
+    {
+        this.origin.vec[0] = vector.vec[0];
+        this.origin.vec[1] = vector.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setTarget : Set line target position                                  //
+    //  param targetX : Line target X position                                //
+    //  param targetY : Line target Y position                                //
     ////////////////////////////////////////////////////////////////////////////
     setTarget: function(targetX, targetY)
     {
-        this.target.setXY(targetX, targetY);
+        this.target.vec[0] = targetX;
+        this.target.vec[1] = targetY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setTargetVec2 : Set line target position from a 2 components vector   //
+    //  param vector : Line target position vector                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setTargetVec2: function(vector)
+    {
+        this.target.vec[0] = vector.vec[0];
+        this.target.vec[1] = vector.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -242,8 +268,8 @@ Line.prototype = {
     render: function()
     {
         // Compute line length and angle
-        var dx = this.target.getX()-this.origin.getX();
-        var dy = this.target.getY()-this.origin.getY();
+        var dx = this.target.vec[0]-this.origin.vec[0];
+        var dy = this.target.vec[1]-this.origin.vec[1];
         var angle = Math.atan2(dy, dx);
         var degAngle = -((angle/Math.PI)*180.0);
         var crossX = Math.sin(angle)*this.thickness*0.5;
@@ -260,8 +286,8 @@ Line.prototype = {
         // Set line model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translate(
-            this.origin.getX()+crossX-offsetX,
-            this.origin.getY()+crossY-offsetY, 0.0
+            this.origin.vec[0]+crossX-offsetX,
+            this.origin.vec[1]+crossY-offsetY, 0.0
         );
         this.modelMatrix.rotateZ(degAngle);
         this.modelMatrix.scale(

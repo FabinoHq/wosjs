@@ -133,7 +133,7 @@ ProcSprite.prototype = {
         this.offsetUniform = this.shader.getUniform("offset");
         this.shader.unbind();
 
-        // Sprite loaded
+        // Procedural sprite loaded
         return true;
     },
 
