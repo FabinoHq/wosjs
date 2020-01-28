@@ -324,7 +324,8 @@ Wos.prototype = {
 
         // Init test line
         this.testline = new Line(this.renderer, this.lineShader);
-        this.testline.init(0.04, -0.5, -0.5, 0.5, 0.5);
+        this.testline.init(0.1, -0.5, -0.5, 0.5, 0.5);
+        this.testline.setSmoothness(0.4);
 
         // Init test sprite
         this.testsprite = new Sprite(this.renderer, this.spriteShader);

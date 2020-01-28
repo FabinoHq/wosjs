@@ -69,6 +69,8 @@ function Line(renderer, lineShader)
     this.length = 0.0;
     // Line thickness
     this.thickness = 0.01;
+    // Line smoothness
+    this.smoothness = 0.0;
 }
 
 Line.prototype = {
@@ -180,6 +182,15 @@ Line.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setSmoothness : Set line smoothness                                   //
+    //  param smoothness : Line smoothness to set                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setSmoothness: function(smoothness)
+    {
+        this.smoothness = smoothness;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  move : Translate line                                                 //
     //  param x : X axis translate value                                      //
     //  param x : Y axis translate value                                      //
@@ -222,6 +233,8 @@ Line.prototype = {
         var degAngle = -((angle/Math.PI)*180.0);
         var crossX = Math.sin(angle)*this.thickness*0.5;
         var crossY = -Math.cos(angle)*this.thickness*0.5;
+        var ratio = this.length;
+        if (this.thickness > 0.0) { ratio = this.length/this.thickness; }
         this.length = Math.sqrt(dx*dx+dy*dy);
 
         // Render line
@@ -241,6 +254,12 @@ Line.prototype = {
         this.lineShader.shader.sendModelMatrix(this.modelMatrix);
         this.lineShader.shader.sendUniform(
             this.lineShader.alphaUniform, this.alpha
+        );
+        this.lineShader.shader.sendUniform(
+            this.lineShader.ratioUniform, ratio
+        );
+        this.lineShader.shader.sendUniform(
+            this.lineShader.smoothUniform, this.smoothness
         );
         
         // Render VBO
