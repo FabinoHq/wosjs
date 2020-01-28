@@ -233,6 +233,48 @@ Matrix4x4.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  translateVec2 : Translate 4x4 matrix with a 2 components vector       //
+    //  param vector : 2 components vector to translate matrix with           //
+    ////////////////////////////////////////////////////////////////////////////
+    translateVec2: function(vector)
+    {
+        this.matrix[12] += (this.matrix[0]*vector.vec[0]
+                        + this.matrix[4]*vector.vec[1]);
+
+        this.matrix[13] += (this.matrix[1]*vector.vec[0]
+                        + this.matrix[5]*vector.vec[1]);
+
+        this.matrix[14] += (this.matrix[2]*vector.vec[0]
+                        + this.matrix[6]*vector.vec[1]);
+
+        this.matrix[15] += (this.matrix[3]*vector.vec[0]
+                        + this.matrix[7]*vector.vec[1]);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  translateVec3 : Translate 4x4 matrix with a 3 components vector       //
+    //  param vector : 3 components vector to translate matrix with           //
+    ////////////////////////////////////////////////////////////////////////////
+    translateVec3: function(vector)
+    {
+        this.matrix[12] += (this.matrix[0]*vector.vec[0]
+                        + this.matrix[4]*vector.vec[1]
+                        + this.matrix[8]*vector.vec[2]);
+
+        this.matrix[13] += (this.matrix[1]*vector.vec[0]
+                        + this.matrix[5]*vector.vec[1]
+                        + this.matrix[9]*vector.vec[2]);
+
+        this.matrix[14] += (this.matrix[2]*vector.vec[0]
+                        + this.matrix[6]*vector.vec[1]
+                        + this.matrix[10]*vector.vec[2]);
+
+        this.matrix[15] += (this.matrix[3]*vector.vec[0]
+                        + this.matrix[7]*vector.vec[1]
+                        + this.matrix[11]*vector.vec[2]);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  translateX : Translate 4x4 matrix on X axis                           //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
