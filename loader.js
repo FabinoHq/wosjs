@@ -54,6 +54,15 @@ function Loader(renderer, audio)
     // Audio engine pointer
     this.audio = audio;
 
+    // Line shader
+    this.lineShader = null;
+    // Sprite shader
+    this.spriteShader = null;
+    // Animated sprite shader
+    this.animSpriteShader = null;
+    // Text shader
+    this.textShader = null;
+
     // Textures array
     this.textures = null;
     this.texturesLoaded = 0;
@@ -73,12 +82,52 @@ Loader.prototype = {
     {
         // Reset loader
         this.loaded = false;
+        this.lineShader = null;
+        this.spriteShader = null;
+        this.animSpriteShader = null;
+        this.textShader = null;
         this.textures = new Array();
         this.sounds = new Array();
         this.texturesLoaded = 0;
         this.allTexturesLoaded = false;
         this.soundsLoaded = 0;
         this.allSoundsLoaded = false;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  loadShaders : Load all global shaders                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    loadShaders: function()
+    {
+        // Check renderer
+        if (!this.renderer)
+        {
+            return false;
+        }
+        // Check WebGL pointer
+        if (!this.renderer.gl)
+        {
+            return false;
+        }
+
+        // Init line shader
+        this.lineShader = new LineShader(this.renderer.gl);
+        this.lineShader.init();
+
+        // Init sprite shader
+        this.spriteShader = new SpriteShader(this.renderer.gl);
+        this.spriteShader.init();
+
+        // Init animated sprite shader
+        this.animSpriteShader = new AnimSpriteShader(this.renderer.gl);
+        this.animSpriteShader.init();
+
+        // Init text shader
+        this.textShader = new TextShader(this.renderer.gl);
+        this.textShader.init();
+        
+        // All global shaders loaded
+        return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
