@@ -61,31 +61,54 @@ function Line(renderer, lineShader)
     // Line alpha
     this.alpha = 1.0;
 
-    // Line sprite size
-    this.width = 1.0;
-    this.height = 1.0;
+    // Line origin position
+    this.origin = null;
+    // Line target position
+    this.target = null;
+    // Line length
+    this.length = 0.0;
+    // Line thickness
+    this.thickness = 0.01;
 }
 
 Line.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init line                                                      //
-    //  param x1 : Line x first position                                      //
-    //  param y1 : Line y first position                                      //
-    //  param x2 : Line x second position                                     //
-    //  param y2 : Line y second position                                     //
+    //  param originX : Line origin X position                                //
+    //  param originY : Line origin Y position                                //
+    //  param targetX : Line target X position                                //
+    //  param targetY : Line target Y position                                //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(x1, y1, x2, y2)
+    init: function(thickness, originX, originY, targetX, targetY)
     {
+        var dx = 0.0;
+        var dy = 0.0;
+
         // Reset line
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
         this.alpha = 1.0;
-        this.width = 1.0;
-        this.height = 1.0;
+        this.origin = new Vector2(0.0, 0.0);
+        this.target = new Vector2(0.0, 0.0);
+        if (originX !== undefined) { this.origin.setX(originX); }
+        if (originY !== undefined) { this.origin.setY(originY); }
+        if (targetX !== undefined) { this.target.setX(targetX); }
+        if (targetY !== undefined) { this.target.setY(targetY); }
+        dx = this.target.getX()-this.origin.getX();
+        dy = this.target.getY()-this.origin.getY();
+        this.length = Math.sqrt(dx*dx+dy*dy);
+        this.thickness = 0.01;
+        if (thickness !== undefined) { this.thickness = thickness; }
 
         // Check gl pointer
         if (!this.renderer.gl)
+        {
+            return false;
+        }
+
+        // Check line shader pointer
+        if (!this.lineShader)
         {
             return false;
         }
@@ -107,50 +130,49 @@ Line.prototype = {
         }
 
         // Update vbo
-        this.vertexBuffer.setPlane2D(this.width, this.height);
+        this.vertexBuffer.setPlane2D(this.length, this.thickness);
 
         // Line loaded
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get line sprite width                                      //
-    //  return : Line sprite width                                            //
+    //  getLength : Get line length                                           //
+    //  return : Line length                                                  //
     ////////////////////////////////////////////////////////////////////////////
-    getWidth: function()
+    getLength: function()
     {
-        return this.width;
+        return this.length;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get line sprite height                                    //
-    //  return : Line sprite height                                           //
+    //  getThickness : Get line thickness                                     //
+    //  return : Line thickness                                               //
     ////////////////////////////////////////////////////////////////////////////
-    getHeight: function()
+    getThickness: function()
     {
-        return this.height;
+        return this.thickness;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  resetMatrix : Reset line sprite model matrix                          //
+    //  setOrigin : Set line origin position                                  //
     ////////////////////////////////////////////////////////////////////////////
-    resetMatrix: function()
+    setOrigin: function(originX, originY)
     {
-        this.modelMatrix.setIdentity();
+        this.origin.setXY(originX, originY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setMatrix : Reset line sprite model matrix                            //
-    //  param modelMatrix : Line sprite model matrix to set                   //
+    //  setTarget : Set line target position                                  //
     ////////////////////////////////////////////////////////////////////////////
-    setMatrix: function(modelMatrix)
+    setTarget: function(targetX, targetY)
     {
-        this.modelMatrix = modelMatrix;
+        this.target.setXY(targetX, targetY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set line sprite alpha                                      //
-    //  param alpha : Line sprite alpha to set                                //
+    //  setAlpha : Set line alpha                                             //
+    //  param alpha : Line alpha to set                                       //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
     {
@@ -158,21 +180,34 @@ Line.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate line sprite on X axis                               //
+    //  move : Translate line                                                 //
+    //  param x : X axis translate value                                      //
+    //  param x : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    move: function(x, y)
+    {
+        this.origin.addXY(x, y);
+        this.target.addXY(x, y);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Translate line on X axis                                      //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
-        this.modelMatrix.translateX(x);
+        this.origin.addX(x);
+        this.target.addX(x);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate line sprite on Y axis                               //
+    //  moveY : Translate line on Y axis                                      //
     //  param y : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
-        this.modelMatrix.translateY(y);
+        this.origin.addY(y);
+        this.target.addY(y);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -180,6 +215,21 @@ Line.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
+        // Compute line length and angle
+        var dx = this.target.getX()-this.origin.getX();
+        var dy = this.target.getY()-this.origin.getY();
+        this.length = Math.sqrt(dx*dx+dy*dy);
+        var angle = Math.atan2(dy, dx);
+        var degAngle = -((angle/Math.PI)*180.0);
+
+        // Update vbo
+        this.vertexBuffer.setPlane2D(this.length, this.thickness);
+
+        // Render line
+        this.modelMatrix.setIdentity();
+        this.modelMatrix.translate(this.origin.getX(), this.origin.getY(), 0.0);
+        this.modelMatrix.rotateZ(degAngle);
+
         // Bind line shader
         this.lineShader.shader.bind();
 
