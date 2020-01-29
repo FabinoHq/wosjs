@@ -65,6 +65,8 @@ function Rect(renderer, rectShader)
 
     // Rect position
     this.position = null;
+    // Rect angle
+    this.angle = 0.0;
     // Rect width
     this.width = 1.0;
     // Rect height
@@ -81,11 +83,11 @@ Rect.prototype = {
     {
         // Reset rect
         this.vertexBuffer = null;
-        this.texture = null;
         this.modelMatrix = null;
         this.color = new Vector3(1.0, 1.0, 1.0);
         this.alpha = 1.0;
         this.position = new Vector2(0.0, 0.0);
+        this.angle = 0.0;
         this.width = width;
         this.height = height;
 
@@ -176,8 +178,29 @@ Rect.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setX : Translate rect sprite on X axis                               //
-    //  param x : X axis translate value                                      //
+    //  setPosition : Set rect position                                       //
+    //  param x : Rect X position                                             //
+    //  param y : Rect Y position                                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosition: function(x, y)
+    {
+        this.position.vec[0] = x;
+        this.position.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPositionVec2 : Set rect position from a 2 components vector        //
+    //  param vector : 2 components vector to set rect position from          //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec2: function(vector)
+    {
+        this.position.vec[0] = vector.vec[0];
+        this.position.vec[1] = vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setX : Set rect X position                                            //
+    //  param x : Rect X position                                             //
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
     {
@@ -185,8 +208,8 @@ Rect.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setY : Translate rect on Y axis                                      //
-    //  param y : Y axis translate value                                      //
+    //  setY : Set rect Y position                                            //
+    //  param y : Rect Y position                                             //
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
     {
@@ -194,7 +217,37 @@ Rect.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate rect sprite on X axis                               //
+    //  setAngle : Set rect rotation angle                                    //
+    //  param angle : Rect rotation angle                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngle: function(angle)
+    {
+        this.angle = angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  move : Translate rect                                                 //
+    //  param x : X axis translate value                                      //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    move: function(x, y)
+    {
+        this.position.vec[0] += x;
+        this.position.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  move : Translate rect with a 2 components vector                      //
+    //  param vector : 2 components vector to translate rect with             //
+    ////////////////////////////////////////////////////////////////////////////
+    moveVec2: function(vector)
+    {
+        this.position.vec[0] += vector.vec[0];
+        this.position.vec[1] += vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Translate rect on X axis                                      //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
@@ -209,6 +262,15 @@ Rect.prototype = {
     moveY: function(y)
     {
         this.position.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate rect by a given angle                                 //
+    //  param angle : Angle to rotate rect by                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angle)
+    {
+        this.angle += angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -257,6 +319,15 @@ Rect.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  getAngle : Get rect rotation angle                                    //
+    //  return : Rect rotation angle                                          //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngle: function()
+    {
+        return this.angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  render : Render line                                                  //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
@@ -266,6 +337,9 @@ Rect.prototype = {
         this.modelMatrix.translate(
             this.position.vec[0], this.position.vec[1], 0.0
         );
+        this.modelMatrix.translate(this.width*0.5, this.height*0.5, 0.0);
+        this.modelMatrix.rotateZ(this.angle);
+        this.modelMatrix.translate(-this.width*0.5, -this.height*0.5, 0.0);
         this.modelMatrix.scale(this.width, this.height, 0.0);
 
         // Bind rect shader
