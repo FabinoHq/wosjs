@@ -59,7 +59,7 @@ function Rect(renderer, rectShader)
     // Rect model matrix
     this.modelMatrix = null;
     // Rect color
-    this.color = new Vector3(1.0, 1.0, 1.0);
+    this.color = null;
     // Rect alpha
     this.alpha = 1.0;
 
@@ -83,6 +83,7 @@ Rect.prototype = {
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
+        this.color = new Vector3(1.0, 1.0, 1.0);
         this.alpha = 1.0;
         this.position = new Vector2(0.0, 0.0);
         this.width = width;
@@ -130,27 +131,26 @@ Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
-        // Update vertex buffer
         this.width = width;
         this.height = height;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get rect width                                             //
-    //  return : Rect width                                                   //
+    //  setWidth : Set rect width                                             //
+    //  param width : Rect width to set                                       //
     ////////////////////////////////////////////////////////////////////////////
-    getWidth: function()
+    setWidth: function(width)
     {
-        return this.width;
+        this.width = width;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get rect height                                           //
-    //  return : Rect height                                                  //
+    //  setHeight : Set rect height                                           //
+    //  param height : Rect height to set                                     //
     ////////////////////////////////////////////////////////////////////////////
-    getHeight: function()
+    setHeight: function(height)
     {
-        return this.height;
+        this.height = height;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -209,6 +209,51 @@ Rect.prototype = {
     moveY: function(y)
     {
         this.position.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getWidth : Get rect width                                             //
+    //  return : Rect width                                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    getWidth: function()
+    {
+        return this.width;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHeight : Get rect height                                           //
+    //  return : Rect height                                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    getHeight: function()
+    {
+        return this.height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAlpha : Get rect alpha                                             //
+    //  return : Rect alpha                                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    getAlpha: function()
+    {
+        return this.alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getX : Get rect X position                                            //
+    //  return : Rect X position                                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getX: function()
+    {
+        return this.position.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getY : Get rect Y position                                            //
+    //  return : Rect Y position                                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getY: function()
+    {
+        return this.position.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
