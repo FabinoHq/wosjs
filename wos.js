@@ -308,9 +308,9 @@ Wos.prototype = {
 
         // Init test rect
         this.testrect = new Rect(this.renderer, this.loader.rectShader);
-        this.testrect.init(0.8, 0.4);
+        this.testrect.init(0.1, 0.8, 0.4);
         this.testrect.setColor(0.0, 0.2, 0.8);
-        this.testrect.setAlpha(0.9);
+        this.testrect.setAlpha(0.5);
 
         // Init test sprite
         this.testsprite = new Sprite(this.renderer, this.loader.spriteShader);

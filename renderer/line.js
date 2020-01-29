@@ -58,17 +58,15 @@ function Line(renderer, lineShader)
     this.vertexBuffer = null;
     // Line model matrix
     this.modelMatrix = null;
-    // Line color
-    this.color = new Vector3(1.0, 1.0, 1.0);
-    // Line alpha
-    this.alpha = 1.0;
 
     // Line origin position
     this.origin = null;
     // Line target position
     this.target = null;
-    // Line length
-    this.length = 0.0;
+     // Line color
+    this.color = null;
+    // Line alpha
+    this.alpha = 1.0;
     // Line thickness
     this.thickness = 0.01;
     // Line smoothness
@@ -85,77 +83,46 @@ Line.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     init: function(thickness, originX, originY, targetX, targetY)
     {
+        // Reset line
         var dx = 0.0;
         var dy = 0.0;
-
-        // Reset line
+        var length = 0.0;
         this.vertexBuffer = null;
-        this.texture = null;
         this.modelMatrix = null;
-        this.alpha = 1.0;
         this.origin = new Vector2(0.0, 0.0);
-        this.target = new Vector2(0.0, 0.0);
-        if (originX !== undefined) { this.origin.vec[0] = originX; }
-        if (originY !== undefined) { this.origin.vec[1] = originY; }
-        if (targetX !== undefined) { this.target.vec[0] = targetX; }
-        if (targetY !== undefined) { this.target.vec[1] = targetY; }
+        this.target = new Vector2(1.0, 1.0);
+        if (originX !== undefined) this.origin.vec[0] = originX;
+        if (originY !== undefined) this.origin.vec[1] = originY;
+        if (targetX !== undefined) this.target.vec[0] = targetX;
+        if (targetY !== undefined) this.target.vec[1] = targetY;
         dx = this.target.vec[0]-this.origin.vec[0];
         dy = this.target.vec[1]-this.origin.vec[1];
-        this.length = Math.sqrt(dx*dx+dy*dy);
+        length = Math.sqrt(dx*dx+dy*dy);
+        this.color = new Vector3(1.0, 1.0, 1.0);
+        this.alpha = 1.0;
         this.thickness = 0.01;
-        if (thickness !== undefined) { this.thickness = thickness; }
+        if (thickness !== undefined) this.thickness = thickness;
+        this.smoothness = 0.0;
 
         // Check gl pointer
-        if (!this.renderer.gl)
-        {
-            return false;
-        }
+        if (!this.renderer.gl) return false;
 
         // Check line shader pointer
-        if (!this.lineShader)
-        {
-            return false;
-        }
+        if (!this.lineShader) return false;
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
 
         // Create vbo
         this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer)
-        {
-            // Could not create vbo
-            return false;
-        }
-        if (!this.vertexBuffer.init())
-        {
-            // Could not init vbo
-            return false;
-        }
+        if (!this.vertexBuffer) return false;
+        if (!this.vertexBuffer.init()) return false;
 
         // Update vbo
         this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Line loaded
         return true;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getLength : Get line length                                           //
-    //  return : Line length                                                  //
-    ////////////////////////////////////////////////////////////////////////////
-    getLength: function()
-    {
-        return this.length;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getThickness : Get line thickness                                     //
-    //  return : Line thickness                                               //
-    ////////////////////////////////////////////////////////////////////////////
-    getThickness: function()
-    {
-        return this.thickness;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -180,6 +147,24 @@ Line.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setOriginX : Set line origin X position                               //
+    //  param originX : Line origin X position                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setOriginX: function(originX)
+    {
+        this.origin.vec[0] = originX;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setOriginY : Set line origin Y position                               //
+    //  param originX : Line origin Y position                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setOriginY: function(originY)
+    {
+        this.origin.vec[1] = originY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setTarget : Set line target position                                  //
     //  param targetX : Line target X position                                //
     //  param targetY : Line target Y position                                //
@@ -201,6 +186,24 @@ Line.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setTargetX : Set line target X position                               //
+    //  param targetX : Line target X position                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setTargetX: function(targetX)
+    {
+        this.target.vec[0] = targetX;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setTargetY : Set line target Y position                               //
+    //  param originX : Line target Y position                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setTargetY: function(targetY)
+    {
+        this.target.vec[1] = targetY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setColor : Set line color                                             //
     //  param r : Line red color channel to set                               //
     //  param g : Line blue color channel to set                              //
@@ -211,6 +214,17 @@ Line.prototype = {
         this.color.vec[0] = r;
         this.color.vec[1] = g;
         this.color.vec[2] = b;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setColorVec3 : Set line color from a 3 components vector              //
+    //  param color : 3 components vector to set line color from              //
+    ////////////////////////////////////////////////////////////////////////////
+    setColorVec3: function(color)
+    {
+        this.color.vec[0] = color.vec[0];
+        this.color.vec[1] = color.vec[1];
+        this.color.vec[2] = color.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -238,8 +252,22 @@ Line.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     move: function(x, y)
     {
-        this.origin.addXY(x, y);
-        this.target.addXY(x, y);
+        this.origin.vec[0] += x;
+        this.origin.vec[1] += y;
+        this.target.vec[0] += x;
+        this.target.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveVec2 : Translate line by a 2 components vector                    //
+    //  param vector : 2 components vector to translate line by               //
+    ////////////////////////////////////////////////////////////////////////////
+    moveVec2: function(vector)
+    {
+        this.origin.vec[0] += vector.vec[0];
+        this.origin.vec[1] += vector.vec[1];
+        this.target.vec[0] += vector.vec[0];
+        this.target.vec[1] += vector.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -248,8 +276,8 @@ Line.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
-        this.origin.addX(x);
-        this.target.addX(x);
+        this.origin.vec[0] += x;
+        this.target.vec[0] += x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -258,8 +286,93 @@ Line.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
-        this.origin.addY(y);
-        this.target.addY(y);
+        this.origin.vec[1] += y;
+        this.target.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getOriginX : Get line origin X position                               //
+    //  return : Line origin X position                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    getOriginX: function()
+    {
+        return this.origin.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getOriginY : Get line origin Y position                               //
+    //  return : Line origin Y position                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    getOriginY: function()
+    {
+        return this.origin.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getTargetX : Get line target X position                               //
+    //  return : Line target X position                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    getTargetX: function()
+    {
+        return this.target.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getTargetY : Get line target Y position                               //
+    //  return : Line target Y position                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    getTargetY: function()
+    {
+        return this.target.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getLength : Get line length                                           //
+    //  return : Line length                                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    getLength: function()
+    {
+        var dx = this.target.vec[0]-this.origin.vec[0];
+        var dy = this.target.vec[1]-this.origin.vec[1];
+        return Math.sqrt(dx*dx+dy*dy);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngle : Get line rotation angle                                    //
+    //  return : Line rotation angle                                          //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngle: function()
+    {
+        var dx = this.target.vec[0]-this.origin.vec[0];
+        var dy = this.target.vec[1]-this.origin.vec[1];
+        return -((Math.atan2(dy, dx)/Math.PI)*180.0);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAlpha : Get line alpha                                             //
+    //  return : Line alpha                                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    getAlpha: function()
+    {
+        return this.alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getThickness : Get line thickness                                     //
+    //  return : Line thickness                                               //
+    ////////////////////////////////////////////////////////////////////////////
+    getThickness: function()
+    {
+        return this.thickness;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getSmoothness : Get line smoothness                                   //
+    //  return : Line smoothness                                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getSmoothness: function()
+    {
+        return this.smoothness;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -270,6 +383,7 @@ Line.prototype = {
         // Compute line length and angle
         var dx = this.target.vec[0]-this.origin.vec[0];
         var dy = this.target.vec[1]-this.origin.vec[1];
+        var length = Math.sqrt(dx*dx+dy*dy);
         var angle = Math.atan2(dy, dx);
         var degAngle = -((angle/Math.PI)*180.0);
         var crossX = Math.sin(angle)*this.thickness*0.5;
@@ -277,10 +391,9 @@ Line.prototype = {
         var offsetX = Math.cos(angle)*this.smoothness*0.5*this.thickness;
         var offsetY = Math.sin(angle)*this.smoothness*0.5*this.thickness;
         var ratio = 1.0;
-        this.length = Math.sqrt(dx*dx+dy*dy);
         if (this.thickness > 0.0)
         {
-            ratio = (this.length+this.smoothness*this.thickness)/this.thickness;
+            ratio = (length+this.smoothness*this.thickness)/this.thickness;
         }
 
         // Set line model matrix
@@ -291,7 +404,7 @@ Line.prototype = {
         );
         this.modelMatrix.rotateZ(degAngle);
         this.modelMatrix.scale(
-            this.length+this.smoothness*this.thickness,
+            length+this.smoothness*this.thickness,
             this.thickness, 0.0
         );
 

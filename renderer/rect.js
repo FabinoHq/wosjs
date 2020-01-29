@@ -58,12 +58,6 @@ function Rect(renderer, rectShader)
     this.vertexBuffer = null;
     // Rect model matrix
     this.modelMatrix = null;
-    // Rect color
-    this.color = null;
-    // Rect alpha
-    this.alpha = 1.0;
-    // Rect thickness
-    this.thickness = 0.01;
 
     // Rect position
     this.position = null;
@@ -71,130 +65,55 @@ function Rect(renderer, rectShader)
     this.angle = 0.0;
     // Rect size
     this.size = null;
+    // Rect color
+    this.color = null;
+    // Rect alpha
+    this.alpha = 1.0;
+    // Rect thickness
+    this.thickness = 0.01;
 }
 
 Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init rect                                                      //
+    //  param thickness : Rect borders thickness                              //
     //  param width : Rect width                                              //
     //  param height : Rect height                                            //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(width, height)
+    init: function(thickness, width, height)
     {
         // Reset rect
         this.vertexBuffer = null;
         this.modelMatrix = null;
+        this.position = new Vector2(0.0, 0.0);
+        this.angle = 0.0;
+        this.size = new Vector2(1.0, 1.0);
+        if (width !== undefined) this.size.vec[0] = width;
+        if (height !== undefined) this.size.vec[1] = height;
         this.color = new Vector3(1.0, 1.0, 1.0);
         this.alpha = 1.0;
         this.thickness = 0.01;
-        this.position = new Vector2(0.0, 0.0);
-        this.angle = 0.0;
-        this.size = new Vector2(width, height);
+        if (thickness !== undefined) this.thickness = thickness;
 
         // Check gl pointer
-        if (!this.renderer.gl)
-        {
-            return false;
-        }
+        if (!this.renderer.gl) return false;
 
         // Check rect shader pointer
-        if (!this.rectShader)
-        {
-            return false;
-        }
+        if (!this.rectShader) return false;
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
 
         // Create vbo
         this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer)
-        {
-            // Could not create vbo
-            return false;
-        }
-        if (!this.vertexBuffer.init())
-        {
-            // Could not init vbo
-            return false;
-        }
+        if (!this.vertexBuffer) return false;
+        if (!this.vertexBuffer.init()) return false;
 
         // Update vbo
         this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Rect loaded
         return true;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setSize : Set rect size                                               //
-    //  param width : Rect width to set                                       //
-    //  param height : Rect height to set                                     //
-    ////////////////////////////////////////////////////////////////////////////
-    setSize: function(width, height)
-    {
-        this.size.vec[0] = width;
-        this.size.vec[1] = height;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setWidth : Set rect width                                             //
-    //  param width : Rect width to set                                       //
-    ////////////////////////////////////////////////////////////////////////////
-    setWidth: function(width)
-    {
-        this.size.vec[0] = width;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setHeight : Set rect height                                           //
-    //  param height : Rect height to set                                     //
-    ////////////////////////////////////////////////////////////////////////////
-    setHeight: function(height)
-    {
-        this.size.vec[1] = height;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setColor : Set rect color                                             //
-    //  param r : Rect red color channel to set                               //
-    //  param g : Rect blue color channel to set                              //
-    //  param b : Rect green color channel to set                             //
-    ////////////////////////////////////////////////////////////////////////////
-    setColor: function(r, g, b)
-    {
-        this.color.vec[0] = r;
-        this.color.vec[1] = g;
-        this.color.vec[2] = b;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setColorVec3 : Set rect color from a 3 components vector              //
-    //  param color : 3 components vector to set color from                   //
-    ////////////////////////////////////////////////////////////////////////////
-    setColorVec3: function(color)
-    {
-        this.color.vec[0] = color.vec[0];
-        this.color.vec[1] = color.vec[1];
-        this.color.vec[2] = color.vec[2];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set rect alpha                                             //
-    //  param alpha : Rect alpha to set                                       //
-    ////////////////////////////////////////////////////////////////////////////
-    setAlpha: function(alpha)
-    {
-        this.alpha = alpha;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setThickness : Set rect thickness                                     //
-    //  param thickness : Rect thickness to set                               //
-    ////////////////////////////////////////////////////////////////////////////
-    setThickness: function(thickness)
-    {
-        this.thickness = thickness;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -237,15 +156,6 @@ Rect.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngle : Set rect rotation angle                                    //
-    //  param angle : Rect rotation angle                                     //
-    ////////////////////////////////////////////////////////////////////////////
-    setAngle: function(angle)
-    {
-        this.angle = angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  move : Translate rect                                                 //
     //  param x : X axis translate value                                      //
     //  param y : Y axis translate value                                      //
@@ -285,12 +195,129 @@ Rect.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAngle : Set rect rotation angle                                    //
+    //  param angle : Rect rotation angle                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngle: function(angle)
+    {
+        this.angle = angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate rect by a given angle                                 //
     //  param angle : Angle to rotate rect by                                 //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
         this.angle += angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSize : Set rect size                                               //
+    //  param width : Rect width to set                                       //
+    //  param height : Rect height to set                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setSize: function(width, height)
+    {
+        this.size.vec[0] = width;
+        this.size.vec[1] = height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSize : Set rect size from a 2 components vector                    //
+    //  param vector : Vector to set rect size from                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setSizeVec2: function(vector)
+    {
+        this.size.vec[0] = vector.vec[0];
+        this.size.vec[1] = vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setWidth : Set rect width                                             //
+    //  param width : Rect width to set                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    setWidth: function(width)
+    {
+        this.size.vec[0] = width;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setHeight : Set rect height                                           //
+    //  param height : Rect height to set                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setHeight: function(height)
+    {
+        this.size.vec[1] = height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setColor : Set rect color                                             //
+    //  param r : Rect red color channel to set                               //
+    //  param g : Rect blue color channel to set                              //
+    //  param b : Rect green color channel to set                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setColor: function(r, g, b)
+    {
+        this.color.vec[0] = r;
+        this.color.vec[1] = g;
+        this.color.vec[2] = b;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setColorVec3 : Set rect color from a 3 components vector              //
+    //  param color : 3 components vector to set rect color from              //
+    ////////////////////////////////////////////////////////////////////////////
+    setColorVec3: function(color)
+    {
+        this.color.vec[0] = color.vec[0];
+        this.color.vec[1] = color.vec[1];
+        this.color.vec[2] = color.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set rect alpha                                             //
+    //  param alpha : Rect alpha to set                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    setAlpha: function(alpha)
+    {
+        this.alpha = alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setThickness : Set rect thickness                                     //
+    //  param thickness : Rect thickness to set                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setThickness: function(thickness)
+    {
+        this.thickness = thickness;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getX : Get rect X position                                            //
+    //  return : Rect X position                                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getX: function()
+    {
+        return this.position.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getY : Get rect Y position                                            //
+    //  return : Rect Y position                                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getY: function()
+    {
+        return this.position.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngle : Get rect rotation angle                                    //
+    //  return : Rect rotation angle                                          //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngle: function()
+    {
+        return this.angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -330,43 +357,13 @@ Rect.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getX : Get rect X position                                            //
-    //  return : Rect X position                                              //
-    ////////////////////////////////////////////////////////////////////////////
-    getX: function()
-    {
-        return this.position.vec[0];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getY : Get rect Y position                                            //
-    //  return : Rect Y position                                              //
-    ////////////////////////////////////////////////////////////////////////////
-    getY: function()
-    {
-        return this.position.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getAngle : Get rect rotation angle                                    //
-    //  return : Rect rotation angle                                          //
-    ////////////////////////////////////////////////////////////////////////////
-    getAngle: function()
-    {
-        return this.angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  render : Render line                                                  //
+    //  render : Render rect                                                  //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
         // Compute rect aspect ration
         var ratio = 1.0;
-        if (this.size.vec[1] > 0.0)
-        {
-            ratio = this.size.vec[0]/this.size.vec[1];
-        }
+        if (this.size.vec[1] > 0.0) ratio = this.size.vec[0]/this.size.vec[1];
 
         // Set rect model matrix
         this.modelMatrix.setIdentity();
