@@ -205,7 +205,7 @@ Rect.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate rect by a given angle                                 //
-    //  param angle : Angle to rotate rect by                                 //
+    //  param angle : Angle to rotate rect by in degrees                                //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
@@ -313,7 +313,7 @@ Rect.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngle : Get rect rotation angle                                    //
-    //  return : Rect rotation angle                                          //
+    //  return : Rect rotation angle in degrees                               //
     ////////////////////////////////////////////////////////////////////////////
     getAngle: function()
     {

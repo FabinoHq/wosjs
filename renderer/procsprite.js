@@ -55,19 +55,24 @@ function ProcSprite(renderer)
     this.vertexBuffer = null;
     // Procedural sprite model matrix
     this.modelMatrix = null;
-    // Procedural sprite alpha
-    this.alpha = 1.0;
-
-    // Procedural sprite size
-    this.width = 1.0;
-    this.height = 1.0;
-    // Procedural sprite offset
-    this.offset = null;
 
     // Procedural sprite shader uniforms locations
     this.alphaUniform = -1;
-    this.timerUniform = -1;
+    this.timeUniform = -1;
     this.offsetUniform = -1;
+
+    // Procedural sprite position
+    this.position = null;
+    // Procedural sprite rotation angle
+    this.angle = 0.0;
+    // Procedural sprite size
+    this.size = null;
+    // Procedural sprite offset
+    this.offset = null;
+    // Procedural sprite time
+    this.time = 0.0;
+    // Procedural sprite alpha
+    this.alpha = 1.0;
 }
 
 ProcSprite.prototype = {
@@ -80,61 +85,145 @@ ProcSprite.prototype = {
     init: function(shaderSrc, width, height)
     {
         // Reset procedural sprite
+        this.shader = null;
         this.vertexBuffer = null;
-        this.texture = null;
         this.modelMatrix = null;
-        if (width !== undefined) { this.width = width; }
-        if (height !== undefined) { this.height = height; }
-        this.offset = new Vector2(0.0, 0.0);
         this.alphaUniform = -1;
-        this.timerUniform = -1;
+        this.timeUniform = -1;
         this.offsetUniform = -1;
+        this.position = new Vector2(0.0, 0.0);
+        this.angle = 0.0;
+        this.size = new Vector2(1.0, 1.0);
+        if (width !== undefined) this.size.vec[0] = width;
+        if (height !== undefined) this.size.vec[1] = height;
+        this.offset = new Vector2(0.0, 0.0);
+        this.time = 0.0;
+        this.alpha = 1.0;
 
         // Check gl pointer
-        if (!this.renderer.gl)
-        {
-            return false;
-        }
+        if (!this.renderer.gl) return false;
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
 
         // Create vbo
         this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer)
-        {
-            // Could not create vbo
-            return false;
-        }
-        if (!this.vertexBuffer.init())
-        {
-            // Could not init vbo
-            return false;
-        }
+        if (!this.vertexBuffer) return false;
+        if (!this.vertexBuffer.init()) return false;
 
         // Update vbo
-        this.vertexBuffer.setPlane2D(this.width, this.height);
+        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Init shader
         this.shader = new Shader(this.renderer.gl);
-        if (!this.shader)
-        {
-            return false;
-        }
-        if (!this.shader.init(defaultVertexShaderSrc, shaderSrc))
-        {
-            return false;
-        }
+        if (!this.shader) return false;
+        if (!this.shader.init(defaultVertexShaderSrc, shaderSrc)) return false;
 
         // Get uniforms locations
         this.shader.bind();
         this.alphaUniform = this.shader.getUniform("alpha");
-        this.timerUniform = this.shader.getUniform("timer");
+        this.timeUniform = this.shader.getUniform("time");
         this.offsetUniform = this.shader.getUniform("offset");
         this.shader.unbind();
 
         // Procedural sprite loaded
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPosition : Set procedural sprite position                          //
+    //  param x : Procedural sprite X position                                //
+    //  param y : Procedural sprite Y position                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosition: function(x, y)
+    {
+        this.position.vec[0] = x;
+        this.position.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPositionVec2 : Set sprite position from a 2 components vector      //
+    //  param vector : 2 components vector to set sprite position from        //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec2: function(vector)
+    {
+        this.position.vec[0] = vector.vec[0];
+        this.position.vec[1] = vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setX : Set procedural sprite X position                               //
+    //  param x : Procedural sprite X position                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setX: function(x)
+    {
+        this.position.vec[0] = x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setY : Set procedural sprite Y position                               //
+    //  param y : Procedural sprite Y position                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setY: function(y)
+    {
+        this.position.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  move : Translate procedural sprite                                    //
+    //  param x : X axis translate value                                      //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    move: function(x, y)
+    {
+        this.position.vec[0] += x;
+        this.position.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveVec2 : Translate procedural sprite by a 2 components vector       //
+    //  param vector : 2 components vector to translate procedural sprite by  //
+    ////////////////////////////////////////////////////////////////////////////
+    moveVec2: function(vector)
+    {
+        this.position.vec[0] += vector.vec[0];
+        this.position.vec[1] += vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Translate procedural sprite on X axis                         //
+    //  param x : X axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveX: function(x)
+    {
+        this.position.vec[0] += x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Translate procedural sprite on Y axis                         //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveY: function(y)
+    {
+        this.position.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngle : Set procedural sprite rotation angle                       //
+    //  param angle : Procedural sprite rotation angle to set in degrees      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngle: function(angle)
+    {
+        this.angle = angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate procedural sprite                                     //
+    //  param angle : Angle to rotate procedural sprite by in degrees         //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angle)
+    {
+        this.angle += angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -144,45 +233,84 @@ ProcSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
-        // Update vertex buffer
-        this.width = width;
-        this.height = height;
-        this.vertexBuffer.setPlane2D(this.width, this.height);
+        this.size.vec[0] = width;
+        this.size.vec[1] = height;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get procedural sprite width                                //
-    //  return : Procedural sprite width                                      //
+    //  setSizeVec2 : Set procedural sprite size from a 2 components vector   //
+    //  param vector : 2 components vector to set procedural sprite size from //
     ////////////////////////////////////////////////////////////////////////////
-    getWidth: function()
+    setSizeVec2: function(vector)
     {
-        return this.width;
+        this.size.vec[0] = vector.vec[0];
+        this.size.vec[1] = vector.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get procedural sprite height                              //
-    //  return : Procedural sprite height                                     //
+    //  setWidth : Set procedural sprite width                                //
+    //  param width : Procedural sprite width to set                          //
     ////////////////////////////////////////////////////////////////////////////
-    getHeight: function()
+    setWidth: function(width)
     {
-        return this.height;
+        this.size.vec[0] = width;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  resetMatrix : Reset procedural sprite model matrix                    //
+    //  setHeight : Set procedural sprite height                              //
+    //  param height : Procedural sprite height to set                        //
     ////////////////////////////////////////////////////////////////////////////
-    resetMatrix: function()
+    setHeight: function(height)
     {
-        this.modelMatrix.setIdentity();
+        this.size.vec[1] = height;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setMatrix : Set procedural sprite model matrix                        //
-    //  param modelMatrix : Procedural sprite model matrix to set             //
+    //  setOffset : Set procedural sprite offset                              //
+    //  param x : Procedural sprite X offset to set                           //
+    //  param y : Procedural sprite Y offset to set                           //
     ////////////////////////////////////////////////////////////////////////////
-    setMatrix: function(modelMatrix)
+    setOffset: function(x, y)
     {
-        this.modelMatrix = modelMatrix;
+        this.offset.vec[0] = x;
+        this.offset.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setOffsetVec2 : Set procedural offset from a 2 components vector      //
+    //  param vector : 2 components vector to set procedural offset from      //
+    ////////////////////////////////////////////////////////////////////////////
+    setOffsetVec2: function(vector)
+    {
+        this.offset.vec[0] = vector.vec[0];
+        this.offset.vec[1] = vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setOffsetX : Set procedural sprite X offset                           //
+    //  param x : Procedural sprite X offset to set                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setOffsetX: function(x)
+    {
+        this.offset.vec[0] = x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setOffsetY : Set procedural sprite Y offset                           //
+    //  param y : Procedural sprite Y offset to set                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setOffsetY: function(y)
+    {
+        this.offset.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setTime : Set procedural sprite time                                  //
+    //  param time : Procedural sprite time to set                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setTime: function(time)
+    {
+        this.time = time;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -195,33 +323,105 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate procedural sprite on X axis                         //
-    //  param x : X axis translate value                                      //
+    //  getX : Get procedural sprite X position                               //
+    //  return : Procedural sprite X position                                 //
     ////////////////////////////////////////////////////////////////////////////
-    moveX: function(x)
+    getX: function()
     {
-        this.modelMatrix.translateX(x);
+        return this.position.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate procedural sprite on Y axis                         //
-    //  param y : Y axis translate value                                      //
+    //  getY : Get procedural sprite Y position                               //
+    //  return : Procedural sprite Y position                                 //
     ////////////////////////////////////////////////////////////////////////////
-    moveY: function(y)
+    getY: function()
     {
-        this.modelMatrix.translateY(y);
+        return this.position.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngle : Get procedural sprite rotation angle                       //
+    //  return : Procedural sprite rotation angle in degrees                  //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngle: function()
+    {
+        return this.angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getWidth : Get procedural sprite width                                //
+    //  return : Procedural sprite width                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    getWidth: function()
+    {
+        return this.size.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHeight : Get procedural sprite height                              //
+    //  return : Procedural sprite height                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    getHeight: function()
+    {
+        return this.size.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getOffsetX : Get procedural sprite offset X position                  //
+    //  return : Procedural sprite offset X position                          //
+    ////////////////////////////////////////////////////////////////////////////
+    getOffsetX: function()
+    {
+        return this.offset.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getOffsetY : Get procedural sprite offset Y position                  //
+    //  return : Procedural sprite offset Y position                          //
+    ////////////////////////////////////////////////////////////////////////////
+    getOffsetY: function()
+    {
+        return this.offset.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getTime : Get procedural sprite time                                  //
+    //  return : Procedural sprite time                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    getTime: function()
+    {
+        return this.time;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAlpha : Get procedural sprite alpha                                //
+    //  return : Procedural sprite alpha                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    getAlpha: function()
+    {
+        return this.alpha;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  render : Render procedural sprite                                     //
-    //  param timer : Time offset for animated procedural generation          //
+    //  param time : Time offset for animated procedural generation           //
     //  param offsetX : X position offset for procedural generation           //
     //  param offsetY : Y position offset for procedural generation           //
     ////////////////////////////////////////////////////////////////////////////
-    render: function(timer, offsetX, offsetY)
+    render: function()
     {
-        // Set procedural sprite offset
-        this.offset.setXY(offsetX, offsetY);
+        // Set procedural sprite model matrix
+        this.modelMatrix.setIdentity();
+        this.modelMatrix.translateVec2(this.position);
+        this.modelMatrix.translate(
+            this.size.vec[0]*0.5, this.size.vec[1]*0.5, 0.0
+        );
+        this.modelMatrix.rotateZ(this.angle);
+        this.modelMatrix.translate(
+            -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
+        );
+        this.modelMatrix.scaleVec2(this.size);
 
         // Bind procedural shader
         this.shader.bind();
@@ -231,7 +431,7 @@ ProcSprite.prototype = {
         this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
         this.shader.sendModelMatrix(this.modelMatrix);
         this.shader.sendUniform(this.alphaUniform, this.alpha);
-        this.shader.sendUniform(this.timerUniform, timer);
+        this.shader.sendUniform(this.timeUniform, this.time);
         this.shader.sendUniformVec2(this.offsetUniform, this.offset);
         
         // Render VBO

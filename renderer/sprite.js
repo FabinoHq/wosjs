@@ -90,8 +90,8 @@ Sprite.prototype = {
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
         this.size = new Vector2(1.0, 1.0);
-        if (width !== undefined) { this.size.vec[0] = width; }
-        if (height !== undefined) { this.size.vec[1] = height; }
+        if (width !== undefined) this.size.vec[0] = width;
+        if (height !== undefined) this.size.vec[1] = height;
         this.uvSize = new Vector2(1.0, 1.0);
         this.uvOffset = new Vector2(0.0, 0.0);
         this.alpha = 1.0;
@@ -134,7 +134,7 @@ Sprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setPositionVec2 : Set sprite position from a 2 components vector      //
-    //  param vector : 2 components vector to set position from               //
+    //  param vector : 2 components vector to set sprite position from        //
     ////////////////////////////////////////////////////////////////////////////
     setPositionVec2: function(vector)
     {
@@ -201,7 +201,7 @@ Sprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngle : Set sprite rotation angle                                  //
-    //  param angle : Sprite rotation angle to set                            //
+    //  param angle : Sprite rotation angle to set in degrees                 //
     ////////////////////////////////////////////////////////////////////////////
     setAngle: function(angle)
     {
@@ -210,7 +210,7 @@ Sprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate sprite                                                //
-    //  param angle : Angle to rotate in degrees                              //
+    //  param angle : Angle to rotate sprite by in degrees                    //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
@@ -236,6 +236,24 @@ Sprite.prototype = {
     {
         this.size.vec[0] = vector.vec[0];
         this.size.vec[1] = vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setWidth : Set sprite width                                           //
+    //  param width : Sprite width to set                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setWidth: function(width)
+    {
+        this.size.vec[0] = width;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setHeight : Set sprite height                                         //
+    //  param height : Sprite height to set                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setHeight: function(height)
+    {
+        this.size.vec[1] = height;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -304,7 +322,7 @@ Sprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngle : Get sprite rotation angle                                  //
-    //  return : Sprite rotation angle                                        //
+    //  return : Sprite rotation angle in degrees                             //
     ////////////////////////////////////////////////////////////////////////////
     getAngle: function()
     {

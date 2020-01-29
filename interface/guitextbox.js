@@ -802,9 +802,7 @@ GuiTextBox.prototype = {
     render: function()
     {
         // Render box
-        this.textbox.resetMatrix();
-        this.textbox.moveX(this.posx);
-        this.textbox.moveY(this.posy);
+        this.textbox.setPosition(this.posx, this.posy);
         this.textbox.render(0.0, 0.0, 0.0);
 
         // Render text
@@ -820,26 +818,24 @@ GuiTextBox.prototype = {
             if (this.selection)
             {
                 // Render selection
-                this.textsel.resetMatrix();
-                this.textsel.moveX(
+                this.textsel.setX(
                     this.posx+
                     (this.height*WOSDefaultTextBoxTextOffsetFactor)+
                     Math.min(this.selStartOffset, this.selEndOffset)
                 );
-                this.textsel.moveY(this.posy);
+                this.textsel.setY(this.posy);
                 this.textsel.render(0.0, 0.0, 0.0);
             }
             else
             {
                 // Render cursor
-                this.textcursor.resetMatrix();
-                this.textcursor.moveX(
+                this.textcursor.setX(
                     this.posx+
                     (this.height*WOSDefaultTextBoxTextOffsetFactor)+
                     this.cursorOffset+
                     (this.height*WOSDefaultTextBoxCursorOffsetFactor)
                 );
-                this.textcursor.moveY(
+                this.textcursor.setY(
                     this.posy+(this.height*
                     (1.0-WOSDefaultTextBoxCursorHeightFactor)*0.5)
                 );
