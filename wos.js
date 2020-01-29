@@ -308,14 +308,14 @@ Wos.prototype = {
 
         // Init test rect
         this.testrect = new Rect(this.renderer, this.loader.rectShader);
-        this.testrect.init(0.5, 0.5);
+        this.testrect.init(0.8, 0.4);
         this.testrect.setColor(0.0, 0.2, 0.8);
         this.testrect.setAlpha(0.9);
 
         // Init test sprite
         this.testsprite = new Sprite(this.renderer, this.loader.spriteShader);
         this.testsprite.init(
-            this.loader.getTexture("testsprite.png"), 0.05, 0.09
+            this.loader.getTexture("testsprite.png"), 0.09, 0.09
         );
 
         // Init test procedural sprite
@@ -335,13 +335,13 @@ Wos.prototype = {
 
         // Init test text
         this.testtext = new GuiText(this.renderer, this.loader.textShader);
-        this.testtext.init("Test text");
+        this.testtext.init("Test text", 0.07);
 
         // init test text box
         this.testtextbox = new GuiTextBox(
             this.renderer, this.loader.textShader
         );
-        this.testtextbox.init(0.5, 0.2, "Test");
+        this.testtextbox.init(0.7, 0.2, "Test");
         this.testtextbox.setSelected(true);
 
         // Run WOS
@@ -452,12 +452,14 @@ Wos.prototype = {
     {
         this.mouseX = mouseX;
         this.mouseY = mouseY;
-        this.curMouseX = ((this.mouseX/this.renderer.getWidth())*2.0)-1.0;
-        this.curMouseY = -((this.mouseY/this.renderer.getHeight())*2.0)+1.0;
-        this.realMouseX = ((this.mouseX-this.renderer.getViewportOffsetX())/
-                            this.renderer.getViewportWidth()*2.0)-1.0;
-        this.realMouseY = -((this.mouseY-this.renderer.getViewportOffsetY())/
-                            this.renderer.getViewportHeight()*2.0)+1.0;
+        this.curMouseX = ((this.mouseX/this.renderer.width)*2.0*
+                            this.renderer.ratio)-this.renderer.ratio;
+        this.curMouseY = -((this.mouseY/this.renderer.height)*2.0)+1.0;
+        this.realMouseX = ((this.mouseX-this.renderer.vpoffx)/
+                            this.renderer.vpwidth*2.0*
+                            this.renderer.ratio)-this.renderer.ratio;
+        this.realMouseY = -((this.mouseY-this.renderer.vpoffy)/
+                            this.renderer.vpheight*2.0)+1.0;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -481,31 +483,31 @@ Wos.prototype = {
         //this.testline.render();
 
         // Render test rect
-        this.testrect.resetMatrix();
-        this.testrect.moveX(-this.testrect.getWidth()/2.0);
-        this.testrect.moveY(-this.testrect.getHeight()/2.0);
-        this.testrect.render();
+        //this.testrect.resetMatrix();
+        //this.testrect.moveX(-this.testrect.getWidth()/2.0);
+        //this.testrect.moveY(-this.testrect.getHeight()/2.0);
+        //this.testrect.render();
 
         // Render test sprite
-        this.testsprite.resetMatrix();
+        //this.testsprite.resetMatrix();
         //this.testsprite.moveX(-this.testsprite.getWidth()/2.0);
         //this.testsprite.moveY(-this.testsprite.getHeight()/2.0);
         //this.testsprite.render();
 
         // Render procedural test sprite
-        this.testproc.resetMatrix();
+        //this.testproc.resetMatrix();
         //this.testproc.moveX(-this.testproc.getWidth()/2.0);
         //this.testproc.moveY(-this.testproc.getHeight()/2.0);
         //this.testproc.render(0.0, 0.0, 0.0);
 
         // Render test anim
-        this.testanim.resetMatrix();
+        //this.testanim.resetMatrix();
         //this.testanim.moveX(-this.testanim.getWidth()/2.0);
         //this.testanim.moveY(-this.testanim.getHeight()/2.0);
         //this.testanim.render(this.frametime);
 
         // Render test text
-        this.testtext.resetMatrix();
+        //this.testtext.resetMatrix();
         //this.testtext.moveX(-this.testtext.getWidth()/2.0);
         //this.testtext.moveY(-this.testtext.getHeight()/2.0);
         //this.testtext.render();

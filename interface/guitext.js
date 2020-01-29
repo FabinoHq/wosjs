@@ -49,9 +49,9 @@ const HiddenTextPassCharacter = "\u2022";
 ////////////////////////////////////////////////////////////////////////////////
 //  Default font settings                                                     //
 ////////////////////////////////////////////////////////////////////////////////
-const WOSDefaultFontCharsizeFactor = 0.00092;
-const WOSDefaultFontScaleXFactor = 1100.0;
-const WOSDefaultFontScaleYFactor = 920.0;
+const WOSDefaultFontCharsizeFactor = 0.00098;
+const WOSDefaultFontScaleXFactor = 1024.0;
+const WOSDefaultFontScaleYFactor = 1024.0;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -102,9 +102,8 @@ GuiText.prototype = {
     //  param text : Text to set                                              //
     //  param height : Text field height                                      //
     //  param hide : Text hide mode                                           //
-    //  param shaderSrc : Text fragment shader source to use                  //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(text, height, hide, shaderSrc)
+    init: function(text, height, hide)
     {
         var i = 0;
         var pixelsData = null;
@@ -208,7 +207,7 @@ GuiText.prototype = {
 
         // Clamp text width
         if (this.width <= 0.001) { this.width = 0.001; }
-        if (this.width >= 1.8) { this.width = 1.8; }
+        if (this.width >= 3.98) { this.width = 3.98; }
 
         // Get char sizes
         this.charsizes = new Array();

@@ -62,6 +62,9 @@ function Renderer()
     this.width = 0;
     this.height = 0;
 
+    // Aspect ratio of the renderer
+    this.ratio = 1.0;
+
     // Size of the viewport
     this.vpwidth = 0.0;
     this.vpheight = 0.0;
@@ -101,6 +104,7 @@ Renderer.prototype = {
         this.offContext = null;
         this.width = 0;
         this.height = 0;
+        this.ratio = 1.0;
         this.vpwidth = 0.0;
         this.vpheight = 0.0;
         this.vpoffx = 0.0;
@@ -225,6 +229,7 @@ Renderer.prototype = {
         if (this.vpheight <= 1.0) { this.vpheight = 1.0; }
         this.vpoffx = (this.width-this.vpwidth)*0.5;
         this.vpoffy = (this.height-this.vpheight)*0.5;
+        if (this.vpheight > 0.0) { this.ratio = this.vpwidth/this.vpheight; }
 
         // Set viewport
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
@@ -238,7 +243,7 @@ Renderer.prototype = {
 
         // Set projection matrix
         this.projMatrix.setOrthographic(
-            -1.0, 1.0,
+            -this.ratio, this.ratio,
             1.0, -1.0,
             0.001, 5000.0
         );
@@ -290,9 +295,23 @@ Renderer.prototype = {
         if (this.vpheight <= 1.0) { this.vpheight = 1.0; }
         this.vpoffx = (this.width-this.vpwidth)*0.5;
         this.vpoffy = (this.height-this.vpheight)*0.5;
+        if (this.vpheight > 0.0) { this.ratio = this.vpwidth/this.vpheight; }
 
         // Update viewport
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
+
+        // Set projection matrix
+        this.projMatrix.setOrthographic(
+            -this.ratio, this.ratio,
+            1.0, -1.0,
+            0.001, 5000.0
+        );
+        this.projMatrix.translateZ(-1.0);
+
+        // Update projection matrix
+        this.shader.bind();
+        this.shader.sendProjectionMatrix(this.projMatrix);
+        this.shader.unbind();
 
         // Clear screen
         this.gl.clear(
@@ -437,6 +456,15 @@ Renderer.prototype = {
     getHeight: function()
     {
         return this.height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getRatio : Get renderer's viewport ratio                              //
+    //  return : Ratio of the renderer's viewport                             //
+    ////////////////////////////////////////////////////////////////////////////
+    getRatio: function()
+    {
+        return this.ratio;
     },
 
     ////////////////////////////////////////////////////////////////////////////
