@@ -488,10 +488,9 @@ Wos.prototype = {
         //this.testrect.render();
 
         // Render test sprite
-        //this.testsprite.resetMatrix();
-        //this.testsprite.moveX(-this.testsprite.getWidth()/2.0);
-        //this.testsprite.moveY(-this.testsprite.getHeight()/2.0);
-        //this.testsprite.render();
+        this.testsprite.setX(-this.testsprite.getWidth()/2.0);
+        this.testsprite.setY(-this.testsprite.getHeight()/2.0);
+        this.testsprite.render();
 
         // Render procedural test sprite
         //this.testproc.resetMatrix();

@@ -61,7 +61,7 @@ function Rect(renderer, rectShader)
 
     // Rect position
     this.position = null;
-    // Rect angle
+    // Rect rotation angle
     this.angle = 0.0;
     // Rect size
     this.size = null;

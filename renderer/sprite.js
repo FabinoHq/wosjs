@@ -60,16 +60,19 @@ function Sprite(renderer, spriteShader)
     this.texture = null;
     // Sprite model matrix
     this.modelMatrix = null;
-    // Sprite alpha
-    this.alpha = 1.0;
 
+    // Sprite position
+    this.position = null;
+    // Sprite rotation angle
+    this.angle = 0.0;
     // Sprite size
-    this.width = 1.0;
-    this.height = 1.0;
-    // Sprite texture UV offset
-    this.uvOffset = null;
+    this.size = null;
     // Sprite texture UV size
     this.uvSize = null;
+    // Sprite texture UV offset
+    this.uvOffset = null;
+    // Sprite alpha
+    this.alpha = 1.0;
 }
 
 Sprite.prototype = {
@@ -78,67 +81,140 @@ Sprite.prototype = {
     //  param tex : Texture pointer                                           //
     //  param width : Sprite width                                            //
     //  param height : Sprite height                                          //
-    //  param uoffset : Sprite texture U offset                               //
-    //  param voffset : Sprite texture V offset                               //
-    //  param usize : Sprite texture U size                                   //
-    //  param vsize : Sprite texture V size                                   //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(tex, width, height, uoffset, voffset, usize, vsize)
+    init: function(tex, width, height)
     {
         // Reset sprite
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
+        this.position = new Vector2(0.0, 0.0);
+        this.size = new Vector2(1.0, 1.0);
+        if (width !== undefined) { this.size.vec[0] = width; }
+        if (height !== undefined) { this.size.vec[1] = height; }
         this.uvSize = new Vector2(1.0, 1.0);
         this.uvOffset = new Vector2(0.0, 0.0);
-        if (width !== undefined) { this.width = width; }
-        if (height !== undefined) { this.height = height; }
-        if (uoffset !== undefined) { this.uvOffset.setX(uoffset); }
-        if (voffset !== undefined) { this.uvOffset.setY(voffset); }
-        if (usize !== undefined) { this.uvSize.setX(usize); }
-        if (vsize !== undefined) { this.uvSize.setY(vsize); }
+        this.alpha = 1.0;
 
         // Check gl pointer
-        if (!this.renderer.gl)
-        {
-            return false;
-        }
+        if (!this.renderer.gl) return false;
 
         // Check sprite shader pointer
-        if (!this.spriteShader)
-        {
-            return false;
-        }
+        if (!this.spriteShader) return false;
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
 
         // Create vbo
         this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer)
-        {
-            // Could not create vbo
-            return false;
-        }
-        if (!this.vertexBuffer.init())
-        {
-            // Could not init vbo
-            return false;
-        }
+        if (!this.vertexBuffer) return false;
+        if (!this.vertexBuffer.init()) return false;
 
         // Set texture
         this.texture = tex;
-        if (!this.texture)
-        {
-            // Could not set texture
-            return false;
-        }
+        if (!this.texture) return false;
 
         // Update vertex buffer
-        this.vertexBuffer.setPlane2D(this.width, this.height);
+        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Sprite loaded
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPosition : Set sprite position                                     //
+    //  param x : Sprite X position                                           //
+    //  param y : Sprite Y position                                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosition: function(x, y)
+    {
+        this.position.vec[0] = x;
+        this.position.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPositionVec2 : Set sprite position from a 2 components vector      //
+    //  param vector : 2 components vector to set position from               //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec2: function(vector)
+    {
+        this.position.vec[0] = vector.vec[0];
+        this.position.vec[1] = vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setX : Set sprite X position                                          //
+    //  param x : Sprite X position                                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setX: function(x)
+    {
+        this.position.vec[0] = x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setY : Set sprite Y position                                          //
+    //  param y : Sprite Y position                                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setY: function(y)
+    {
+        this.position.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  move : Translate sprite                                               //
+    //  param x : X axis translate value                                      //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    move: function(x, y)
+    {
+        this.position.vec[0] += x;
+        this.position.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveVec2 : Translate sprite by a 2 components vector                  //
+    //  param vector : 2 components vector to translate sprite by             //
+    ////////////////////////////////////////////////////////////////////////////
+    moveVec2: function(vector)
+    {
+        this.position.vec[0] += vector.vec[0];
+        this.position.vec[1] += vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Translate sprite on X axis                                    //
+    //  param x : X axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveX: function(x)
+    {
+        this.position.vec[0] += x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Translate sprite on Y axis                                    //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveY: function(y)
+    {
+        this.position.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngle : Set sprite rotation angle                                  //
+    //  param angle : Sprite rotation angle to set                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngle: function(angle)
+    {
+        this.angle = angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate sprite                                                //
+    //  param angle : Angle to rotate in degrees                              //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angle)
+    {
+        this.angle += angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -148,59 +224,55 @@ Sprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
-        // Update vertex buffer
-        this.width = width;
-        this.height = height;
-        this.vertexBuffer.setPlane2D(this.width, this.height);
+        this.size.vec[0] = width;
+        this.size.vec[1] = height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSizeVec2 : Set sprite size from a 2 components vector              //
+    //  param vector : 2 components vector to set size from                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setSizeVec2: function(vector)
+    {
+        this.size.vec[0] = vector.vec[0];
+        this.size.vec[1] = vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setUVSize : Set sprite render subrectangle size                       //
+    //  param usize : Sprite texture U size                                   //
+    //  param vsize : Sprite texture V size                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setUVSize: function(usize, vsize)
+    {
+        this.uvSize.vec[0] = usize;
+        this.uvSize.vec[1] = vsize;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSubrect : Set sprite render subrectangle offset                    //
+    //  param uoffset : Sprite texture U offset                               //
+    //  param voffset : Sprite texture V offset                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setUVOffset: function(uoffset, voffset)
+    {
+        this.uvOffset.vec[0] = uoffset;
+        this.uvOffset.vec[1] = voffset;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setSubrect : Set sprite render subrectangle                           //
-    //  param uoffset : Sprite texture U offset                               //
-    //  param voffset : Sprite texture V offset                               //
     //  param usize : Sprite texture U size                                   //
     //  param vsize : Sprite texture V size                                   //
+    //  param uoffset : Sprite texture U offset                               //
+    //  param voffset : Sprite texture V offset                               //
     ////////////////////////////////////////////////////////////////////////////
-    setSubrect: function(uoffset, voffset, usize, vsize)
+    setSubrect: function(usize, vsize, uoffset, voffset)
     {
-        // Update sprite subrect
-        this.uvOffset.setXY(uoffset, voffset);
-        this.uvSize.setXY(usize, vsize);
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get sprite width                                           //
-    //  return : Sprite width                                                 //
-    ////////////////////////////////////////////////////////////////////////////
-    getWidth: function()
-    {
-        return this.width;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get sprite height                                         //
-    //  return : Sprite height                                                //
-    ////////////////////////////////////////////////////////////////////////////
-    getHeight: function()
-    {
-        return this.height;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  resetMatrix : Reset sprite model matrix                               //
-    ////////////////////////////////////////////////////////////////////////////
-    resetMatrix: function()
-    {
-        this.modelMatrix.setIdentity();
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setMatrix : Set sprite model matrix                                   //
-    //  param modelMatrix : Sprite model matrix                               //
-    ////////////////////////////////////////////////////////////////////////////
-    setMatrix: function(modelMatrix)
-    {
-        this.modelMatrix = modelMatrix;
+        this.uvSize.vec[0] = usize;
+        this.uvSize.vec[1] = vsize;
+        this.uvOffset.vec[0] = uoffset;
+        this.uvOffset.vec[1] = voffset;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -213,48 +285,93 @@ Sprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate sprite on X axis                                    //
-    //  param x : X axis translate value                                      //
+    //  getX : Get sprite X position                                          //
+    //  return : Sprite X position                                            //
     ////////////////////////////////////////////////////////////////////////////
-    moveX: function(x)
+    getX: function()
     {
-        this.modelMatrix.translateX(x);
+        return this.position.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate sprite on Y axis                                    //
-    //  param y : Y axis translate value                                      //
+    //  getY : Get sprite Y position                                          //
+    //  return : Sprite Y position                                            //
     ////////////////////////////////////////////////////////////////////////////
-    moveY: function(y)
+    getY: function()
     {
-        this.modelMatrix.translateY(y);
+        return this.position.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate sprite                                                //
-    //  param angle : Angle to rotate in degrees                              //
+    //  getAngle : Get sprite rotation angle                                  //
+    //  return : Sprite rotation angle                                        //
     ////////////////////////////////////////////////////////////////////////////
-    rotate: function(angle)
+    getAngle: function()
     {
-        this.modelMatrix.rotateZ(-angle);
+        return this.angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  scaleX : Scale sprite along the X axis                                //
-    //  param scaleX : X factor to scale to                                   //
+    //  getWidth : Get sprite width                                           //
+    //  return : Sprite width                                                 //
     ////////////////////////////////////////////////////////////////////////////
-    scaleX: function(scaleX)
+    getWidth: function()
     {
-        this.modelMatrix.scaleX(scaleX);
+        return this.size.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  scaleY : Scale sprite along the Y axis                                //
-    //  param scaleY : Y factor to scale to                                   //
+    //  getHeight : Get sprite height                                         //
+    //  return : Sprite height                                                //
     ////////////////////////////////////////////////////////////////////////////
-    scaleY: function(scaleY)
+    getHeight: function()
     {
-        this.modelMatrix.scaleY(scaleY);
+        return this.size.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getUVWidth : Get sprite render subrectangle width                     //
+    //  return : Sprite render subrectangle width                             //
+    ////////////////////////////////////////////////////////////////////////////
+    getUVWidth: function()
+    {
+        return this.uvSize.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getUVHeight : Get sprite render subrectangle height                   //
+    //  return : Sprite render subrectangle height                            //
+    ////////////////////////////////////////////////////////////////////////////
+    getUVHeight: function()
+    {
+        return this.uvSize.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getUVWidth : Get sprite render subrectangle X offset                  //
+    //  return : Sprite render subrectangle X offset                          //
+    ////////////////////////////////////////////////////////////////////////////
+    getUVOffsetX: function()
+    {
+        return this.uvOffset.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getUVHeight : Get sprite render subrectangle Y offset                 //
+    //  return : Sprite render subrectangle Y offset                          //
+    ////////////////////////////////////////////////////////////////////////////
+    getUVOffsetY: function()
+    {
+        return this.uvOffset.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAlpha : Get sprite alpha                                           //
+    //  return : Sprite alpha                                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    getAlpha: function()
+    {
+        return this.alpha;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -262,6 +379,18 @@ Sprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
+        // Set sprite model matrix
+        this.modelMatrix.setIdentity();
+        this.modelMatrix.translateVec2(this.position);
+        this.modelMatrix.translate(
+            this.size.vec[0]*0.5, this.size.vec[1]*0.5, 0.0
+        );
+        this.modelMatrix.rotateZ(this.angle);
+        this.modelMatrix.translate(
+            -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
+        );
+        this.modelMatrix.scaleVec2(this.size);
+
         // Bind sprite shader
         this.spriteShader.shader.bind();
 
