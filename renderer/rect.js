@@ -69,10 +69,8 @@ function Rect(renderer, rectShader)
     this.position = null;
     // Rect angle
     this.angle = 0.0;
-    // Rect width
-    this.width = 1.0;
-    // Rect height
-    this.height = 1.0;
+    // Rect size
+    this.size = null;
 }
 
 Rect.prototype = {
@@ -91,8 +89,7 @@ Rect.prototype = {
         this.thickness = 0.01;
         this.position = new Vector2(0.0, 0.0);
         this.angle = 0.0;
-        this.width = width;
-        this.height = height;
+        this.size = new Vector2(width, height);
 
         // Check gl pointer
         if (!this.renderer.gl)
@@ -136,8 +133,8 @@ Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
-        this.width = width;
-        this.height = height;
+        this.size.vec[0] = width;
+        this.size.vec[1] = height;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -146,7 +143,7 @@ Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setWidth: function(width)
     {
-        this.width = width;
+        this.size.vec[0] = width;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -155,7 +152,7 @@ Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
-        this.height = height;
+        this.size.vec[1] = height;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -169,6 +166,17 @@ Rect.prototype = {
         this.color.vec[0] = r;
         this.color.vec[1] = g;
         this.color.vec[2] = b;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setColorVec3 : Set rect color from a 3 components vector              //
+    //  param color : 3 components vector to set color from                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setColorVec3: function(color)
+    {
+        this.color.vec[0] = color.vec[0];
+        this.color.vec[1] = color.vec[1];
+        this.color.vec[2] = color.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -291,7 +299,7 @@ Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
-        return this.width;
+        return this.size.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -300,7 +308,7 @@ Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
-        return this.height;
+        return this.size.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -355,20 +363,22 @@ Rect.prototype = {
     {
         // Compute rect aspect ration
         var ratio = 1.0;
-        if (this.height > 0.0)
+        if (this.size.vec[1] > 0.0)
         {
-            ratio = this.width/this.height;
+            ratio = this.size.vec[0]/this.size.vec[1];
         }
 
         // Set rect model matrix
         this.modelMatrix.setIdentity();
+        this.modelMatrix.translateVec2(this.position);
         this.modelMatrix.translate(
-            this.position.vec[0], this.position.vec[1], 0.0
+            this.size.vec[0]*0.5, this.size.vec[1]*0.5, 0.0
         );
-        this.modelMatrix.translate(this.width*0.5, this.height*0.5, 0.0);
         this.modelMatrix.rotateZ(this.angle);
-        this.modelMatrix.translate(-this.width*0.5, -this.height*0.5, 0.0);
-        this.modelMatrix.scale(this.width, this.height, 0.0);
+        this.modelMatrix.translate(
+            -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
+        );
+        this.modelMatrix.scaleVec2(this.size);
 
         // Bind rect shader
         this.rectShader.shader.bind();

@@ -563,6 +563,42 @@ Matrix4x4.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  scaleVec2 : Scale 4x4 matrix by a 2 components vector                 //
+    //  param vector : 2 components vector to scale matrix by                 //
+    ////////////////////////////////////////////////////////////////////////////
+    scaleVec2: function(vector)
+    {
+        this.matrix[0] *= vector.vec[0];
+        this.matrix[1] *= vector.vec[0];
+        this.matrix[2] *= vector.vec[0];
+        this.matrix[3] *= vector.vec[0];
+        this.matrix[4] *= vector.vec[1];
+        this.matrix[5] *= vector.vec[1];
+        this.matrix[6] *= vector.vec[1];
+        this.matrix[7] *= vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  scaleVec3 : Scale 4x4 matrix by a 3 components vector                 //
+    //  param vector : 3 components vector to scale matrix by                 //
+    ////////////////////////////////////////////////////////////////////////////
+    scaleVec3: function(vector)
+    {
+        this.matrix[0] *= vector.vec[0];
+        this.matrix[1] *= vector.vec[0];
+        this.matrix[2] *= vector.vec[0];
+        this.matrix[3] *= vector.vec[0];
+        this.matrix[4] *= vector.vec[1];
+        this.matrix[5] *= vector.vec[1];
+        this.matrix[6] *= vector.vec[1];
+        this.matrix[7] *= vector.vec[1];
+        this.matrix[8] *= vector.vec[2];
+        this.matrix[9] *= vector.vec[2];
+        this.matrix[10] *= vector.vec[2];
+        this.matrix[11] *= vector.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  scaleX : Scale 4x4 matrix along the X axis                            //
     //  param x : X factor to scale to                                        //
     ////////////////////////////////////////////////////////////////////////////
