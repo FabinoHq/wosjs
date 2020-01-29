@@ -63,6 +63,8 @@ function Rect(renderer, rectShader)
     // Rect alpha
     this.alpha = 1.0;
 
+    // Rect position
+    this.position = null;
     // Rect width
     this.width = 1.0;
     // Rect height
@@ -82,6 +84,7 @@ Rect.prototype = {
         this.texture = null;
         this.modelMatrix = null;
         this.alpha = 1.0;
+        this.position = new Vector2(0.0, 0.0);
         this.width = width;
         this.height = height;
 
@@ -114,7 +117,7 @@ Rect.prototype = {
         }
 
         // Update vbo
-        this.vertexBuffer.setPlane2D(this.width, this.height);
+        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Rect loaded
         return true;
@@ -130,7 +133,6 @@ Rect.prototype = {
         // Update vertex buffer
         this.width = width;
         this.height = height;
-        this.vertexBuffer.setPlane2D(this.width, this.height);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -149,23 +151,6 @@ Rect.prototype = {
     getHeight: function()
     {
         return this.height;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  resetMatrix : Reset rect model matrix                                 //
-    ////////////////////////////////////////////////////////////////////////////
-    resetMatrix: function()
-    {
-        this.modelMatrix.setIdentity();
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setMatrix : Set rect model matrix                                     //
-    //  param modelMatrix : Rect model matrix to set                          //
-    ////////////////////////////////////////////////////////////////////////////
-    setMatrix: function(modelMatrix)
-    {
-        this.modelMatrix = modelMatrix;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -191,12 +176,30 @@ Rect.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setX : Translate rect sprite on X axis                               //
+    //  param x : X axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    setX: function(x)
+    {
+        this.position.vec[0] = x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setY : Translate rect on Y axis                                      //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    setY: function(y)
+    {
+        this.position.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  moveX : Translate rect sprite on X axis                               //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
-        this.modelMatrix.translateX(x);
+        this.position.vec[0] += x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -205,7 +208,7 @@ Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
-        this.modelMatrix.translateY(y);
+        this.position.vec[1] += y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -213,6 +216,13 @@ Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
+        // Set rect model matrix
+        this.modelMatrix.setIdentity();
+        this.modelMatrix.translate(
+            this.position.vec[0], this.position.vec[1], 0.0
+        );
+        this.modelMatrix.scale(this.width, this.height, 0.0);
+
         // Bind rect shader
         this.rectShader.shader.bind();
 

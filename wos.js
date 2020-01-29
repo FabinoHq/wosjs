@@ -483,9 +483,8 @@ Wos.prototype = {
         //this.testline.render();
 
         // Render test rect
-        //this.testrect.resetMatrix();
-        //this.testrect.moveX(-this.testrect.getWidth()/2.0);
-        //this.testrect.moveY(-this.testrect.getHeight()/2.0);
+        //this.testrect.setX(-this.testrect.getWidth()/2.0);
+        //this.testrect.setY(-this.testrect.getHeight()/2.0);
         //this.testrect.render();
 
         // Render test sprite
