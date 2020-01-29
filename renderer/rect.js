@@ -62,6 +62,8 @@ function Rect(renderer, rectShader)
     this.color = null;
     // Rect alpha
     this.alpha = 1.0;
+    // Rect thickness
+    this.thickness = 0.01;
 
     // Rect position
     this.position = null;
@@ -86,6 +88,7 @@ Rect.prototype = {
         this.modelMatrix = null;
         this.color = new Vector3(1.0, 1.0, 1.0);
         this.alpha = 1.0;
+        this.thickness = 0.01;
         this.position = new Vector2(0.0, 0.0);
         this.angle = 0.0;
         this.width = width;
@@ -175,6 +178,15 @@ Rect.prototype = {
     setAlpha: function(alpha)
     {
         this.alpha = alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setThickness : Set rect thickness                                     //
+    //  param thickness : Rect thickness to set                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setThickness: function(thickness)
+    {
+        this.thickness = thickness;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -301,6 +313,15 @@ Rect.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  getThickness : Get rect thickness                                     //
+    //  return : Rect thickness                                               //
+    ////////////////////////////////////////////////////////////////////////////
+    getThickness: function()
+    {
+        return this.thickness;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  getX : Get rect X position                                            //
     //  return : Rect X position                                              //
     ////////////////////////////////////////////////////////////////////////////
@@ -332,6 +353,13 @@ Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
+        // Compute rect aspect ration
+        var ratio = 1.0;
+        if (this.height > 0.0)
+        {
+            ratio = this.width/this.height;
+        }
+
         // Set rect model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translate(
@@ -354,6 +382,12 @@ Rect.prototype = {
         );
         this.rectShader.shader.sendUniform(
             this.rectShader.alphaUniform, this.alpha
+        );
+        this.rectShader.shader.sendUniform(
+            this.rectShader.ratioUniform, ratio
+        );
+        this.rectShader.shader.sendUniform(
+            this.rectShader.thicknessUniform, this.thickness
         );
 
         // Render VBO
