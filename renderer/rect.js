@@ -359,10 +359,6 @@ Rect.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-        // Compute rect aspect ration
-        var ratio = 1.0;
-        if (this.size.vec[1] > 0.0) ratio = this.size.vec[0]/this.size.vec[1];
-
         // Set rect model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec2(this.position);
@@ -389,7 +385,10 @@ Rect.prototype = {
             this.rectShader.alphaUniform, this.alpha
         );
         this.rectShader.shader.sendUniform(
-            this.rectShader.ratioUniform, ratio
+            this.rectShader.widthUniform, this.size.vec[0]
+        );
+        this.rectShader.shader.sendUniform(
+            this.rectShader.heightUniform, this.size.vec[1]
         );
         this.rectShader.shader.sendUniform(
             this.rectShader.thicknessUniform, this.thickness

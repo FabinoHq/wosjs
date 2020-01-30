@@ -49,11 +49,12 @@ const rectFragmentShaderSrc = [
     "varying vec2 texCoord;",
     "uniform vec3 color;",
     "uniform float alpha;",
-    "uniform float ratio;",
+    "uniform float width;",
+    "uniform float height;",
     "uniform float thickness;",
     "void main()",
     "{",
-    "    vec2 rect = step(1.0-(thickness/vec2(ratio, 1.0)),",
+    "    vec2 rect = step(1.0-(thickness/vec2(abs(width), abs(height))),",
     "        abs(texCoord-0.5)*2.0);",
     "    gl_FragColor = vec4(color, clamp(rect.x+rect.y, 0.0, 1.0)*alpha);",
     "}"
@@ -75,7 +76,8 @@ function RectShader(glPointer)
     // Rect shader uniforms locations
     this.colorUniform = -1;
     this.alphaUniform = -1;
-    this.ratioUniform = -1;
+    this.widthUniform = -1;
+    this.heightUniform = -1;
     this.thicknessUniform = -1;
 }
 
@@ -88,7 +90,8 @@ RectShader.prototype = {
         // Reset rect shader
         this.colorUniform = -1;
         this.alphaUniform = -1;
-        this.ratioUniform = -1;
+        this.widthUniform = -1;
+        this.heightUniform = -1;
         this.thicknessUniform = -1;
 
         // Check gl pointer
@@ -112,7 +115,8 @@ RectShader.prototype = {
         this.shader.bind();
         this.colorUniform = this.shader.getUniform("color");
         this.alphaUniform = this.shader.getUniform("alpha");
-        this.ratioUniform = this.shader.getUniform("ratio");
+        this.widthUniform = this.shader.getUniform("width");
+        this.heightUniform = this.shader.getUniform("height");
         this.thicknessUniform = this.shader.getUniform("thickness");
         this.shader.unbind();
 
