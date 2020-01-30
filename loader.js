@@ -102,15 +102,10 @@ Loader.prototype = {
     loadShaders: function()
     {
         // Check renderer
-        if (!this.renderer)
-        {
-            return false;
-        }
+        if (!this.renderer) return false;
+
         // Check WebGL pointer
-        if (!this.renderer.gl)
-        {
-            return false;
-        }
+        if (!this.renderer.gl) return false;
 
         // Init line shader
         this.lineShader = new LineShader(this.renderer.gl);
@@ -142,10 +137,7 @@ Loader.prototype = {
     loadFonts: function()
     {
         // Check renderer
-        if (!this.renderer)
-        {
-            return false;
-        }
+        if (!this.renderer) return false;
         
         // Prerender text
         var textWidth = this.renderer.getTextWidth("TextWidth", 20.0);
@@ -160,20 +152,18 @@ Loader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     loadTextures: function()
     {
+        var texlen = 0;
+        var i = 0;
+
         // Check renderer pointer
-        if (!this.renderer)
-        {
-            return false;
-        }
+        if (!this.renderer) return false;
+
         // Check WebGL pointer
-        if (!this.renderer.gl)
-        {
-            return false;
-        }
+        if (!this.renderer.gl) return false;
 
         // Load all textures asynchronously
-        var texlen = TexturesAssets.length;
-        for (var i = 0; i < texlen; ++i)
+        texlen = TexturesAssets.length;
+        for (i = 0; i < texlen; ++i)
         {
             this.textures[i] = new Texture(this.renderer);
             this.textures[i].loader = this;
@@ -209,20 +199,18 @@ Loader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     loadSounds: function()
     {
+        var sndlen = 0;
+        var i = 0;
+
         // Check audio engine pointer
-        if (!this.audio)
-        {
-            return false;
-        }
+        if (!this.audio) return false;
+
         // Check audio context pointer
-        if (!this.audio.context)
-        {
-            return false;
-        }
+        if (!this.audio.context) return false;
 
         // Load all sounds asynchronously
-        var sndlen = SoundsAssets.length;
-        for (var i = 0; i < sndlen; ++i)
+        sndlen = SoundsAssets.length;
+        for (i = 0; i < sndlen; ++i)
         {
             this.sounds[i] = new Sound(this.audio.context);
             this.sounds[i].loader = this;
@@ -232,7 +220,6 @@ Loader.prototype = {
             }
             this.sounds[i].load("sounds/" + SoundsAssets[i]);
         }
-
         return true;
     },
 
@@ -270,7 +257,8 @@ Loader.prototype = {
     getTexture: function(name)
     {
         var texlen = TexturesAssets.length;
-        for (var i = 0; i < texlen; ++i)
+        var i = 0;
+        for (i = 0; i < texlen; ++i)
         {
             if (TexturesAssets[i] == name)
             {
@@ -288,7 +276,8 @@ Loader.prototype = {
     getSound: function(name)
     {
         var sndlen = SoundsAssets.length;
-        for (var i = 0; i < sndlen; ++i)
+        var i = 0;
+        for (i = 0; i < sndlen; ++i)
         {
             if (SoundsAssets[i] == name)
             {
