@@ -60,8 +60,8 @@ function modulus(x, n)
 ////////////////////////////////////////////////////////////////////////////////
 function divideInt(x, n)
 {
-    if (n == 0) { return 0; }
-    if (x < 0) { x -= (n-1); }
+    if (n == 0) return 0;
+    if (x < 0) x -= (n-1);
     return parseInt(x/n, 10);
 }
 
@@ -185,7 +185,7 @@ function fractalHeigthmap(seed, i, j)
     var bilinear3 = crnd + (crnd3-crnd)*ix3 +
                     (crnd2-crnd)*jy3 + ((crnd4+crnd)-(crnd3+crnd2))*ix3*jy3;
 
-    // Final fractal noise
+    // Final fractal heightmap
     return (bilinear1*0.7+bilinear2*0.2+bilinear3*0.1);
 }
 
