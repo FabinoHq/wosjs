@@ -117,16 +117,10 @@ Renderer.prototype = {
         this.context = document.getElementById(canvas);
 
         // Check context
-        if (!this.context)
-        {
-            return false;
-        }
+        if (!this.context) return false;
 
         // Check rendering context
-        if (!window.WebGLRenderingContext)
-        {
-            return false;
-        }
+        if (!window.WebGLRenderingContext) return false;
 
         // Check valid context
         for (i = 0; i < glContextNames.length; ++i)
@@ -146,11 +140,8 @@ Renderer.prototype = {
             }
         }
 
-        if (!this.gl)
-        {
-            // No valid context found
-            return false;
-        }
+        // No valid context found
+        if (!this.gl) return false;
         
         // Get canvas context
         this.ctx = this.context.getContext("2d");
@@ -170,37 +161,25 @@ Renderer.prototype = {
         // Init context size
         this.width = window.innerWidth;
         this.height = window.innerHeight;
-        if (this.width <= 1.0) { this.width = 1.0; }
-        if (this.height <= 1.0) { this.height = 1.0; }
+        if (this.width <= 1.0) this.width = 1.0;
+        if (this.height <= 1.0) this.height = 1.0;
         this.context.width = this.width;
         this.context.height = this.height;
 
         // Create offscreen canvas
         this.offCanvas = document.createElement('canvas');
-        if (!this.offCanvas)
-        {
-            return false;
-        }
+        if (!this.offCanvas) return false;
         this.offCanvas.width = 1;
         this.offCanvas.height = 1;
 
         // Get offscreen context
         this.offContext = this.offCanvas.getContext('2d');
-        if (!this.offContext)
-        {
-            return false;
-        }
+        if (!this.offContext) return false;
 
         // Init default shader
         this.shader = new Shader(this.gl);
-        if (!this.shader)
-        {
-            return false;
-        }
-        if (!this.shader.init())
-        {
-            return false;
-        }
+        if (!this.shader) return false;
+        if (!this.shader.init()) return false;
         this.shader.bind();
 
         // Set default clear color
@@ -217,19 +196,15 @@ Renderer.prototype = {
         if (WOSRatioMaxClamping)
         {
             if (this.vpwidth >= this.vpheight*WOSRatioXMax)
-            {
                 this.vpwidth = this.vpheight*WOSRatioXMax;
-            }
             if (this.vpheight >= this.vpwidth*WOSRatioYMax)
-            {
                 this.vpheight = this.vpwidth*WOSRatioYMax;
-            }
         }
-        if (this.vpwidth <= 1.0) { this.vpwidth = 1.0; }
-        if (this.vpheight <= 1.0) { this.vpheight = 1.0; }
+        if (this.vpwidth <= 1.0) this.vpwidth = 1.0;
+        if (this.vpheight <= 1.0) this.vpheight = 1.0;
         this.vpoffx = (this.width-this.vpwidth)*0.5;
         this.vpoffy = (this.height-this.vpheight)*0.5;
-        if (this.vpheight > 0.0) { this.ratio = this.vpwidth/this.vpheight; }
+        if (this.vpheight > 0.0) this.ratio = this.vpwidth/this.vpheight;
 
         // Set viewport
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
@@ -283,19 +258,15 @@ Renderer.prototype = {
         if (WOSRatioMaxClamping)
         {
             if (this.vpwidth >= this.vpheight*WOSRatioXMax)
-            {
                 this.vpwidth = this.vpheight*WOSRatioXMax;
-            }
             if (this.vpheight >= this.vpwidth*WOSRatioYMax)
-            {
                 this.vpheight = this.vpwidth*WOSRatioYMax;
-            }
         }
-        if (this.vpwidth <= 1.0) { this.vpwidth = 1.0; }
-        if (this.vpheight <= 1.0) { this.vpheight = 1.0; }
+        if (this.vpwidth <= 1.0) this.vpwidth = 1.0;
+        if (this.vpheight <= 1.0) this.vpheight = 1.0;
         this.vpoffx = (this.width-this.vpwidth)*0.5;
         this.vpoffy = (this.height-this.vpheight)*0.5;
-        if (this.vpheight > 0.0) { this.ratio = this.vpwidth/this.vpheight; }
+        if (this.vpheight > 0.0) this.ratio = this.vpwidth/this.vpheight;
 
         // Update viewport
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
@@ -352,8 +323,8 @@ Renderer.prototype = {
         // Update renderer size
         this.width = window.innerWidth;
         this.height = window.innerHeight;
-        if (this.width <= 1.0) { this.width = 1.0; }
-        if (this.height <= 1.0) { this.height = 1.0; }
+        if (this.width <= 1.0) this.width = 1.0;
+        if (this.height <= 1.0) this.height = 1.0;
     },
 
     ////////////////////////////////////////////////////////////////////////////
