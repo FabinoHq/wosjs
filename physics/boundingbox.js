@@ -46,8 +46,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 function BoundingBox()
 {
-    this.pos = new Vector2(0.0, 0.0);
-    this.half = new Vector2(0.0, 0.0);
+    this.position = new Vector2(0.0, 0.0);
+    this.halfsize = new Vector2(0.0, 0.0);
 }
 
 BoundingBox.prototype = {
@@ -56,49 +56,49 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     reset: function()
     {
-        this.pos.vec[0] = 0.0;
-        this.pos.vec[1] = 0.0;
-        this.half.vec[0] = 0.0;
-        this.half.vec[1] = 0.0;
+        this.position.vec[0] = 0.0;
+        this.position.vec[1] = 0.0;
+        this.halfsize.vec[0] = 0.0;
+        this.halfsize.vec[1] = 0.0;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPos : Set bounding box position from coordinates                   //
+    //  setPosition : Set bounding box position from coordinates              //
     //  param x : Bounding box X position                                     //
     //  param y : Bounding box Y position                                     //
     ////////////////////////////////////////////////////////////////////////////
-    setPos: function(x, y)
+    setPosition: function(x, y)
     {
-        this.pos.vec[0] = x;
-        this.pos.vec[1] = y;
+        this.position.vec[0] = x;
+        this.position.vec[1] = y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosVec2 : Set bounding box position from a 2 components vector     //
+    //  setPositionVec2 : Set bounding box position from a vector             //
     //  param pos : 2 components vector to set bounding box position from     //
     ////////////////////////////////////////////////////////////////////////////
-    setPosVec2: function(pos)
+    setPositionVec2: function(pos)
     {
-        this.pos.vec[0] = pos.vec[0];
-        this.pos.vec[1] = pos.vec[1];
+        this.position.vec[0] = position.vec[0];
+        this.position.vec[1] = position.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosX : Set bounding box X position                                 //
+    //  setX : Set bounding box X position                                    //
     //  param x : Bounding box X position                                     //
     ////////////////////////////////////////////////////////////////////////////
-    setPosX: function(x)
+    setX: function(x)
     {
-        this.pos.vec[0] = x;
+        this.position.vec[0] = x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosY : Set bounding box Y position                                 //
+    //  setY : Set bounding box Y position                                    //
     //  param y : Bounding box Y position                                     //
     ////////////////////////////////////////////////////////////////////////////
-    setPosY: function(y)
+    setY: function(y)
     {
-        this.pos.vec[1] = y;
+        this.position.vec[1] = y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -108,8 +108,8 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setHalf: function(halfWidth, halfHeight)
     {
-        this.half.vec[0] = halfWidth;
-        this.half.vec[1] = halfHeight;
+        this.halfsize.vec[0] = halfWidth;
+        this.halfsize.vec[1] = halfHeight;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -118,8 +118,8 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setHalfVec2: function(half)
     {
-        this.half.vec[0] = half.vec[0];
-        this.half.vec[1] = half.vec[1];
+        this.halfsize.vec[0] = half.vec[0];
+        this.halfsize.vec[1] = half.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -128,7 +128,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setHalfWidth: function(halfWidth)
     {
-        this.half.vec[0] = halfWidth;
+        this.halfsize.vec[0] = halfWidth;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -137,7 +137,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setHalfHeight: function(halfHeight)
     {
-        this.half.vec[1] = halfHeight;
+        this.halfsize.vec[1] = halfHeight;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -147,8 +147,8 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
-        this.half.vec[0] = width*0.5;
-        this.half.vec[1] = height*0.5;
+        this.halfsize.vec[0] = width*0.5;
+        this.halfsize.vec[1] = height*0.5;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -157,8 +157,8 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSizeVec2: function(size)
     {
-        this.half.vec[0] = size.vec[0]*0.5;
-        this.half.vec[1] = size.vec[1]*0.5;
+        this.halfsize.vec[0] = size.vec[0]*0.5;
+        this.halfsize.vec[1] = size.vec[1]*0.5;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -167,7 +167,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setWidth: function(width)
     {
-        this.half.vec[0] = width*0.5;
+        this.halfsize.vec[0] = width*0.5;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -176,7 +176,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
-        this.half.vec[1] = height*0.5;
+        this.halfsize.vec[1] = height*0.5;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
-        return this.pos.vec[0];
+        return this.position.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -194,7 +194,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
-        return this.pos.vec[1];
+        return this.position.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getHalfWidth: function()
     {
-        return this.half.vec[0];
+        return this.halfsize.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -212,7 +212,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getHalfHeight: function()
     {
-        return this.half.vec[1];
+        return this.halfsize.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -221,7 +221,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
-        return this.half.vec[0]*2.0;
+        return this.halfsize.vec[0]*2.0;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -230,7 +230,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
-        return this.half.vec[1]*2.0;
+        return this.halfsize.vec[1]*2.0;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -239,8 +239,8 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveVec2: function(vector)
     {
-        this.pos.vec[0] += vector.vec[0];
-        this.pos.vec[1] += vector.vec[1];
+        this.position.vec[0] += vector.vec[0];
+        this.position.vec[1] += vector.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -250,8 +250,8 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     move: function(x, y)
     {
-        this.pos.vec[0] += x;
-        this.pos.vec[1] += y;
+        this.position.vec[0] += x;
+        this.position.vec[1] += y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -260,7 +260,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
-        this.pos.vec[0] += x;
+        this.position.vec[0] += x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -269,7 +269,7 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
-        this.pos.vec[1] += y;
+        this.position.vec[1] += y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -294,7 +294,7 @@ BoundingBox.prototype = {
 
         // Reset collision
         collision.reset();
-        collision.setPos(
+        collision.setPosition(
             origin.vec[0]+offset.vec[0], origin.vec[1]+offset.vec[1]
         );
         collision.setOffsetVec2(offset);
@@ -313,17 +313,14 @@ BoundingBox.prototype = {
         signY = (scaleY >= 0.0)?1.0:-1.0;
 
         // Compute near and far edges on both axis
-        nearX = (this.pos.vec[0]-(signX*(this.half.vec[0]+padding.vec[0]))
-                    -origin.vec[0])*scaleX;
-
-        nearY = (this.pos.vec[1]-(signY*(this.half.vec[1]+padding.vec[1]))
-                    -origin.vec[1])*scaleY;
-
-        farX = (this.pos.vec[0]+(signX*(this.half.vec[0]+padding.vec[0]))
-                    -origin.vec[0])*scaleX;
-
-        farY = (this.pos.vec[1]+(signY*(this.half.vec[1]+padding.vec[1]))
-                    -origin.vec[1])*scaleY;
+        nearX = (this.position.vec[0]-(signX*(this.halfsize.vec[0]+
+            padding.vec[0]))-origin.vec[0])*scaleX;
+        nearY = (this.position.vec[1]-(signY*(this.halfsize.vec[1]+
+            padding.vec[1]))-origin.vec[1])*scaleY;
+        farX = (this.position.vec[0]+(signX*(this.halfsize.vec[0]+
+            padding.vec[0]))-origin.vec[0])*scaleX;
+        farY = (this.position.vec[1]+(signY*(this.halfsize.vec[1]+
+            padding.vec[1]))-origin.vec[1])*scaleY;
 
         if ((nearX > farY) || (nearY > farX))
         {
@@ -356,7 +353,7 @@ BoundingBox.prototype = {
             collision.setNormal(0.0, -signY);
         }
         collision.setOffset(near*offset.vec[0], near*offset.vec[1]);
-        collision.setPos(
+        collision.setPosition(
             origin.vec[0]+(near*offset.vec[0]),
             origin.vec[1]+(near*offset.vec[1])
         );
@@ -373,14 +370,15 @@ BoundingBox.prototype = {
     collideBox: function(collision, box, offset)
     {
         var padding = new Vector2(0.0, 0.0);
-        padding.set(box.half);
+        padding.set(box.halfsize);
 
         // Dynamic sweep collision
-        if (!this.collideSegment(collision, box.pos, offset, padding))
+        if (!this.collideSegment(collision, box.position, offset, padding))
         {
             collision.reset();
-            collision.setPos(
-                box.pos.vec[0]+offset.vec[0], box.pos.vec[1]+offset.vec[1]
+            collision.setPosition(
+                box.position.vec[0]+offset.vec[0],
+                box.position.vec[1]+offset.vec[1]
             );
             collision.setOffset(offset.vec[0], offset.vec[1]);
             return false;

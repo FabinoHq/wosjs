@@ -47,7 +47,7 @@
 function Collision()
 {
     this.collide = false;
-    this.pos = new Vector2(0.0, 0.0);
+    this.position = new Vector2(0.0, 0.0);
     this.offset = new Vector2(0.0, 0.0);
     this.normal = new Vector2(0.0, 0.0);
     this.factor = 0.0;
@@ -60,8 +60,8 @@ Collision.prototype = {
     reset: function()
     {
         this.collide = false;
-        this.pos.vec[0] = 0.0;
-        this.pos.vec[1] = 0.0;
+        this.position.vec[0] = 0.0;
+        this.position.vec[1] = 0.0;
         this.offset.vec[0] = 0.0;
         this.offset.vec[1] = 0.0;
         this.normal.vec[0] = 0.0;
@@ -76,8 +76,8 @@ Collision.prototype = {
     setCollision: function(collision)
     {
         this.collide = collision.collide;
-        this.pos.vec[0] = collision.pos.vec[0];
-        this.pos.vec[1] = collision.pos.vec[1];
+        this.position.vec[0] = collision.position.vec[0];
+        this.position.vec[1] = collision.position.vec[1];
         this.offset.vec[0] = collision.offset.vec[0];
         this.offset.vec[1] = collision.offset.vec[1];
         this.normal.vec[0] = collision.normal.vec[0];
@@ -95,42 +95,42 @@ Collision.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPos : Set collision position from coordinates                      //
+    //  setPosition : Set collision position from coordinates                 //
     //  param x : Collision X position to set                                 //
     //  param y : Collision Y position to set                                 //
     ////////////////////////////////////////////////////////////////////////////
-    setPos: function(x, y)
+    setPosition: function(x, y)
     {
-        this.pos.vec[0] = x;
-        this.pos.vec[1] = y;
+        this.position.vec[0] = x;
+        this.position.vec[1] = y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosVec2 : Set collision position from a 2 components vector        //
+    //  setPositionVec2 : Set collision position from a 2 components vector   //
     //  param pos : 2 components vector to set collision position from        //
     ////////////////////////////////////////////////////////////////////////////
-    setPosVec2: function(pos)
+    setPositionVec2: function(pos)
     {
-        this.pos.vec[0] = pos.vec[0];
-        this.pos.vec[1] = pos.vec[1];
+        this.position.vec[0] = position.vec[0];
+        this.position.vec[1] = position.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosX : Set collision X position                                    //
+    //  setX : Set collision X position                                       //
     //  param x : Collision X position to set                                 //
     ////////////////////////////////////////////////////////////////////////////
-    setPosX: function(x)
+    setX: function(x)
     {
-        this.pos.vec[0] = x;
+        this.position.vec[0] = x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosY : Set collision Y position                                    //
+    //  setY : Set collision Y position                                       //
     //  param y : Collision Y position to set                                 //
     ////////////////////////////////////////////////////////////////////////////
-    setPosY: function(y)
+    setY: function(y)
     {
-        this.pos.vec[1] = y;
+        this.position.vec[1] = y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -228,21 +228,21 @@ Collision.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getPosX : Get collision X position                                    //
+    //  getX : Get collision X position                                       //
     //  return : Collision X position                                         //
     ////////////////////////////////////////////////////////////////////////////
-    getPosX: function()
+    getX: function()
     {
-        return this.pos.vec[0];
+        return this.position.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getPosY : Get collision Y position                                    //
+    //  getY : Get collision Y position                                       //
     //  return : Collision Y position                                         //
     ////////////////////////////////////////////////////////////////////////////
-    getPosY: function()
+    getY: function()
     {
-        return this.pos.vec[1];
+        return this.position.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
