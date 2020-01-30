@@ -339,7 +339,7 @@ BoundingBox.prototype = {
         }
 
         // Clamp near value
-        near -= Number.EPSILON*10.0;
+        near -= 0.001;
         if (near <= 0.0) near = 0.0;
         if (near >= 1.0) near = 1.0;
 
@@ -371,7 +371,8 @@ BoundingBox.prototype = {
     collideBox: function(collision, box, offset)
     {
         var padding = new Vector2(0.0, 0.0);
-        padding.set(box.halfsize);
+        padding.vec[0] = box.halfsize.vec[0];
+        padding.vec[1] = box.halfsize.vec[1];
 
         // Dynamic sweep collision
         if (!this.collideSegment(collision, box.position, offset, padding))
