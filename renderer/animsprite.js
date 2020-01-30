@@ -63,10 +63,10 @@ function AnimSprite(renderer, animSpriteShader)
 
     // Animated sprite position
     this.position = null;
-    // Animated sprite angle
-    this.angle = 0.0;
     // Animated sprite size
     this.size = null;
+    // Animated sprite rotation angle
+    this.angle = 0.0;
     // Animated sprite frame count
     this.count = null;
     // Animated sprite start frame
@@ -101,11 +101,11 @@ AnimSprite.prototype = {
         this.texture = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
-        this.angle = 0.0;
         this.size = new Vector2(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
-        this.count = new Vector2(0, 0);
+        this.angle = 0.0;
+        this.count = new Vector2(1, 1);
         if (countX !== undefined) this.count.vec[0] = countX;
         if (countY !== undefined) this.count.vec[1] = countY;
         this.start = new Vector2(0, 0);
@@ -219,24 +219,6 @@ AnimSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngle : Set animated sprite rotation angle                         //
-    //  param angle : Animated sprite rotation angle to set in degrees        //
-    ////////////////////////////////////////////////////////////////////////////
-    setAngle: function(angle)
-    {
-        this.angle = angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate sprite                                                //
-    //  param angle : Angle to rotate animated sprite by in degrees           //
-    ////////////////////////////////////////////////////////////////////////////
-    rotate: function(angle)
-    {
-        this.angle += angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setSize : Set animated sprite size                                    //
     //  param width : Animated sprite width to set                            //
     //  param height : Animated sprite height to set                          //
@@ -273,6 +255,24 @@ AnimSprite.prototype = {
     setHeight: function(height)
     {
         this.size.vec[1] = height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngle : Set animated sprite rotation angle                         //
+    //  param angle : Animated sprite rotation angle to set in degrees        //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngle: function(angle)
+    {
+        this.angle = angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate sprite                                                //
+    //  param angle : Angle to rotate animated sprite by in degrees           //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angle)
+    {
+        this.angle += angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -338,16 +338,7 @@ AnimSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
-        return this.position.vec[0];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getAngle : Get animated sprite rotation angle                         //
-    //  return : Animated sprite rotation angle in degrees                    //
-    ////////////////////////////////////////////////////////////////////////////
-    getAngle: function()
-    {
-        return this.angle;
+        return this.position.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -366,6 +357,15 @@ AnimSprite.prototype = {
     getHeight: function()
     {
         return this.size.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngle : Get animated sprite rotation angle                         //
+    //  return : Animated sprite rotation angle in degrees                    //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngle: function()
+    {
+        return this.angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////

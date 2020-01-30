@@ -52,6 +52,13 @@ const HiddenTextPassCharacter = "\u2022";
 const WOSDefaultFontCharsizeFactor = 0.00098;
 const WOSDefaultFontScaleXFactor = 1024.0;
 const WOSDefaultFontScaleYFactor = 1024.0;
+const WOSDefaultFontSizeFactor = 800.0;
+const WOSDefaultMinFontSize = 12.0;
+const WOSDefaultMaxFontSize = 400.0;
+const WOSDefaultMinTextWidth = 0.001;
+const WOSDefaultMaxTextWidth = 3.98;
+const WOSDefaultMinTextHeight = 0.015;
+const WOSDefaultMaxTextHeight = 0.5;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,19 +81,21 @@ function GuiText(renderer, textShader)
     // GuiText model matrix
     this.modelMatrix = null;
 
-    // GuiText internal string
-    this.text = "";
-
+    // GuiText position
+    this.position = null;
+    // GuiText size
+    this.size = null;
+    // GuiText rotation angle
+    this.angle = 0.0;
     // GuiText color
-    this.color = new Vector3(1.0, 1.0, 1.0);
+    this.color = null;
     // GuiText alpha
     this.alpha = 1.0;
 
-    // GuiText parameters
-    this.fontsize = 40.0;
-    this.width = 0.05;
-    this.height = 0.05;
+    // GuiText internal string
+    this.text = "";
     this.textLength = 0;
+    this.fontsize = 40.0;
 
     // Characters sizes array
     this.charsizes = null;
@@ -112,24 +121,20 @@ GuiText.prototype = {
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
-        this.text = "";
-        this.colorR = 1.0;
-        this.colorG = 1.0;
-        this.colorB = 1.0;
+        this.position = new Vector2(0.0, 0.0);
+        this.angle = 0.0;
+        this.size = new Vector2(0.05, 0.05);
+        this.color = new Vector3(1.0, 1.0, 1.0);
         this.alpha = 1.0;
-        this.fontsize = 40.0;
-        this.width = 0.05;
-        this.height = 0.05;
+        this.text = "";
         this.textLength = 0;
+        this.fontsize = 40.0;
         this.charsizes = null;
         this.hidden = false;
         this.hidetext = "";
 
         // Set hidden mode
-        if (hide !== undefined)
-        {
-            this.hidden = hide;
-        }
+        if (hide !== undefined) this.hidden = hide;
 
         // Set text
         this.text = "";
@@ -153,61 +158,47 @@ GuiText.prototype = {
         }
 
         // Set text field height
-        if (height !== undefined)
-        {
-            this.height = height;
-        }
-        // Clamp to minimum and maximum text field height
-        if (this.height <= 0.015) { this.height = 0.015; }
-        if (this.height >= 0.5) { this.height = 0.5; }
+        if (height !== undefined) this.size.vec[1] = height;
+        if (this.size.vec[1] <= WOSDefaultMinTextHeight)
+            this.size.vec[1] = WOSDefaultMinTextHeight;
+        if (this.size.vec[1] >= WOSDefaultMaxTextHeight)
+            this.size.vec[1] = WOSDefaultMaxTextHeight;
 
         // Set font size based on text field height
-        this.fontsize = this.height*800.0;
-        if (this.fontsize <= 12.0) { this.fontsize = 12.0; }
-        if (this.fontsize >= 400.0) { this.fontsize = 400.0; }
+        this.fontsize = this.size.vec[1]*WOSDefaultFontSizeFactor;
+        if (this.fontsize <= WOSDefaultMinFontSize)
+            this.fontsize = WOSDefaultMinFontSize;
+        if (this.fontsize >= WOSDefaultMaxFontSize)
+            this.fontsize = WOSDefaultMaxFontSize;
 
         // Check renderer pointer
-        if (!this.renderer)
-        {
-            return false;
-        }
+        if (!this.renderer) return false;
 
         // Check gl pointer
-        if (!this.renderer.gl)
-        {
-            return false;
-        }
+        if (!this.renderer.gl) return false;
 
         // Check text shader pointer
-        if (!this.textShader)
-        {
-            return false;
-        }
+        if (!this.textShader) return false;
         
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
 
         // Create vbo
         this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer)
-        {
-            // Could not create vbo
-            return false;
-        }
-        if (!this.vertexBuffer.init())
-        {
-            // Could not init vbo
-            return false;
-        }
+        if (!this.vertexBuffer) return false;
+        if (!this.vertexBuffer.init()) return false;
+        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Set text width
-        this.width = this.renderer.getTextWidth(
+        this.size.vec[0] = this.renderer.getTextWidth(
             this.text, this.fontsize
         )*WOSDefaultFontCharsizeFactor;
 
         // Clamp text width
-        if (this.width <= 0.001) { this.width = 0.001; }
-        if (this.width >= 3.98) { this.width = 3.98; }
+        if (this.size.vec[0] <= WOSDefaultMinTextWidth)
+            this.size.vec[0] = WOSDefaultMinTextWidth;
+        if (this.size.vec[0] >= WOSDefaultMaxTextWidth)
+            this.size.vec[0] = WOSDefaultMaxTextWidth;
 
         // Get char sizes
         this.charsizes = new Array();
@@ -221,23 +212,19 @@ GuiText.prototype = {
         // Render text
         pixelsData = this.renderer.renderText(
             this.text,
-            this.width*WOSDefaultFontScaleXFactor,
-            this.height*WOSDefaultFontScaleYFactor,
+            this.size.vec[0]*WOSDefaultFontScaleXFactor,
+            this.size.vec[1]*WOSDefaultFontScaleYFactor,
             this.fontsize
         );
 
         // Create texture
         this.texture = this.renderer.gl.createTexture();
-        if (!this.texture)
-        {
-            // Could not create texture
-            return false;
-        }
+        if (!this.texture) return false;
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
         this.renderer.gl.texImage2D(
             this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            this.width*WOSDefaultFontScaleXFactor,
-            this.height*WOSDefaultFontScaleYFactor, 0,
+            this.size.vec[0]*WOSDefaultFontScaleXFactor,
+            this.size.vec[1]*WOSDefaultFontScaleYFactor, 0,
             this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
         );
 
@@ -267,13 +254,150 @@ GuiText.prototype = {
 
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
-        // Update vertex buffer     
-        this.vertexBuffer.setPlane2D(
-            this.width, this.height
-        );
-
         // Text loaded
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPosition : Set text position                                       //
+    //  param x : Text X position                                             //
+    //  param y : Text Y position                                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosition: function(x, y)
+    {
+        this.position.vec[0] = x;
+        this.position.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPositionVec2 : Set text position from a 2 components vector        //
+    //  param vector : 2 components vector to set text position from          //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec2: function(vector)
+    {
+        this.position.vec[0] = vector.vec[0];
+        this.position.vec[1] = vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setX : Set text X position                                            //
+    //  param x : Text X position                                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setX: function(x)
+    {
+        this.position.vec[0] = x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setY : Set text Y position                                            //
+    //  param y : Text Y position                                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setY: function(y)
+    {
+        this.position.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  move : Translate text                                                 //
+    //  param x : X axis translate value                                      //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    move: function(x, y)
+    {
+        this.position.vec[0] += x;
+        this.position.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveVec2 : Translate text by a 2 components vector                    //
+    //  param vector : 2 components vector to translate text by               //
+    ////////////////////////////////////////////////////////////////////////////
+    moveVec2: function(vector)
+    {
+        this.position.vec[0] += vector.vec[0];
+        this.position.vec[1] += vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Translate text on X axis                                      //
+    //  param x : X axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveX: function(x)
+    {
+        this.position.vec[0] += x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Translate text on Y axis                                      //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveY: function(y)
+    {
+        this.position.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setHeight : Set text height                                           //
+    //  param height : Text height to set                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setHeight: function(height)
+    {
+        // Set text field height
+        this.size.vec[1] = height;
+        if (this.size.vec[1] <= WOSDefaultMinTextHeight)
+            this.size.vec[1] = WOSDefaultMinTextHeight;
+        if (this.size.vec[1] >= WOSDefaultMaxTextHeight)
+            this.size.vec[1] = WOSDefaultMaxTextHeight;
+
+        // Set font size based on text field height
+        this.fontsize = this.size.vec[1]*WOSDefaultFontSizeFactor;
+        if (this.fontsize <= WOSDefaultMinFontSize)
+            this.fontsize = WOSDefaultMinFontSize;
+        if (this.fontsize >= WOSDefaultMaxFontSize)
+            this.fontsize = WOSDefaultMaxFontSize;
+
+        // Update text
+        this.setText(this.getText());
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngle : Set text rotation angle                                    //
+    //  param angle : Text rotation angle to set in degrees                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngle: function(angle)
+    {
+        this.angle = angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate text                                                  //
+    //  param angle : Angle to rotate text by in degrees                      //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angle)
+    {
+        this.angle += angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setColor : Set text color                                             //
+    //  param r : Text red color channel to set                               //
+    //  param g : Text blue color channel to set                              //
+    //  param b : Text green color channel to set                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setColor: function(r, g, b)
+    {
+        this.color.vec[0] = r;
+        this.color.vec[1] = g;
+        this.color.vec[2] = b;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set text alpha                                             //
+    //  param alpha : Text alpha to set                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    setAlpha: function(alpha)
+    {
+        this.alpha = alpha;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -306,13 +430,15 @@ GuiText.prototype = {
         }
 
         // Set text width
-        this.width = this.renderer.getTextWidth(
+        this.size.vec[0] = this.renderer.getTextWidth(
             this.text, this.fontsize
         )*WOSDefaultFontCharsizeFactor;
 
         // Clamp text width
-        if (this.width <= 0.001) { this.width = 0.001; }
-        if (this.width >= 2.0) { this.width = 2.0; }
+        if (this.size.vec[0] <= WOSDefaultMinTextWidth)
+            this.size.vec[0] = WOSDefaultMinTextWidth;
+        if (this.size.vec[0] >= WOSDefaultMaxTextWidth)
+            this.size.vec[0] = WOSDefaultMaxTextWidth;
 
         // Get char sizes
         this.charsizes = new Array();
@@ -326,8 +452,8 @@ GuiText.prototype = {
         // Render text
         pixelsData = this.renderer.renderText(
             this.text,
-            this.width*WOSDefaultFontScaleXFactor,
-            this.height*WOSDefaultFontScaleYFactor,
+            this.size.vec[0]*WOSDefaultFontScaleXFactor,
+            this.size.vec[1]*WOSDefaultFontScaleYFactor,
             this.fontsize
         );
 
@@ -335,14 +461,11 @@ GuiText.prototype = {
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
         this.renderer.gl.texImage2D(
             this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            this.width*WOSDefaultFontScaleXFactor,
-            this.height*WOSDefaultFontScaleYFactor, 0,
+            this.size.vec[0]*WOSDefaultFontScaleXFactor,
+            this.size.vec[1]*WOSDefaultFontScaleYFactor, 0,
             this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
         );
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-
-        // Update vertex buffer     
-        this.vertexBuffer.setPlane2D(this.width, this.height);
         return true;
     },
 
@@ -354,8 +477,8 @@ GuiText.prototype = {
     addCharacter: function(index, character)
     {
         // Clamp index into text length range
-        if (index <= 0) { index = 0; }
-        if (index >= this.textLength) { index = this.textLength; }
+        if (index <= 0) index = 0;
+        if (index >= this.textLength) index = this.textLength;
 
         // Insert character
         this.setText(
@@ -373,8 +496,8 @@ GuiText.prototype = {
         if (this.textLength > 0)
         {
             // Clamp index into text length range
-            if (index <= 1) { index = 1; }
-            if (index >= this.textLength) { index = this.textLength; }
+            if (index <= 1) index = 1;
+            if (index >= this.textLength) index = this.textLength;
 
             // Erase character
             this.setText(
@@ -414,16 +537,91 @@ GuiText.prototype = {
         }
 
         // Clamp indexes into text length range
-        if (selStart <= 0) { selStart = 0; }
-        if (selStart >= this.textLength) { selStart = this.textLength; }
-        if (selEnd <= 0) { selEnd = 0; }
-        if (selEnd >= this.textLength) { selEnd = this.textLength; }
+        if (selStart <= 0) selStart = 0;
+        if (selStart >= this.textLength) selStart = this.textLength;
+        if (selEnd <= 0) selEnd = 0;
+        if (selEnd >= this.textLength) selEnd = this.textLength;
 
         // Erase characters selection
         this.setText(
             this.text.substring(0, selStart) +
             this.text.substring(selEnd, this.textLength)
         );
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setHidden : Set text hidden mode                                      //
+    //  param hidden : Text hidden mode to set                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setHidden: function(hidden)
+    {
+        var text = this.getText();
+        this.hidden = hidden;
+        this.setText(text);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getX : Get text X position                                            //
+    //  return : Text X position                                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getX: function()
+    {
+        return this.position.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getY : Get text Y position                                            //
+    //  return : Text Y position                                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getY: function()
+    {
+        return this.position.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getWidth : Get text width                                             //
+    //  return : Text width                                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    getWidth: function()
+    {
+        return this.size.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHeight : Get text height                                           //
+    //  return : Text height                                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    getHeight: function()
+    {
+        return this.size.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngle : Get text rotation angle                                    //
+    //  return : Text rotation angle in degrees                               //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngle: function()
+    {
+        return this.angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAlpha : Get text alpha                                             //
+    //  return : Text alpha                                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    getAlpha: function()
+    {
+        return this.alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getText : Get text internal string                                    //
+    //  return : Text internal string                                         //
+    ////////////////////////////////////////////////////////////////////////////
+    getText: function()
+    {
+        if (this.hidden) return this.hidetext;
+        return this.text;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -434,8 +632,8 @@ GuiText.prototype = {
     getCharPos: function(index)
     {
         // Clamp index into text length range
-        if (index <= 0) { index = 0; }
-        if (index >= this.textLength) { index = this.textLength; }
+        if (index <= 0) index = 0;
+        if (index >= this.textLength) index = this.textLength;
 
         // Return character size at given index
         return this.charsizes[index];
@@ -449,25 +647,15 @@ GuiText.prototype = {
     getNextWidth: function(character)
     {
         // Get current text width
-        var width = this.width;
+        var width = this.size.vec[0];
 
         // Add new character width
-        if (this.hidden) { character = HiddenTextPassCharacter; }
+        if (this.hidden) character = HiddenTextPassCharacter;
         width += this.renderer.getTextWidth(character, this.fontsize)/
                     WOSDefaultFontScaleXFactor;
 
         // Return total width
         return width;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getText : Get text internal string                                    //
-    //  return : Text internal string                                         //
-    ////////////////////////////////////////////////////////////////////////////
-    getText: function()
-    {
-        if (this.hidden) { return this.hidetext; }
-        else { return this.text; }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -480,24 +668,6 @@ GuiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get text width                                             //
-    //  return : Text width                                                   //
-    ////////////////////////////////////////////////////////////////////////////
-    getWidth: function()
-    {
-        return this.width;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get text height                                           //
-    //  return : Text height                                                  //
-    ////////////////////////////////////////////////////////////////////////////
-    getHeight: function()
-    {
-        return this.height;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  getFontsize : Get text font size                                      //
     //  return : Text font size                                               //
     ////////////////////////////////////////////////////////////////////////////
@@ -507,87 +677,12 @@ GuiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  resetMatrix : Reset text model matrix                                 //
+    //  getHidden : Get text hidden mode                                      //
+    //  return : Text hidden mode                                             //
     ////////////////////////////////////////////////////////////////////////////
-    resetMatrix: function()
+    getHidden: function()
     {
-        this.modelMatrix.setIdentity();
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setMatrix : Set text model matrix                                     //
-    //  param modelMatrix : Text model matrix                                 //
-    ////////////////////////////////////////////////////////////////////////////
-    setMatrix: function(modelMatrix)
-    {
-        this.modelMatrix = modelMatrix;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setColor : Set text color                                             //
-    //  param r : Text red color channel to set                               //
-    //  param g : Text blue color channel to set                              //
-    //  param b : Text green color channel to set                             //
-    ////////////////////////////////////////////////////////////////////////////
-    setColor: function(r, g, b)
-    {
-        this.color.vec[0] = r;
-        this.color.vec[1] = g;
-        this.color.vec[2] = b;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set text alpha                                             //
-    //  param alpha : Text alpha to set                                       //
-    ////////////////////////////////////////////////////////////////////////////
-    setAlpha: function(alpha)
-    {
-        this.alpha = alpha;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate text on X axis                                      //
-    //  param x : X axis translate value                                      //
-    ////////////////////////////////////////////////////////////////////////////
-    moveX: function(x)
-    {
-        this.modelMatrix.translateX(x);
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate text on Y axis                                      //
-    //  param y : Y axis translate value                                      //
-    ////////////////////////////////////////////////////////////////////////////
-    moveY: function(y)
-    {
-        this.modelMatrix.translateY(y);
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate text                                                  //
-    //  param angle : Angle to rotate in degrees                              //
-    ////////////////////////////////////////////////////////////////////////////
-    rotate: function(angle)
-    {
-        this.modelMatrix.rotateZ(-angle);
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  scaleX : Scale text along the X axis                                  //
-    //  param scaleX : X factor to scale to                                   //
-    ////////////////////////////////////////////////////////////////////////////
-    scaleX: function(scaleX)
-    {
-        this.modelMatrix.scaleX(scaleX);
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  scaleY : Scale text along the Y axis                                  //
-    //  param scaleY : Y factor to scale to                                   //
-    ////////////////////////////////////////////////////////////////////////////
-    scaleY: function(scaleY)
-    {
-        this.modelMatrix.scaleY(scaleY);
+        return this.hidden;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -595,6 +690,18 @@ GuiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
+        // Set text model matrix
+        this.modelMatrix.setIdentity();
+        this.modelMatrix.translateVec2(this.position);
+        this.modelMatrix.translate(
+            this.size.vec[0]*0.5, this.size.vec[1]*0.5, 0.0
+        );
+        this.modelMatrix.rotateZ(this.angle);
+        this.modelMatrix.translate(
+            -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
+        );
+        this.modelMatrix.scaleVec2(this.size);
+
         // Bind text shader
         this.textShader.shader.bind();
 

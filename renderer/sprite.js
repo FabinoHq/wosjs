@@ -63,10 +63,10 @@ function Sprite(renderer, spriteShader)
 
     // Sprite position
     this.position = null;
-    // Sprite rotation angle
-    this.angle = 0.0;
     // Sprite size
     this.size = null;
+    // Sprite rotation angle
+    this.angle = 0.0;
     // Sprite texture UV size
     this.uvSize = null;
     // Sprite texture UV offset
@@ -92,6 +92,7 @@ Sprite.prototype = {
         this.size = new Vector2(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
+        this.angle = 0.0;
         this.uvSize = new Vector2(1.0, 1.0);
         this.uvOffset = new Vector2(0.0, 0.0);
         this.alpha = 1.0;
@@ -198,24 +199,6 @@ Sprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngle : Set sprite rotation angle                                  //
-    //  param angle : Sprite rotation angle to set in degrees                 //
-    ////////////////////////////////////////////////////////////////////////////
-    setAngle: function(angle)
-    {
-        this.angle = angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate sprite                                                //
-    //  param angle : Angle to rotate sprite by in degrees                    //
-    ////////////////////////////////////////////////////////////////////////////
-    rotate: function(angle)
-    {
-        this.angle += angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setSize : Set sprite size                                             //
     //  param width : Sprite width to set                                     //
     //  param height : Sprite height to set                                   //
@@ -252,6 +235,24 @@ Sprite.prototype = {
     setHeight: function(height)
     {
         this.size.vec[1] = height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngle : Set sprite rotation angle                                  //
+    //  param angle : Sprite rotation angle to set in degrees                 //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngle: function(angle)
+    {
+        this.angle = angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate sprite                                                //
+    //  param angle : Angle to rotate sprite by in degrees                    //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angle)
+    {
+        this.angle += angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -315,16 +316,7 @@ Sprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
-        return this.position.vec[0];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getAngle : Get sprite rotation angle                                  //
-    //  return : Sprite rotation angle in degrees                             //
-    ////////////////////////////////////////////////////////////////////////////
-    getAngle: function()
-    {
-        return this.angle;
+        return this.position.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -343,6 +335,15 @@ Sprite.prototype = {
     getHeight: function()
     {
         return this.size.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngle : Get sprite rotation angle                                  //
+    //  return : Sprite rotation angle in degrees                             //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngle: function()
+    {
+        return this.angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////

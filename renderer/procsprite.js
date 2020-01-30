@@ -63,10 +63,10 @@ function ProcSprite(renderer)
 
     // Procedural sprite position
     this.position = null;
-    // Procedural sprite rotation angle
-    this.angle = 0.0;
     // Procedural sprite size
     this.size = null;
+    // Procedural sprite rotation angle
+    this.angle = 0.0;
     // Procedural sprite offset
     this.offset = null;
     // Procedural sprite time
@@ -92,10 +92,10 @@ ProcSprite.prototype = {
         this.timeUniform = -1;
         this.offsetUniform = -1;
         this.position = new Vector2(0.0, 0.0);
-        this.angle = 0.0;
         this.size = new Vector2(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
+        this.angle = 0.0;
         this.offset = new Vector2(0.0, 0.0);
         this.time = 0.0;
         this.alpha = 1.0;
@@ -207,24 +207,6 @@ ProcSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngle : Set procedural sprite rotation angle                       //
-    //  param angle : Procedural sprite rotation angle to set in degrees      //
-    ////////////////////////////////////////////////////////////////////////////
-    setAngle: function(angle)
-    {
-        this.angle = angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate procedural sprite                                     //
-    //  param angle : Angle to rotate procedural sprite by in degrees         //
-    ////////////////////////////////////////////////////////////////////////////
-    rotate: function(angle)
-    {
-        this.angle += angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setSize : Set procedural sprite size                                  //
     //  param width : Procedural sprite width to set                          //
     //  param height : Procedural sprite height to set                        //
@@ -261,6 +243,24 @@ ProcSprite.prototype = {
     setHeight: function(height)
     {
         this.size.vec[1] = height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngle : Set procedural sprite rotation angle                       //
+    //  param angle : Procedural sprite rotation angle to set in degrees      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngle: function(angle)
+    {
+        this.angle = angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate procedural sprite                                     //
+    //  param angle : Angle to rotate procedural sprite by in degrees         //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angle)
+    {
+        this.angle += angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -335,16 +335,7 @@ ProcSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
-        return this.position.vec[0];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getAngle : Get procedural sprite rotation angle                       //
-    //  return : Procedural sprite rotation angle in degrees                  //
-    ////////////////////////////////////////////////////////////////////////////
-    getAngle: function()
-    {
-        return this.angle;
+        return this.position.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -363,6 +354,15 @@ ProcSprite.prototype = {
     getHeight: function()
     {
         return this.size.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngle : Get procedural sprite rotation angle                       //
+    //  return : Procedural sprite rotation angle in degrees                  //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngle: function()
+    {
+        return this.angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////

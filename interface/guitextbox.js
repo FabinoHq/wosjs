@@ -806,11 +806,9 @@ GuiTextBox.prototype = {
         this.textbox.render(0.0, 0.0, 0.0);
 
         // Render text
-        this.guitext.resetMatrix();
-        this.guitext.moveX(
-            this.posx+(this.height*WOSDefaultTextBoxTextOffsetFactor)
+        this.guitext.setPosition(
+            this.posx+(this.height*WOSDefaultTextBoxTextOffsetFactor), this.posy
         );
-        this.guitext.moveY(this.posy);
         this.guitext.render();
 
         if (this.selected)

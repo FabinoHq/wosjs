@@ -504,9 +504,8 @@ Wos.prototype = {
         //this.testanim.render(this.frametime);
 
         // Render test text
-        //this.testtext.resetMatrix();
-        //this.testtext.moveX(-this.testtext.getWidth()/2.0);
-        //this.testtext.moveY(-this.testtext.getHeight()/2.0);
+        //this.testtext.setX(-this.testtext.getWidth()/2.0);
+        //this.testtext.setY(-this.testtext.getHeight()/2.0);
         //this.testtext.render();
 
         // Render test text box

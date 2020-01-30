@@ -61,10 +61,10 @@ function Rect(renderer, rectShader)
 
     // Rect position
     this.position = null;
-    // Rect rotation angle
-    this.angle = 0.0;
     // Rect size
     this.size = null;
+    // Rect rotation angle
+    this.angle = 0.0;
     // Rect color
     this.color = null;
     // Rect alpha
@@ -86,10 +86,10 @@ Rect.prototype = {
         this.vertexBuffer = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
-        this.angle = 0.0;
         this.size = new Vector2(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
+        this.angle = 0.0;
         this.color = new Vector3(1.0, 1.0, 1.0);
         this.alpha = 1.0;
         this.thickness = 0.01;
@@ -193,24 +193,6 @@ Rect.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngle : Set rect rotation angle                                    //
-    //  param angle : Rect rotation angle                                     //
-    ////////////////////////////////////////////////////////////////////////////
-    setAngle: function(angle)
-    {
-        this.angle = angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate rect by a given angle                                 //
-    //  param angle : Angle to rotate rect by in degrees                                //
-    ////////////////////////////////////////////////////////////////////////////
-    rotate: function(angle)
-    {
-        this.angle += angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setSize : Set rect size                                               //
     //  param width : Rect width to set                                       //
     //  param height : Rect height to set                                     //
@@ -247,6 +229,24 @@ Rect.prototype = {
     setHeight: function(height)
     {
         this.size.vec[1] = height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngle : Set rect rotation angle                                    //
+    //  param angle : Rect rotation angle                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngle: function(angle)
+    {
+        this.angle = angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate rect                                                  //
+    //  param angle : Angle to rotate rect by in degrees                      //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angle)
+    {
+        this.angle += angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -310,15 +310,6 @@ Rect.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAngle : Get rect rotation angle                                    //
-    //  return : Rect rotation angle in degrees                               //
-    ////////////////////////////////////////////////////////////////////////////
-    getAngle: function()
-    {
-        return this.angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  getWidth : Get rect width                                             //
     //  return : Rect width                                                   //
     ////////////////////////////////////////////////////////////////////////////
@@ -334,6 +325,15 @@ Rect.prototype = {
     getHeight: function()
     {
         return this.size.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngle : Get rect rotation angle                                    //
+    //  return : Rect rotation angle in degrees                               //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngle: function()
+    {
+        return this.angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
