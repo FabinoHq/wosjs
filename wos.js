@@ -255,7 +255,6 @@ function Wos()
     this.testtext = null;
 }
 
-
 Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Start WOS (load basic system)                                  //
