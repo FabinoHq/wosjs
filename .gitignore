@@ -22,7 +22,6 @@
 !math/vector_3.js
 !math/matrix_4_4.js
 
-!physics/
 !physics/collision.js
 !physics/boundingbox.js
 

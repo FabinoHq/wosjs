@@ -76,9 +76,12 @@ Collision.prototype = {
     setCollision: function(collision)
     {
         this.collide = collision.collide;
-        this.pos.set(collision.pos);
-        this.offset.set(collision.offset);
-        this.normal.set(collision.normal);
+        this.pos.vec[0] = collision.pos.vec[0];
+        this.pos.vec[1] = collision.pos.vec[1];
+        this.offset.vec[0] = collision.offset.vec[0];
+        this.offset.vec[1] = collision.offset.vec[1];
+        this.normal.vec[0] = collision.normal.vec[0];
+        this.normal.vec[1] = collision.normal.vec[1];
         this.factor = collision.factor;
     },
 
@@ -92,24 +95,24 @@ Collision.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPos : Set collision position                                       //
-    //  param pos : Collision position to set                                 //
-    ////////////////////////////////////////////////////////////////////////////
-    setPos: function(pos)
-    {
-        this.pos.vec[0] = pos.vec[0];
-        this.pos.vec[1] = pos.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setPosXY : Set collision position from coordinates                    //
+    //  setPos : Set collision position from coordinates                      //
     //  param x : Collision X position to set                                 //
     //  param y : Collision Y position to set                                 //
     ////////////////////////////////////////////////////////////////////////////
-    setPosXY: function(x, y)
+    setPos: function(x, y)
     {
         this.pos.vec[0] = x;
         this.pos.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPosVec2 : Set collision position from a 2 components vector        //
+    //  param pos : 2 components vector to set collision position from        //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosVec2: function(pos)
+    {
+        this.pos.vec[0] = pos.vec[0];
+        this.pos.vec[1] = pos.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -131,23 +134,23 @@ Collision.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setOffset : Set collision offset                                      //
-    //  param offset : Collision offset to set                                //
-    ////////////////////////////////////////////////////////////////////////////
-    setOffset: function(offset)
-    {
-        this.offset.set(offset);
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setOffsetXY : Set collision offset from coordinates                   //
+    //  setOffset : Set collision offset from coordinates                     //
     //  param offsetX : Collision X offset to set                             //
     //  param offsetY : Collision Y offset to set                             //
     ////////////////////////////////////////////////////////////////////////////
-    setOffsetXY: function(offsetX, offsetY)
+    setOffset: function(offsetX, offsetY)
     {
         this.offset.vec[0] = offsetX;
         this.offset.vec[1] = offsetY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setOffsetVec2 : Set collision offset from a 2 components vector       //
+    //  param offset : 2 components vector to set collision offset from       //
+    ////////////////////////////////////////////////////////////////////////////
+    setOffsetVec2: function(offset)
+    {
+        this.offset.set(offset);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -169,23 +172,23 @@ Collision.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setNormal : Set collision normal                                      //
-    //  param normal : Collision normal to set                                //
-    ////////////////////////////////////////////////////////////////////////////
-    setNormal: function(normal)
-    {
-        this.normal.set(normal);
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setNormalXY : Set collision normal from coordinates                   //
+    //  setNormal : Set collision normal from coordinates                     //
     //  param normalX : Collision X normal to set                             //
     //  param normalY : Collision Y normal to set                             //
     ////////////////////////////////////////////////////////////////////////////
-    setNormalXY: function(normalX, normalY)
+    setNormal: function(normalX, normalY)
     {
         this.normal.vec[0] = normalX;
         this.normal.vec[1] = normalY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setNormalVec2 : Set collision normal from a 2 components vector       //
+    //  param normal : 2 components vector to set collision normal from       //
+    ////////////////////////////////////////////////////////////////////////////
+    setNormalVec2: function(normal)
+    {
+        this.normal.set(normal);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -225,15 +228,6 @@ Collision.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getPos : Get collision position                                       //
-    //  return : Collision position                                           //
-    ////////////////////////////////////////////////////////////////////////////
-    getPos: function()
-    {
-        return this.pos;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  getPosX : Get collision X position                                    //
     //  return : Collision X position                                         //
     ////////////////////////////////////////////////////////////////////////////
@@ -252,15 +246,6 @@ Collision.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getOffset : Get collision offset                                      //
-    //  return : Collision offset                                             //
-    ////////////////////////////////////////////////////////////////////////////
-    getOffset: function()
-    {
-        return this.offset;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  getOffsetX : Get collision X offset                                   //
     //  return : Collision X offset                                           //
     ////////////////////////////////////////////////////////////////////////////
@@ -276,15 +261,6 @@ Collision.prototype = {
     getOffsetY: function()
     {
         return this.offset.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getNormal : Get collision normal                                      //
-    //  return : Collision normal                                             //
-    ////////////////////////////////////////////////////////////////////////////
-    getNormal: function()
-    {
-        return this.normal;
     },
 
     ////////////////////////////////////////////////////////////////////////////
