@@ -339,9 +339,8 @@ BoundingBox.prototype = {
         }
 
         // Clamp near value
-        near -= 0.002;
         if (near <= 0.0) near = 0.0;
-        if (near >= 0.998) near = 0.998;
+        if (near >= 1.0) near = 1.0;
 
         // Collision
         collision.setFactor(near);
