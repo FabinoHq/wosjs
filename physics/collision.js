@@ -40,6 +40,7 @@
 //      physics/collision.js : Collision management                           //
 ////////////////////////////////////////////////////////////////////////////////
 
+
 ////////////////////////////////////////////////////////////////////////////////
 //  Collision class definition                                                //
 ////////////////////////////////////////////////////////////////////////////////
@@ -59,9 +60,12 @@ Collision.prototype = {
     reset: function()
     {
         this.collide = false;
-        this.pos.reset();
-        this.offset.reset();
-        this.normal.reset();
+        this.pos.vec[0] = 0.0;
+        this.pos.vec[1] = 0.0;
+        this.offset.vec[0] = 0.0;
+        this.offset.vec[1] = 0.0;
+        this.normal.vec[0] = 0.0;
+        this.normal.vec[1] = 0.0;
         this.factor = 0.0;
     },
 

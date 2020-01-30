@@ -1,0 +1,409 @@
+////////////////////////////////////////////////////////////////////////////////
+//   _______                               ________________________________   //
+//   \\ .   \                     ________/ . . . . . . . . . . . . . .   /   //
+//    \\ .   \     ____       ___/ . . . . .   __________________________/    //
+//     \\ .   \   //   \   __/. . .  _________/   /    // .  _________/       //
+//      \\ .   \_//     \_//     ___/.  _____    /    // .  /_____            //
+//       \\ .   \/   _   \/    _/// .  /    \\   |    \\  .       \           //
+//        \\ .      /\\       /  || .  |    ||   |     \\______    \          //
+//         \\ .    /  \\     /   || .  \____//   |  _________//    /          //
+//          \\ .  /    \\   /    //  .           / // . . . .     /           //
+//           \\__/      \\_/    //______________/ //_____________/            //
+//                                                                            //
+////////////////////////////////////////////////////////////////////////////////
+//   This is free and unencumbered software released into the public domain.  //
+//                                                                            //
+//   Anyone is free to copy, modify, publish, use, compile, sell, or          //
+//   distribute this software, either in source code form or as a compiled    //
+//   binary, for any purpose, commercial or non-commercial, and by any        //
+//   means.                                                                   //
+//                                                                            //
+//   In jurisdictions that recognize copyright laws, the author or authors    //
+//   of this software dedicate any and all copyright interest in the          //
+//   software to the public domain. We make this dedication for the benefit   //
+//   of the public at large and to the detriment of our heirs and             //
+//   successors. We intend this dedication to be an overt act of              //
+//   relinquishment in perpetuity of all present and future rights to this    //
+//   software under copyright law.                                            //
+//                                                                            //
+//   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,          //
+//   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF       //
+//   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.   //
+//   IN NO EVENT SHALL THE AUTHORS BE LIABLE FOR ANY CLAIM, DAMAGES OR        //
+//   OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,    //
+//   ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR    //
+//   OTHER DEALINGS IN THE SOFTWARE.                                          //
+//                                                                            //
+//   For more information, please refer to <http://unlicense.org>             //
+////////////////////////////////////////////////////////////////////////////////
+//    WOS : Web Operating System                                              //
+//      physics/boundingbox.js : BoundingBox management                       //
+////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  BoundingBox class definition                                              //
+////////////////////////////////////////////////////////////////////////////////
+function BoundingBox()
+{
+    this.pos = new Vector2(0.0, 0.0);
+    this.half = new Vector2(0.0, 0.0);
+}
+
+BoundingBox.prototype = {
+    ////////////////////////////////////////////////////////////////////////////
+    //  reset : Reset bounding box                                            //
+    ////////////////////////////////////////////////////////////////////////////
+    reset: function()
+    {
+        this.pos.vec[0] = 0.0;
+        this.pos.vec[1] = 0.0;
+        this.half.vec[0] = 0.0;
+        this.half.vec[1] = 0.0;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPos : Set bounding box position                                    //
+    //  param pos : Bounding box position                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setPos: function(pos)
+    {
+        this.pos.vec[0] = pos.vec[0];
+        this.pos.vec[1] = pos.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPos : Set bounding box position from coordinates                   //
+    //  param x : Bounding box X position                                     //
+    //  param y : Bounding box Y position                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosXY: function(x, y)
+    {
+        this.pos.vec[0] = x;
+        this.pos.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPosX : Set bounding box X position                                 //
+    //  param x : Bounding box X position                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosX: function(x)
+    {
+        this.pos.vec[0] = x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPosY : Set bounding box Y position                                 //
+    //  param y : Bounding box Y position                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosY: function(y)
+    {
+        this.pos.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setHalf : Set bounding box half size                                  //
+    //  param half : Bounding box half size                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setHalf: function(half)
+    {
+        this.half.vec[0] = half.vec[0];
+        this.half.vec[1] = half.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setHalfXY : Set bounding box half size from coordinates               //
+    //  param halfWidth : Bounding box half width                             //
+    //  param halfHeight : Bounding box half height                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setHalfXY: function(halfWidth, halfHeight)
+    {
+        this.half.vec[0] = halfWidth;
+        this.half.vec[1] = halfHeight;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setHalfWidth : Set bounding box half width                            //
+    //  param halfWidth : Bounding box half width                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setHalfWidth: function(halfWidth)
+    {
+        this.half.vec[0] = halfWidth;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setHalfHeight : Set bounding box half height                          //
+    //  param halfHeight : Bounding box half height                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setHalfHeight: function(halfHeight)
+    {
+        this.half.vec[1] = halfHeight;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSize : Set bounding box size                                       //
+    //  param size : Bounding box size                                        //
+    ////////////////////////////////////////////////////////////////////////////
+    setSize: function(size)
+    {
+        this.half.vec[0] = size.vec[0]*0.5;
+        this.half.vec[1] = size.vec[1]*0.5;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSizeXY : Set bounding box size from coordinates                    //
+    //  param width : Bounding box width                                      //
+    //  param height : Bounding box height                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setSizeXY: function(width, height)
+    {
+        this.half.vec[0] = width*0.5;
+        this.half.vec[1] = height*0.5;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setWidth : Set bounding box width                                     //
+    //  param width : Bounding box width                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    setWidth: function(width)
+    {
+        this.half.vec[0] = width*0.5;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setHeight : Set bounding box height                                   //
+    //  param height : Bounding box height                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setHeight: function(height)
+    {
+        this.half.vec[1] = height*0.5;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getPos : Get bounding box position                                    //
+    //  return : Bounding box position                                        //
+    ////////////////////////////////////////////////////////////////////////////
+    getPos: function()
+    {
+        return this.pos;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getX : Get bounding box X position                                    //
+    //  return : Bounding box X position                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    getX: function()
+    {
+        return this.pos.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getY : Get bounding box Y position                                    //
+    //  return : Bounding box Y position                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    getY: function()
+    {
+        return this.pos.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHalf : Get bounding box half size                                  //
+    //  return : Bounding box half size                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    getHalf: function()
+    {
+        return this.half;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHalfWidth : Get bounding box half width                            //
+    //  return : Bounding box half width                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    getHalfWidth: function()
+    {
+        return this.half.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHalfHeight : Get bounding box half height                          //
+    //  return : Bounding box half height                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    getHalfHeight: function()
+    {
+        return this.half.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getWidth : Get bounding box width                                     //
+    //  return : Bounding box width                                           //
+    ////////////////////////////////////////////////////////////////////////////
+    getWidth: function()
+    {
+        return this.half.vec[0]*2.0;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getHeight : Get bounding box height                                   //
+    //  return : Bounding box height                                          //
+    ////////////////////////////////////////////////////////////////////////////
+    getHeight: function()
+    {
+        return this.half.vec[1]*2.0;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  move : Translate bounding box                                         //
+    //  param vector : Vector to translate bounding box by                    //
+    ////////////////////////////////////////////////////////////////////////////
+    move: function(vector)
+    {
+        this.pos.vec[0] += vector.vec[0];
+        this.pos.vec[1] += vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveXY : Translate bounding box by coordinates                        //
+    //  param x : X axis translate value                                      //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveXY: function(x, y)
+    {
+        this.pos.vec[0] += x;
+        this.pos.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Translate bounding box on X axis                              //
+    //  param x : X axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveX: function(x)
+    {
+        this.pos.vec[0] += x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Translate bounding box on Y axis                              //
+    //  param x : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveY: function(y)
+    {
+        this.pos.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  collideSegment : Collide a segment with bounding box                  //
+    //  param collision : Collision object to store collision informations    //
+    //  param origin : Position of the segment start point                    //
+    //  param offset : Size of the segment (end point - start point)          //
+    //  param padding : Collision padding                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    collideSegment: function(collision, origin, offset, padding)
+    {
+        var scaleX = 1.0;
+        var scaleY = 1.0;
+        var signX = 1.0;
+        var signY = 1.0;
+        var nearX = 0.0;
+        var nearY = 0.0;
+        var farX = 0.0;
+        var farY = 0.0;
+        var near = 0.0;
+        var far = 0.0;
+
+        // Reset collision
+        collision.reset();
+        collision.setPosXY(
+            origin.vec[0]+offset.vec[0], origin.vec[1]+offset.vec[1]
+        );
+        collision.setOffset(offset);
+        if ((offset.vec[0] == 0.0) && (offset.vec[1] == 0.0)) return false;
+
+        // Offset scale and sign
+        if (offset.vec[0] != 0.0)
+        {
+            scaleX = (1.0/offset.vec[0]);
+        }
+        if (offset.vec[1] != 0.0)
+        {
+            scaleY = (1.0/offset.vec[1]);
+        }
+        signX = (scaleX >= 0.0)?1.0:-1.0;
+        signY = (scaleY >= 0.0)?1.0:-1.0;
+
+        // Compute near and far edges on both axis
+        nearX = (this.pos.vec[0]-(signX*(this.half.vec[0]+padding.vec[0]))
+                    -origin.vec[0])*scaleX;
+
+        nearY = (this.pos.vec[1]-(signY*(this.half.vec[1]+padding.vec[1]))
+                    -origin.vec[1])*scaleY;
+
+        farX = (this.pos.vec[0]+(signX*(this.half.vec[0]+padding.vec[0]))
+                    -origin.vec[0])*scaleX;
+
+        farY = (this.pos.vec[1]+(signY*(this.half.vec[1]+padding.vec[1]))
+                    -origin.vec[1])*scaleY;
+
+        if ((nearX > farY) || (nearY > farX))
+        {
+            // Box is not in the direction
+            return false;
+        }
+
+        // Compute near and far edges
+        near = (nearX > nearY)?nearX:nearY;
+        far = (farX < farY)?farX:farY;
+
+        if ((near >= 1.0) || (far <= 0.0))
+        {
+            // Outside the box
+            return false;
+        }
+
+        // Clamp near value
+        if (near <= 0.0) near = 0.0;
+        if (near >= 1.0) near = 1.0;
+
+        // Collision
+        collision.setFactor(near);
+        if (nearX > nearY)
+        {
+            collision.setNormalXY(-signX, 0.0);
+        }
+        else
+        {
+            collision.setNormalXY(0.0, -signY);
+        }
+        collision.setOffsetXY(near*offset.vec[0], near*offset.vec[1]);
+        collision.setPosXY(
+            origin.vec[0]+(near*offset.vec[0]),
+            origin.vec[1]+(near*offset.vec[1])
+        );
+        collision.setColliding(true);
+        return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  collideBox : Collide a bounding box with bounding box                 //
+    //  param collision : Collision object to store collision informations    //
+    //  param box : Bounding box to collide with                              //
+    //  param offset : Offset vector to sweep bounding box by                 //
+    ////////////////////////////////////////////////////////////////////////////
+    collideBox: function(collision, box, offset)
+    {
+        var padding = new Vector2(0.0, 0.0);
+        padding.set(box.half);
+
+        // Dynamic sweep collision
+        if (!this.collideSegment(collision, box.pos, offset, padding))
+        {
+            collision.reset();
+            collision.setPosXY(
+                box.pos.vec[0]+offset.vec[0], box.pos.vec[1]+offset.vec[1]
+            );
+            collision.setOffsetXY(offset.vec[0], offset.vec[1]);
+            return false;
+        }
+        return true;
+    }
+};
+

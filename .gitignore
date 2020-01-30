@@ -24,6 +24,7 @@
 
 !physics/
 !physics/collision.js
+!physics/boundingbox.js
 
 !renderer/animsprite.js
 !renderer/renderer.js
