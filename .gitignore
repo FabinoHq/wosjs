@@ -25,7 +25,6 @@
 !physics/
 !physics/collision.js
 
-!renderer/
 !renderer/animsprite.js
 !renderer/renderer.js
 !renderer/vertexbuffer.js

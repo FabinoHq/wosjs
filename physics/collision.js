@@ -46,9 +46,9 @@
 function Collision()
 {
     this.collide = false;
-    this.pos = new Vector2();
-    this.offset = new Vector2();
-    this.normal = new Vector2();
+    this.pos = new Vector2(0.0, 0.0);
+    this.offset = new Vector2(0.0, 0.0);
+    this.normal = new Vector2(0.0, 0.0);
     this.factor = 0.0;
 }
 
@@ -67,6 +67,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setCollision : Set from collision                                     //
+    //  param collision : Collision object to set from                        //
     ////////////////////////////////////////////////////////////////////////////
     setCollision: function(collision)
     {
@@ -79,6 +80,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setColliding : Set collision colliding state                          //
+    //  param colliding : Collision colliding state to set                    //
     ////////////////////////////////////////////////////////////////////////////
     setColliding: function(colliding)
     {
@@ -87,14 +89,18 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setPos : Set collision position                                       //
+    //  param pos : Collision position to set                                 //
     ////////////////////////////////////////////////////////////////////////////
     setPos: function(pos)
     {
-        this.pos.set(pos);
+        this.pos.vec[0] = pos.vec[0];
+        this.pos.vec[1] = pos.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setPosXY : Set collision position from coordinates                    //
+    //  param x : Collision X position to set                                 //
+    //  param y : Collision Y position to set                                 //
     ////////////////////////////////////////////////////////////////////////////
     setPosXY: function(x, y)
     {
@@ -104,6 +110,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setPosX : Set collision X position                                    //
+    //  param x : Collision X position to set                                 //
     ////////////////////////////////////////////////////////////////////////////
     setPosX: function(x)
     {
@@ -112,6 +119,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setPosY : Set collision Y position                                    //
+    //  param y : Collision Y position to set                                 //
     ////////////////////////////////////////////////////////////////////////////
     setPosY: function(y)
     {
@@ -120,6 +128,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setOffset : Set collision offset                                      //
+    //  param offset : Collision offset to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setOffset: function(offset)
     {
@@ -128,6 +137,8 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setOffsetXY : Set collision offset from coordinates                   //
+    //  param offsetX : Collision X offset to set                             //
+    //  param offsetY : Collision Y offset to set                             //
     ////////////////////////////////////////////////////////////////////////////
     setOffsetXY: function(offsetX, offsetY)
     {
@@ -137,6 +148,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setOffsetX : Set collision X offset                                   //
+    //  param offsetX : Collision X offset to set                             //
     ////////////////////////////////////////////////////////////////////////////
     setOffsetX: function(offsetX)
     {
@@ -145,6 +157,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setOffsetY : Set collision Y offset                                   //
+    //  param offsetY : Collision Y offset to set                             //
     ////////////////////////////////////////////////////////////////////////////
     setOffsetY: function(offsetY)
     {
@@ -152,7 +165,8 @@ Collision.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setNormal :Set collision normal                                       //
+    //  setNormal : Set collision normal                                      //
+    //  param normal : Collision normal to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setNormal: function(normal)
     {
@@ -161,6 +175,8 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setNormalXY : Set collision normal from coordinates                   //
+    //  param normalX : Collision X normal to set                             //
+    //  param normalY : Collision Y normal to set                             //
     ////////////////////////////////////////////////////////////////////////////
     setNormalXY: function(normalX, normalY)
     {
@@ -170,6 +186,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setNormalX : Set collision X normal                                   //
+    //  param normalX : Collision X normal to set                             //
     ////////////////////////////////////////////////////////////////////////////
     setNormalX: function(normalX)
     {
@@ -178,6 +195,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setNormalY : Set collision Y normal                                   //
+    //  param normalY : Collision Y normal to set                             //
     ////////////////////////////////////////////////////////////////////////////
     setNormalY: function(normalY)
     {
@@ -186,6 +204,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setFactor : Set collision factor                                      //
+    //  param factor : Collision factor to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setFactor: function(factor)
     {
@@ -194,6 +213,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getColliding : Get collision colliding state                          //
+    //  return : Collision colliding state                                    //
     ////////////////////////////////////////////////////////////////////////////
     getColliding: function()
     {
@@ -202,6 +222,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getPos : Get collision position                                       //
+    //  return : Collision position                                           //
     ////////////////////////////////////////////////////////////////////////////
     getPos: function()
     {
@@ -210,6 +231,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getPosX : Get collision X position                                    //
+    //  return : Collision X position                                         //
     ////////////////////////////////////////////////////////////////////////////
     getPosX: function()
     {
@@ -218,6 +240,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getPosY : Get collision Y position                                    //
+    //  return : Collision Y position                                         //
     ////////////////////////////////////////////////////////////////////////////
     getPosY: function()
     {
@@ -226,6 +249,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getOffset : Get collision offset                                      //
+    //  return : Collision offset                                             //
     ////////////////////////////////////////////////////////////////////////////
     getOffset: function()
     {
@@ -234,6 +258,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getOffsetX : Get collision X offset                                   //
+    //  return : Collision X offset                                           //
     ////////////////////////////////////////////////////////////////////////////
     getOffsetX: function()
     {
@@ -242,6 +267,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getOffsetY : Get collision Y offset                                   //
+    //  return : Collision Y offset                                           //
     ////////////////////////////////////////////////////////////////////////////
     getOffsetY: function()
     {
@@ -250,6 +276,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getNormal : Get collision normal                                      //
+    //  return : Collision normal                                             //
     ////////////////////////////////////////////////////////////////////////////
     getNormal: function()
     {
@@ -258,6 +285,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getNormalX : Get collision X normal                                   //
+    //  return : Collision X normal                                           //
     ////////////////////////////////////////////////////////////////////////////
     getNormalX: function()
     {
@@ -266,6 +294,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getNormalY : Get collision Y normal                                   //
+    //  return : Collision Y normal                                           //
     ////////////////////////////////////////////////////////////////////////////
     getNormalY: function()
     {
@@ -274,6 +303,7 @@ Collision.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getFactor : Get collision factor                                      //
+    //  return : Collision factor                                             //
     ////////////////////////////////////////////////////////////////////////////
     getFactor: function()
     {
