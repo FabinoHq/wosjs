@@ -67,10 +67,7 @@ Sound.prototype = {
         this.sound = null;
 
         // Check audio context
-        if (!this.audioContext)
-        {
-            return false;
-        }
+        if (!this.audioContext) return false;
 
         // Create sound
         this.sound = this.audioContext.createBufferSource();

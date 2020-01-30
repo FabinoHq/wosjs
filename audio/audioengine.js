@@ -73,10 +73,7 @@ AudioEngine.prototype = {
         }
 
         // Check context
-        if (!this.context)
-        {
-            return false;
-        }
+        if (!this.context) return false;
 
         // Audio engine successfully loaded
         this.loaded = true;
