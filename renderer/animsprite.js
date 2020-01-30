@@ -60,12 +60,13 @@ function AnimSprite(renderer, animSpriteShader)
     this.texture = null;
     // Animated sprite model matrix
     this.modelMatrix = null;
-    // Animated sprite alpha
-    this.alpha = 1.0;
 
+    // Animated sprite position
+    this.position = null;
+    // Animated sprite angle
+    this.angle = 0.0;
     // Animated sprite size
-    this.width = 1.0;
-    this.height = 1.0;
+    this.size = null;
     // Animated sprite frame count
     this.count = null;
     // Animated sprite start frame
@@ -74,6 +75,8 @@ function AnimSprite(renderer, animSpriteShader)
     this.end = null;
     // Animated sprite frametime in seconds
     this.frametime = 1.0;
+    // Animated sprite alpha
+    this.alpha = 1.0;
 
     // Animated sprite current states
     this.current = null;
@@ -90,81 +93,196 @@ AnimSprite.prototype = {
     //  param height : Animated sprite height                                 //
     //  param countX : Animated sprite frames count in U texture axis         //
     //  param countY : Animated sprite frames count in V texture axis         //
-    //  param frametime : Animated sprite frametime in seconds                //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(tex, width, height, countX, countY, frametime)
+    init: function(tex, width, height, countX, countY)
     {
         // Reset animated sprite
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
+        this.position = new Vector2(0.0, 0.0);
+        this.angle = 0.0;
+        this.size = new Vector2(1.0, 1.0);
+        if (width !== undefined) this.size.vec[0] = width;
+        if (height !== undefined) this.size.vec[1] = height;
         this.count = new Vector2(0, 0);
+        if (countX !== undefined) this.count.vec[0] = countX;
+        if (countY !== undefined) this.count.vec[1] = countY;
         this.start = new Vector2(0, 0);
         this.end = new Vector2(0, 0);
+        this.frametime = 1.0;
+        this.alpha = 1.0;
         this.current = new Vector2(0, 0);
         this.next = new Vector2(0, 0);
-        if (width !== undefined) { this.width = width; }
-        if (height !== undefined) { this.height = height; }
-        if (countX !== undefined) { this.count.setX(countX); }
-        if (countY !== undefined) { this.count.setY(countY); }
-        if (frametime !== undefined) { this.frametime = frametime; }
         this.currentTime = 0.0;
         this.interpOffset = 0.0;
 
         // Check gl pointer
-        if (!this.renderer.gl)
-        {
-            return false;
-        }
+        if (!this.renderer.gl) return false;
 
         // Check animated sprite shader pointer
-        if (!this.animShader)
-        {
-            return false;
-        }
+        if (!this.animShader) return false;
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
 
         // Create vbo
         this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer)
-        {
-            // Could not create vbo
-            return false;
-        }
-        if (!this.vertexBuffer.init())
-        {
-            // Could not init vbo
-            return false;
-        }
+        if (!this.vertexBuffer) return false;
+        if (!this.vertexBuffer.init()) return false;
+        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Set texture
         this.texture = tex;
-        if (!this.texture)
-        {
-            // Could not set texture
-            return false;
-        }
-
-        // Update vertex buffer     
-        this.vertexBuffer.setPlane2D(this.width, this.height);
+        if (!this.texture) return false;
 
         // Sprite loaded
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSize : Set sprite size                                             //
-    //  param width : Sprite width to set                                     //
-    //  param height : Sprite height to set                                   //
+    //  setPosition : Set animated sprite position                            //
+    //  param x : Animated sprite X position                                  //
+    //  param y : Animated sprite Y position                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosition: function(x, y)
+    {
+        this.position.vec[0] = x;
+        this.position.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPositionVec2 : Set anim position from a 2 components vector        //
+    //  param vector : 2 components vector to set anim position from          //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec2: function(vector)
+    {
+        this.position.vec[0] = vector.vec[0];
+        this.position.vec[1] = vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setX : Set animated sprite X position                                 //
+    //  param x : Animated sprite X position                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    setX: function(x)
+    {
+        this.position.vec[0] = x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setY : Set animated sprite Y position                                 //
+    //  param y : Animated sprite Y position                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    setY: function(y)
+    {
+        this.position.vec[1] = y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  move : Translate animated sprite                                      //
+    //  param x : X axis translate value                                      //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    move: function(x, y)
+    {
+        this.position.vec[0] += x;
+        this.position.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveVec2 : Translate animated sprite by a 2 components vector         //
+    //  param vector : 2 components vector to translate animated sprite by    //
+    ////////////////////////////////////////////////////////////////////////////
+    moveVec2: function(vector)
+    {
+        this.position.vec[0] += vector.vec[0];
+        this.position.vec[1] += vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Translate animated sprite on X axis                           //
+    //  param x : X axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveX: function(x)
+    {
+        this.position.vec[0] += x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Translate animated sprite on Y axis                           //
+    //  param y : Y axis translate value                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveY: function(y)
+    {
+        this.position.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngle : Set animated sprite rotation angle                         //
+    //  param angle : Animated sprite rotation angle to set in degrees        //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngle: function(angle)
+    {
+        this.angle = angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate sprite                                                //
+    //  param angle : Angle to rotate animated sprite by in degrees           //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angle)
+    {
+        this.angle += angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSize : Set animated sprite size                                    //
+    //  param width : Animated sprite width to set                            //
+    //  param height : Animated sprite height to set                          //
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
-        // Update vertex buffer
-        this.width = width;
-        this.height = height;
-        this.vertexBuffer.setPlane2D(this.width, this.height);
+        this.size.vec[0] = width;
+        this.size.vec[1] = height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSizeVec2 : Set animated sprite size from a 2 components vector     //
+    //  param vector : 2 components vector to set animated sprite size from   //
+    ////////////////////////////////////////////////////////////////////////////
+    setSizeVec2: function(vector)
+    {
+        this.size.vec[0] = vector.vec[0];
+        this.size.vec[1] = vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setWidth : Set animated sprite width                                  //
+    //  param width : Animated sprite width to set                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setWidth: function(width)
+    {
+        this.size.vec[0] = width;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setHeight : Set animated sprite height                                //
+    //  param height : Animated sprite height to set                          //
+    ////////////////////////////////////////////////////////////////////////////
+    setHeight: function(height)
+    {
+        this.size.vec[1] = height;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setCount : Set animation frame count                                  //
+    //  param countX : Animation X frames total count                         //
+    //  param countY : Animation Y frames total count                         //
+    ////////////////////////////////////////////////////////////////////////////
+    setCount: function(countX, countY)
+    {
+        this.count.setXY(countX, countY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -188,38 +306,12 @@ AnimSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get sprite width                                           //
-    //  return : Sprite width                                                 //
+    //  setFrametime : Set animated sprite frametime                          //
+    //  param frametime : Animated sprite frametime to set                    //
     ////////////////////////////////////////////////////////////////////////////
-    getWidth: function()
+    setFrametime: function(frametime)
     {
-        return this.width;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get sprite height                                         //
-    //  return : Sprite height                                                //
-    ////////////////////////////////////////////////////////////////////////////
-    getHeight: function()
-    {
-        return this.height;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  resetMatrix : Reset animated sprite model matrix                      //
-    ////////////////////////////////////////////////////////////////////////////
-    resetMatrix: function()
-    {
-        this.modelMatrix.setIdentity();
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setMatrix : Set animated sprite model matrix                          //
-    //  param modelMatrix : Animated sprite model matrix                      //
-    ////////////////////////////////////////////////////////////////////////////
-    setMatrix: function(modelMatrix)
-    {
-        this.modelMatrix = modelMatrix;
+        this.frametime = frametime;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -232,52 +324,169 @@ AnimSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate animated sprite on X axis                           //
-    //  param x : X axis translate value                                      //
+    //  getX : Get animated sprite X position                                 //
+    //  return : Animated sprite X position                                   //
     ////////////////////////////////////////////////////////////////////////////
-    moveX: function(x)
+    getX: function()
     {
-        this.modelMatrix.translateX(x);
+        return this.position.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate animated sprite on Y axis                           //
-    //  param y : Y axis translate value                                      //
+    //  getY : Get animated sprite Y position                                 //
+    //  return : Animated sprite Y position                                   //
     ////////////////////////////////////////////////////////////////////////////
-    moveY: function(y)
+    getY: function()
     {
-        this.modelMatrix.translateY(y);
+        return this.position.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate animated sprite                                       //
-    //  param angle : Angle to rotate in degrees                              //
+    //  getAngle : Get animated sprite rotation angle                         //
+    //  return : Animated sprite rotation angle in degrees                    //
     ////////////////////////////////////////////////////////////////////////////
-    rotate: function(angle)
+    getAngle: function()
     {
-        this.modelMatrix.rotateZ(-angle);
+        return this.angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  scaleX : Scale animated sprite along the X axis                       //
-    //  param scaleX : X factor to scale to                                   //
+    //  getWidth : Get animated sprite width                                  //
+    //  return : Animated sprite width                                        //
     ////////////////////////////////////////////////////////////////////////////
-    scaleX: function(scaleX)
+    getWidth: function()
     {
-        this.modelMatrix.scaleX(scaleX);
+        return this.size.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  scaleY : Scale animated sprite along the Y axis                       //
-    //  param scaleY : Y factor to scale to                                   //
+    //  getHeight : Get animated sprite height                                //
+    //  return : Animated sprite height                                       //
     ////////////////////////////////////////////////////////////////////////////
-    scaleY: function(scaleY)
+    getHeight: function()
     {
-        this.modelMatrix.scaleY(scaleY);
+        return this.size.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  resetAnim : Reset current animation frame                             //
+    //  getCountX : Get animated sprite X frames count                        //
+    //  return : Animated sprite X frames count                               //
+    ////////////////////////////////////////////////////////////////////////////
+    getCountX: function()
+    {
+        return this.count.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getCountY : Get animated sprite Y frames count                        //
+    //  return : Animated sprite Y frames count                               //
+    ////////////////////////////////////////////////////////////////////////////
+    getCountY: function()
+    {
+        return this.count.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getStartX : Get animated sprite X start frame                         //
+    //  return : Animated sprite X start frame                                //
+    ////////////////////////////////////////////////////////////////////////////
+    getStartX: function()
+    {
+        return this.start.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getStartY : Get animated sprite Y start frame                         //
+    //  return : Animated sprite Y start frame                                //
+    ////////////////////////////////////////////////////////////////////////////
+    getStartY: function()
+    {
+        return this.start.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getEndX : Get animated sprite X end frame                             //
+    //  return : Animated sprite X end frame                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    getEndX: function()
+    {
+        return this.end.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getEndY : Get animated sprite Y end frame                             //
+    //  return : Animated sprite Y end frame                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    getEndY: function()
+    {
+        return this.end.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getFrametime : Get animated sprite frametime                          //
+    //  return : Animated sprite frametime                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    getFrametime: function()
+    {
+        return this.frametime;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAlpha : Get animated sprite alpha                                  //
+    //  return : Animated sprite alpha                                        //
+    ////////////////////////////////////////////////////////////////////////////
+    getAlpha: function()
+    {
+        return this.alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getCurrentX : Get animated sprite X current frame                     //
+    //  return : Animated sprite X current frame                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getCurrentX: function()
+    {
+        return this.current.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getCurrentY : Get animated sprite Y current frame                     //
+    //  return : Animated sprite Y current frame                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getCurrentY: function()
+    {
+        return this.current.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getNextX : Get animated sprite X next frame                           //
+    //  return : Animated sprite X next frame                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    getNextX: function()
+    {
+        return this.next.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getNextY : Get animated sprite Y next frame                           //
+    //  return : Animated sprite Y next frame                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    getNextY: function()
+    {
+        return this.next.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getCurrentTime : Get animated sprite current time                     //
+    //  return : Animated sprite current time                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    getCurrentTime: function()
+    {
+        return this.currentTime;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  resetAnim : Reset current animation                                   //
     ////////////////////////////////////////////////////////////////////////////
     resetAnim: function()
     {
@@ -367,6 +576,18 @@ AnimSprite.prototype = {
         // Compute cubic interpolation
         interp = this.interpOffset + (this.interpOffset - 
             this.interpOffset*this.interpOffset*(3.0-2.0*this.interpOffset));
+
+        // Set animated sprite model matrix
+        this.modelMatrix.setIdentity();
+        this.modelMatrix.translateVec2(this.position);
+        this.modelMatrix.translate(
+            this.size.vec[0]*0.5, this.size.vec[1]*0.5, 0.0
+        );
+        this.modelMatrix.rotateZ(this.angle);
+        this.modelMatrix.translate(
+            -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
+        );
+        this.modelMatrix.scaleVec2(this.size);
 
         // Bind shader
         this.animShader.shader.bind();

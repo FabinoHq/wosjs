@@ -109,13 +109,11 @@ Sprite.prototype = {
         this.vertexBuffer = new VertexBuffer(this.renderer.gl);
         if (!this.vertexBuffer) return false;
         if (!this.vertexBuffer.init()) return false;
+        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Set texture
         this.texture = tex;
         if (!this.texture) return false;
-
-        // Update vertex buffer
-        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Sprite loaded
         return true;
@@ -230,7 +228,7 @@ Sprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setSizeVec2 : Set sprite size from a 2 components vector              //
-    //  param vector : 2 components vector to set size from                   //
+    //  param vector : 2 components vector to set sprite size from            //
     ////////////////////////////////////////////////////////////////////////////
     setSizeVec2: function(vector)
     {

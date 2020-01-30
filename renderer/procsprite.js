@@ -110,8 +110,6 @@ ProcSprite.prototype = {
         this.vertexBuffer = new VertexBuffer(this.renderer.gl);
         if (!this.vertexBuffer) return false;
         if (!this.vertexBuffer.init()) return false;
-
-        // Update vbo
         this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Init shader
