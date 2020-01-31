@@ -332,7 +332,7 @@ BoundingBox.prototype = {
         near = (nearX > nearY)?nearX:nearY;
         far = (farX < farY)?farX:farY;
 
-        if ((near >= 1.0) || (far <= 0.0))
+        if ((near >= 1.0) || (far <= WOSFloatEpsilon))
         {
             // Outside the box
             return false;
