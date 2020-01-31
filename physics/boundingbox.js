@@ -294,6 +294,7 @@ BoundingBox.prototype = {
 
         // Reset collision
         collision.reset();
+        collision.setFactor(1.0);
         collision.setPosition(
             origin.vec[0]+offset.vec[0], origin.vec[1]+offset.vec[1]
         );
@@ -377,6 +378,7 @@ BoundingBox.prototype = {
         if (!this.collideSegment(collision, box.position, offset, padding))
         {
             collision.reset();
+            collision.setFactor(1.0);
             collision.setPosition(
                 box.position.vec[0]+offset.vec[0],
                 box.position.vec[1]+offset.vec[1]
