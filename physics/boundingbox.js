@@ -302,14 +302,11 @@ BoundingBox.prototype = {
         if ((offset.vec[0] == 0.0) && (offset.vec[1] == 0.0)) return false;
 
         // Offset scale and sign
-        if (offset.vec[0] != 0.0)
-        {
-            scaleX = (1.0/offset.vec[0]);
-        }
-        if (offset.vec[1] != 0.0)
-        {
-            scaleY = (1.0/offset.vec[1]);
-        }
+        if (offset.vec[0] != 0.0) scaleX = (1.0/offset.vec[0]);
+        else scaleX = (1.0/WOSFloatEpsilon);
+        if (offset.vec[1] != 0.0) scaleY = (1.0/offset.vec[1]);
+        else scaleY = (1.0/WOSFloatEpsilon);
+
         signX = (scaleX >= 0.0)?1.0:-1.0;
         signY = (scaleY >= 0.0)?1.0:-1.0;
 
