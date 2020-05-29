@@ -181,12 +181,28 @@ Loader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     handleTexturesLoaded: function()
     {
+        var allSoundsReady = this.allSoundsLoaded;
+
+        // Check audio pointer
+        if (this.audio)
+        {
+            // Skip all sounds if audio engine is not loaded
+            if (!this.audio.context || !this.audio.loaded)
+            {
+                allSoundsReady = true;
+            }
+        }
+        else
+        {
+            allSoundsReady = true;
+        }
+
         ++this.texturesLoaded;
         if (this.texturesLoaded >= TexturesAssets.length)
         {
             // All textures loaded
             this.allTexturesLoaded = true;
-            if (this.allTexturesLoaded && this.allSoundsLoaded)
+            if (this.allTexturesLoaded && allSoundsReady)
             {
                 // All assets loaded
                 this.onAssetsLoaded();
@@ -207,6 +223,9 @@ Loader.prototype = {
 
         // Check audio context pointer
         if (!this.audio.context) return false;
+
+        // Check audio engine loaded state
+        if (!this.audio.loaded) return false;
 
         // Load all sounds asynchronously
         sndlen = SoundsAssets.length;
