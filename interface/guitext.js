@@ -116,6 +116,8 @@ GuiText.prototype = {
     {
         var i = 0;
         var pixelsData = null;
+        var pixelsDataWidth = 0;
+        var pixelsDataHeight = 0;
 
         // Reset GuiText
         this.vertexBuffer = null;
@@ -209,12 +211,17 @@ GuiText.prototype = {
             )*WOSDefaultFontCharsizeFactor;
         }
 
+        // Update pixels data size
+        pixelsDataWidth = Math.round(
+            this.size.vec[0]*WOSDefaultFontScaleXFactor
+        );
+        pixelsDataHeight = Math.round(
+            this.size.vec[1]*WOSDefaultFontScaleYFactor
+        );
+
         // Render text
         pixelsData = this.renderer.renderText(
-            this.text,
-            this.size.vec[0]*WOSDefaultFontScaleXFactor,
-            this.size.vec[1]*WOSDefaultFontScaleYFactor,
-            this.fontsize
+            this.text, pixelsDataWidth, pixelsDataHeight, this.fontsize
         );
 
         // Create texture
@@ -223,8 +230,7 @@ GuiText.prototype = {
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
         this.renderer.gl.texImage2D(
             this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            this.size.vec[0]*WOSDefaultFontScaleXFactor,
-            this.size.vec[1]*WOSDefaultFontScaleYFactor, 0,
+            pixelsDataWidth, pixelsDataHeight, 0,
             this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
         );
 
@@ -407,6 +413,8 @@ GuiText.prototype = {
     setText: function(text)
     {
         var pixelsData = null;
+        var pixelsDataWidth = 0;
+        var pixelsDataHeight = 0;
 
         // Set text
         this.text = "";
@@ -449,20 +457,24 @@ GuiText.prototype = {
             )*WOSDefaultFontCharsizeFactor;
         }
 
+        // Update pixels data size
+        pixelsDataWidth = Math.round(
+            this.size.vec[0]*WOSDefaultFontScaleXFactor
+        );
+        pixelsDataHeight = Math.round(
+            this.size.vec[1]*WOSDefaultFontScaleYFactor
+        );
+
         // Render text
         pixelsData = this.renderer.renderText(
-            this.text,
-            this.size.vec[0]*WOSDefaultFontScaleXFactor,
-            this.size.vec[1]*WOSDefaultFontScaleYFactor,
-            this.fontsize
+            this.text, pixelsDataWidth, pixelsDataHeight, this.fontsize
         );
 
         // Update texture data
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
         this.renderer.gl.texImage2D(
             this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            this.size.vec[0]*WOSDefaultFontScaleXFactor,
-            this.size.vec[1]*WOSDefaultFontScaleYFactor, 0,
+            pixelsDataWidth, pixelsDataHeight, 0,
             this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
         );
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
