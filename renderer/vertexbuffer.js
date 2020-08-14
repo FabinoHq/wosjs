@@ -203,7 +203,7 @@ VertexBuffer.prototype = {
         this.vertCount = 6;
 
         // Set vertices data
-        this.verticesData = new GLArrayDataType(8);
+        this.verticesData = new GLArrayDataType(12);
         this.verticesData[0] = 0.0;
         this.verticesData[1] = 0.0;
         this.verticesData[2] = 0.0;
