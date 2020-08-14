@@ -74,8 +74,6 @@ function GuiText(renderer, textShader)
     // Text shader pointer
     this.textShader = textShader;
 
-    // GuiText VBO
-    this.vertexBuffer = null;
     // GuiText generated texture
     this.texture = null;
     // GuiText model matrix
@@ -120,7 +118,6 @@ GuiText.prototype = {
         var pixelsDataHeight = 0;
 
         // Reset GuiText
-        this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
@@ -184,12 +181,6 @@ GuiText.prototype = {
         
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
-
-        // Create vbo
-        this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer) return false;
-        if (!this.vertexBuffer.init()) return false;
-        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Set text width
         this.size.vec[0] = this.renderer.getTextWidth(
@@ -735,9 +726,9 @@ GuiText.prototype = {
         );
 
         // Render VBO
-        this.vertexBuffer.bind();
-        this.vertexBuffer.render(this.textShader.shader);
-        this.vertexBuffer.unbind();
+        this.renderer.vertexBuffer.bind();
+        this.renderer.vertexBuffer.render(this.textShader.shader);
+        this.renderer.vertexBuffer.unbind();
 
         // Unbind texture
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);

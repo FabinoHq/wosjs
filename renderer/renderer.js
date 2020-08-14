@@ -74,6 +74,7 @@ function Renderer()
     this.vpoffy = 0.0;
 
     // Default graphics pipeline
+    this.vertexBuffer = null;
     this.shader = null;
     this.projMatrix = null;
     this.view = null;
@@ -109,6 +110,7 @@ Renderer.prototype = {
         this.vpheight = 0.0;
         this.vpoffx = 0.0;
         this.vpoffy = 0.0;
+        this.vertexBuffer = null;
         this.shader = null;
         this.projMatrix = null;
         this.view = null;
@@ -175,6 +177,11 @@ Renderer.prototype = {
         // Get offscreen context
         this.offContext = this.offCanvas.getContext('2d');
         if (!this.offContext) return false;
+
+        // Init default vbo
+        this.vertexBuffer = new VertexBuffer(this.gl);
+        if (!this.vertexBuffer) return false;
+        if (!this.vertexBuffer.init()) return false;
 
         // Init default shader
         this.shader = new Shader(this.gl);

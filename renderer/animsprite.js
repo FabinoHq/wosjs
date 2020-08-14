@@ -54,8 +54,6 @@ function AnimSprite(renderer, animSpriteShader)
     // Animated sprite shader pointer
     this.animShader = animSpriteShader;
 
-    // Animated sprite VBO
-    this.vertexBuffer = null;
     // Animated sprite texture
     this.texture = null;
     // Animated sprite model matrix
@@ -97,7 +95,6 @@ AnimSprite.prototype = {
     init: function(tex, width, height, countX, countY)
     {
         // Reset animated sprite
-        this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
@@ -125,12 +122,6 @@ AnimSprite.prototype = {
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
-
-        // Create vbo
-        this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer) return false;
-        if (!this.vertexBuffer.init()) return false;
-        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Set texture
         this.texture = tex;
@@ -616,9 +607,9 @@ AnimSprite.prototype = {
         this.texture.bind();
 
         // Render VBO
-        this.vertexBuffer.bind();
-        this.vertexBuffer.render(this.animShader.shader);
-        this.vertexBuffer.unbind();
+        this.renderer.vertexBuffer.bind();
+        this.renderer.vertexBuffer.render(this.animShader.shader);
+        this.renderer.vertexBuffer.unbind();
 
         // Unbind texture
         this.texture.unbind();

@@ -54,8 +54,6 @@ function Line(renderer, lineShader)
     // Line shader pointer
     this.lineShader = lineShader;
 
-    // Line VBO
-    this.vertexBuffer = null;
     // Line model matrix
     this.modelMatrix = null;
 
@@ -87,7 +85,6 @@ Line.prototype = {
         var dx = 0.0;
         var dy = 0.0;
         var length = 0.0;
-        this.vertexBuffer = null;
         this.modelMatrix = null;
         this.origin = new Vector2(0.0, 0.0);
         this.target = new Vector2(1.0, 1.0);
@@ -112,12 +109,6 @@ Line.prototype = {
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
-
-        // Create vbo
-        this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer) return false;
-        if (!this.vertexBuffer.init()) return false;
-        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Line loaded
         return true;
@@ -436,9 +427,9 @@ Line.prototype = {
         );
         
         // Render VBO
-        this.vertexBuffer.bind();
-        this.vertexBuffer.render(this.lineShader.shader);
-        this.vertexBuffer.unbind();
+        this.renderer.vertexBuffer.bind();
+        this.renderer.vertexBuffer.render(this.lineShader.shader);
+        this.renderer.vertexBuffer.unbind();
 
         // Unbind line shader
         this.lineShader.shader.unbind();

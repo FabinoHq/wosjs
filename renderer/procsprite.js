@@ -51,8 +51,6 @@ function ProcSprite(renderer)
 
     // Procedural sprite shader
     this.shader = null;
-    // Procedural sprite VBO
-    this.vertexBuffer = null;
     // Procedural sprite model matrix
     this.modelMatrix = null;
 
@@ -86,7 +84,6 @@ ProcSprite.prototype = {
     {
         // Reset procedural sprite
         this.shader = null;
-        this.vertexBuffer = null;
         this.modelMatrix = null;
         this.alphaUniform = -1;
         this.timeUniform = -1;
@@ -105,12 +102,6 @@ ProcSprite.prototype = {
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
-
-        // Create vbo
-        this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer) return false;
-        if (!this.vertexBuffer.init()) return false;
-        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Init shader
         this.shader = new Shader(this.renderer.gl);
@@ -430,9 +421,9 @@ ProcSprite.prototype = {
         this.shader.sendUniformVec2(this.offsetUniform, this.offset);
         
         // Render VBO
-        this.vertexBuffer.bind();
-        this.vertexBuffer.render(this.shader);
-        this.vertexBuffer.unbind();
+        this.renderer.vertexBuffer.bind();
+        this.renderer.vertexBuffer.render(this.shader);
+        this.renderer.vertexBuffer.unbind();
 
         // Unbind procedural shader
         this.shader.unbind();

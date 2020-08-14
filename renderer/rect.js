@@ -54,8 +54,6 @@ function Rect(renderer, rectShader)
     // Rect shader pointer
     this.rectShader = rectShader;
 
-    // Rect VBO
-    this.vertexBuffer = null;
     // Rect model matrix
     this.modelMatrix = null;
 
@@ -83,7 +81,6 @@ Rect.prototype = {
     init: function(thickness, width, height)
     {
         // Reset rect
-        this.vertexBuffer = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
         this.size = new Vector2(1.0, 1.0);
@@ -103,12 +100,6 @@ Rect.prototype = {
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
-
-        // Create vbo
-        this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer) return false;
-        if (!this.vertexBuffer.init()) return false;
-        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Rect loaded
         return true;
@@ -395,9 +386,9 @@ Rect.prototype = {
         );
 
         // Render VBO
-        this.vertexBuffer.bind();
-        this.vertexBuffer.render(this.rectShader.shader);
-        this.vertexBuffer.unbind();
+        this.renderer.vertexBuffer.bind();
+        this.renderer.vertexBuffer.render(this.rectShader.shader);
+        this.renderer.vertexBuffer.unbind();
 
         // Unbind rect shader
         this.rectShader.shader.unbind();

@@ -191,55 +191,6 @@ VertexBuffer.prototype = {
 
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
     },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setPlane2D : Set vertex buffer object as a simple 2D plane geometry   //
-    //  param width : Width of the 2D plane                                   //
-    //  param height : Height of the 2D plane                                 //
-    ////////////////////////////////////////////////////////////////////////////
-    setPlane2D: function(width, height)
-    {
-        // Set plane geometry
-        this.vertCount = 6;
-
-        // Set vertices data
-        this.verticesData = new GLArrayDataType(12);
-        this.verticesData[0] = 0.0;
-        this.verticesData[1] = 0.0;
-        this.verticesData[2] = 0.0;
-        this.verticesData[3] = 0.0;
-        this.verticesData[4] = height;
-        this.verticesData[5] = 0.0;
-        this.verticesData[6] = width;
-        this.verticesData[7] = height;
-        this.verticesData[8] = 0.0;
-        this.verticesData[9] = width;
-        this.verticesData[10] = 0.0;
-        this.verticesData[11] = 0.0;
-
-        // Set texture coords data
-        this.texCoordsData = new GLArrayDataType(8);
-        this.texCoordsData[0] = 0.0;
-        this.texCoordsData[1] = 1.0;
-        this.texCoordsData[2] = 0.0;
-        this.texCoordsData[3] = 0.0;
-        this.texCoordsData[4] = 1.0;
-        this.texCoordsData[5] = 0.0;
-        this.texCoordsData[6] = 1.0;
-        this.texCoordsData[7] = 1.0;
-
-        // Set indices data
-        this.indicesData = new GLIndexDataType(6);
-        this.indicesData[0] = 0;
-        this.indicesData[1] = 1;
-        this.indicesData[2] = 2;
-        this.indicesData[3] = 2;
-        this.indicesData[4] = 3;
-        this.indicesData[5] = 0;
-
-        // Update VBO
-        this.updateBuffer();
-    },
     
     ////////////////////////////////////////////////////////////////////////////
     //  render : Render the vertex buffer object                              //

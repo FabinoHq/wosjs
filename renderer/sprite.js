@@ -54,8 +54,6 @@ function Sprite(renderer, spriteShader)
     // Sprite shader pointer
     this.spriteShader = spriteShader;
 
-    // Sprite VBO
-    this.vertexBuffer = null;
     // Sprite texture
     this.texture = null;
     // Sprite model matrix
@@ -85,7 +83,6 @@ Sprite.prototype = {
     init: function(tex, width, height)
     {
         // Reset sprite
-        this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
@@ -105,12 +102,6 @@ Sprite.prototype = {
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
-
-        // Create vbo
-        this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer) return false;
-        if (!this.vertexBuffer.init()) return false;
-        this.vertexBuffer.setPlane2D(1.0, 1.0);
 
         // Set texture
         this.texture = tex;
@@ -429,9 +420,9 @@ Sprite.prototype = {
         this.texture.bind();
 
         // Render VBO
-        this.vertexBuffer.bind();
-        this.vertexBuffer.render(this.spriteShader.shader);
-        this.vertexBuffer.unbind();
+        this.renderer.vertexBuffer.bind();
+        this.renderer.vertexBuffer.render(this.spriteShader.shader);
+        this.renderer.vertexBuffer.unbind();
 
         // Unbind texture
         this.texture.unbind();
