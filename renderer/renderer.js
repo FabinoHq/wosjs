@@ -129,7 +129,7 @@ Renderer.prototype = {
         {
             try {
                 this.gl = this.context.getContext(
-                    glContextNames[i], { alpha: false }
+                    glContextNames[i], { alpha: false, antialias: true }
                 );
             } catch(e) {
                 this.gl = null;
