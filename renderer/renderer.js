@@ -225,9 +225,7 @@ Renderer.prototype = {
 
         // Set projection matrix
         this.projMatrix.setOrthographic(
-            -this.ratio, this.ratio,
-            1.0, -1.0,
-            0.001, 5000.0
+            -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
         );
         this.projMatrix.translateZ(-1.0);
         this.shader.sendProjectionMatrix(this.projMatrix);
@@ -280,9 +278,7 @@ Renderer.prototype = {
 
         // Set projection matrix
         this.projMatrix.setOrthographic(
-            -this.ratio, this.ratio,
-            1.0, -1.0,
-            0.001, 5000.0
+            -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
         );
         this.projMatrix.translateZ(-1.0);
 
