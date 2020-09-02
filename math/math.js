@@ -48,6 +48,16 @@ const WOSFloatEpsilon = 0.00001;
 
 
 ////////////////////////////////////////////////////////////////////////////////
+//  truncate : Float to integer truncation                                    //
+//  param x : Number to truncate                                              //
+//  return : Truncated integer                                                //
+////////////////////////////////////////////////////////////////////////////////
+function truncate(x)
+{
+    return (x < 0) ? Math.ceil(x) : Math.floor(x);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 //  modulus : Integer modulo                                                  //
 //  param x : Left operand                                                    //
 //  param n : Right operand                                                   //
@@ -55,7 +65,7 @@ const WOSFloatEpsilon = 0.00001;
 ////////////////////////////////////////////////////////////////////////////////
 function modulus(x, n)
 {
-    return Math.trunc(((x%n)+n)%n);
+    return truncate(((x%n)+n)%n);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +78,7 @@ function divideInt(x, n)
 {
     if (n == 0) return 0;
     if (x < 0) x -= (n-1);
-    return Math.trunc(x/n);
+    return truncate(x/n);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -80,8 +90,8 @@ function divideInt(x, n)
 function divideToInt(x, n)
 {
     if (n == 0) return 0;
-    if (x < 0) return Math.trunc(x/n)-1;
-    return Math.trunc(x/n);
+    if (x < 0) return truncate(x/n)-1;
+    return truncate(x/n);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
