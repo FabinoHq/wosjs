@@ -55,7 +55,7 @@ const WOSFloatEpsilon = 0.00001;
 ////////////////////////////////////////////////////////////////////////////////
 function modulus(x, n)
 {
-    return parseInt(((x%n)+n)%n, 10);
+    return Math.trunc(((x%n)+n)%n);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -68,7 +68,20 @@ function divideInt(x, n)
 {
     if (n == 0) return 0;
     if (x < 0) x -= (n-1);
-    return parseInt(x/n, 10);
+    return Math.trunc(x/n);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//  divideToInt : Float to integer division                                   //
+//  param x : Left operand                                                    //
+//  param n : Right operand                                                   //
+//  return : Integer division (x / n)                                         //
+////////////////////////////////////////////////////////////////////////////////
+function divideToInt(x, n)
+{
+    if (n == 0) return 0;
+    if (x < 0) return Math.trunc(x/n)-1;
+    return Math.trunc(x/n);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
