@@ -78,6 +78,7 @@ function Renderer()
     this.shader = null;
     this.projMatrix = null;
     this.view = null;
+    this.camera = null;
 }
 
 Renderer.prototype = {
@@ -114,6 +115,7 @@ Renderer.prototype = {
         this.shader = null;
         this.projMatrix = null;
         this.view = null;
+        this.camera = null;
 
         // Get html canvas
         this.context = document.getElementById(canvas);
@@ -234,6 +236,9 @@ Renderer.prototype = {
         this.view = new View();
         this.shader.sendViewMatrix(this.view.viewMatrix);
 
+        // Init camera
+        this.camera = new Camera();
+
         // Init depth and blend functions
         this.gl.disable(this.gl.DEPTH_TEST);
         this.gl.enable(this.gl.BLEND);
@@ -312,6 +317,30 @@ Renderer.prototype = {
             // Update view matrix
             this.view.compute();
             this.shader.sendViewMatrix(this.view.viewMatrix);
+
+            // Unbind shader
+            this.shader.unbind();
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setCamera : Set rendering camera                                      //
+    //  param camera : Camera to use for rendering                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setCamera: function(camera)
+    {
+        if (camera)
+        {
+            // Set current view
+            this.camera = camera;
+
+            // Bind shader
+            this.shader.bind();
+
+            // Update view matrix
+            this.camera.compute();
+            this.shader.sendProjMatrix(this.camera.projMatrix);
+            this.shader.sendViewMatrix(this.camera.viewMatrix);
 
             // Unbind shader
             this.shader.unbind();

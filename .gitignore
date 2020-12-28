@@ -25,6 +25,7 @@
 !physics/collision.js
 !physics/boundingbox.js
 
+!renderer/
 !renderer/animsprite.js
 !renderer/renderer.js
 !renderer/vertexbuffer.js
@@ -41,6 +42,7 @@
 !renderer/animsprite.js
 !renderer/procsprite.js
 !renderer/view.js
+!renderer/camera.js
 
 !interface/guitext.js
 !interface/guitextbox.js
