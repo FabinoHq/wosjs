@@ -41,6 +41,7 @@
 !renderer/sprite.js
 !renderer/animsprite.js
 !renderer/procsprite.js
+!renderer/staticmesh.js
 !renderer/view.js
 !renderer/camera.js
 
