@@ -301,6 +301,29 @@ Renderer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setDefaultView : Set default rendering view                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setDefaultView: function()
+    {
+        if (this.view)
+        {
+            // Reset view
+            this.view.reset();
+
+            // Bind shader
+            this.shader.bind();
+
+            // Update view matrix
+            this.view.compute();
+            this.shader.sendProjectionMatrix(this.projMatrix);
+            this.shader.sendViewMatrix(this.view.viewMatrix);
+
+            // Unbind shader
+            this.shader.unbind();
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setView : Set rendering view                                          //
     //  param view : View matrix to use for rendering                         //
     ////////////////////////////////////////////////////////////////////////////
@@ -340,6 +363,9 @@ Renderer.prototype = {
 
             // Enable depth buffer
             this.gl.enable(this.gl.DEPTH_TEST);
+
+            // Clear depth buffer
+            this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
 
             // Bind shader
             this.shader.bind();

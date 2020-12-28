@@ -96,6 +96,10 @@ function VertexBuffer(glPointer)
 VertexBuffer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init vertex buffer object                                      //
+    //  param vertCount : Vertices count                                      //
+    //  param vertices : Vertices                                             //
+    //  param texcoords : Texture coordinates                                 //
+    //  param indices : Triangles indices                                     //
     ////////////////////////////////////////////////////////////////////////////
     init: function(vertCount, vertices, texcoords, indices)
     {

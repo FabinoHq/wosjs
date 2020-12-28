@@ -76,11 +76,11 @@ function Sprite(renderer, spriteShader)
 Sprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init sprite                                                    //
-    //  param tex : Texture pointer                                           //
+    //  param texture : Texture pointer                                       //
     //  param width : Sprite width                                            //
     //  param height : Sprite height                                          //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(tex, width, height)
+    init: function(texture, width, height)
     {
         // Reset sprite
         this.texture = null;
@@ -104,7 +104,7 @@ Sprite.prototype = {
         this.modelMatrix = new Matrix4x4();
 
         // Set texture
-        this.texture = tex;
+        this.texture = texture;
         if (!this.texture) return false;
 
         // Sprite loaded

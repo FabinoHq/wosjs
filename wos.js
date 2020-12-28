@@ -482,7 +482,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     compute: function()
     {
-
+        
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -527,7 +527,10 @@ Wos.prototype = {
         //this.testtextbox.setY(-this.testtextbox.getHeight()/2.0);
         //this.testtextbox.render();
 
+        // Set camera
         //this.renderer.setCamera(this.camera);
+
+        // Render test static mesh
         //this.staticmesh.render();
     }
 };

@@ -75,11 +75,13 @@ function StaticMesh(renderer, meshShader)
 StaticMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init static mesh                                               //
-    //  param tex : Texture pointer                                           //
-    //  param width : Static mesh width                                       //
-    //  param height : Static mesh height                                     //
+    //  param texture : Texture pointer                                       //
+    //  param vertCount : Vertices count                                      //
+    //  param vertices : Vertices                                             //
+    //  param texcoords : Texture coordinates                                 //
+    //  param indices : Triangles indices                                     //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(tex)
+    init: function(texture, vertCount, vertices, texcoords, indices)
     {
         // Reset static mesh
         this.texture = null;
@@ -95,14 +97,29 @@ StaticMesh.prototype = {
         // Check static mesh shader pointer
         if (!this.meshShader) return false;
 
+        // Init vertex buffer
         this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if (!this.vertexBuffer.init()) return false;
+        if ((vertCount > 0) && vertices && texcoords && indices)
+        {
+            if (!this.vertexBuffer.init(
+                vertCount, vertices, texcoords, indices))
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if (!this.vertexBuffer.init())
+            {
+                return false;
+            }
+        }
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
 
         // Set texture
-        this.texture = tex;
+        this.texture = texture;
         if (!this.texture) return false;
 
         // Static mesh loaded
