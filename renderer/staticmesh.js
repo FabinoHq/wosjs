@@ -206,7 +206,7 @@ StaticMesh.prototype = {
     //  moveZ : Translate static mesh on Z axis                               //
     //  param z : Z axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
-    moveY: function(z)
+    moveZ: function(z)
     {
         this.position.vec[2] += z;
     },
@@ -430,7 +430,7 @@ StaticMesh.prototype = {
 
         // Render VBO
         this.vertexBuffer.bind();
-        this.vertexBuffer.render(this.spriteShader.shader);
+        this.vertexBuffer.render(this.meshShader.shader);
         this.vertexBuffer.unbind();
 
         // Unbind texture

@@ -241,6 +241,12 @@ function Wos()
     // WOS assets loader
     this.loader = null;
 
+    // Test camera
+    this.camera = null;
+
+    // Test static mesh
+    this.staticmesh = null;
+
     // Test line
     this.testline = null;
     // Test rect
@@ -297,6 +303,15 @@ Wos.prototype = {
         {
             this.loader.getSound("test.wav").play();
         }
+
+        // Init test camera
+        this.camera = new Camera();
+
+        // Init test static mesh
+        this.staticmesh = new StaticMesh(
+            this.renderer, this.loader.staticMeshShader
+        );
+        this.staticmesh.init(this.loader.getTexture("testsprite.png"));
 
         // Init test line
         this.testline = new Line(this.renderer, this.loader.lineShader);
@@ -511,6 +526,8 @@ Wos.prototype = {
         //this.testtextbox.setX(-this.testtextbox.getWidth()/2.0);
         //this.testtextbox.setY(-this.testtextbox.getHeight()/2.0);
         //this.testtextbox.render();
+
+        //this.renderer.setCamera(this.camera);
+        //this.staticmesh.render();
     }
 };
-

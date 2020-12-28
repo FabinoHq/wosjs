@@ -56,8 +56,16 @@ function Camera()
     this.z = 0.0;
 
     // Camera angles
-    this.horizontal = 0.0;
-    this.vertical = 0.0;
+    this.angleX = 0.0;
+    this.angleY = 0.0;
+    this.angleZ = 0.0;
+
+    // Camera fovy
+    this.fovy = 90.0;
+
+    // Camera near and far planes
+    this.nearPlane = 0.001;
+    this.farPlane = 1000.0;
 }
 
 Camera.prototype = {
@@ -71,20 +79,27 @@ Camera.prototype = {
         this.x = 0.0;
         this.y = 0.0;
         this.z = 0.0;
-        this.horizontal = 0.0;
-        this.vertical = 0.0;
+        this.angleX = 0.0;
+        this.angleY = 0.0;
+        this.angleZ = 0.0;
+        this.fovy = 90.0;
+        this.nearPlane = 0.001;
+        this.farPlane = 1000.0;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  compute : Compute the camera matrix                                   //
     ////////////////////////////////////////////////////////////////////////////
-    compute: function(fovy, ratio, near, far)
+    compute: function(ratio)
     {
         this.projMatrix.setIdentity();
-        this.projMatrix.setPerspective(fovy, ratio, near, far);
+        this.projMatrix.setPerspective(
+            this.fovy, ratio, this.nearPlane, this.farPlane
+        );
         this.viewMatrix.setIdentity();
-        this.viewMatrix.rotateX(this.horizontal);
-        this.viewMatrix.rotateY(this.vertical);
+        this.viewMatrix.rotateX(this.angleX);
+        this.viewMatrix.rotateY(this.angleY);
+        this.viewMatrix.rotateY(this.angleZ);
         this.viewMatrix.translate(this.x, this.y, this.z);
     },
 
@@ -140,21 +155,57 @@ Camera.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate the camera along the horizontal axis                  //
-    //  param angle : Value of the rotation in degrees                        //
+    //  rotateX : Rotate the camera along the X axis                          //
+    //  param angleX : Value of the X rotation in degrees                     //
     ////////////////////////////////////////////////////////////////////////////
-    rotate: function(angle)
+    rotateX: function(angleX)
     {
-        this.horizontal += angle;
+        this.angleX += angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateVertical : Rotate the camera along the vertical axis            //
-    //  param angle : Value of the rotation in degrees                        //
+    //  rotateY : Rotate the camera along the Y axis                          //
+    //  param angleY : Value of the Y rotation in degrees                     //
     ////////////////////////////////////////////////////////////////////////////
-    rotateVertical: function(angle)
+    rotateY: function(angleX)
     {
-        this.vertical += angle;
+        this.angleY += angleY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateZ : Rotate the camera along the Z axis                          //
+    //  param angleZ : Value of the Z rotation in degrees                     //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateZ: function(angleZ)
+    {
+        this.angleZ += angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setFovy : Set the camera fovy angle                                   //
+    //  param fovy : Value of the camera fovy in degrees                      //
+    ////////////////////////////////////////////////////////////////////////////
+    setFovy: function(fovy)
+    {
+        this.fovy = fovy;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setNearPlane : Set the camera near plane                              //
+    //  param nearPlane : Value of the camera near plane                      //
+    ////////////////////////////////////////////////////////////////////////////
+    setNearPlane: function(nearPlane)
+    {
+        this.nearPlane = nearPlane;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setFarPlane : Set the camera far plane                                //
+    //  param farPlane : Value of the camera far plane                        //
+    ////////////////////////////////////////////////////////////////////////////
+    setFarPlane: function(farPlane)
+    {
+        this.farPlane = farPlane;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -185,20 +236,29 @@ Camera.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAngle : Get the camera's horizontal rotation angle                 //
-    //  return : Horizontal rotation angle of the camera                      //
+    //  getAngle : Get the camera's X rotation angle                          //
+    //  return : X rotation angle of the camera                               //
     ////////////////////////////////////////////////////////////////////////////
-    getAngle: function()
+    getAngleX: function()
     {
-        return this.horizontal;
+        return this.angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAngleVertical : Get the camera's vertical rotation angle           //
-    //  return : Horizontal rotation angle of the camera                      //
+    //  getAngleY : Get the camera's Y rotation angle                         //
+    //  return : Y rotation angle of the camera                               //
     ////////////////////////////////////////////////////////////////////////////
-    getAngleVertical: function()
+    getAngleY: function()
     {
-        return this.vertical;
+        return this.angleY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngleZ : Get the camera's Z rotation angle                         //
+    //  return : Z rotation angle of the camera                               //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngleZ: function()
+    {
+        return this.angleZ;
     }
 };

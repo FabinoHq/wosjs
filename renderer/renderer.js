@@ -311,11 +311,15 @@ Renderer.prototype = {
             // Set current view
             this.view = view;
 
+            // Enable depth buffer
+            this.gl.disable(this.gl.DEPTH_TEST);
+
             // Bind shader
             this.shader.bind();
 
             // Update view matrix
             this.view.compute();
+            this.shader.sendProjectionMatrix(this.projMatrix);
             this.shader.sendViewMatrix(this.view.viewMatrix);
 
             // Unbind shader
@@ -334,12 +338,15 @@ Renderer.prototype = {
             // Set current view
             this.camera = camera;
 
+            // Enable depth buffer
+            this.gl.enable(this.gl.DEPTH_TEST);
+
             // Bind shader
             this.shader.bind();
 
             // Update view matrix
-            this.camera.compute();
-            this.shader.sendProjMatrix(this.camera.projMatrix);
+            this.camera.compute(this.ratio);
+            this.shader.sendProjectionMatrix(this.camera.projMatrix);
             this.shader.sendViewMatrix(this.camera.viewMatrix);
 
             // Unbind shader

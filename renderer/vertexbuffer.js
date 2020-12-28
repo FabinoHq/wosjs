@@ -97,7 +97,7 @@ VertexBuffer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init vertex buffer object                                      //
     ////////////////////////////////////////////////////////////////////////////
-    init: function()
+    init: function(vertCount, vertices, texcoords, indices)
     {
         // Check gl pointer
         if (!this.gl)
@@ -105,11 +105,23 @@ VertexBuffer.prototype = {
             return false;
         }
 
-        // Set default data
-        this.verticesData = defaultVertices;
-        this.texCoordsData = defaultTexCoords;
-        this.indicesData = defaultIndices;
-        this.vertCount = 6;
+        // Check vertex buffer data
+        if ((vertCount > 0) && vertices && texcoords && indices)
+        {
+            // Set vertex buffer data
+            this.vertCount = vertCount;
+            this.verticesData = vertices;
+            this.texCoordsData = texcoords;
+            this.indicesData = indices;
+        }
+        else
+        {
+            // Set default data
+            this.vertCount = 6;
+            this.verticesData = defaultVertices;
+            this.texCoordsData = defaultTexCoords;
+            this.indicesData = defaultIndices;
+        }
 
         // Create VBO
         this.vertexBuffer = this.gl.createBuffer();

@@ -35,6 +35,7 @@
 !renderer/spriteshader.js
 !renderer/animspriteshader.js
 !renderer/textshader.js
+!renderer/staticmeshshader.js
 !renderer/texture.js
 !renderer/line.js
 !renderer/rect.js

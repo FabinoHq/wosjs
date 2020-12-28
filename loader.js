@@ -64,6 +64,8 @@ function Loader(renderer, audio)
     this.animSpriteShader = null;
     // Text shader
     this.textShader = null;
+    // Static mesh shader
+    this.staticMeshShader = null;
 
     // Textures array
     this.textures = null;
@@ -88,6 +90,7 @@ Loader.prototype = {
         this.spriteShader = null;
         this.animSpriteShader = null;
         this.textShader = null;
+        this.staticMeshShader = null;
         this.textures = new Array();
         this.sounds = new Array();
         this.texturesLoaded = 0;
@@ -126,6 +129,10 @@ Loader.prototype = {
         // Init text shader
         this.textShader = new TextShader(this.renderer.gl);
         this.textShader.init();
+
+        // Init static mesh shader
+        this.staticMeshShader = new StaticMeshShader(this.renderer.gl);
+        this.staticMeshShader.init();
         
         // All global shaders loaded
         return true;
