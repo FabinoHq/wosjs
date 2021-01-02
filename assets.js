@@ -47,6 +47,11 @@ var TexturesAssets = [
     "testsprite.png"
 ];
 
+// WOS models assets
+var ModelsAssets = [
+    "testmodel.wmsh"
+];
+
 // WOS sounds assets
 var SoundsAssets = [
     "test.wav"

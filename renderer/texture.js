@@ -82,16 +82,13 @@ Texture.prototype = {
         this.smooth = true;
 
         // Check renderer
-        if (!this.renderer)
-        {
-            return false;
-        }
+        if (!this.renderer) return false;
 
         // Check gl pointer
-        if (!this.renderer.gl)
-        {
-            return false;
-        }
+        if (!this.renderer.gl) return false;
+
+        // Check source url
+        if (!src) return false;
 
         // Create texture
         this.tex = this.renderer.gl.createTexture();

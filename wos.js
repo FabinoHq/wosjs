@@ -290,6 +290,7 @@ Wos.prototype = {
         this.loader.loadShaders();
         this.loader.loadFonts();
         this.loader.loadTextures();
+        this.loader.loadModels();
         this.loader.loadSounds();
     },
 
@@ -303,15 +304,6 @@ Wos.prototype = {
         {
             this.loader.getSound("test.wav").play();
         }
-
-        // Init test camera
-        this.camera = new Camera();
-
-        // Init test static mesh
-        this.staticmesh = new StaticMesh(
-            this.renderer, this.loader.staticMeshShader
-        );
-        this.staticmesh.init(this.loader.getTexture("testsprite.png"));
 
         // Init test line
         this.testline = new Line(this.renderer, this.loader.lineShader);
@@ -358,6 +350,20 @@ Wos.prototype = {
         );
         this.testtextbox.init(0.7, 0.2, "Test");
         this.testtextbox.setSelected(true);
+
+        // Init test camera
+        this.camera = new Camera();
+
+        // Init test static mesh
+        this.staticmesh = new StaticMesh(
+            this.renderer, this.loader.staticMeshShader
+        );
+
+        this.staticmesh.init(this.loader.getTexture("testsprite.png"),
+            this.loader.getModel("testmodel.wmsh").facesCount,
+            this.loader.getModel("testmodel.wmsh").vertices,
+            this.loader.getModel("testmodel.wmsh").texCoords,
+            this.loader.getModel("testmodel.wmsh").indices);
 
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
@@ -528,9 +534,15 @@ Wos.prototype = {
         //this.testtextbox.render();
 
         // Set camera
+        //this.camera.reset();
+        //this.camera.rotateX(-70.0);
+        //this.camera.moveY(-2.0);
+        //this.camera.moveZ(-0.5);
         //this.renderer.setCamera(this.camera);
 
         // Render test static mesh
+        //this.staticmesh.rotateX(this.frametime*30.0);
+        //this.staticmesh.rotateY(this.frametime*30.0);
         //this.staticmesh.render();
     }
 };

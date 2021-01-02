@@ -66,11 +66,18 @@ function Loader(renderer, audio)
     this.textShader = null;
     // Static mesh shader
     this.staticMeshShader = null;
+    // Shaders loaded state
+    this.allShadersLoaded = false;
 
     // Textures array
     this.textures = null;
     this.texturesLoaded = 0;
     this.allTexturesLoaded = false;
+
+    // Models array
+    this.models = null;
+    this.modelsLoaded = 0;
+    this.allModelsLoaded = false;
 
     // Sounds array
     this.sounds = null;
@@ -91,10 +98,14 @@ Loader.prototype = {
         this.animSpriteShader = null;
         this.textShader = null;
         this.staticMeshShader = null;
+        this.allShadersLoaded = false;
         this.textures = new Array();
-        this.sounds = new Array();
         this.texturesLoaded = 0;
         this.allTexturesLoaded = false;
+        this.models = new Array();
+        this.modelsLoaded = 0;
+        this.allModelsLoaded = false;
+        this.sounds = new Array();
         this.soundsLoaded = 0;
         this.allSoundsLoaded = false;
     },
@@ -112,29 +123,30 @@ Loader.prototype = {
 
         // Init line shader
         this.lineShader = new LineShader(this.renderer.gl);
-        this.lineShader.init();
+        if (!this.lineShader.init()) return false;
 
         // Init rect shader
         this.rectShader = new RectShader(this.renderer.gl);
-        this.rectShader.init();
+        if (!this.rectShader.init()) return false;
 
         // Init sprite shader
         this.spriteShader = new SpriteShader(this.renderer.gl);
-        this.spriteShader.init();
+        if (!this.spriteShader.init()) return false;
 
         // Init animated sprite shader
         this.animSpriteShader = new AnimSpriteShader(this.renderer.gl);
-        this.animSpriteShader.init();
+        if (!this.animSpriteShader.init()) return false;
 
         // Init text shader
         this.textShader = new TextShader(this.renderer.gl);
-        this.textShader.init();
+        if (!this.textShader.init()) return false;
 
         // Init static mesh shader
         this.staticMeshShader = new StaticMeshShader(this.renderer.gl);
-        this.staticMeshShader.init();
-        
+        if (!this.staticMeshShader.init()) return false;
+
         // All global shaders loaded
+        this.allShadersLoaded = true;
         return true;
     },
 
@@ -209,7 +221,72 @@ Loader.prototype = {
         {
             // All textures loaded
             this.allTexturesLoaded = true;
-            if (this.allTexturesLoaded && allSoundsReady)
+            if (this.allShadersLoaded && this.allTexturesLoaded &&
+                this.allModelsLoaded && allSoundsReady)
+            {
+                // All assets loaded
+                this.onAssetsLoaded();
+            }
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  loadModels : Load all models                                          //
+    ////////////////////////////////////////////////////////////////////////////
+    loadModels: function()
+    {
+        var modlen = 0;
+        var i = 0;
+
+        // Check renderer pointer
+        if (!this.renderer) return false;
+
+        // Check WebGL pointer
+        if (!this.renderer.gl) return false;
+
+        // Load all models asynchronously
+        modlen = ModelsAssets.length;
+        for (i = 0; i < modlen; ++i)
+        {
+            this.models[i] = new ModelData();
+            this.models[i].loader = this;
+            this.models[i].onModelLoaded = function()
+            {
+                this.loader.handleModelsLoaded();
+            }
+            this.models[i].load("models/" + ModelsAssets[i]);
+        }
+        return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  handleModelsLoaded : Called when a model is loaded                    //
+    ////////////////////////////////////////////////////////////////////////////
+    handleModelsLoaded: function()
+    {
+        var allSoundsReady = this.allSoundsLoaded;
+
+        // Check audio pointer
+        if (this.audio)
+        {
+            // Skip all sounds if audio engine is not loaded
+            if (!this.audio.context || !this.audio.loaded)
+            {
+                allSoundsReady = true;
+            }
+        }
+        else
+        {
+            allSoundsReady = true;
+        }
+
+        ++this.modelsLoaded;
+        if (this.modelsLoaded >= ModelsAssets.length)
+        {
+            // All models loaded
+            this.allModelsLoaded = true;
+            if (this.allShadersLoaded && this.allTexturesLoaded &&
+                this.allModelsLoaded && allSoundsReady)
             {
                 // All assets loaded
                 this.onAssetsLoaded();
@@ -259,7 +336,8 @@ Loader.prototype = {
         {
             // All sounds loaded
             this.allSoundsLoaded = true;
-            if (this.allTexturesLoaded && this.allSoundsLoaded)
+            if (this.allShadersLoaded && this.allTexturesLoaded &&
+                this.allModelsLoaded && this.allSoundsLoaded)
             {
                 // All assets loaded
                 this.onAssetsLoaded();
@@ -289,6 +367,25 @@ Loader.prototype = {
             if (TexturesAssets[i] == name)
             {
                 return this.textures[i];
+            }
+        }
+        return null;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getModel : Get a model resource previously loaded                     //
+    //  param name : Name of the model to get                                 //
+    //  return : Model data pointer                                           //
+    ////////////////////////////////////////////////////////////////////////////
+    getModel: function(name)
+    {
+        var modlen = ModelsAssets.length;
+        var i = 0;
+        for (i = 0; i < modlen; ++i)
+        {
+            if (ModelsAssets[i] == name)
+            {
+                return this.models[i];
             }
         }
         return null;

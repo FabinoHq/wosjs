@@ -25,6 +25,7 @@
 !physics/collision.js
 !physics/boundingbox.js
 
+!renderer/
 !renderer/animsprite.js
 !renderer/renderer.js
 !renderer/vertexbuffer.js
@@ -36,6 +37,7 @@
 !renderer/textshader.js
 !renderer/staticmeshshader.js
 !renderer/texture.js
+!renderer/modeldata.js
 !renderer/line.js
 !renderer/rect.js
 !renderer/sprite.js
@@ -57,6 +59,10 @@
 # Textures files
 !textures/cursor.png
 !textures/testsprite.png
+
+# Models files
+!models/
+!models/testmodel.wmsh
 
 # Sounds files
 !sounds/test.wav
