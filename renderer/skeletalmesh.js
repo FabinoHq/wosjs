@@ -37,50 +37,50 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/staticmesh.js : Static mesh management                       //
+//      renderer/skeletalmesh.js : Skeletal mesh management                   //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Static mesh class definition                                              //
+//  Skeletal mesh class definition                                            //
 //  param renderer : Renderer pointer                                         //
-//  param meshShader : Static mesh shader pointer                             //
+//  param skeletalShader : Skeletal mesh shader pointer                       //
 ////////////////////////////////////////////////////////////////////////////////
-function StaticMesh(renderer, meshShader)
+function SkeletalMesh(renderer, skeletalShader)
 {
     // Renderer pointer
     this.renderer = renderer;
 
-    // Static mesh shader pointer
-    this.meshShader = meshShader;
+    // Skeletal mesh shader pointer
+    this.skeletalShader = skeletalShader;
 
-    // Static mesh vertex buffer
+    // Skeletal mesh vertex buffer
     this.vertexBuffer = null;
 
-    // Static mesh texture
+    // Skeletal mesh texture
     this.texture = null;
-    // Static mesh model matrix
+    // Skeletal mesh model matrix
     this.modelMatrix = null;
 
-    // Static mesh position
+    // Skeletal mesh position
     this.position = null;
-    // Static mesh size
+    // Skeletal mesh size
     this.size = null;
-    // Static mesh rotation angles
+    // Skeletal mesh rotation angles
     this.angles = null;
-    // Static mesh alpha
+    // Skeletal mesh alpha
     this.alpha = 1.0;
 }
 
-StaticMesh.prototype = {
+SkeletalMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init static mesh                                               //
+    //  init : Init skeletal mesh                                             //
     //  param model : Model pointer                                           //
     //  param texture : Texture pointer                                       //
     ////////////////////////////////////////////////////////////////////////////
     init: function(model, texture)
     {
-        // Reset static mesh
+        // Reset skeletal mesh
         this.texture = null;
         this.modelMatrix = null;
         this.position = new Vector3(0.0, 0.0, 0.0);
@@ -91,8 +91,8 @@ StaticMesh.prototype = {
         // Check gl pointer
         if (!this.renderer.gl) return false;
 
-        // Check static mesh shader pointer
-        if (!this.meshShader) return false;
+        // Check skeletal mesh shader pointer
+        if (!this.skeletalShader) return false;
 
         // Check model pointer
         if (!model) return false;
@@ -125,15 +125,15 @@ StaticMesh.prototype = {
         this.texture = texture;
         if (!this.texture) return false;
 
-        // Static mesh loaded
+        // Skeletal mesh loaded
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosition : Set static mesh position                                //
-    //  param x : Static mesh X position                                      //
-    //  param y : Static mesh Y position                                      //
-    //  param z : Static mesh Z position                                      //
+    //  setPosition : Set skeletal mesh position                              //
+    //  param x : Skeletal mesh X position                                    //
+    //  param y : Skeletal mesh Y position                                    //
+    //  param z : Skeletal mesh Z position                                    //
     ////////////////////////////////////////////////////////////////////////////
     setPosition: function(x, y, z)
     {
@@ -143,8 +143,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPositionVec3 : Set static mesh position from a 3 components vector //
-    //  param vector : 3 components vector to set static mesh position from   //
+    //  setPositionVec3 : Set skeletal mesh position from a vector            //
+    //  param vector : 3 components vector to set skeletal mesh position from //
     ////////////////////////////////////////////////////////////////////////////
     setPositionVec3: function(vector)
     {
@@ -154,8 +154,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setX : Set static mesh X position                                     //
-    //  param x : Static mesh X position                                      //
+    //  setX : Set skeletal mesh X position                                   //
+    //  param x : Skeletal mesh X position                                    //
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
     {
@@ -163,8 +163,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setY : Set static mesh Y position                                     //
-    //  param y : Static mesh Y position                                      //
+    //  setY : Set skeletal mesh Y position                                   //
+    //  param y : Skeletal mesh Y position                                    //
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
     {
@@ -172,8 +172,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setZ : Set static mesh Z position                                     //
-    //  param z : Static mesh Z position                                      //
+    //  setZ : Set skeletal mesh Z position                                   //
+    //  param z : Skeletal mesh Z position                                    //
     ////////////////////////////////////////////////////////////////////////////
     setZ: function(z)
     {
@@ -181,7 +181,7 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  move : Translate static mesh                                          //
+    //  move : Translate skeletal mesh                                        //
     //  param x : X axis translate value                                      //
     //  param y : Y axis translate value                                      //
     //  param z : Z axis translate value                                      //
@@ -194,8 +194,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveVec3 : Translate static mesh by a 3 components vector             //
-    //  param vector : 3 components vector to translate static mesh by        //
+    //  moveVec3 : Translate skeletal mesh by a 3 components vector           //
+    //  param vector : 3 components vector to translate skeletal mesh by      //
     ////////////////////////////////////////////////////////////////////////////
     moveVec3: function(vector)
     {
@@ -205,7 +205,7 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate static mesh on X axis                               //
+    //  moveX : Translate skeletal mesh on X axis                             //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
@@ -214,7 +214,7 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate static mesh on Y axis                               //
+    //  moveY : Translate skeletal mesh on Y axis                             //
     //  param y : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
@@ -223,7 +223,7 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveZ : Translate static mesh on Z axis                               //
+    //  moveZ : Translate skeletal mesh on Z axis                             //
     //  param z : Z axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveZ: function(z)
@@ -232,10 +232,10 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSize : Set static mesh size                                        //
-    //  param width : Static mesh width to set                                //
-    //  param height : Static mesh height to set                              //
-    //  param depth : Static mesh depth to set                                //
+    //  setSize : Set skeletal mesh size                                      //
+    //  param width : Skeletal mesh width to set                              //
+    //  param height : Skeletal mesh height to set                            //
+    //  param depth : Skeletal mesh depth to set                              //
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height, depth)
     {
@@ -245,8 +245,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSizeVec3 : Set static mesh size from a 3 components vector         //
-    //  param vector : 3 components vector to set static mesh size from       //
+    //  setSizeVec3 : Set skeletal mesh size from a 3 components vector       //
+    //  param vector : 3 components vector to set skeletal mesh size from     //
     ////////////////////////////////////////////////////////////////////////////
     setSizeVec3: function(vector)
     {
@@ -256,8 +256,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setWidth : Set static mesh width                                      //
-    //  param width : Static mesh width to set                                //
+    //  setWidth : Set skeletal mesh width                                    //
+    //  param width : Skeletal mesh width to set                              //
     ////////////////////////////////////////////////////////////////////////////
     setWidth: function(width)
     {
@@ -265,8 +265,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setHeight : Set static mesh height                                    //
-    //  param height : Static mesh height to set                              //
+    //  setHeight : Set skeletal mesh height                                  //
+    //  param height : Skeletal mesh height to set                            //
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
@@ -274,8 +274,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setDepth : Set static mesh depth                                      //
-    //  param depth : Static mesh depth to set                                //
+    //  setDepth : Set skeletal mesh depth                                    //
+    //  param depth : Skeletal mesh depth to set                              //
     ////////////////////////////////////////////////////////////////////////////
     setDepth: function(depth)
     {
@@ -283,8 +283,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngles : Set static mesh rotation angles                           //
-    //  param angle : Static mesh rotation angle to set in degrees            //
+    //  setAngles : Set skeletal mesh rotation angles                         //
+    //  param angle : Skeletal mesh rotation angle to set in degrees          //
     ////////////////////////////////////////////////////////////////////////////
     setAngles: function(angleX, angleY, angleZ)
     {
@@ -294,8 +294,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateX : Rotate static mesh on the X axis                            //
-    //  param angleX : X angle to rotate static mesh by in degrees            //
+    //  rotateX : Rotate skeletal mesh on the X axis                          //
+    //  param angleX : X angle to rotate skeletal mesh by in degrees          //
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
@@ -303,8 +303,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateY : Rotate static mesh on the Y axis                            //
-    //  param angleY : Y angle to rotate static mesh by in degrees            //
+    //  rotateY : Rotate skeletal mesh on the Y axis                          //
+    //  param angleY : Y angle to rotate skeletal mesh by in degrees          //
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleY)
     {
@@ -312,8 +312,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateZ : Rotate static mesh on the Z axis                            //
-    //  param angleZ : Z angle to rotate static mesh by in degrees            //
+    //  rotateZ : Rotate skeletal mesh on the Z axis                          //
+    //  param angleZ : Z angle to rotate skeletal mesh by in degrees          //
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
@@ -321,8 +321,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set static mesh alpha                                      //
-    //  param alpha : Static mesh alpha to set                                //
+    //  setAlpha : Set skeletal mesh alpha                                    //
+    //  param alpha : Skeletal mesh alpha to set                              //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
     {
@@ -330,8 +330,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getX : Get static mesh X position                                     //
-    //  return : Static mesh X position                                       //
+    //  getX : Get skeletal mesh X position                                   //
+    //  return : Skeletal mesh X position                                     //
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
@@ -339,8 +339,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getY : Get static mesh Y position                                     //
-    //  return : Static mesh Y position                                       //
+    //  getY : Get skeletal mesh Y position                                   //
+    //  return : Skeletal mesh Y position                                     //
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
@@ -348,8 +348,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getZ : Get static mesh Z position                                     //
-    //  return : Static mesh Z position                                       //
+    //  getZ : Get skeletal mesh Z position                                   //
+    //  return : Skeletal mesh Z position                                     //
     ////////////////////////////////////////////////////////////////////////////
     getZ: function()
     {
@@ -357,8 +357,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get static mesh width                                      //
-    //  return : Static mesh width                                            //
+    //  getWidth : Get skeletal mesh width                                    //
+    //  return : Skeletal mesh width                                          //
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
@@ -366,8 +366,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get static mesh height                                    //
-    //  return : Static mesh height                                           //
+    //  getHeight : Get skeletal mesh height                                  //
+    //  return : Skeletal mesh height                                         //
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
@@ -375,8 +375,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get static mesh depth                                     //
-    //  return : Static mesh depth                                            //
+    //  getHeight : Get skeletal mesh depth                                   //
+    //  return : Skeletal mesh depth                                          //
     ////////////////////////////////////////////////////////////////////////////
     getDepth: function()
     {
@@ -384,8 +384,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAngleX : Get static mesh X rotation angle                          //
-    //  return : Static mesh X rotation angle in degrees                      //
+    //  getAngleX : Get skeletal mesh X rotation angle                        //
+    //  return : Skeletal mesh X rotation angle in degrees                    //
     ////////////////////////////////////////////////////////////////////////////
     getAngleX: function()
     {
@@ -393,8 +393,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAngleY : Get static mesh Y rotation angle                          //
-    //  return : Static mesh Y rotation angle in degrees                      //
+    //  getAngleY : Get skeletal mesh Y rotation angle                        //
+    //  return : Skeletal mesh Y rotation angle in degrees                    //
     ////////////////////////////////////////////////////////////////////////////
     getAngleY: function()
     {
@@ -402,8 +402,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAngleZ : Get static mesh Z rotation angle                          //
-    //  return : Static mesh Z rotation angle in degrees                      //
+    //  getAngleZ : Get skeletal mesh Z rotation angle                        //
+    //  return : Skeletal mesh Z rotation angle in degrees                    //
     ////////////////////////////////////////////////////////////////////////////
     getAngleZ: function()
     {
@@ -411,8 +411,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAlpha : Get static mesh alpha                                      //
-    //  return : Static mesh alpha                                            //
+    //  getAlpha : Get skeletal mesh alpha                                    //
+    //  return : Skeletal mesh alpha                                          //
     ////////////////////////////////////////////////////////////////////////////
     getAlpha: function()
     {
@@ -420,11 +420,11 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  render : Render static mesh                                           //
+    //  render : Render skeletal mesh                                         //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-        // Set static mesh model matrix
+        // Set skeletal mesh model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec3(this.position);
         this.modelMatrix.rotateX(this.angles.vec[0]);
@@ -432,17 +432,19 @@ StaticMesh.prototype = {
         this.modelMatrix.rotateZ(this.angles.vec[2]);
         this.modelMatrix.scaleVec3(this.size);
 
-        // Bind static mesh shader
-        this.meshShader.shader.bind();
+        // Bind skeletal mesh shader
+        this.skeletalShader.shader.bind();
 
         // Send shader uniforms
-        this.meshShader.shader.sendProjectionMatrix(
+        this.skeletalShader.shader.sendProjectionMatrix(
             this.renderer.camera.projMatrix
         );
-        this.meshShader.shader.sendViewMatrix(this.renderer.camera.viewMatrix);
-        this.meshShader.shader.sendModelMatrix(this.modelMatrix);
-        this.meshShader.shader.sendUniform(
-            this.meshShader.alphaUniform, this.alpha
+        this.skeletalShader.shader.sendViewMatrix(
+            this.renderer.camera.viewMatrix
+        );
+        this.skeletalShader.shader.sendModelMatrix(this.modelMatrix);
+        this.skeletalShader.shader.sendUniform(
+            this.skeletalShader.alphaUniform, this.alpha
         );
 
         // Bind texture
@@ -450,13 +452,13 @@ StaticMesh.prototype = {
 
         // Render VBO
         this.vertexBuffer.bind();
-        this.vertexBuffer.render(this.meshShader.shader);
+        this.vertexBuffer.render(this.skeletalShader.shader);
         this.vertexBuffer.unbind();
 
         // Unbind texture
         this.texture.unbind();
 
-        // Unbind static mesh shader
-        this.meshShader.shader.unbind();
+        // Unbind skeletal mesh shader
+        this.skeletalShader.shader.unbind();
     }
 };

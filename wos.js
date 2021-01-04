@@ -246,6 +246,8 @@ function Wos()
 
     // Test static mesh
     this.staticmesh = null;
+    // Test skeletal mesh
+    this.skeletalmesh = null;
 
     // Test line
     this.testline = null;
@@ -358,8 +360,16 @@ Wos.prototype = {
         this.staticmesh = new StaticMesh(
             this.renderer, this.loader.staticMeshShader
         );
-
         this.staticmesh.init(
+            this.loader.getModel("testmodel.wmsh"),
+            this.loader.getTexture("testsprite.png")
+        );
+
+        // Init test skeletal mesh
+        this.skeletalmesh = new SkeletalMesh(
+            this.renderer, this.loader.skeletalMeshShader
+        );
+        this.skeletalmesh.init(
             this.loader.getModel("testmodel.wmsh"),
             this.loader.getTexture("testsprite.png")
         );
@@ -543,5 +553,8 @@ Wos.prototype = {
         //this.staticmesh.rotateX(this.frametime*30.0);
         //this.staticmesh.rotateY(this.frametime*30.0);
         //this.staticmesh.render();
+
+        // Render test skeletal mesh
+        //this.skeletalmesh.render();
     }
 };

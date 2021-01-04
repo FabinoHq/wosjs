@@ -25,6 +25,7 @@
 !physics/collision.js
 !physics/boundingbox.js
 
+!renderer/
 !renderer/animsprite.js
 !renderer/renderer.js
 !renderer/vertexbuffer.js
@@ -35,6 +36,7 @@
 !renderer/animspriteshader.js
 !renderer/textshader.js
 !renderer/staticmeshshader.js
+!renderer/skeletalmeshshader.js
 !renderer/texture.js
 !renderer/modeldata.js
 !renderer/line.js
@@ -43,6 +45,7 @@
 !renderer/animsprite.js
 !renderer/procsprite.js
 !renderer/staticmesh.js
+!renderer/skeletalmesh.js
 !renderer/view.js
 !renderer/camera.js
 
