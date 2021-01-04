@@ -51,14 +51,10 @@ function Camera()
     this.viewMatrix = new Matrix4x4();
 
     // Camera position
-    this.x = 0.0;
-    this.y = 0.0;
-    this.z = 0.0;
+    this.position = new Vector3(0.0, 0.0, 0.0);
 
     // Camera angles
-    this.angleX = 0.0;
-    this.angleY = 0.0;
-    this.angleZ = 0.0;
+    this.angles = new Vector3(0.0, 0.0, 0.0);
 
     // Camera fovy
     this.fovy = 90.0;
@@ -76,12 +72,8 @@ Camera.prototype = {
     {
         this.projMatrix.setIdentity();
         this.viewMatrix.setIdentity();
-        this.x = 0.0;
-        this.y = 0.0;
-        this.z = 0.0;
-        this.angleX = 0.0;
-        this.angleY = 0.0;
-        this.angleZ = 0.0;
+        this.position.reset();
+        this.angles.reset();
         this.fovy = 90.0;
         this.nearPlane = 0.001;
         this.farPlane = 1000.0;
@@ -97,10 +89,10 @@ Camera.prototype = {
             this.fovy, ratio, this.nearPlane, this.farPlane
         );
         this.viewMatrix.setIdentity();
-        this.viewMatrix.rotateX(this.angleX);
-        this.viewMatrix.rotateY(this.angleY);
-        this.viewMatrix.rotateY(this.angleZ);
-        this.viewMatrix.translate(this.x, this.y, this.z);
+        this.viewMatrix.rotateX(this.angles.vec[0]);
+        this.viewMatrix.rotateY(this.angles.vec[1]);
+        this.viewMatrix.rotateY(this.angles.vec[2]);
+        this.viewMatrix.translateVec3(this.position);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -111,9 +103,9 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     move: function(x, y, z)
     {
-        this.x += x;
-        this.y += y;
-        this.z += z;
+        this.position.vec[0] += x;
+        this.position.vec[1] += y;
+        this.position.vec[2] += z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -122,9 +114,9 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveVec3: function(vector)
     {
-        this.x += vector.vec[0];
-        this.y += vector.vec[1];
-        this.z += vector.vec[2];
+        this.position.vec[0] += vector.vec[0];
+        this.position.vec[1] += vector.vec[1];
+        this.position.vec[2] += vector.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -133,7 +125,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
-        this.x += x;
+        this.position.vec[0] += x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -142,7 +134,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
-        this.y += y;
+        this.position.vec[1] += y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -151,7 +143,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveZ: function(z)
     {
-        this.z += z;
+        this.position.vec[2] += z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -160,7 +152,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
-        this.angleX += angleX;
+        this.angles.vec[0] += angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -169,7 +161,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleX)
     {
-        this.angleY += angleY;
+        this.angles.vec[1] += angleY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -178,7 +170,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
-        this.angleZ += angleZ;
+        this.angles.vec[2] += angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -214,7 +206,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
-        return this.x;
+        return this.position.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -223,7 +215,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
-        return this.y;
+        return this.position.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -232,7 +224,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getZ: function()
     {
-        return this.z;
+        return this.position.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -241,7 +233,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getAngleX: function()
     {
-        return this.angleX;
+        return this.angles.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -250,7 +242,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getAngleY: function()
     {
-        return this.angleY;
+        return this.angles.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -259,6 +251,6 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getAngleZ: function()
     {
-        return this.angleZ;
+        return this.angles.vec[2];
     }
 };

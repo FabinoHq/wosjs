@@ -359,11 +359,10 @@ Wos.prototype = {
             this.renderer, this.loader.staticMeshShader
         );
 
-        this.staticmesh.init(this.loader.getTexture("testsprite.png"),
-            this.loader.getModel("testmodel.wmsh").facesCount,
-            this.loader.getModel("testmodel.wmsh").vertices,
-            this.loader.getModel("testmodel.wmsh").texCoords,
-            this.loader.getModel("testmodel.wmsh").indices);
+        this.staticmesh.init(
+            this.loader.getModel("testmodel.wmsh"),
+            this.loader.getTexture("testsprite.png")
+        );
 
         // Run WOS
         this.lastTime = window.performance.now()*0.001;

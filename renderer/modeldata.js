@@ -52,8 +52,8 @@ function ModelData()
     // Model data
     this.model = null;
 
-    // Animated model
-    this.animatedModel = false;
+    // Skeletal model
+    this.skeletalModel = false;
 
     // Faces count
     this.facesCount = 0;
@@ -98,7 +98,7 @@ ModelData.prototype = {
         var i = 0;
         var majorVersion = 0;
         var minorVersion = 0;
-        var animatedModel = 0;
+        var skeletalModel = 0;
         var vertCount = 0;
         var texCoordsCount = 0;
         var normalsCount = 0;
@@ -106,22 +106,23 @@ ModelData.prototype = {
         var modelData = this.model.responseText.split(' ');
         var modelDataLen = modelData.length;
 
-        if (modelDataLen >= 7)
+        if (modelDataLen >= 8)
         {
             // Check model file version
-            majorVersion = parseInt(modelData[0]);
-            minorVersion = parseInt(modelData[1]);
-            if ((majorVersion == 1) && (minorVersion == 0))
+            majorVersion = parseInt(modelData[1]);
+            minorVersion = parseInt(modelData[2]);
+            if ((modelData[0] == "WMSH") &&
+                (majorVersion == 1) && (minorVersion == 0))
             {
                 // Check if this is a static mesh
-                animatedModel = parseInt(modelData[2]);
-                if (animatedModel) this.animatedModel = true;
+                skeletalModel = parseInt(modelData[3]);
+                if (skeletalModel) this.skeletalModel = true;
 
                 // Read model data count
-                vertCount = parseFloat(modelData[3]);
-                texCoordsCount = parseFloat(modelData[4]);
-                normalsCount = parseFloat(modelData[5]);
-                this.facesCount = parseFloat(modelData[6]);
+                vertCount = parseInt(modelData[4]);
+                texCoordsCount = parseInt(modelData[5]);
+                normalsCount = parseInt(modelData[6]);
+                this.facesCount = parseInt(modelData[7]);
 
                 // Check model data count
                 if ((vertCount > 0) && (texCoordsCount > 0) &&
@@ -134,7 +135,7 @@ ModelData.prototype = {
 
                     // Read vertices
                     currentIndex = 0;
-                    for (i = 7; i < vertCount+7; ++i)
+                    for (i = 8; i < (vertCount+8); ++i)
                     {
                         if (i < modelDataLen)
                         {
@@ -145,8 +146,8 @@ ModelData.prototype = {
 
                     // Read texture coordinates
                     currentIndex = 0;
-                    for (i = vertCount+7;
-                        i < vertCount+texCoordsCount+7; ++i)
+                    for (i = (vertCount+8);
+                        i < (vertCount+texCoordsCount+8); ++i)
                     {
                         if (i < modelDataLen)
                         {
@@ -157,8 +158,8 @@ ModelData.prototype = {
 
                     // Read indices
                     currentIndex = 0;
-                    for (i = vertCount+texCoordsCount+7;
-                        i < vertCount+texCoordsCount+this.facesCount+7; ++i)
+                    for (i = (vertCount+texCoordsCount+8);
+                        i < (vertCount+texCoordsCount+this.facesCount+8); ++i)
                     {
                         if (i < modelDataLen)
                         {

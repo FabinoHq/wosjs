@@ -75,13 +75,10 @@ function StaticMesh(renderer, meshShader)
 StaticMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init static mesh                                               //
+    //  param model : Model pointer                                           //
     //  param texture : Texture pointer                                       //
-    //  param vertCount : Vertices count                                      //
-    //  param vertices : Vertices                                             //
-    //  param texcoords : Texture coordinates                                 //
-    //  param indices : Triangles indices                                     //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(texture, vertCount, vertices, texcoords, indices)
+    init: function(model, texture)
     {
         // Reset static mesh
         this.texture = null;
@@ -97,22 +94,28 @@ StaticMesh.prototype = {
         // Check static mesh shader pointer
         if (!this.meshShader) return false;
 
+        // Check model pointer
+        if (!model) return false;
+
+        // Check texture pointer
+        if (!texture) return false;
+
         // Init vertex buffer
         this.vertexBuffer = new VertexBuffer(this.renderer.gl);
-        if ((vertCount > 0) && vertices && texcoords && indices)
+        if ((model.facesCount > 0) && model.vertices &&
+            model.texCoords && model.indices)
         {
-            if (!this.vertexBuffer.init(
-                vertCount, vertices, texcoords, indices))
+            if (!this.vertexBuffer.init(model.facesCount, model.vertices,
+                model.texCoords, model.indices))
             {
+                // Could not create vertex buffer
                 return false;
             }
         }
         else
         {
-            if (!this.vertexBuffer.init())
-            {
-                return false;
-            }
+            // Invalid model data
+            return false;
         }
 
         // Create model matrix
