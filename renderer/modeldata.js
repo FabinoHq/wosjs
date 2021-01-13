@@ -63,6 +63,18 @@ function ModelData()
     this.texCoords = null;
     // Indices
     this.indices = null;
+    // Bones count
+    this.bonesCount = 0;
+    // Bones parents
+    this.bonesParents = null;
+    // Bones positions
+    this.bonesPositions = null;
+    // Bones rotations
+    this.bonesAngles = null;
+    // Bones indices
+    this.bonesIndices = null;
+    // Bones weights
+    this.bonesWeights = null;
 }
 
 ModelData.prototype = {
@@ -102,6 +114,12 @@ ModelData.prototype = {
         var vertCount = 0;
         var texCoordsCount = 0;
         var normalsCount = 0;
+        var bonesMaxInfluence = 0;
+        var bonesPositionsCount = 0;
+        var bonesAnglesCount = 0;
+        var bonesIndicesCount = 0;
+        var bonesWeightsCount = 0;
+        var currentRead = 0;
         var currentIndex = 0;
         var modelData = this.model.responseText.split(' ');
         var modelDataLen = modelData.length;
@@ -124,6 +142,18 @@ ModelData.prototype = {
                 normalsCount = parseInt(modelData[6]);
                 this.facesCount = parseInt(modelData[7]);
 
+                currentRead = 8;
+                if (this.skeletalModel)
+                {
+                    this.bonesCount = parseInt(modelData[8]);
+                    bonesPositionsCount = parseInt(modelData[9]);
+                    bonesAnglesCount = parseInt(modelData[10]);
+                    bonesMaxInfluence = parseInt(modelData[11]);
+                    bonesIndicesCount = parseInt(modelData[12]);
+                    bonesWeightsCount = parseInt(modelData[13]);
+                    currentRead = 14;
+                }
+
                 // Check model data count
                 if ((vertCount > 0) && (texCoordsCount > 0) &&
                     (normalsCount == 0) && (this.facesCount > 0))
@@ -132,10 +162,26 @@ ModelData.prototype = {
                     this.vertices = new GLArrayDataType(vertCount);
                     this.texCoords = new GLArrayDataType(texCoordsCount);
                     this.indices = new GLIndexDataType(this.facesCount);
+                    if (this.skeletalModel)
+                    {
+                        this.bonesParents = new Array(this.bonesCount);
+                        this.bonesPositions = new GLArrayDataType(
+                            bonesPositionsCount
+                        );
+                        this.bonesAngles = new GLArrayDataType(
+                            bonesAnglesCount
+                        );
+                        this.bonesIndices = new GLIndexDataType(
+                            bonesIndicesCount
+                        );
+                        this.bonesWeights = new GLArrayDataType(
+                            bonesWeightsCount
+                        );
+                    }
 
                     // Read vertices
                     currentIndex = 0;
-                    for (i = 8; i < (vertCount+8); ++i)
+                    for (i = currentRead; i < (currentRead+vertCount); ++i)
                     {
                         if (i < modelDataLen)
                         {
@@ -143,11 +189,11 @@ ModelData.prototype = {
                                 parseFloat(modelData[i]);
                         }
                     }
+                    currentRead += vertCount;
 
                     // Read texture coordinates
                     currentIndex = 0;
-                    for (i = (vertCount+8);
-                        i < (vertCount+texCoordsCount+8); ++i)
+                    for (i = currentRead; i < (currentRead+texCoordsCount); ++i)
                     {
                         if (i < modelDataLen)
                         {
@@ -155,17 +201,87 @@ ModelData.prototype = {
                                 parseFloat(modelData[i]);
                         }
                     }
+                    currentRead += texCoordsCount;
 
                     // Read indices
                     currentIndex = 0;
-                    for (i = (vertCount+texCoordsCount+8);
-                        i < (vertCount+texCoordsCount+this.facesCount+8); ++i)
+                    for (i = currentRead;
+                        i < (currentRead+this.facesCount); ++i)
                     {
                         if (i < modelDataLen)
                         {
                             this.indices[currentIndex++] =
                                 parseFloat(modelData[i]);
                         }
+                    }
+                    currentRead += this.facesCount;
+
+                    if (this.skeletalModel && (bonesMaxInfluence == 4))
+                    {
+                        // Read bones hierarchy
+                        currentIndex = 0;
+                        for (i = currentRead;
+                            i < (currentRead+(this.bonesCount)); ++i)
+                        {
+                            if (i < modelDataLen)
+                            {
+                                this.bonesParents[currentIndex++] =
+                                    parseInt(modelData[i]);
+                            }
+                        }
+                        currentRead += this.bonesCount;
+
+                        // Read bones positions
+                        currentIndex = 0;
+                        for (i = currentRead;
+                            i < (currentRead+bonesPositionsCount); ++i)
+                        {
+                            if (i < modelDataLen)
+                            {
+                                this.bonesPositions[currentIndex++] =
+                                    parseFloat(modelData[i]);
+                            }
+                        }
+                        currentRead += bonesPositionsCount;
+
+                        // Read bones angles
+                        currentIndex = 0;
+                        for (i = currentRead;
+                            i < (currentRead+bonesAnglesCount); ++i)
+                        {
+                            if (i < modelDataLen)
+                            {
+                                this.bonesAngles[currentIndex++] =
+                                    parseFloat(modelData[i]);
+                            }
+                        }
+                        currentRead += bonesAnglesCount;
+
+                        // Read bones indices
+                        currentIndex = 0;
+                        for (i = currentRead;
+                            i < (currentRead+bonesIndicesCount); ++i)
+                        {
+                            if (i < modelDataLen)
+                            {
+                                this.bonesIndices[currentIndex++] =
+                                    parseFloat(modelData[i]);
+                            }
+                        }
+                        currentRead += bonesIndicesCount;
+
+                        // Read bones weights
+                        currentIndex = 0;
+                        for (i = currentRead;
+                            i < (currentRead+bonesWeightsCount); ++i)
+                        {
+                            if (i < modelDataLen)
+                            {
+                                this.bonesWeights[currentIndex++] =
+                                    parseFloat(modelData[i]);
+                            }
+                        }
+                        currentRead += bonesWeightsCount;
                     }
 
                     // Mesh data successfully loaded

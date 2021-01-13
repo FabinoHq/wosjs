@@ -29,6 +29,7 @@
 !renderer/animsprite.js
 !renderer/renderer.js
 !renderer/vertexbuffer.js
+!renderer/skeletalvertexbuffer.js
 !renderer/shader.js
 !renderer/lineshader.js
 !renderer/rectshader.js
@@ -63,7 +64,9 @@
 !textures/testsprite.png
 
 # Models files
+!models/
 !models/testmodel.wmsh
+!models/testskeletal.wmsh
 
 # Sounds files
 !sounds/test.wav

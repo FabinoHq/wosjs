@@ -370,7 +370,7 @@ Wos.prototype = {
             this.renderer, this.loader.skeletalMeshShader
         );
         this.skeletalmesh.init(
-            this.loader.getModel("testmodel.wmsh"),
+            this.loader.getModel("testskeletal.wmsh"),
             this.loader.getTexture("testsprite.png")
         );
 
@@ -497,7 +497,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     compute: function()
     {
-        
+        //this.skeletalmesh.compute(this.frametime);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -544,9 +544,9 @@ Wos.prototype = {
 
         // Set camera
         //this.camera.reset();
-        //this.camera.rotateX(-70.0);
-        //this.camera.moveY(-2.0);
-        //this.camera.moveZ(-0.5);
+        //this.camera.rotateX(0.0);
+        //this.camera.moveY(0.0);
+        //this.camera.moveZ(-3.0);
         //this.renderer.setCamera(this.camera);
 
         // Render test static mesh

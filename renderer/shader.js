@@ -94,9 +94,12 @@ function Shader(glPointer)
     // Shader attributes locations
     this.vertexLocation = -1;
     this.texCoordsLocation = -1;
+    this.bonesIndicesLocation = -1;
+    this.bonesWeightsLocation = -1;
 
     // Shader uniforms locations
     this.textureLocation = -1;
+    this.bonesMatricesLocation = -1;
     this.projMatrixLocation = -1;
     this.viewMatrixLocation = -1;
     this.modelMatrixLocation = -1;
@@ -204,6 +207,8 @@ Shader.prototype = {
         // Bind vertex and texcoord attributes
         this.gl.bindAttribLocation(this.shaderProgram, 0, "vertexPos");
         this.gl.bindAttribLocation(this.shaderProgram, 1, "vertexColor");
+        this.gl.bindAttribLocation(this.shaderProgram, 2, "bonesIndices");
+        this.gl.bindAttribLocation(this.shaderProgram, 3, "bonesWeights");
 
         // Link shader program
         this.gl.linkProgram(this.shaderProgram);
@@ -231,11 +236,34 @@ Shader.prototype = {
         );
         if (this.texCoordsLocation == -1) return false;
 
+        // Get bones indices attribute location
+        this.bonesIndicesLocation = this.gl.getAttribLocation(
+            this.shaderProgram, "bonesIndices"
+        );
+        //if (this.bonesIndicesLocation == -1) return false;
+
+        // Get bones weights attribute location
+        this.bonesWeightsLocation = this.gl.getAttribLocation(
+            this.shaderProgram, "bonesWeights"
+        );
+        //if (this.bonesWeightsLocation == -1) return false;
+
         // Get texture location
         this.textureLocation = this.gl.getUniformLocation(
             this.shaderProgram, "texture"
         );
         if (this.textureLocation == -1) return false;
+        this.gl.uniform1i(this.textureLocation, 0);
+
+        // Get bones matrices location
+        this.bonesMatricesLocation = this.gl.getUniformLocation(
+            this.shaderProgram, "bonesMatrices"
+        );
+        //if (this.bonesMatricesLocation == -1) return false;
+        if (this.bonesMatricesLocation != -1)
+        {
+            this.gl.uniform1i(this.bonesMatricesLocation, 1);
+        }
 
         // Get projection matrix location
         this.projMatrixLocation = this.gl.getUniformLocation(

@@ -62,6 +62,23 @@ function SkeletalMesh(renderer, skeletalShader)
     // Skeletal mesh model matrix
     this.modelMatrix = null;
 
+    // Bones count
+    this.bonesCount = 0;
+    // Bones parents
+    this.bonesParents = null;
+    // Bones positions
+    this.bonesPositions = null;
+    // Bones angles
+    this.bonesAngles = null;
+    // Bones matrices
+    this.bonesMatrices = null;
+    // Bones bind pose inverse matrices
+    this.bonesInverses = null;
+    // Bones matrices texture
+    this.bonesTexture = null;
+    // Bones array
+    this.bonesArray = null;
+
     // Skeletal mesh position
     this.position = null;
     // Skeletal mesh size
@@ -70,6 +87,9 @@ function SkeletalMesh(renderer, skeletalShader)
     this.angles = null;
     // Skeletal mesh alpha
     this.alpha = 1.0;
+
+    // Test time
+    this.testtime = 0.0;
 }
 
 SkeletalMesh.prototype = {
@@ -80,9 +100,12 @@ SkeletalMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     init: function(model, texture)
     {
+        var i = 0;
+
         // Reset skeletal mesh
         this.texture = null;
         this.modelMatrix = null;
+        this.bonesTexture = null;
         this.position = new Vector3(0.0, 0.0, 0.0);
         this.size = new Vector3(1.0, 1.0, 1.0);
         this.angles = new Vector3(0.0, 0.0, 0.0);
@@ -101,12 +124,13 @@ SkeletalMesh.prototype = {
         if (!texture) return false;
 
         // Init vertex buffer
-        this.vertexBuffer = new VertexBuffer(this.renderer.gl);
+        this.vertexBuffer = new SkeletalVertexBuffer(this.renderer.gl);
         if ((model.facesCount > 0) && model.vertices &&
             model.texCoords && model.indices)
         {
             if (!this.vertexBuffer.init(model.facesCount, model.vertices,
-                model.texCoords, model.indices))
+                model.texCoords, model.indices,
+                model.bonesIndices, model.bonesWeights))
             {
                 // Could not create vertex buffer
                 return false;
@@ -117,6 +141,67 @@ SkeletalMesh.prototype = {
             // Invalid model data
             return false;
         }
+
+        // Check skeletal model data
+        if (!model.skeletalModel) return false;
+
+        // Create bones matrices
+        this.bonesCount = model.bonesCount;
+        this.bonesParents = new Array(this.bonesCount);
+        this.bonesMatrices = new Array(this.bonesCount);
+        this.bonesInverses = new Array(this.bonesCount);
+        this.bonesPositions = new Array(this.bonesCount);
+        this.bonesAngles = new Array(this.bonesCount);
+        for (i = 0; i < this.bonesCount; ++i)
+        {
+            this.bonesParents[i] = model.bonesParents[i];
+            this.bonesPositions[i] = new Vector3(model.bonesPositions[(i*3)],
+                model.bonesPositions[(i*3)+1], model.bonesPositions[(i*3)+2]
+            );
+            this.bonesAngles[i] = new Vector3(model.bonesAngles[(i*3)],
+                model.bonesAngles[(i*3)+1], model.bonesAngles[(i*3)+2]
+            );
+            this.bonesMatrices[i] = new Matrix4x4();
+            this.bonesMatrices[i].setIdentity();
+            this.bonesMatrices[i].setMatrix(
+                this.bonesMatrices[this.bonesParents[i]]
+            );
+            this.bonesMatrices[i].translateVec3(this.bonesPositions[i]);
+            this.bonesMatrices[i].rotateVec3(this.bonesAngles[i]);
+            this.bonesInverses[i] = new Matrix4x4();
+            this.bonesInverses[i].setMatrix(this.bonesMatrices[i]);
+            this.bonesInverses[i].inverse();
+        }
+
+        // Create bones matrices texture
+        this.bonesTexture = this.renderer.gl.createTexture();
+        this.renderer.gl.bindTexture(
+            this.renderer.gl.TEXTURE_2D, this.bonesTexture
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_MIN_FILTER,
+            this.renderer.gl.NEAREST
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_MAG_FILTER,
+            this.renderer.gl.NEAREST
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_WRAP_S,
+            this.renderer.gl.CLAMP_TO_EDGE
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_WRAP_T,
+            this.renderer.gl.CLAMP_TO_EDGE
+        );
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+
+        // Create bones array
+        this.bonesArray = new GLArrayDataType(this.bonesCount*16);
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
@@ -420,6 +505,65 @@ SkeletalMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  compute : Compute skeletal mesh                                       //
+    //  param frametime : Frametime for skeletal mesh update                  //
+    ////////////////////////////////////////////////////////////////////////////
+    compute: function(frametime)
+    {
+        var i = 0;
+        this.testtime += frametime;
+
+        for (i = 0; i < this.bonesCount; ++i)
+        {
+            // Transform bone matrix
+            this.bonesMatrices[i].setIdentity();
+            this.bonesMatrices[i].setMatrix(
+                this.bonesMatrices[this.bonesParents[i]]
+            );
+            this.bonesMatrices[i].translateVec3(this.bonesPositions[i]);
+            this.bonesMatrices[i].rotateVec3(this.bonesAngles[i]);
+
+            // Multiply bone matrix by inverse bind pose matrix
+            var tmpMat = new Matrix4x4();
+            tmpMat.setMatrix(this.bonesMatrices[i]);
+            tmpMat.multiply(this.bonesInverses[i]);
+
+            // Copy bone matrix to bones array
+            this.bonesArray[i*16] = tmpMat.matrix[0];
+            this.bonesArray[(i*16)+1] = tmpMat.matrix[1];
+            this.bonesArray[(i*16)+2] = tmpMat.matrix[2];
+            this.bonesArray[(i*16)+3] = tmpMat.matrix[3];
+            this.bonesArray[(i*16)+4] = tmpMat.matrix[4];
+            this.bonesArray[(i*16)+5] = tmpMat.matrix[5];
+            this.bonesArray[(i*16)+6] = tmpMat.matrix[6];
+            this.bonesArray[(i*16)+7] = tmpMat.matrix[7];
+            this.bonesArray[(i*16)+8] = tmpMat.matrix[8];
+            this.bonesArray[(i*16)+9] = tmpMat.matrix[9];
+            this.bonesArray[(i*16)+10] = tmpMat.matrix[10];
+            this.bonesArray[(i*16)+11] = tmpMat.matrix[11];
+            this.bonesArray[(i*16)+12] = tmpMat.matrix[12];
+            this.bonesArray[(i*16)+13] = tmpMat.matrix[13];
+            this.bonesArray[(i*16)+14] = tmpMat.matrix[14];
+            this.bonesArray[(i*16)+15] = tmpMat.matrix[15];
+        }
+
+        // Bind bones matrices texture
+        this.renderer.gl.bindTexture(
+            this.renderer.gl.TEXTURE_2D, this.bonesTexture
+        );
+
+        // Upload bones matrices array into texture
+        this.renderer.gl.texImage2D(
+            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
+            4, this.bonesCount, 0, this.renderer.gl.RGBA,
+            this.renderer.gl.FLOAT, this.bonesArray
+        );
+
+        // Unbind bones matrices texture
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  render : Render skeletal mesh                                         //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
@@ -427,9 +571,7 @@ SkeletalMesh.prototype = {
         // Set skeletal mesh model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec3(this.position);
-        this.modelMatrix.rotateX(this.angles.vec[0]);
-        this.modelMatrix.rotateY(this.angles.vec[1]);
-        this.modelMatrix.rotateZ(this.angles.vec[2]);
+        this.modelMatrix.rotateVec3(this.angles);
         this.modelMatrix.scaleVec3(this.size);
 
         // Bind skeletal mesh shader
@@ -446,9 +588,17 @@ SkeletalMesh.prototype = {
         this.skeletalShader.shader.sendUniform(
             this.skeletalShader.alphaUniform, this.alpha
         );
+        this.skeletalShader.shader.sendUniform(
+            this.skeletalShader.bonesCountUniform, this.bonesCount
+        );
 
         // Bind texture
+        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
         this.texture.bind();
+        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+        this.renderer.gl.bindTexture(
+            this.renderer.gl.TEXTURE_2D, this.bonesTexture
+        );
 
         // Render VBO
         this.vertexBuffer.bind();
@@ -456,6 +606,9 @@ SkeletalMesh.prototype = {
         this.vertexBuffer.unbind();
 
         // Unbind texture
+        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
         this.texture.unbind();
 
         // Unbind skeletal mesh shader

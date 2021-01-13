@@ -309,4 +309,3 @@ Texture.prototype = {
         return this.smooth;
     }
 };
-

@@ -49,11 +49,11 @@ var TexturesAssets = [
 
 // WOS models assets
 var ModelsAssets = [
-    "testmodel.wmsh"
+    "testmodel.wmsh",
+    "testskeletal.wmsh"
 ];
 
 // WOS sounds assets
 var SoundsAssets = [
     "test.wav"
 ];
-

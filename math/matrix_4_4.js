@@ -398,6 +398,27 @@ Matrix4x4.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  rotateVec2 : Rotate 4x4 matrix with a 2 components vector             //
+    //  param vector : 2 components vector to rotate matrix with              //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateVec2: function(vector)
+    {
+        this.rotateX(vector.vec[0]);
+        this.rotateY(vector.vec[1]);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateVec3 : Rotate 4x4 matrix with a 3 components vector             //
+    //  param vector : 3 components vector to rotate matrix with              //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateVec3: function(vector)
+    {
+        this.rotateX(vector.vec[0]);
+        this.rotateY(vector.vec[1]);
+        this.rotateZ(vector.vec[2]);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  rotateX : Rotate 4x4 matrix arround X axis                            //
     //  param angle : Angle to rotate in degrees                              //
     ////////////////////////////////////////////////////////////////////////////
@@ -723,6 +744,153 @@ Matrix4x4.prototype = {
                             + this.matrix[15]*mat.matrix[15]);
 
         this.matrix = multMat.matrix;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  inverse : Inverse 4x4 matrix                                          //
+    ////////////////////////////////////////////////////////////////////////////
+    inverse: function()
+    {
+        var invMat = new Matrix4x4();
+        var det = 0;
+
+        invMat.matrix[0] = this.matrix[5] * this.matrix[10] * this.matrix[15] -
+            this.matrix[5] * this.matrix[11] * this.matrix[14] -
+            this.matrix[9] * this.matrix[6] * this.matrix[15] +
+            this.matrix[9] * this.matrix[7] * this.matrix[14] +
+            this.matrix[13] * this.matrix[6] * this.matrix[11] -
+            this.matrix[13] * this.matrix[7] * this.matrix[10];
+
+        invMat.matrix[1] = -this.matrix[1] * this.matrix[10] * this.matrix[15] +
+            this.matrix[1] * this.matrix[11] * this.matrix[14] +
+            this.matrix[9] * this.matrix[2] * this.matrix[15] -
+            this.matrix[9] * this.matrix[3] * this.matrix[14] -
+            this.matrix[13] * this.matrix[2] * this.matrix[11] +
+            this.matrix[13] * this.matrix[3] * this.matrix[10];
+
+        invMat.matrix[2] = this.matrix[1] * this.matrix[6] * this.matrix[15] -
+            this.matrix[1] * this.matrix[7] * this.matrix[14] -
+            this.matrix[5] * this.matrix[2] * this.matrix[15] +
+            this.matrix[5] * this.matrix[3] * this.matrix[14] +
+            this.matrix[13] * this.matrix[2] * this.matrix[7] -
+            this.matrix[13] * this.matrix[3] * this.matrix[6];
+
+        invMat.matrix[3] = -this.matrix[1] * this.matrix[6] * this.matrix[11] +
+            this.matrix[1] * this.matrix[7] * this.matrix[10] +
+            this.matrix[5] * this.matrix[2] * this.matrix[11] -
+            this.matrix[5] * this.matrix[3] * this.matrix[10] -
+            this.matrix[9] * this.matrix[2] * this.matrix[7] +
+            this.matrix[9] * this.matrix[3] * this.matrix[6];
+
+        invMat.matrix[4] = -this.matrix[4] * this.matrix[10] * this.matrix[15] +
+            this.matrix[4] * this.matrix[11] * this.matrix[14] +
+            this.matrix[8] * this.matrix[6] * this.matrix[15] -
+            this.matrix[8] * this.matrix[7] * this.matrix[14] -
+            this.matrix[12] * this.matrix[6] * this.matrix[11] +
+            this.matrix[12] * this.matrix[7] * this.matrix[10];
+
+        invMat.matrix[5] = this.matrix[0] * this.matrix[10] * this.matrix[15] -
+            this.matrix[0] * this.matrix[11] * this.matrix[14] -
+            this.matrix[8] * this.matrix[2] * this.matrix[15] +
+            this.matrix[8] * this.matrix[3] * this.matrix[14] +
+            this.matrix[12] * this.matrix[2] * this.matrix[11] -
+            this.matrix[12] * this.matrix[3] * this.matrix[10];
+
+        invMat.matrix[6] = -this.matrix[0] * this.matrix[6] * this.matrix[15] +
+            this.matrix[0] * this.matrix[7] * this.matrix[14] +
+            this.matrix[4] * this.matrix[2] * this.matrix[15] -
+            this.matrix[4] * this.matrix[3] * this.matrix[14] -
+            this.matrix[12] * this.matrix[2] * this.matrix[7] +
+            this.matrix[12] * this.matrix[3] * this.matrix[6];
+
+        invMat.matrix[7] = this.matrix[0] * this.matrix[6] * this.matrix[11] -
+            this.matrix[0] * this.matrix[7] * this.matrix[10] -
+            this.matrix[4] * this.matrix[2] * this.matrix[11] +
+            this.matrix[4] * this.matrix[3] * this.matrix[10] +
+            this.matrix[8] * this.matrix[2] * this.matrix[7] -
+            this.matrix[8] * this.matrix[3] * this.matrix[6];
+
+        invMat.matrix[8] = this.matrix[4] * this.matrix[9] * this.matrix[15] -
+            this.matrix[4] * this.matrix[11] * this.matrix[13] -
+            this.matrix[8] * this.matrix[5] * this.matrix[15] +
+            this.matrix[8] * this.matrix[7] * this.matrix[13] +
+            this.matrix[12] * this.matrix[5] * this.matrix[11] -
+            this.matrix[12] * this.matrix[7] * this.matrix[9];
+
+        invMat.matrix[9] = -this.matrix[0] * this.matrix[9] * this.matrix[15] +
+            this.matrix[0] * this.matrix[11] * this.matrix[13] +
+            this.matrix[8] * this.matrix[1] * this.matrix[15] -
+            this.matrix[8] * this.matrix[3] * this.matrix[13] -
+            this.matrix[12] * this.matrix[1] * this.matrix[11] +
+            this.matrix[12] * this.matrix[3] * this.matrix[9];
+
+        invMat.matrix[10] = this.matrix[0] * this.matrix[5] * this.matrix[15] -
+            this.matrix[0] * this.matrix[7] * this.matrix[13] -
+            this.matrix[4] * this.matrix[1] * this.matrix[15] +
+            this.matrix[4] * this.matrix[3] * this.matrix[13] +
+            this.matrix[12] * this.matrix[1] * this.matrix[7] -
+            this.matrix[12] * this.matrix[3] * this.matrix[5];
+
+        invMat.matrix[11] = -this.matrix[0] * this.matrix[5] * this.matrix[11] +
+            this.matrix[0] * this.matrix[7] * this.matrix[9] +
+            this.matrix[4] * this.matrix[1] * this.matrix[11] -
+            this.matrix[4] * this.matrix[3] * this.matrix[9] -
+            this.matrix[8] * this.matrix[1] * this.matrix[7] +
+            this.matrix[8] * this.matrix[3] * this.matrix[5];
+
+        invMat.matrix[12] = -this.matrix[4] * this.matrix[9] * this.matrix[14] +
+            this.matrix[4] * this.matrix[10] * this.matrix[13] +
+            this.matrix[8] * this.matrix[5] * this.matrix[14] -
+            this.matrix[8] * this.matrix[6] * this.matrix[13] -
+            this.matrix[12] * this.matrix[5] * this.matrix[10] +
+            this.matrix[12] * this.matrix[6] * this.matrix[9];
+
+        invMat.matrix[13] = this.matrix[0] * this.matrix[9] * this.matrix[14] -
+            this.matrix[0] * this.matrix[10] * this.matrix[13] -
+            this.matrix[8] * this.matrix[1] * this.matrix[14] +
+            this.matrix[8] * this.matrix[2] * this.matrix[13] +
+            this.matrix[12] * this.matrix[1] * this.matrix[10] -
+            this.matrix[12] * this.matrix[2] * this.matrix[9];
+
+        invMat.matrix[14] = -this.matrix[0] * this.matrix[5] * this.matrix[14] +
+            this.matrix[0] * this.matrix[6] * this.matrix[13] +
+            this.matrix[4] * this.matrix[1] * this.matrix[14] -
+            this.matrix[4] * this.matrix[2] * this.matrix[13] -
+            this.matrix[12] * this.matrix[1] * this.matrix[6] +
+            this.matrix[12] * this.matrix[2] * this.matrix[5];
+
+        invMat.matrix[15] = this.matrix[0] * this.matrix[5] * this.matrix[10] -
+            this.matrix[0] * this.matrix[6] * this.matrix[9] -
+            this.matrix[4] * this.matrix[1] * this.matrix[10] +
+            this.matrix[4] * this.matrix[2] * this.matrix[9] +
+            this.matrix[8] * this.matrix[1] * this.matrix[6] -
+            this.matrix[8] * this.matrix[2] * this.matrix[5];
+
+        det = this.matrix[0] * invMat.matrix[0] +
+            this.matrix[1] * invMat.matrix[4] +
+            this.matrix[2] * invMat.matrix[8] +
+            this.matrix[3] * invMat.matrix[12];
+
+        if (det != 0.0)
+        {
+            det = 1.0/det;
+            invMat.matrix[0] *= det;
+            invMat.matrix[1] *= det;
+            invMat.matrix[2] *= det;
+            invMat.matrix[3] *= det;
+            invMat.matrix[4] *= det;
+            invMat.matrix[5] *= det;
+            invMat.matrix[6] *= det;
+            invMat.matrix[7] *= det;
+            invMat.matrix[8] *= det;
+            invMat.matrix[9] *= det;
+            invMat.matrix[10] *= det;
+            invMat.matrix[11] *= det;
+            invMat.matrix[12] *= det;
+            invMat.matrix[13] *= det;
+            invMat.matrix[14] *= det;
+            invMat.matrix[15] *= det;
+            this.matrix = invMat.matrix;
+        }
     }
 };
-

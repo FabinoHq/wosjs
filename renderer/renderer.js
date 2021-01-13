@@ -96,6 +96,7 @@ Renderer.prototype = {
             "moz-webgl"
         ];
         var i = 0;
+        var texFloatExt = 0;
         
         // Reset renderer
         this.loaded = false;
@@ -146,7 +147,11 @@ Renderer.prototype = {
 
         // No valid context found
         if (!this.gl) return false;
-        
+
+        // Check texture float extension
+        texFloatExt = this.gl.getExtension("OES_texture_float");
+        if (!texFloatExt) return false;
+
         // Get canvas context
         this.ctx = this.context.getContext("2d");
 
@@ -247,6 +252,9 @@ Renderer.prototype = {
 
         // Unbind default shader
         this.shader.unbind();
+
+        // Set texture 0 as active texture
+        this.gl.activeTexture(this.gl.TEXTURE0);
 
         // WebGL successfully loaded
         this.loaded = true;

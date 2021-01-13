@@ -427,9 +427,7 @@ StaticMesh.prototype = {
         // Set static mesh model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec3(this.position);
-        this.modelMatrix.rotateX(this.angles.vec[0]);
-        this.modelMatrix.rotateY(this.angles.vec[1]);
-        this.modelMatrix.rotateZ(this.angles.vec[2]);
+        this.modelMatrix.rotateVec3(this.angles);
         this.modelMatrix.scaleVec3(this.size);
 
         // Bind static mesh shader

@@ -47,14 +47,34 @@
 const skeletalVertexShaderSrc = [
     "attribute vec3 vertexPos;",
     "attribute vec2 vertexColor;",
+    "attribute vec4 bonesIndices;",
+    "attribute vec4 bonesWeights;",
     "uniform mat4 projMatrix;",
     "uniform mat4 viewMatrix;",
     "uniform mat4 modelMatrix;",
+    "uniform float bonesCount;",
+    "uniform sampler2D bonesMatrices;",
     "varying vec2 texCoord;",
+    "mat4 boneMatrix(float boneIndex)",
+    "{",
+    "    float v = (boneIndex+0.5)/bonesCount;",
+    "    mat4 boneMat = mat4(texture2D(bonesMatrices, vec2(0.125, v)),",
+    "                        texture2D(bonesMatrices, vec2(0.375, v)),",
+    "                        texture2D(bonesMatrices, vec2(0.625, v)),",
+    "                        texture2D(bonesMatrices, vec2(0.875, v)));",
+    "    return boneMat;",
+    "}",
     "void main()",
     "{",
     "    texCoord = vertexColor;",
-    "    gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
+    "    vec4 vertPos = (",
+    "        boneMatrix(bonesIndices[0])*bonesWeights[0]*vec4(vertexPos, 1.0)+",
+    "        boneMatrix(bonesIndices[1])*bonesWeights[1]*vec4(vertexPos, 1.0)+",
+    "        boneMatrix(bonesIndices[2])*bonesWeights[2]*vec4(vertexPos, 1.0)+",
+    "        boneMatrix(bonesIndices[3])*bonesWeights[3]*vec4(vertexPos, 1.0)",
+    "    );",
+    "    gl_Position = projMatrix*viewMatrix*modelMatrix*vertPos;",
+    "    ;",
     "}"
 ].join("\n");
 
@@ -88,6 +108,7 @@ function SkeletalMeshShader(glPointer)
 
     // Skeletal mesh shader uniforms locations
     this.alphaUniform = -1;
+    this.bonesCountUniform = -1;
 }
 
 SkeletalMeshShader.prototype = {
@@ -120,6 +141,7 @@ SkeletalMeshShader.prototype = {
         // Get skeletal mesh shader uniforms locations
         this.shader.bind();
         this.alphaUniform = this.shader.getUniform("alpha");
+        this.bonesCountUniform = this.shader.getUniform("bonesCount");
         this.shader.unbind();
 
         // Skeletal mesh shader successfully loaded
