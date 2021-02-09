@@ -45,6 +45,8 @@
 //  Skeletal vertex shader                                                    //
 ////////////////////////////////////////////////////////////////////////////////
 const skeletalVertexShaderSrc = [
+    "precision mediump float;",
+    "precision mediump int;",
     "attribute vec3 vertexPos;",
     "attribute vec2 vertexColor;",
     "attribute vec4 bonesIndices;",
@@ -83,6 +85,7 @@ const skeletalVertexShaderSrc = [
 ////////////////////////////////////////////////////////////////////////////////
 const skeletalMeshFragmentShaderSrc = [
     "precision mediump float;",
+    "precision mediump int;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "uniform float alpha;",

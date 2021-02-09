@@ -46,6 +46,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 const textFragmentShaderSrc = [
     "precision mediump float;",
+    "precision mediump int;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "uniform vec3 color;",

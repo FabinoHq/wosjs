@@ -45,6 +45,8 @@
 //  Default vertex shader                                                     //
 ////////////////////////////////////////////////////////////////////////////////
 const defaultVertexShaderSrc = [
+    "precision mediump float;",
+    "precision mediump int;",
     "attribute vec3 vertexPos;",
     "attribute vec2 vertexColor;",
     "uniform mat4 projMatrix;",
@@ -63,6 +65,7 @@ const defaultVertexShaderSrc = [
 ////////////////////////////////////////////////////////////////////////////////
 const defaultFragmentShaderSrc = [
     "precision mediump float;",
+    "precision mediump int;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "void main()",

@@ -46,6 +46,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 const rectFragmentShaderSrc = [
     "precision mediump float;",
+    "precision mediump int;",
     "varying vec2 texCoord;",
     "uniform vec3 color;",
     "uniform float alpha;",

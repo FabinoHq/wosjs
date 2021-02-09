@@ -46,6 +46,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 const staticMeshFragmentShaderSrc = [
     "precision mediump float;",
+    "precision mediump int;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "uniform float alpha;",

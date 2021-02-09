@@ -31,13 +31,6 @@
 !renderer/vertexbuffer.js
 !renderer/skeletalvertexbuffer.js
 !renderer/shader.js
-!renderer/lineshader.js
-!renderer/rectshader.js
-!renderer/spriteshader.js
-!renderer/animspriteshader.js
-!renderer/textshader.js
-!renderer/staticmeshshader.js
-!renderer/skeletalmeshshader.js
 !renderer/texture.js
 !renderer/modeldata.js
 !renderer/line.js
