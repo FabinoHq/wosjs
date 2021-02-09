@@ -60,6 +60,8 @@ function Loader(renderer, audio)
     this.rectShader = null;
     // Sprite shader
     this.spriteShader = null;
+    // Ninebox shader
+    this.nineboxShader = null;
     // Animated sprite shader
     this.animSpriteShader = null;
     // Text shader
@@ -96,7 +98,9 @@ Loader.prototype = {
         // Reset loader
         this.loaded = false;
         this.lineShader = null;
+        this.rectShader = null;
         this.spriteShader = null;
+        this.nineboxShader = null;
         this.animSpriteShader = null;
         this.textShader = null;
         this.staticMeshShader = null;
@@ -135,6 +139,10 @@ Loader.prototype = {
         // Init sprite shader
         this.spriteShader = new SpriteShader(this.renderer.gl);
         if (!this.spriteShader.init()) return false;
+
+        // Init ninebox shader
+        this.nineboxShader = new NineboxShader(this.renderer.gl);
+        if (!this.nineboxShader.init()) return false;
 
         // Init animated sprite shader
         this.animSpriteShader = new AnimSpriteShader(this.renderer.gl);

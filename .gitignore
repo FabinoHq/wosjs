@@ -38,6 +38,7 @@
 !renderer/sprite.js
 !renderer/animsprite.js
 !renderer/procsprite.js
+!renderer/ninebox.js
 !renderer/staticmesh.js
 !renderer/skeletalmesh.js
 !renderer/view.js
@@ -47,6 +48,7 @@
 !renderer/shaders/rectshader.js
 !renderer/shaders/spriteshader.js
 !renderer/shaders/animspriteshader.js
+!renderer/shaders/nineboxshader.js
 !renderer/shaders/textshader.js
 !renderer/shaders/staticmeshshader.js
 !renderer/shaders/skeletalmeshshader.js

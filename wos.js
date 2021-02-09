@@ -244,11 +244,6 @@ function Wos()
     // Test camera
     this.camera = null;
 
-    // Test static mesh
-    this.staticmesh = null;
-    // Test skeletal mesh
-    this.skeletalmesh = null;
-
     // Test line
     this.testline = null;
     // Test rect
@@ -257,10 +252,17 @@ function Wos()
     this.testsprite = null;
     // Test procedural sprite
     this.testproc = null;
+    // Test ninebox
+    this.testninebox = null;
     // Test anim
     this.testanim = null;
     // Test text
     this.testtext = null;
+
+    // Test static mesh
+    this.staticmesh = null;
+    // Test skeletal mesh
+    this.skeletalmesh = null;
 }
 
 Wos.prototype = {
@@ -329,6 +331,14 @@ Wos.prototype = {
         // Init test procedural sprite
         this.testproc = new ProcSprite(this.renderer);
         this.testproc.init();
+
+        // Init test ninebox
+        this.testninebox = new Ninebox(
+            this.renderer, this.loader.nineboxShader
+        );
+        this.testninebox.init(
+            this.loader.getTexture("testsprite.png"), 1.0, 1.0
+        );
 
         // Init test anim
         this.testanim = new AnimSprite(
@@ -526,6 +536,11 @@ Wos.prototype = {
         //this.testproc.setX(-this.testproc.getWidth()/2.0);
         //this.testproc.setY(-this.testproc.getHeight()/2.0);
         //this.testproc.render();
+
+        // Render test ninebox
+        //this.testninebox.setX(-this.testninebox.getWidth()/2.0);
+        //this.testninebox.setY(-this.testninebox.getHeight()/2.0);
+        //this.testninebox.render();
 
         // Render test anim
         //this.testanim.setX(-this.testanim.getWidth()/2.0);
