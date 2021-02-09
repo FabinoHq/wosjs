@@ -53,6 +53,8 @@
 !renderer/shaders/staticmeshshader.js
 !renderer/shaders/skeletalmeshshader.js
 
+!interface/
+!interface/guibutton.js
 !interface/guitext.js
 !interface/guitextbox.js
 

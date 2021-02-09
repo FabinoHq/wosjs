@@ -256,8 +256,12 @@ function Wos()
     this.testninebox = null;
     // Test anim
     this.testanim = null;
+    // Test button
+    this.testbutton = null;
     // Test text
     this.testtext = null;
+    // Test text box
+    this.testtextbox = null;
 
     // Test static mesh
     this.staticmesh = null;
@@ -352,6 +356,14 @@ Wos.prototype = {
         this.testanim.setEnd(1, 1);
         this.testanim.resetAnim();
 
+        // Init test button
+        this.testbutton = new GuiButton(
+            this.renderer, this.loader.nineboxShader
+        );
+        this.testbutton.init(
+            this.loader.getTexture("testninebox.png"), 0.3, 0.08, 15.0
+        );
+
         // Init test text
         this.testtext = new GuiText(this.renderer, this.loader.textShader);
         this.testtext.init("Test text", 0.07);
@@ -440,6 +452,8 @@ Wos.prototype = {
     handleMouseMove: function(mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
+        /*if (this.testbutton)
+            this.testbutton.mouseMove(this.realMouseX, this.realMouseY);*/
         /*if (this.testtextbox)
             this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);*/
     },
@@ -453,6 +467,8 @@ Wos.prototype = {
     handleMouseDown: function(button, mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
+        /*if (this.testbutton)
+            this.testbutton.mousePress(this.realMouseX, this.realMouseY);*/
         /*if (this.testtextbox)
             this.testtextbox.mousePress(this.realMouseX, this.realMouseY);*/
     },
@@ -466,6 +482,8 @@ Wos.prototype = {
     handleMouseUp: function(button, mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
+        /*if (this.testbutton)
+            this.testbutton.mouseRelease(this.realMouseX, this.realMouseY);*/
         /*if (this.testtextbox)
             this.testtextbox.mouseRelease(this.realMouseX, this.realMouseY);*/
     },
@@ -547,6 +565,11 @@ Wos.prototype = {
         //this.testanim.setX(-this.testanim.getWidth()/2.0);
         //this.testanim.setY(-this.testanim.getHeight()/2.0);
         //this.testanim.render(this.frametime);
+
+        // Render test button
+        //this.testbutton.setX(-this.testbutton.getWidth()/2.0);
+        //this.testbutton.setY(-this.testbutton.getHeight()/2.0);
+        //this.testbutton.render();
 
         // Render test text
         //this.testtext.setX(-this.testtext.getWidth()/2.0);

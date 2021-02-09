@@ -737,4 +737,3 @@ GuiText.prototype = {
         this.textShader.shader.unbind();
     }
 };
-
