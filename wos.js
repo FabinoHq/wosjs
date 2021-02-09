@@ -337,7 +337,7 @@ Wos.prototype = {
             this.renderer, this.loader.nineboxShader
         );
         this.testninebox.init(
-            this.loader.getTexture("testsprite.png"), 1.0, 1.0
+            this.loader.getTexture("testninebox.png"), 0.4, 0.4, 15.0
         );
 
         // Init test anim
@@ -538,6 +538,7 @@ Wos.prototype = {
         //this.testproc.render();
 
         // Render test ninebox
+        //this.testninebox.setSize(this.realMouseX*2.0, this.realMouseY*2.0);
         //this.testninebox.setX(-this.testninebox.getWidth()/2.0);
         //this.testninebox.setY(-this.testninebox.getHeight()/2.0);
         //this.testninebox.render();

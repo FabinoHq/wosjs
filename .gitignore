@@ -63,8 +63,10 @@
 !fonts/wosfont.otf
 
 # Textures files
+!textures/
 !textures/cursor.png
 !textures/testsprite.png
+!textures/testninebox.png
 
 # Models files
 !models/

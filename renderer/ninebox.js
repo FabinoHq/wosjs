@@ -67,8 +67,8 @@ function Ninebox(renderer, nineboxShader)
     this.angle = 0.0;
     // Ninebox texture UV size
     this.uvSize = null;
-    // Ninebox texture UV offset
-    this.uvOffset = null;
+    // Ninebox texture UV factor
+    this.uvFactor = null;
     // Ninebox alpha
     this.alpha = 1.0;
 }
@@ -79,8 +79,9 @@ Ninebox.prototype = {
     //  param texture : Texture pointer                                       //
     //  param width : Ninebox width                                           //
     //  param height : Ninebox height                                         //
+    //  param factor : Ninebox factor                                         //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(texture, width, height)
+    init: function(texture, width, height, factor)
     {
         // Reset ninebox
         this.texture = null;
@@ -91,7 +92,8 @@ Ninebox.prototype = {
         if (height !== undefined) this.size.vec[1] = height;
         this.angle = 0.0;
         this.uvSize = new Vector2(1.0, 1.0);
-        this.uvOffset = new Vector2(0.0, 0.0);
+        this.uvFactor = 1.0;
+        if (factor !== undefined) this.uvFactor = factor;
         this.alpha = 1.0;
 
         // Check gl pointer
@@ -247,49 +249,21 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setUVSize : Set ninebox render subrectangle size                      //
-    //  param usize : Ninebox texture U size                                  //
-    //  param vsize : Ninebox texture V size                                  //
-    ////////////////////////////////////////////////////////////////////////////
-    setUVSize: function(usize, vsize)
-    {
-        this.uvSize.vec[0] = usize;
-        this.uvSize.vec[1] = vsize;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setSubrect : Set ninebox render subrectangle offset                   //
-    //  param uoffset : Ninebox texture U offset                              //
-    //  param voffset : Ninebox texture V offset                              //
-    ////////////////////////////////////////////////////////////////////////////
-    setUVOffset: function(uoffset, voffset)
-    {
-        this.uvOffset.vec[0] = uoffset;
-        this.uvOffset.vec[1] = voffset;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setSubrect : Set ninebox render subrectangle                          //
-    //  param usize : Ninebox texture U size                                  //
-    //  param vsize : Ninebox texture V size                                  //
-    //  param uoffset : Ninebox texture U offset                              //
-    //  param voffset : Ninebox texture V offset                              //
-    ////////////////////////////////////////////////////////////////////////////
-    setSubrect: function(usize, vsize, uoffset, voffset)
-    {
-        this.uvSize.vec[0] = usize;
-        this.uvSize.vec[1] = vsize;
-        this.uvOffset.vec[0] = uoffset;
-        this.uvOffset.vec[1] = voffset;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setAlpha : Set ninebox alpha                                          //
     //  param alpha : Ninebox alpha to set                                    //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
     {
         this.alpha = alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setFactor : Set ninebox factor                                        //
+    //  param factor : Ninebox factor to set                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    setFactor: function(factor)
+    {
+        this.uvFactor = factor;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -338,48 +312,21 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getUVWidth : Get ninebox render subrectangle width                    //
-    //  return : Ninebox render subrectangle width                            //
-    ////////////////////////////////////////////////////////////////////////////
-    getUVWidth: function()
-    {
-        return this.uvSize.vec[0];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getUVHeight : Get ninebox render subrectangle height                  //
-    //  return : Ninebox render subrectangle height                           //
-    ////////////////////////////////////////////////////////////////////////////
-    getUVHeight: function()
-    {
-        return this.uvSize.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getUVWidth : Get ninebox render subrectangle X offset                 //
-    //  return : Ninebox render subrectangle X offset                         //
-    ////////////////////////////////////////////////////////////////////////////
-    getUVOffsetX: function()
-    {
-        return this.uvOffset.vec[0];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getUVHeight : Get ninebox render subrectangle Y offset                //
-    //  return : Ninebox render subrectangle Y offset                         //
-    ////////////////////////////////////////////////////////////////////////////
-    getUVOffsetY: function()
-    {
-        return this.uvOffset.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  getAlpha : Get ninebox alpha                                          //
     //  return : Ninebox alpha                                                //
     ////////////////////////////////////////////////////////////////////////////
     getAlpha: function()
     {
         return this.alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getFactor : Get ninebox factor                                        //
+    //  return : Ninebox factor                                               //
+    ////////////////////////////////////////////////////////////////////////////
+    getFactor: function()
+    {
+        return this.uvFactor;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -412,10 +359,10 @@ Ninebox.prototype = {
             this.nineboxShader.alphaUniform, this.alpha
         );
         this.nineboxShader.shader.sendUniformVec2(
-            this.nineboxShader.uvOffsetUniform, this.uvOffset
+            this.nineboxShader.uvSizeUniform, this.size
         );
-        this.nineboxShader.shader.sendUniformVec2(
-            this.nineboxShader.uvSizeUniform, this.uvSize
+        this.nineboxShader.shader.sendUniform(
+            this.nineboxShader.uvFactorUniform, this.uvFactor
         );
 
         // Bind texture

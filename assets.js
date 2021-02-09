@@ -44,7 +44,8 @@
 // WOS textures assets
 var TexturesAssets = [
     "cursor.png",
-    "testsprite.png"
+    "testsprite.png",
+    "testninebox.png"
 ];
 
 // WOS models assets

@@ -50,11 +50,37 @@ const nineboxFragmentShaderSrc = [
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "uniform float alpha;",
-    "uniform vec2 uvOffset;",
     "uniform vec2 uvSize;",
+    "uniform float uvFactor;",
     "void main()",
     "{",
-    "    vec4 texColor = texture2D(texture, (texCoord*uvSize)+uvOffset);",
+    "    vec2 nineSize = abs(uvSize*uvFactor);",
+    "    vec2 curCoord = texCoord*nineSize;",
+    "    if (curCoord.x >= 0.25)",
+    "    {",
+    "        if (curCoord.x >= (nineSize.x-0.25))",
+    "        {",
+    "            curCoord.x = curCoord.x-nineSize.x;",
+    "        }",
+    "        else",
+    "        {",
+    "            curCoord.x = 0.25+mod(curCoord.x, 0.5);",
+    "        }",
+    "    }",
+    "    if (curCoord.y >= 0.25)",
+    "    {",
+    "        if (curCoord.y >= (nineSize.y-0.25))",
+    "        {",
+    "            curCoord.y = curCoord.y-nineSize.y;",
+    "        }",
+    "        else",
+    "        {",
+    "            curCoord.y = 0.25+mod(curCoord.y, 0.5);",
+    "        }",
+    "    }",
+    "    if (nineSize.x <= 0.5) { curCoord.x = texCoord.x; }",
+    "    if (nineSize.y <= 0.5) { curCoord.y = texCoord.y; }",
+    "    vec4 texColor = texture2D(texture, curCoord);",
     "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
     "}"
 ].join("\n");
@@ -75,7 +101,7 @@ function NineboxShader(glPointer)
     // Ninebox shader uniforms locations
     this.alphaUniform = -1;
     this.uvSizeUniform = -1;
-    this.uvOffsetUniform = -1;
+    this.uvFactorUniform = -1;
 }
 
 NineboxShader.prototype = {
@@ -87,7 +113,7 @@ NineboxShader.prototype = {
         // Reset ninebox shader
         this.alphaUniform = -1;
         this.uvSizeUniform = -1;
-        this.uvOffsetUniform = -1;
+        this.uvFactorUniform = -1;
 
         // Check gl pointer
         if (!this.gl)
@@ -109,8 +135,8 @@ NineboxShader.prototype = {
         // Get ninebox shader uniforms locations
         this.shader.bind();
         this.alphaUniform = this.shader.getUniform("alpha");
-        this.uvOffsetUniform = this.shader.getUniform("uvOffset");
         this.uvSizeUniform = this.shader.getUniform("uvSize");
+        this.uvFactorUniform = this.shader.getUniform("uvFactor");
         this.shader.unbind();
 
         // Ninebox shader successfully loaded
