@@ -64,6 +64,8 @@ function Loader(renderer, audio)
     this.nineboxShader = null;
     // Animated sprite shader
     this.animSpriteShader = null;
+    // Button shader
+    this.buttonShader = null;
     // Text shader
     this.textShader = null;
     // Static mesh shader
@@ -102,6 +104,7 @@ Loader.prototype = {
         this.spriteShader = null;
         this.nineboxShader = null;
         this.animSpriteShader = null;
+        this.buttonShader = null;
         this.textShader = null;
         this.staticMeshShader = null;
         this.skeletalMeshShader = null;
@@ -147,6 +150,10 @@ Loader.prototype = {
         // Init animated sprite shader
         this.animSpriteShader = new AnimSpriteShader(this.renderer.gl);
         if (!this.animSpriteShader.init()) return false;
+
+        // Init button shader
+        this.buttonShader = new ButtonShader(this.renderer.gl);
+        if (!this.buttonShader.init()) return false;
 
         // Init text shader
         this.textShader = new TextShader(this.renderer.gl);

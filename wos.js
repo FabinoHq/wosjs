@@ -358,7 +358,7 @@ Wos.prototype = {
 
         // Init test button
         this.testbutton = new GuiButton(
-            this.renderer, this.loader.nineboxShader
+            this.renderer, this.loader.buttonShader
         );
         this.testbutton.init(
             this.loader.getTexture("testninebox.png"), 0.3, 0.08, 15.0

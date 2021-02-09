@@ -49,6 +49,7 @@
 !renderer/shaders/spriteshader.js
 !renderer/shaders/animspriteshader.js
 !renderer/shaders/nineboxshader.js
+!renderer/shaders/buttonshader.js
 !renderer/shaders/textshader.js
 !renderer/shaders/staticmeshshader.js
 !renderer/shaders/skeletalmeshshader.js

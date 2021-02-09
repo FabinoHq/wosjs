@@ -63,10 +63,6 @@ function GuiButton(renderer, buttonShader)
     this.position = null;
     // Button size
     this.size = null;
-    // Button texture UV size
-    this.uvSize = null;
-    // Button texture UV factor
-    this.uvFactor = null;
     // Button alpha
     this.alpha = 1.0;
 }
@@ -77,9 +73,8 @@ GuiButton.prototype = {
     //  param texture : Texture pointer                                       //
     //  param width : Button width                                            //
     //  param height : Button height                                          //
-    //  param factor : Button factor                                          //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(texture, width, height, factor)
+    init: function(texture, width, height)
     {
         // Reset button
         this.texture = null;
@@ -88,9 +83,6 @@ GuiButton.prototype = {
         this.size = new Vector2(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
-        this.uvSize = new Vector2(1.0, 1.0);
-        this.uvFactor = 1.0;
-        if (factor !== undefined) this.uvFactor = factor;
         this.alpha = 1.0;
 
         // Check gl pointer
@@ -364,12 +356,6 @@ GuiButton.prototype = {
         this.buttonShader.shader.sendModelMatrix(this.modelMatrix);
         this.buttonShader.shader.sendUniform(
             this.buttonShader.alphaUniform, this.alpha
-        );
-        this.buttonShader.shader.sendUniformVec2(
-            this.buttonShader.uvSizeUniform, this.size
-        );
-        this.buttonShader.shader.sendUniform(
-            this.buttonShader.uvFactorUniform, this.uvFactor
         );
 
         // Bind texture
