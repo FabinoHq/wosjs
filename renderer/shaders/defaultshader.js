@@ -48,14 +48,14 @@ const defaultVertexShaderSrc = [
     "precision mediump float;",
     "precision mediump int;",
     "attribute vec3 vertexPos;",
-    "attribute vec2 vertexColor;",
+    "attribute vec2 vertexCoord;",
     "uniform mat4 projMatrix;",
     "uniform mat4 viewMatrix;",
     "uniform mat4 modelMatrix;",
     "varying vec2 texCoord;",
     "void main()",
     "{",
-    "    texCoord = vertexColor;",
+    "    texCoord = vertexCoord;",
     "    gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
     "}"
 ].join("\n");
@@ -66,11 +66,9 @@ const defaultVertexShaderSrc = [
 const defaultFragmentShaderSrc = [
     "precision mediump float;",
     "precision mediump int;",
-    "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "void main()",
     "{",
-    "    vec4 texColor = texture2D(texture, texCoord);",
-    "    gl_FragColor = vec4(texColor.rgb, texColor.a);",
+    "    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);",
     "}"
 ].join("\n");

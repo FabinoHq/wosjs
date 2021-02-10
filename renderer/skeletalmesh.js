@@ -55,8 +55,9 @@ function SkeletalMesh(renderer, skeletalShader)
     this.skeletalShader = skeletalShader;
 
     // Skeletal mesh shader uniforms locations
-    this.alphaUniform = -1;
+    this.bonesMatricesLocation = -1;
     this.bonesCountUniform = -1;
+    this.alphaUniform = -1;
 
     // Skeletal mesh vertex buffer
     this.vertexBuffer = null;
@@ -104,8 +105,9 @@ SkeletalMesh.prototype = {
         var i = 0;
 
         // Reset skeletal mesh
-        this.alphaUniform = -1;
+        this.bonesMatricesLocation = -1;
         this.bonesCountUniform = -1;
+        this.alphaUniform = -1;
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
@@ -123,6 +125,10 @@ SkeletalMesh.prototype = {
 
         // Get skeletal mesh shader uniforms locations
         this.skeletalShader.bind();
+        this.bonesMatricesLocation = this.skeletalShader.getUniform(
+            "bonesMatrices"
+        );
+        this.skeletalShader.sendIntUniform(this.bonesMatricesLocation, 1);
         this.alphaUniform = this.skeletalShader.getUniform("alpha");
         this.bonesCountUniform = this.skeletalShader.getUniform("bonesCount");
         this.skeletalShader.unbind();

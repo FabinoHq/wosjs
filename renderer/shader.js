@@ -67,7 +67,6 @@ function Shader(glPointer)
 
     // Shader uniforms locations
     this.textureLocation = -1;
-    this.bonesMatricesLocation = -1;
     this.projMatrixLocation = -1;
     this.viewMatrixLocation = -1;
     this.modelMatrixLocation = -1;
@@ -200,7 +199,7 @@ Shader.prototype = {
 
         // Get texture coords attribute location
         this.texCoordsLocation = this.gl.getAttribLocation(
-            this.shaderProgram, "vertexColor"
+            this.shaderProgram, "vertexCoord"
         );
         if (this.texCoordsLocation == -1) return false;
 
@@ -208,13 +207,11 @@ Shader.prototype = {
         this.bonesIndicesLocation = this.gl.getAttribLocation(
             this.shaderProgram, "bonesIndices"
         );
-        //if (this.bonesIndicesLocation == -1) return false;
 
         // Get bones weights attribute location
         this.bonesWeightsLocation = this.gl.getAttribLocation(
             this.shaderProgram, "bonesWeights"
         );
-        //if (this.bonesWeightsLocation == -1) return false;
 
         // Get texture location
         this.textureLocation = this.gl.getUniformLocation(
@@ -222,16 +219,6 @@ Shader.prototype = {
         );
         if (this.textureLocation == -1) return false;
         this.gl.uniform1i(this.textureLocation, 0);
-
-        // Get bones matrices location
-        this.bonesMatricesLocation = this.gl.getUniformLocation(
-            this.shaderProgram, "bonesMatrices"
-        );
-        //if (this.bonesMatricesLocation == -1) return false;
-        if (this.bonesMatricesLocation != -1)
-        {
-            this.gl.uniform1i(this.bonesMatricesLocation, 1);
-        }
 
         // Get projection matrix location
         this.projMatrixLocation = this.gl.getUniformLocation(
