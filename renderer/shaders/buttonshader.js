@@ -50,9 +50,14 @@ const buttonFragmentShaderSrc = [
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "uniform float alpha;",
+    "uniform int buttonState;",
     "void main()",
     "{",
-    "    vec4 texColor = texture2D(texture, texCoord);",
+    "    vec2 buttonCoord = texCoord*0.5;",
+    "    if (buttonState == 1) { buttonCoord.x += 0.5; }",
+    "    else if (buttonState == 2) { buttonCoord.y += 0.5; }",
+    "    else if (buttonState == 3) { buttonCoord += 0.5; }",
+    "    vec4 texColor = texture2D(texture, buttonCoord);",
     "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
     "}"
 ].join("\n");
@@ -72,6 +77,7 @@ function ButtonShader(glPointer)
 
     // Button shader uniforms locations
     this.alphaUniform = -1;
+    this.buttonStateUniform = -1;
 }
 
 ButtonShader.prototype = {
@@ -82,6 +88,7 @@ ButtonShader.prototype = {
     {
         // Reset button shader
         this.alphaUniform = -1;
+        this.buttonStateUniform = -1;
 
         // Check gl pointer
         if (!this.gl)
@@ -103,6 +110,7 @@ ButtonShader.prototype = {
         // Get button shader uniforms locations
         this.shader.bind();
         this.alphaUniform = this.shader.getUniform("alpha");
+        this.buttonStateUniform = this.shader.getUniform("buttonState");
         this.shader.unbind();
 
         // Button shader successfully loaded

@@ -65,6 +65,8 @@ function GuiButton(renderer, buttonShader)
     this.size = null;
     // Button alpha
     this.alpha = 1.0;
+    // Button state
+    this.buttonState = 0;
 }
 
 GuiButton.prototype = {
@@ -84,6 +86,7 @@ GuiButton.prototype = {
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.alpha = 1.0;
+        this.buttonState = 0;
 
         // Check gl pointer
         if (!this.renderer.gl) return false;
@@ -229,22 +232,21 @@ GuiButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setFactor : Set button factor                                         //
-    //  param factor : Button factor to set                                   //
-    ////////////////////////////////////////////////////////////////////////////
-    setFactor: function(factor)
-    {
-        this.uvFactor = factor;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  mousePress : Handle mouse press event                                 //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
     ////////////////////////////////////////////////////////////////////////////
     mousePress: function(mouseX, mouseY)
     {
-
+        if (this.isPicking(mouseX, mouseY))
+        {
+            this.buttonState = 3;
+            this.onButtonPressed();
+        }
+        else
+        {
+            this.buttonState = 0;
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -254,7 +256,18 @@ GuiButton.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     mouseRelease: function(mouseX, mouseY)
     {
-
+        if (this.isPicking(mouseX, mouseY))
+        {
+            if (this.buttonState == 3)
+            {
+                this.onButtonReleased();
+            }
+            this.buttonState = 1;
+        }
+        else
+        {
+            this.buttonState = 0;
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -264,7 +277,32 @@ GuiButton.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     mouseMove: function(mouseX, mouseY)
     {
+        if (this.isPicking(mouseX, mouseY))
+        {
+            switch (this.buttonState)
+            {
+                case 2: case 3:
+                    this.buttonState = 3;
+                    break;
 
+                default:
+                    this.buttonState = 1;
+                    break;
+            }
+        }
+        else
+        {
+            switch (this.buttonState)
+            {
+                case 2: case 3:
+                    this.buttonState = 2;
+                    break;
+
+                default:
+                    this.buttonState = 0;
+                    break;
+            }
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -281,6 +319,25 @@ GuiButton.prototype = {
     onButtonReleased: function()
     {
 
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  isPicking : Get button picking state                                  //
+    //  return : True if the button is picking                                //
+    ////////////////////////////////////////////////////////////////////////////
+    isPicking: function(mouseX, mouseY)
+    {
+        if ((mouseX >= this.position.vec[0]) &&
+            (mouseX <= (this.position.vec[0]+ this.size.vec[0])) &&
+            (mouseY >= this.position.vec[1]) &&
+            (mouseY <= (this.position.vec[1]+ this.size.vec[1])))
+        {
+            // Button is picking
+            return true;
+        }
+
+        // Button is not picking
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -329,15 +386,6 @@ GuiButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getFactor : Get button factor                                         //
-    //  return : Button factor                                                //
-    ////////////////////////////////////////////////////////////////////////////
-    getFactor: function()
-    {
-        return this.uvFactor;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  render : Render button                                                //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
@@ -356,6 +404,9 @@ GuiButton.prototype = {
         this.buttonShader.shader.sendModelMatrix(this.modelMatrix);
         this.buttonShader.shader.sendUniform(
             this.buttonShader.alphaUniform, this.alpha
+        );
+        this.buttonShader.shader.sendIntUniform(
+            this.buttonShader.buttonStateUniform, this.buttonState
         );
 
         // Bind texture

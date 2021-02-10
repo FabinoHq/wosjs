@@ -361,7 +361,7 @@ Wos.prototype = {
             this.renderer, this.loader.buttonShader
         );
         this.testbutton.init(
-            this.loader.getTexture("testninebox.png"), 0.3, 0.08, 15.0
+            this.loader.getTexture("testbutton.png"), 0.12, 0.06
         );
 
         // Init test text

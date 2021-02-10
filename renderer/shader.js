@@ -365,6 +365,16 @@ Shader.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  sendIntUniform : Send shader integer uniform single data              //
+    //  param uniformLoc : Location index of the shader uniform               //
+    //  param uniformData : Uniform integer single data to upload             //
+    ////////////////////////////////////////////////////////////////////////////
+    sendIntUniform: function(uniformLoc, uniformData)
+    {
+        this.gl.uniform1i(uniformLoc, uniformData);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  sendUniformVec2 : Send shader uniform 2 components vector             //
     //  param uniformLoc : Location index of the shader uniform               //
     //  param uniformVec2 : Uniform 2 components vector to upload             //
