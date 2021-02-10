@@ -54,25 +54,16 @@ function Loader(renderer, audio)
     // Audio engine pointer
     this.audio = audio;
 
-    // Line shader
+    // Shaders
     this.lineShader = null;
-    // Rect shader
     this.rectShader = null;
-    // Sprite shader
     this.spriteShader = null;
-    // Ninebox shader
     this.nineboxShader = null;
-    // Animated sprite shader
     this.animSpriteShader = null;
-    // Button shader
     this.buttonShader = null;
-    // Text shader
     this.textShader = null;
-    // Static mesh shader
     this.staticMeshShader = null;
-    // Skeletal mesh shader
     this.skeletalMeshShader = null;
-    // Shaders loaded state
     this.allShadersLoaded = false;
 
     // Textures array
@@ -99,6 +90,7 @@ Loader.prototype = {
     {
         // Reset loader
         this.loaded = false;
+
         this.lineShader = null;
         this.rectShader = null;
         this.spriteShader = null;
@@ -109,6 +101,7 @@ Loader.prototype = {
         this.staticMeshShader = null;
         this.skeletalMeshShader = null;
         this.allShadersLoaded = false;
+
         this.textures = new Array();
         this.texturesLoaded = 0;
         this.allTexturesLoaded = false;
@@ -132,40 +125,76 @@ Loader.prototype = {
         if (!this.renderer.gl) return false;
 
         // Init line shader
-        this.lineShader = new LineShader(this.renderer.gl);
-        if (!this.lineShader.init()) return false;
+        this.lineShader = new Shader(this.renderer.gl);
+        if (!this.lineShader.init(
+            defaultVertexShaderSrc, lineFragmentShaderSrc))
+        {
+            return false;
+        }
 
         // Init rect shader
-        this.rectShader = new RectShader(this.renderer.gl);
-        if (!this.rectShader.init()) return false;
+        this.rectShader = new Shader(this.renderer.gl);
+        if (!this.rectShader.init(
+            defaultVertexShaderSrc, rectFragmentShaderSrc)) 
+        {
+            return false;
+        }
 
         // Init sprite shader
-        this.spriteShader = new SpriteShader(this.renderer.gl);
-        if (!this.spriteShader.init()) return false;
+        this.spriteShader = new Shader(this.renderer.gl);
+        if (!this.spriteShader.init(
+            defaultVertexShaderSrc, spriteFragmentShaderSrc))
+        {
+            return false;
+        }
 
         // Init ninebox shader
-        this.nineboxShader = new NineboxShader(this.renderer.gl);
-        if (!this.nineboxShader.init()) return false;
+        this.nineboxShader = new Shader(this.renderer.gl);
+        if (!this.nineboxShader.init(
+            defaultVertexShaderSrc, nineboxFragmentShaderSrc))
+        {
+            return false;
+        }
 
         // Init animated sprite shader
-        this.animSpriteShader = new AnimSpriteShader(this.renderer.gl);
-        if (!this.animSpriteShader.init()) return false;
+        this.animSpriteShader = new Shader(this.renderer.gl);
+        if (!this.animSpriteShader.init(
+            defaultVertexShaderSrc, animspriteFragmentShaderSrc))
+        {
+            return false;
+        }
 
         // Init button shader
-        this.buttonShader = new ButtonShader(this.renderer.gl);
-        if (!this.buttonShader.init()) return false;
+        this.buttonShader = new Shader(this.renderer.gl);
+        if (!this.buttonShader.init(
+            defaultVertexShaderSrc, buttonFragmentShaderSrc))
+        {
+            return false;
+        }
 
         // Init text shader
-        this.textShader = new TextShader(this.renderer.gl);
-        if (!this.textShader.init()) return false;
+        this.textShader = new Shader(this.renderer.gl);
+        if (!this.textShader.init(
+            defaultVertexShaderSrc, textFragmentShaderSrc))
+        {
+            return false;
+        }
 
         // Init static mesh shader
-        this.staticMeshShader = new StaticMeshShader(this.renderer.gl);
-        if (!this.staticMeshShader.init()) return false;
+        this.staticMeshShader = new Shader(this.renderer.gl);
+        if (!this.staticMeshShader.init(
+            defaultVertexShaderSrc, staticMeshFragmentShaderSrc))
+        {
+            return false;
+        }
 
         // Init skeletal mesh shader
-        this.skeletalMeshShader = new SkeletalMeshShader(this.renderer.gl);
-        if (!this.skeletalMeshShader.init()) return false;
+        this.skeletalMeshShader = new Shader(this.renderer.gl);
+        if (!this.skeletalMeshShader.init(
+            skeletalMeshVertexShaderSrc, skeletalMeshFragmentShaderSrc))
+        {
+            return false;
+        }
 
         // All global shaders loaded
         this.allShadersLoaded = true;

@@ -74,6 +74,10 @@ function GuiText(renderer, textShader)
     // Text shader pointer
     this.textShader = textShader;
 
+    // Text shader uniforms locations
+    this.colorUniform = -1;
+    this.alphaUniform = -1;
+
     // GuiText generated texture
     this.texture = null;
     // GuiText model matrix
@@ -118,6 +122,8 @@ GuiText.prototype = {
         var pixelsDataHeight = 0;
 
         // Reset GuiText
+        this.colorUniform = -1;
+        this.alphaUniform = -1;
         this.texture = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
@@ -178,7 +184,13 @@ GuiText.prototype = {
 
         // Check text shader pointer
         if (!this.textShader) return false;
-        
+
+        // Get text shader uniforms locations
+        this.textShader.bind();
+        this.colorUniform = this.textShader.getUniform("color");
+        this.alphaUniform = this.textShader.getUniform("alpha");
+        this.textShader.unbind();
+
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
 
@@ -706,18 +718,14 @@ GuiText.prototype = {
         this.modelMatrix.scaleVec2(this.size);
 
         // Bind text shader
-        this.textShader.shader.bind();
+        this.textShader.bind();
 
         // Send shader uniforms
-        this.textShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.textShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.textShader.shader.sendModelMatrix(this.modelMatrix);
-        this.textShader.shader.sendUniformVec3(
-            this.textShader.colorUniform, this.color
-        );
-        this.textShader.shader.sendUniform(
-            this.textShader.alphaUniform, this.alpha
-        );
+        this.textShader.sendProjectionMatrix(this.renderer.projMatrix);
+        this.textShader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.textShader.sendModelMatrix(this.modelMatrix);
+        this.textShader.sendUniformVec3(this.colorUniform, this.color);
+        this.textShader.sendUniform(this.alphaUniform, this.alpha);
 
         // Bind texture
         this.renderer.gl.bindTexture(
@@ -727,13 +735,13 @@ GuiText.prototype = {
 
         // Render VBO
         this.renderer.vertexBuffer.bind();
-        this.renderer.vertexBuffer.render(this.textShader.shader);
+        this.renderer.vertexBuffer.render(this.textShader);
         this.renderer.vertexBuffer.unbind();
 
         // Unbind texture
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
         // Unbind text shader
-        this.textShader.shader.unbind();
+        this.textShader.unbind();
     }
 };

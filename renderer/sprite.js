@@ -54,6 +54,11 @@ function Sprite(renderer, spriteShader)
     // Sprite shader pointer
     this.spriteShader = spriteShader;
 
+    // Sprite shader uniforms locations
+    this.alphaUniform = -1;
+    this.uvSizeUniform = -1;
+    this.uvOffsetUniform = -1;
+
     // Sprite texture
     this.texture = null;
     // Sprite model matrix
@@ -83,6 +88,9 @@ Sprite.prototype = {
     init: function(texture, width, height)
     {
         // Reset sprite
+        this.alphaUniform = -1;
+        this.uvSizeUniform = -1;
+        this.uvOffsetUniform = -1;
         this.texture = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
@@ -99,6 +107,13 @@ Sprite.prototype = {
 
         // Check sprite shader pointer
         if (!this.spriteShader) return false;
+
+        // Get sprite shader uniforms locations
+        this.spriteShader.bind();
+        this.alphaUniform = this.spriteShader.getUniform("alpha");
+        this.uvOffsetUniform = this.spriteShader.getUniform("uvOffset");
+        this.uvSizeUniform = this.spriteShader.getUniform("uvSize");
+        this.spriteShader.unbind();
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
@@ -400,35 +415,29 @@ Sprite.prototype = {
         this.modelMatrix.scaleVec2(this.size);
 
         // Bind sprite shader
-        this.spriteShader.shader.bind();
+        this.spriteShader.bind();
 
         // Send shader uniforms
-        this.spriteShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.spriteShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.spriteShader.shader.sendModelMatrix(this.modelMatrix);
-        this.spriteShader.shader.sendUniform(
-            this.spriteShader.alphaUniform, this.alpha
-        );
-        this.spriteShader.shader.sendUniformVec2(
-            this.spriteShader.uvOffsetUniform, this.uvOffset
-        );
-        this.spriteShader.shader.sendUniformVec2(
-            this.spriteShader.uvSizeUniform, this.uvSize
-        );
+        this.spriteShader.sendProjectionMatrix(this.renderer.projMatrix);
+        this.spriteShader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.spriteShader.sendModelMatrix(this.modelMatrix);
+        this.spriteShader.sendUniform(this.alphaUniform, this.alpha);
+        this.spriteShader.sendUniformVec2(this.uvOffsetUniform, this.uvOffset);
+        this.spriteShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
 
         // Bind texture
         this.texture.bind();
 
         // Render VBO
         this.renderer.vertexBuffer.bind();
-        this.renderer.vertexBuffer.render(this.spriteShader.shader);
+        this.renderer.vertexBuffer.render(this.spriteShader);
         this.renderer.vertexBuffer.unbind();
 
         // Unbind texture
         this.texture.unbind();
 
         // Unbind sprite shader
-        this.spriteShader.shader.unbind();
+        this.spriteShader.unbind();
     }
 };
 

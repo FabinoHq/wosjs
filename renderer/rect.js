@@ -54,6 +54,13 @@ function Rect(renderer, rectShader)
     // Rect shader pointer
     this.rectShader = rectShader;
 
+    // Rect shader uniforms locations
+    this.colorUniform = -1;
+    this.alphaUniform = -1;
+    this.widthUniform = -1;
+    this.heightUniform = -1;
+    this.thicknessUniform = -1;
+
     // Rect model matrix
     this.modelMatrix = null;
 
@@ -81,6 +88,11 @@ Rect.prototype = {
     init: function(thickness, width, height)
     {
         // Reset rect
+        this.colorUniform = -1;
+        this.alphaUniform = -1;
+        this.widthUniform = -1;
+        this.heightUniform = -1;
+        this.thicknessUniform = -1;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
         this.size = new Vector2(1.0, 1.0);
@@ -97,6 +109,15 @@ Rect.prototype = {
 
         // Check rect shader pointer
         if (!this.rectShader) return false;
+
+        // Get rect shader uniforms locations
+        this.rectShader.bind();
+        this.colorUniform = this.rectShader.getUniform("color");
+        this.alphaUniform = this.rectShader.getUniform("alpha");
+        this.widthUniform = this.rectShader.getUniform("width");
+        this.heightUniform = this.rectShader.getUniform("height");
+        this.thicknessUniform = this.rectShader.getUniform("thickness");
+        this.rectShader.unbind();
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
@@ -363,35 +384,25 @@ Rect.prototype = {
         this.modelMatrix.scaleVec2(this.size);
 
         // Bind rect shader
-        this.rectShader.shader.bind();
+        this.rectShader.bind();
 
         // Send rect shader uniforms
-        this.rectShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.rectShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.rectShader.shader.sendModelMatrix(this.modelMatrix);
-        this.rectShader.shader.sendUniformVec3(
-            this.rectShader.colorUniform, this.color
-        );
-        this.rectShader.shader.sendUniform(
-            this.rectShader.alphaUniform, this.alpha
-        );
-        this.rectShader.shader.sendUniform(
-            this.rectShader.widthUniform, this.size.vec[0]
-        );
-        this.rectShader.shader.sendUniform(
-            this.rectShader.heightUniform, this.size.vec[1]
-        );
-        this.rectShader.shader.sendUniform(
-            this.rectShader.thicknessUniform, this.thickness
-        );
+        this.rectShader.sendProjectionMatrix(this.renderer.projMatrix);
+        this.rectShader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.rectShader.sendModelMatrix(this.modelMatrix);
+        this.rectShader.sendUniformVec3(this.colorUniform, this.color);
+        this.rectShader.sendUniform(this.alphaUniform, this.alpha);
+        this.rectShader.sendUniform(this.widthUniform, this.size.vec[0]);
+        this.rectShader.sendUniform(this.heightUniform, this.size.vec[1]);
+        this.rectShader.sendUniform(this.thicknessUniform, this.thickness);
 
         // Render VBO
         this.renderer.vertexBuffer.bind();
-        this.renderer.vertexBuffer.render(this.rectShader.shader);
+        this.renderer.vertexBuffer.render(this.rectShader);
         this.renderer.vertexBuffer.unbind();
 
         // Unbind rect shader
-        this.rectShader.shader.unbind();
+        this.rectShader.unbind();
     }
 };
 

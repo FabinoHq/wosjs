@@ -54,6 +54,12 @@ function Line(renderer, lineShader)
     // Line shader pointer
     this.lineShader = lineShader;
 
+    // Line shader uniforms locations
+    this.colorUniform = -1;
+    this.alphaUniform = -1;
+    this.ratioUniform = -1;
+    this.smoothUniform = -1;
+
     // Line model matrix
     this.modelMatrix = null;
 
@@ -85,6 +91,10 @@ Line.prototype = {
         var dx = 0.0;
         var dy = 0.0;
         var length = 0.0;
+        this.colorUniform = -1;
+        this.alphaUniform = -1;
+        this.ratioUniform = -1;
+        this.smoothUniform = -1;
         this.modelMatrix = null;
         this.origin = new Vector2(0.0, 0.0);
         this.target = new Vector2(1.0, 1.0);
@@ -106,6 +116,14 @@ Line.prototype = {
 
         // Check line shader pointer
         if (!this.lineShader) return false;
+
+        // Get line shader uniforms locations
+        this.lineShader.bind();
+        this.colorUniform = this.lineShader.getUniform("color");
+        this.alphaUniform = this.lineShader.getUniform("alpha");
+        this.ratioUniform = this.lineShader.getUniform("ratio");
+        this.smoothUniform = this.lineShader.getUniform("smooth");
+        this.lineShader.unbind();
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
@@ -407,32 +425,23 @@ Line.prototype = {
         );
 
         // Bind line shader
-        this.lineShader.shader.bind();
+        this.lineShader.bind();
 
         // Send line shader uniforms
-        this.lineShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.lineShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.lineShader.shader.sendModelMatrix(this.modelMatrix);
-        this.lineShader.shader.sendUniformVec3(
-            this.lineShader.colorUniform, this.color
-        );
-        this.lineShader.shader.sendUniform(
-            this.lineShader.alphaUniform, this.alpha
-        );
-        this.lineShader.shader.sendUniform(
-            this.lineShader.ratioUniform, ratio
-        );
-        this.lineShader.shader.sendUniform(
-            this.lineShader.smoothUniform, this.smoothness
-        );
-        
+        this.lineShader.sendProjectionMatrix(this.renderer.projMatrix);
+        this.lineShader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.lineShader.sendModelMatrix(this.modelMatrix);
+        this.lineShader.sendUniformVec3(this.colorUniform, this.color);
+        this.lineShader.sendUniform(this.alphaUniform, this.alpha);
+        this.lineShader.sendUniform(this.ratioUniform, ratio);
+        this.lineShader.sendUniform(this.smoothUniform, this.smoothness);
+
         // Render VBO
         this.renderer.vertexBuffer.bind();
-        this.renderer.vertexBuffer.render(this.lineShader.shader);
+        this.renderer.vertexBuffer.render(this.lineShader);
         this.renderer.vertexBuffer.unbind();
 
         // Unbind line shader
-        this.lineShader.shader.unbind();
+        this.lineShader.unbind();
     }
 };
-

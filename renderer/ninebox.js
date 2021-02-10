@@ -54,6 +54,11 @@ function Ninebox(renderer, nineboxShader)
     // Ninebox shader pointer
     this.nineboxShader = nineboxShader;
 
+    // Ninebox shader uniforms locations
+    this.alphaUniform = -1;
+    this.uvSizeUniform = -1;
+    this.uvFactorUniform = -1;
+
     // Ninebox texture
     this.texture = null;
     // Ninebox model matrix
@@ -84,6 +89,9 @@ Ninebox.prototype = {
     init: function(texture, width, height, factor)
     {
         // Reset ninebox
+        this.alphaUniform = -1;
+        this.uvSizeUniform = -1;
+        this.uvFactorUniform = -1;
         this.texture = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
@@ -101,6 +109,13 @@ Ninebox.prototype = {
 
         // Check ninebox shader pointer
         if (!this.nineboxShader) return false;
+
+        // Get ninebox shader uniforms locations
+        this.nineboxShader.bind();
+        this.alphaUniform = this.nineboxShader.getUniform("alpha");
+        this.uvSizeUniform = this.nineboxShader.getUniform("uvSize");
+        this.uvFactorUniform = this.nineboxShader.getUniform("uvFactor");
+        this.nineboxShader.unbind();
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
@@ -347,36 +362,30 @@ Ninebox.prototype = {
         this.modelMatrix.scaleVec2(this.size);
 
         // Bind ninebox shader
-        this.nineboxShader.shader.bind();
+        this.nineboxShader.bind();
 
         // Send shader uniforms
-        this.nineboxShader.shader.sendProjectionMatrix(
+        this.nineboxShader.sendProjectionMatrix(
             this.renderer.projMatrix
         );
-        this.nineboxShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.nineboxShader.shader.sendModelMatrix(this.modelMatrix);
-        this.nineboxShader.shader.sendUniform(
-            this.nineboxShader.alphaUniform, this.alpha
-        );
-        this.nineboxShader.shader.sendUniformVec2(
-            this.nineboxShader.uvSizeUniform, this.size
-        );
-        this.nineboxShader.shader.sendUniform(
-            this.nineboxShader.uvFactorUniform, this.uvFactor
-        );
+        this.nineboxShader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.nineboxShader.sendModelMatrix(this.modelMatrix);
+        this.nineboxShader.sendUniform(this.alphaUniform, this.alpha);
+        this.nineboxShader.sendUniformVec2(this.uvSizeUniform, this.size);
+        this.nineboxShader.sendUniform(this.uvFactorUniform, this.uvFactor);
 
         // Bind texture
         this.texture.bind();
 
         // Render VBO
         this.renderer.vertexBuffer.bind();
-        this.renderer.vertexBuffer.render(this.nineboxShader.shader);
+        this.renderer.vertexBuffer.render(this.nineboxShader);
         this.renderer.vertexBuffer.unbind();
 
         // Unbind texture
         this.texture.unbind();
 
         // Unbind ninebox shader
-        this.nineboxShader.shader.unbind();
+        this.nineboxShader.unbind();
     }
 };

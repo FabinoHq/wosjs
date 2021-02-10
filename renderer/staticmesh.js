@@ -54,6 +54,9 @@ function StaticMesh(renderer, meshShader)
     // Static mesh shader pointer
     this.meshShader = meshShader;
 
+    // Static mesh shader uniforms locations
+    this.alphaUniform = -1;
+
     // Static mesh vertex buffer
     this.vertexBuffer = null;
 
@@ -81,6 +84,8 @@ StaticMesh.prototype = {
     init: function(model, texture)
     {
         // Reset static mesh
+        this.alphaUniform = -1;
+        this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
         this.position = new Vector3(0.0, 0.0, 0.0);
@@ -93,6 +98,11 @@ StaticMesh.prototype = {
 
         // Check static mesh shader pointer
         if (!this.meshShader) return false;
+
+        // Get static mesh shader uniforms locations
+        this.meshShader.bind();
+        this.alphaUniform = this.meshShader.getUniform("alpha");
+        this.meshShader.unbind();
 
         // Check model pointer
         if (!model) return false;
@@ -431,30 +441,26 @@ StaticMesh.prototype = {
         this.modelMatrix.scaleVec3(this.size);
 
         // Bind static mesh shader
-        this.meshShader.shader.bind();
+        this.meshShader.bind();
 
         // Send shader uniforms
-        this.meshShader.shader.sendProjectionMatrix(
-            this.renderer.camera.projMatrix
-        );
-        this.meshShader.shader.sendViewMatrix(this.renderer.camera.viewMatrix);
-        this.meshShader.shader.sendModelMatrix(this.modelMatrix);
-        this.meshShader.shader.sendUniform(
-            this.meshShader.alphaUniform, this.alpha
-        );
+        this.meshShader.sendProjectionMatrix(this.renderer.camera.projMatrix);
+        this.meshShader.sendViewMatrix(this.renderer.camera.viewMatrix);
+        this.meshShader.sendModelMatrix(this.modelMatrix);
+        this.meshShader.sendUniform(this.alphaUniform, this.alpha);
 
         // Bind texture
         this.texture.bind();
 
         // Render VBO
         this.vertexBuffer.bind();
-        this.vertexBuffer.render(this.meshShader.shader);
+        this.vertexBuffer.render(this.meshShader);
         this.vertexBuffer.unbind();
 
         // Unbind texture
         this.texture.unbind();
 
         // Unbind static mesh shader
-        this.meshShader.shader.unbind();
+        this.meshShader.unbind();
     }
 };

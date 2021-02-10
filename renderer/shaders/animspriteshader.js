@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/animspriteshader.js : Animated sprite shader management      //
+//      renderer/animspriteshader.js : Animated sprite shader                 //
 ////////////////////////////////////////////////////////////////////////////////
 
 
@@ -61,69 +61,3 @@ const animspriteFragmentShaderSrc = [
     "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
     "}"
 ].join("\n");
-
-
-////////////////////////////////////////////////////////////////////////////////
-//  AnimSpriteShader class definition                                         //
-//  param glPointer : WebGL functions pointer                                 //
-////////////////////////////////////////////////////////////////////////////////
-function AnimSpriteShader(glPointer)
-{
-    // WebGL functions pointer
-    this.gl = glPointer;
-
-    // Animated sprite shader
-    this.shader = null;
-
-    // Animated sprite shader uniforms locations
-    this.alphaUniform = -1;
-    this.countUniform = -1;
-    this.currentUniform = -1;
-    this.nextUniform = -1;
-    this.interpUniform = -1;
-}
-
-AnimSpriteShader.prototype = {
-    ////////////////////////////////////////////////////////////////////////////
-    //  init : Init animated sprite shader                                    //
-    ////////////////////////////////////////////////////////////////////////////
-    init: function()
-    {
-        // Reset animated sprite shader
-        this.alphaUniform = -1;
-        this.countUniform = -1;
-        this.currentUniform = -1;
-        this.nextUniform = -1;
-        this.interpUniform = -1;
-
-        // Check gl pointer
-        if (!this.gl)
-        {
-            return false;
-        }
-
-        // Init animated sprite shader
-        this.shader = new Shader(this.gl);
-        if (!this.shader)
-        {
-            return false;
-        }
-        if (!this.shader.init(
-            defaultVertexShaderSrc, animspriteFragmentShaderSrc))
-        {
-            return false;
-        }
-
-        // Get animated sprite shader uniforms locations
-        this.shader.bind();
-        this.alphaUniform = this.shader.getUniform("alpha");
-        this.countUniform = this.shader.getUniform("count");
-        this.currentUniform = this.shader.getUniform("current");
-        this.nextUniform = this.shader.getUniform("next");
-        this.interpUniform = this.shader.getUniform("interp");
-        this.shader.unbind();
-
-        // Animated sprite shader successfully loaded
-        return true;
-    }
-};

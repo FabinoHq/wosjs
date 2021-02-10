@@ -44,15 +44,22 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  AnimSprite class definition                                               //
 //  param renderer : Renderer pointer                                         //
-//  param animSpriteShader : Animated sprite shader pointer                   //
+//  param animShader : Animated sprite shader pointer                         //
 ////////////////////////////////////////////////////////////////////////////////
-function AnimSprite(renderer, animSpriteShader)
+function AnimSprite(renderer, animShader)
 {
     // Renderer pointer
     this.renderer = renderer;
 
     // Animated sprite shader pointer
-    this.animShader = animSpriteShader;
+    this.animShader = animShader;
+
+    // Animated sprite shader uniforms locations
+    this.alphaUniform = -1;
+    this.countUniform = -1;
+    this.currentUniform = -1;
+    this.nextUniform = -1;
+    this.interpUniform = -1;
 
     // Animated sprite texture
     this.texture = null;
@@ -95,6 +102,11 @@ AnimSprite.prototype = {
     init: function(tex, width, height, countX, countY)
     {
         // Reset animated sprite
+        this.alphaUniform = -1;
+        this.countUniform = -1;
+        this.currentUniform = -1;
+        this.nextUniform = -1;
+        this.interpUniform = -1;
         this.texture = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
@@ -119,6 +131,15 @@ AnimSprite.prototype = {
 
         // Check animated sprite shader pointer
         if (!this.animShader) return false;
+
+        // Get animated sprite shader uniforms locations
+        this.animShader.bind();
+        this.alphaUniform = this.animShader.getUniform("alpha");
+        this.countUniform = this.animShader.getUniform("count");
+        this.currentUniform = this.animShader.getUniform("current");
+        this.nextUniform = this.animShader.getUniform("next");
+        this.interpUniform = this.animShader.getUniform("interp");
+        this.animShader.unbind();
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
@@ -581,41 +602,31 @@ AnimSprite.prototype = {
         this.modelMatrix.scaleVec2(this.size);
 
         // Bind shader
-        this.animShader.shader.bind();
+        this.animShader.bind();
 
         // Send shader uniforms
-        this.animShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.animShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.animShader.shader.sendModelMatrix(this.modelMatrix);
-        this.animShader.shader.sendUniform(
-            this.animShader.alphaUniform, this.alpha
-        );
-        this.animShader.shader.sendUniformVec2(
-            this.animShader.countUniform, this.count
-        );
-        this.animShader.shader.sendUniformVec2(
-            this.animShader.currentUniform, this.current
-        );
-        this.animShader.shader.sendUniformVec2(
-            this.animShader.nextUniform, this.next
-        );
-        this.animShader.shader.sendUniform(
-            this.animShader.interpUniform, interp
-        );
+        this.animShader.sendProjectionMatrix(this.renderer.projMatrix);
+        this.animShader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.animShader.sendModelMatrix(this.modelMatrix);
+        this.animShader.sendUniform(this.alphaUniform, this.alpha);
+        this.animShader.sendUniformVec2(this.countUniform, this.count);
+        this.animShader.sendUniformVec2(this.currentUniform, this.current);
+        this.animShader.sendUniformVec2(this.nextUniform, this.next);
+        this.animShader.sendUniform(this.interpUniform, interp);
 
         // Bind texture
         this.texture.bind();
 
         // Render VBO
         this.renderer.vertexBuffer.bind();
-        this.renderer.vertexBuffer.render(this.animShader.shader);
+        this.renderer.vertexBuffer.render(this.animShader);
         this.renderer.vertexBuffer.unbind();
 
         // Unbind texture
         this.texture.unbind();
 
         // Unbind shader
-        this.animShader.shader.unbind();
+        this.animShader.unbind();
     }
 };
 

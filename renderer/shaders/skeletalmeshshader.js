@@ -42,9 +42,9 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Skeletal vertex shader                                                    //
+//  Skeletal mesh vertex shader                                               //
 ////////////////////////////////////////////////////////////////////////////////
-const skeletalVertexShaderSrc = [
+const skeletalMeshVertexShaderSrc = [
     "precision mediump float;",
     "precision mediump int;",
     "attribute vec3 vertexPos;",
@@ -95,59 +95,3 @@ const skeletalMeshFragmentShaderSrc = [
     "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
     "}"
 ].join("\n");
-
-
-////////////////////////////////////////////////////////////////////////////////
-//  SkeletalMeshShader class definition                                       //
-//  param glPointer : WebGL functions pointer                                 //
-////////////////////////////////////////////////////////////////////////////////
-function SkeletalMeshShader(glPointer)
-{
-    // WebGL functions pointer
-    this.gl = glPointer;
-
-    // Skeletal mesh shader
-    this.shader = null;
-
-    // Skeletal mesh shader uniforms locations
-    this.alphaUniform = -1;
-    this.bonesCountUniform = -1;
-}
-
-SkeletalMeshShader.prototype = {
-    ////////////////////////////////////////////////////////////////////////////
-    //  init : Init skeletal mesh shader                                      //
-    ////////////////////////////////////////////////////////////////////////////
-    init: function()
-    {
-        // Reset skeletal mesh shader
-        this.alphaUniform = -1;
-
-        // Check gl pointer
-        if (!this.gl)
-        {
-            return false;
-        }
-
-        // Init skeletal mesh shader
-        this.shader = new Shader(this.gl);
-        if (!this.shader)
-        {
-            return false;
-        }
-        if (!this.shader.init(
-            skeletalVertexShaderSrc, skeletalMeshFragmentShaderSrc))
-        {
-            return false;
-        }
-
-        // Get skeletal mesh shader uniforms locations
-        this.shader.bind();
-        this.alphaUniform = this.shader.getUniform("alpha");
-        this.bonesCountUniform = this.shader.getUniform("bonesCount");
-        this.shader.unbind();
-
-        // Skeletal mesh shader successfully loaded
-        return true;
-    }
-};

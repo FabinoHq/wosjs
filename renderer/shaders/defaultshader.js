@@ -37,26 +37,40 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/rectshader.js : Rect shader management                       //
+//      renderer/defaultshader.js : Default shader                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Rect fragment shader                                                      //
+//  Default vertex shader                                                     //
 ////////////////////////////////////////////////////////////////////////////////
-const rectFragmentShaderSrc = [
+const defaultVertexShaderSrc = [
     "precision mediump float;",
     "precision mediump int;",
+    "attribute vec3 vertexPos;",
+    "attribute vec2 vertexColor;",
+    "uniform mat4 projMatrix;",
+    "uniform mat4 viewMatrix;",
+    "uniform mat4 modelMatrix;",
     "varying vec2 texCoord;",
-    "uniform vec3 color;",
-    "uniform float alpha;",
-    "uniform float width;",
-    "uniform float height;",
-    "uniform float thickness;",
     "void main()",
     "{",
-    "    vec2 rect = step(1.0-(thickness/vec2(abs(width), abs(height))),",
-    "        abs(texCoord-0.5)*2.0);",
-    "    gl_FragColor = vec4(color, clamp(rect.x+rect.y, 0.0, 1.0)*alpha);",
+    "    texCoord = vertexColor;",
+    "    gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
+    "}"
+].join("\n");
+
+////////////////////////////////////////////////////////////////////////////////
+//  Default fragment shader                                                   //
+////////////////////////////////////////////////////////////////////////////////
+const defaultFragmentShaderSrc = [
+    "precision mediump float;",
+    "precision mediump int;",
+    "uniform sampler2D texture;",
+    "varying vec2 texCoord;",
+    "void main()",
+    "{",
+    "    vec4 texColor = texture2D(texture, texCoord);",
+    "    gl_FragColor = vec4(texColor.rgb, texColor.a);",
     "}"
 ].join("\n");

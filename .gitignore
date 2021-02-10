@@ -44,6 +44,7 @@
 !renderer/view.js
 !renderer/camera.js
 !renderer/shaders/
+!renderer/shaders/defaultshader.js
 !renderer/shaders/lineshader.js
 !renderer/shaders/rectshader.js
 !renderer/shaders/spriteshader.js

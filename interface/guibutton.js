@@ -54,6 +54,10 @@ function GuiButton(renderer, buttonShader)
     // Button shader pointer
     this.buttonShader = buttonShader;
 
+    // Button shader uniforms locations
+    this.alphaUniform = -1;
+    this.stateUniform = -1;
+
     // Button texture
     this.texture = null;
     // Button model matrix
@@ -79,6 +83,8 @@ GuiButton.prototype = {
     init: function(texture, width, height)
     {
         // Reset button
+        this.alphaUniform = -1;
+        this.buttonStateUniform = -1;
         this.texture = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
@@ -93,6 +99,12 @@ GuiButton.prototype = {
 
         // Check button shader pointer
         if (!this.buttonShader) return false;
+
+        // Get button shader uniforms locations
+        this.buttonShader.bind();
+        this.alphaUniform = this.buttonShader.getUniform("alpha");
+        this.stateUniform = this.buttonShader.getUniform("buttonState");
+        this.buttonShader.unbind();
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
@@ -328,9 +340,9 @@ GuiButton.prototype = {
     isPicking: function(mouseX, mouseY)
     {
         if ((mouseX >= this.position.vec[0]) &&
-            (mouseX <= (this.position.vec[0]+ this.size.vec[0])) &&
+            (mouseX <= (this.position.vec[0] + this.size.vec[0])) &&
             (mouseY >= this.position.vec[1]) &&
-            (mouseY <= (this.position.vec[1]+ this.size.vec[1])))
+            (mouseY <= (this.position.vec[1] + this.size.vec[1])))
         {
             // Button is picking
             return true;
@@ -396,31 +408,27 @@ GuiButton.prototype = {
         this.modelMatrix.scaleVec2(this.size);
 
         // Bind button shader
-        this.buttonShader.shader.bind();
+        this.buttonShader.bind();
 
         // Send shader uniforms
-        this.buttonShader.shader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.buttonShader.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.buttonShader.shader.sendModelMatrix(this.modelMatrix);
-        this.buttonShader.shader.sendUniform(
-            this.buttonShader.alphaUniform, this.alpha
-        );
-        this.buttonShader.shader.sendIntUniform(
-            this.buttonShader.buttonStateUniform, this.buttonState
-        );
+        this.buttonShader.sendProjectionMatrix(this.renderer.projMatrix);
+        this.buttonShader.sendViewMatrix(this.renderer.view.viewMatrix);
+        this.buttonShader.sendModelMatrix(this.modelMatrix);
+        this.buttonShader.sendUniform(this.alphaUniform, this.alpha);
+        this.buttonShader.sendIntUniform(this.stateUniform, this.buttonState);
 
         // Bind texture
         this.texture.bind();
 
         // Render VBO
         this.renderer.vertexBuffer.bind();
-        this.renderer.vertexBuffer.render(this.buttonShader.shader);
+        this.renderer.vertexBuffer.render(this.buttonShader);
         this.renderer.vertexBuffer.unbind();
 
         // Unbind texture
         this.texture.unbind();
 
         // Unbind button shader
-        this.buttonShader.shader.unbind();
+        this.buttonShader.unbind();
     }
 };

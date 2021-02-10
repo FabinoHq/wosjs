@@ -54,6 +54,10 @@ function SkeletalMesh(renderer, skeletalShader)
     // Skeletal mesh shader pointer
     this.skeletalShader = skeletalShader;
 
+    // Skeletal mesh shader uniforms locations
+    this.alphaUniform = -1;
+    this.bonesCountUniform = -1;
+
     // Skeletal mesh vertex buffer
     this.vertexBuffer = null;
 
@@ -87,9 +91,6 @@ function SkeletalMesh(renderer, skeletalShader)
     this.angles = null;
     // Skeletal mesh alpha
     this.alpha = 1.0;
-
-    // Test time
-    this.testtime = 0.0;
 }
 
 SkeletalMesh.prototype = {
@@ -103,6 +104,9 @@ SkeletalMesh.prototype = {
         var i = 0;
 
         // Reset skeletal mesh
+        this.alphaUniform = -1;
+        this.bonesCountUniform = -1;
+        this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix = null;
         this.bonesTexture = null;
@@ -116,6 +120,12 @@ SkeletalMesh.prototype = {
 
         // Check skeletal mesh shader pointer
         if (!this.skeletalShader) return false;
+
+        // Get skeletal mesh shader uniforms locations
+        this.skeletalShader.bind();
+        this.alphaUniform = this.skeletalShader.getUniform("alpha");
+        this.bonesCountUniform = this.skeletalShader.getUniform("bonesCount");
+        this.skeletalShader.unbind();
 
         // Check model pointer
         if (!model) return false;
@@ -511,7 +521,7 @@ SkeletalMesh.prototype = {
     compute: function(frametime)
     {
         var i = 0;
-        this.testtime += frametime;
+        var tmpMat = new Matrix4x4();
 
         for (i = 0; i < this.bonesCount; ++i)
         {
@@ -524,7 +534,6 @@ SkeletalMesh.prototype = {
             this.bonesMatrices[i].rotateVec3(this.bonesAngles[i]);
 
             // Multiply bone matrix by inverse bind pose matrix
-            var tmpMat = new Matrix4x4();
             tmpMat.setMatrix(this.bonesMatrices[i]);
             tmpMat.multiply(this.bonesInverses[i]);
 
@@ -575,21 +584,17 @@ SkeletalMesh.prototype = {
         this.modelMatrix.scaleVec3(this.size);
 
         // Bind skeletal mesh shader
-        this.skeletalShader.shader.bind();
+        this.skeletalShader.bind();
 
         // Send shader uniforms
-        this.skeletalShader.shader.sendProjectionMatrix(
+        this.skeletalShader.sendProjectionMatrix(
             this.renderer.camera.projMatrix
         );
-        this.skeletalShader.shader.sendViewMatrix(
-            this.renderer.camera.viewMatrix
-        );
-        this.skeletalShader.shader.sendModelMatrix(this.modelMatrix);
-        this.skeletalShader.shader.sendUniform(
-            this.skeletalShader.alphaUniform, this.alpha
-        );
-        this.skeletalShader.shader.sendUniform(
-            this.skeletalShader.bonesCountUniform, this.bonesCount
+        this.skeletalShader.sendViewMatrix(this.renderer.camera.viewMatrix);
+        this.skeletalShader.sendModelMatrix(this.modelMatrix);
+        this.skeletalShader.sendUniform(this.alphaUniform, this.alpha);
+        this.skeletalShader.sendUniform(
+            this.bonesCountUniform, this.bonesCount
         );
 
         // Bind texture
@@ -602,7 +607,7 @@ SkeletalMesh.prototype = {
 
         // Render VBO
         this.vertexBuffer.bind();
-        this.vertexBuffer.render(this.skeletalShader.shader);
+        this.vertexBuffer.render(this.skeletalShader);
         this.vertexBuffer.unbind();
 
         // Unbind texture
@@ -612,6 +617,6 @@ SkeletalMesh.prototype = {
         this.texture.unbind();
 
         // Unbind skeletal mesh shader
-        this.skeletalShader.shader.unbind();
+        this.skeletalShader.unbind();
     }
 };
