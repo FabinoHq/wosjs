@@ -236,6 +236,8 @@ function Wos()
 
     // WOS renderer
     this.renderer = null;
+    // WOS backrenderer
+    this.backrenderer = null;
     // WOS audio engine
     this.audio = null;
     // WOS assets loader
@@ -309,6 +311,13 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     initDone: function()
     {
+        // Init backrenderer
+        this.backrenderer = new BackRenderer(
+            this.renderer, this.loader.backrendererShader
+        );
+        this.backrenderer.init(1, 1);
+        this.backrenderer.clear();
+
         // Play test sound
         if (this.audio.enabled)
         {
@@ -572,54 +581,66 @@ Wos.prototype = {
         // Clear renderer
         this.renderer.clear();
 
+        // Render into background renderer
+        //this.backrenderer.clear();
+
+        // Set renderer as active
+        //this.renderer.setActive();
+
+        // Render background renderer texture
+        //this.backrenderer.setX(-this.backrenderer.getWidth()*0.5);
+        //this.backrenderer.setY(-this.backrenderer.getHeight()*0.5);
+        //this.backrenderer.setSize(1.0, 1.0);
+        //this.backrenderer.render();
+
         // Render test line
         //this.testline.setTarget(this.realMouseX, this.realMouseY);
         //this.testline.render();
 
         // Render test rect
-        //this.testrect.setX(-this.testrect.getWidth()/2.0);
-        //this.testrect.setY(-this.testrect.getHeight()/2.0);
+        //this.testrect.setX(-this.testrect.getWidth()*0.5);
+        //this.testrect.setY(-this.testrect.getHeight()*0.5);
         //this.testrect.render();
 
         // Render test sprite
-        //this.testsprite.setX(-this.testsprite.getWidth()/2.0);
-        //this.testsprite.setY(-this.testsprite.getHeight()/2.0);
+        //this.testsprite.setX(-this.testsprite.getWidth()*0.5);
+        //this.testsprite.setY(-this.testsprite.getHeight()*0.5);
         //this.testsprite.render();
 
         // Render test procedural sprite
-        //this.testproc.setX(-this.testproc.getWidth()/2.0);
-        //this.testproc.setY(-this.testproc.getHeight()/2.0);
+        //this.testproc.setX(-this.testproc.getWidth()*0.5);
+        //this.testproc.setY(-this.testproc.getHeight()*0.5);
         //this.testproc.render();
 
         // Render test ninebox
         //this.testninebox.setSize(this.realMouseX*2.0, this.realMouseY*2.0);
-        //this.testninebox.setX(-this.testninebox.getWidth()/2.0);
-        //this.testninebox.setY(-this.testninebox.getHeight()/2.0);
+        //this.testninebox.setX(-this.testninebox.getWidth()*0.5);
+        //this.testninebox.setY(-this.testninebox.getHeight()*0.5);
         //this.testninebox.render();
 
         // Render test anim
-        //this.testanim.setX(-this.testanim.getWidth()/2.0);
-        //this.testanim.setY(-this.testanim.getHeight()/2.0);
+        //this.testanim.setX(-this.testanim.getWidth()*0.5);
+        //this.testanim.setY(-this.testanim.getHeight()*0.5);
         //this.testanim.render(this.frametime);
 
         // Render test button
-        //this.testbutton.setX(-this.testbutton.getWidth()/2.0);
-        //this.testbutton.setY(-this.testbutton.getHeight()/2.0);
+        //this.testbutton.setX(-this.testbutton.getWidth()*0.5);
+        //this.testbutton.setY(-this.testbutton.getHeight()*0.5);
         //this.testbutton.render();
 
         // Render test toggle button
-        //this.testtogglebutton.setX(-this.testtogglebutton.getWidth()/2.0);
-        //this.testtogglebutton.setY(-this.testtogglebutton.getHeight()/2.0);
+        //this.testtogglebutton.setX(-this.testtogglebutton.getWidth()*0.5);
+        //this.testtogglebutton.setY(-this.testtogglebutton.getHeight()*0.5);
         //this.testtogglebutton.render();
 
         // Render test text
-        //this.testtext.setX(-this.testtext.getWidth()/2.0);
-        //this.testtext.setY(-this.testtext.getHeight()/2.0);
+        //this.testtext.setX(-this.testtext.getWidth()*0.5);
+        //this.testtext.setY(-this.testtext.getHeight()*0.5);
         //this.testtext.render();
 
         // Render test text box
-        //this.testtextbox.setX(-this.testtextbox.getWidth()/2.0);
-        //this.testtextbox.setY(-this.testtextbox.getHeight()/2.0);
+        //this.testtextbox.setX(-this.testtextbox.getWidth()*0.5);
+        //this.testtextbox.setY(-this.testtextbox.getHeight()*0.5);
         //this.testtextbox.render();
 
         // Set camera

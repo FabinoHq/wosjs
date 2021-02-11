@@ -55,6 +55,7 @@ function Loader(renderer, audio)
     this.audio = audio;
 
     // Shaders
+    this.backrendererShader = null;
     this.lineShader = null;
     this.rectShader = null;
     this.spriteShader = null;
@@ -92,6 +93,7 @@ Loader.prototype = {
         // Reset loader
         this.loaded = false;
 
+        this.backrendererShader = null;
         this.lineShader = null;
         this.rectShader = null;
         this.spriteShader = null;
@@ -125,6 +127,14 @@ Loader.prototype = {
 
         // Check WebGL pointer
         if (!this.renderer.gl) return false;
+
+        // Init background renderer shader
+        this.backrendererShader = new Shader(this.renderer.gl);
+        if (!this.backrendererShader.init(
+            defaultVertexShaderSrc, backrendererFragmentShaderSrc))
+        {
+            return false;
+        }
 
         // Init line shader
         this.lineShader = new Shader(this.renderer.gl);

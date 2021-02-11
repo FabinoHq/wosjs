@@ -28,6 +28,7 @@
 !renderer/
 !renderer/animsprite.js
 !renderer/renderer.js
+!renderer/backrenderer.js
 !renderer/vertexbuffer.js
 !renderer/skeletalvertexbuffer.js
 !renderer/shader.js
@@ -45,6 +46,7 @@
 !renderer/camera.js
 !renderer/shaders/
 !renderer/shaders/defaultshader.js
+!renderer/shaders/backrenderershader.js
 !renderer/shaders/lineshader.js
 !renderer/shaders/rectshader.js
 !renderer/shaders/spriteshader.js

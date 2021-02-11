@@ -73,6 +73,13 @@ function Renderer()
     this.vpoffx = 0.0;
     this.vpoffy = 0.0;
 
+    // Renderer subzone
+    this.subzone = false;
+    this.subwidth = 1.0;
+    this.subheight = 1.0;
+    this.suboffsetx = 0.0;
+    this.suboffsety = 0.0;
+
     // Default graphics pipeline
     this.vertexBuffer = null;
     this.shader = null;
@@ -112,6 +119,11 @@ Renderer.prototype = {
         this.vpheight = 0.0;
         this.vpoffx = 0.0;
         this.vpoffy = 0.0;
+        this.subzone = false;
+        this.subwidth = 1.0;
+        this.subheight = 1.0;
+        this.suboffsetx = 0.0;
+        this.suboffsety = 0.0;
         this.vertexBuffer = null;
         this.shader = null;
         this.projMatrix = null;
@@ -196,7 +208,7 @@ Renderer.prototype = {
         if (!this.shader.init()) return false;
         this.shader.bind();
 
-        // Set default clear color
+        // Set renderer clear color
         this.gl.clearColor(
             WOSDefaultClearColorRed,
             WOSDefaultClearColorGreen,
@@ -222,7 +234,7 @@ Renderer.prototype = {
 
         // Init viewport
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
-        this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth,this.vpheight);
+        this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
         this.gl.disable(this.gl.SCISSOR_TEST);
 
         // Init projection matrix
@@ -246,6 +258,9 @@ Renderer.prototype = {
         // Init camera
         this.camera = new Camera();
 
+        // Disable dithering
+        this.gl.disable(this.gl.DITHER);
+
         // Init depth and blend functions
         this.gl.disable(this.gl.DEPTH_TEST);
         this.gl.enable(this.gl.BLEND);
@@ -258,7 +273,7 @@ Renderer.prototype = {
         // Set texture 0 as active texture
         this.gl.activeTexture(this.gl.TEXTURE0);
 
-        // WebGL successfully loaded
+        // Renderer is successfully loaded
         this.loaded = true;
         return true;
     },
@@ -290,7 +305,7 @@ Renderer.prototype = {
 
         // Update viewport
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
-        this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth,this.vpheight);
+        this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
         this.gl.disable(this.gl.SCISSOR_TEST);
 
         // Set projection matrix
@@ -304,12 +319,51 @@ Renderer.prototype = {
         this.shader.sendProjectionMatrix(this.projMatrix);
         this.shader.unbind();
 
+        // Set renderer clear color
+        this.gl.clearColor(
+            WOSDefaultClearColorRed,
+            WOSDefaultClearColorGreen,
+            WOSDefaultClearColorBlue,
+            1.0
+        );
+
         // Clear screen
         this.gl.clear(
             this.gl.COLOR_BUFFER_BIT |
             this.gl.DEPTH_BUFFER_BIT |
             this.gl.STENCIL_BUFFER_BIT
         );
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setActive : Set renderer as active                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setActive: function()
+    {
+        // Unbind framebuffer
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
+        // Update viewport
+        this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
+        if (this.subzone)
+        {
+            this.gl.scissor(
+                this.vpoffx+
+                (((this.suboffsetx/this.ratio)+1.0)*0.5*this.vpwidth),
+                this.vpoffy+((this.suboffsety+1.0)*0.5*this.vpheight),
+                this.vpwidth/this.ratio*0.5*this.subwidth,
+                this.vpheight*0.5*this.subheight
+            );
+            this.gl.enable(this.gl.SCISSOR_TEST);
+        }
+        else
+        {
+            this.gl.scissor(
+                this.vpoffx, this.vpoffy,
+                this.vpwidth, this.vpheight
+            );
+            this.gl.disable(this.gl.SCISSOR_TEST);
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -321,13 +375,18 @@ Renderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSubzone: function(width, height, offsetX, offsetY)
     {
+        this.subwidth = width;
+        this.subheight = height;
+        this.suboffsetx = offsetX;
+        this.suboffsety = offsetY;
         this.gl.scissor(
-            this.vpoffx+(this.vpwidth*offsetX),
-            this.vpoffy+(this.vpheight*offsetY),
-            this.vpwidth*width,
-            this.vpheight*height
+            this.vpoffx+(((this.suboffsetx/this.ratio)+1.0)*0.5*this.vpwidth),
+            this.vpoffy+((this.suboffsety+1.0)*0.5*this.vpheight),
+            this.vpwidth/this.ratio*0.5*this.subwidth,
+            this.vpheight*0.5*this.subheight
         );
         this.gl.enable(this.gl.SCISSOR_TEST);
+        this.subzone = true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -335,8 +394,13 @@ Renderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     disableSubzone: function()
     {
-        this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth,this.vpheight);
+        this.subwidth = 1.0;
+        this.subheight = 1.0;
+        this.suboffsetx = 0.0;
+        this.suboffsety = 0.0;
+        this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
         this.gl.disable(this.gl.SCISSOR_TEST);
+        this.subzone = false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -463,15 +527,17 @@ Renderer.prototype = {
         var pixelsData = null;
 
         // Update offscreen canvas size
-        this.offCanvas.width = width;
-        this.offCanvas.height = height;
+        this.offCanvas.width = Math.round(width);
+        this.offCanvas.height = Math.round(height);
 
         // Draw text
         this.offContext.font = fontsize.toString() + "px wosfont";
         this.offContext.fillText(text, 0, (0.84*fontsize));
 
         // Get pixels data
-        textData = this.offContext.getImageData(0, 0, width, height);
+        textData = this.offContext.getImageData(
+            0, 0, this.offCanvas.width, this.offCanvas.height
+        );
         pixelsData = new Uint8Array(textData.data.buffer);
         return pixelsData;
     },
@@ -489,14 +555,16 @@ Renderer.prototype = {
         var pixelsData = null;
 
         // Update offscreen canvas size
-        this.offCanvas.width = width;
-        this.offCanvas.height = height;
+        this.offCanvas.width = Math.round(width);
+        this.offCanvas.height = Math.round(height);
 
         // Create image context
         this.offContext.drawImage(image, 0, 0);
 
         // Get pixels data
-        imageData = this.offContext.getImageData(0, 0, width, height);
+        imageData = this.offContext.getImageData(
+            0, 0, this.offCanvas.width, this.offCanvas.height
+        );
         pixelsData = new Uint8Array(imageData.data.buffer);
         return pixelsData;
     },
