@@ -220,8 +220,10 @@ Renderer.prototype = {
         this.vpoffy = (this.height-this.vpheight)*0.5;
         if (this.vpheight > 0.0) this.ratio = this.vpwidth/this.vpheight;
 
-        // Set viewport
+        // Init viewport
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
+        this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth,this.vpheight);
+        this.gl.disable(this.gl.SCISSOR_TEST);
 
         // Init projection matrix
         this.projMatrix = new Matrix4x4();
@@ -288,6 +290,8 @@ Renderer.prototype = {
 
         // Update viewport
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
+        this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth,this.vpheight);
+        this.gl.disable(this.gl.SCISSOR_TEST);
 
         // Set projection matrix
         this.projMatrix.setOrthographic(
@@ -306,6 +310,33 @@ Renderer.prototype = {
             this.gl.DEPTH_BUFFER_BIT |
             this.gl.STENCIL_BUFFER_BIT
         );
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSubzone : Set rendering sub zone                                   //
+    //  param width : Sub zone width                                          //
+    //  param height : Sub zone height                                        //
+    //  param offsetX : Subzone X offset                                      //
+    //  param offsetY : Subzone Y offset                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    setSubzone: function(width, height, offsetX, offsetY)
+    {
+        this.gl.scissor(
+            this.vpoffx+(this.vpwidth*offsetX),
+            this.vpoffy+(this.vpheight*offsetY),
+            this.vpwidth*width,
+            this.vpheight*height
+        );
+        this.gl.enable(this.gl.SCISSOR_TEST);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  disableSubzone : Disable rendering sub zone                           //
+    ////////////////////////////////////////////////////////////////////////////
+    disableSubzone: function()
+    {
+        this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth,this.vpheight);
+        this.gl.disable(this.gl.SCISSOR_TEST);
     },
 
     ////////////////////////////////////////////////////////////////////////////
