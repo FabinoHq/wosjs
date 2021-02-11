@@ -258,6 +258,8 @@ function Wos()
     this.testanim = null;
     // Test button
     this.testbutton = null;
+    // Test toggle button
+    this.testtogglebutton = null;
     // Test text
     this.testtext = null;
     // Test text box
@@ -364,6 +366,14 @@ Wos.prototype = {
             this.loader.getTexture("testbutton.png"), 0.12, 0.06
         );
 
+        // Init test toggle button
+        this.testtogglebutton = new GuiToggleButton(
+            this.renderer, this.loader.toggleButtonShader
+        );
+        this.testtogglebutton.init(
+            this.loader.getTexture("testtogglebutton.png"), 0.12, 0.12
+        );
+
         // Init test text
         this.testtext = new GuiText(this.renderer, this.loader.textShader);
         this.testtext.init("Test text", 0.07);
@@ -453,9 +463,17 @@ Wos.prototype = {
     {
         this.updateMousePosition(mouseX, mouseY);
         /*if (this.testbutton)
+        {
             this.testbutton.mouseMove(this.realMouseX, this.realMouseY);
-        if (this.testtextbox)
-            this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);*/
+        }*/
+        /*if (this.testtogglebutton)
+        {
+            this.testtogglebutton.mouseMove(this.realMouseX, this.realMouseY);
+        }*/
+        /*if (this.testtextbox)
+        {
+            this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);
+        }*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -468,9 +486,17 @@ Wos.prototype = {
     {
         this.updateMousePosition(mouseX, mouseY);
         /*if (this.testbutton)
+        {
             this.testbutton.mousePress(this.realMouseX, this.realMouseY);
-        if (this.testtextbox)
-            this.testtextbox.mousePress(this.realMouseX, this.realMouseY);*/
+        }*/
+        /*if (this.testtogglebutton)
+        {
+            this.testtogglebutton.mousePress(this.realMouseX, this.realMouseY);
+        }*/
+        /*if (this.testtextbox)
+        {
+            this.testtextbox.mousePress(this.realMouseX, this.realMouseY);
+        }*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -483,9 +509,19 @@ Wos.prototype = {
     {
         this.updateMousePosition(mouseX, mouseY);
         /*if (this.testbutton)
+        {
             this.testbutton.mouseRelease(this.realMouseX, this.realMouseY);
-        if (this.testtextbox)
-            this.testtextbox.mouseRelease(this.realMouseX, this.realMouseY);*/
+        }*/
+        /*if (this.testtogglebutton)
+        {
+            this.testtogglebutton.mouseRelease(
+                this.realMouseX, this.realMouseY
+            );
+        }*/
+        /*if (this.testtextbox)
+        {
+            this.testtextbox.mouseRelease(this.realMouseX, this.realMouseY);
+        }*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -570,6 +606,11 @@ Wos.prototype = {
         //this.testbutton.setX(-this.testbutton.getWidth()/2.0);
         //this.testbutton.setY(-this.testbutton.getHeight()/2.0);
         //this.testbutton.render();
+
+        // Render test toggle button
+        //this.testtogglebutton.setX(-this.testtogglebutton.getWidth()/2.0);
+        //this.testtogglebutton.setY(-this.testtogglebutton.getHeight()/2.0);
+        //this.testtogglebutton.render();
 
         // Render test text
         //this.testtext.setX(-this.testtext.getWidth()/2.0);

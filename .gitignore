@@ -51,12 +51,14 @@
 !renderer/shaders/animspriteshader.js
 !renderer/shaders/nineboxshader.js
 !renderer/shaders/buttonshader.js
+!renderer/shaders/togglebuttonshader.js
 !renderer/shaders/textshader.js
 !renderer/shaders/staticmeshshader.js
 !renderer/shaders/skeletalmeshshader.js
 
 !interface/
 !interface/guibutton.js
+!interface/guitogglebutton.js
 !interface/guitext.js
 !interface/guitextbox.js
 
@@ -72,6 +74,7 @@
 !textures/testsprite.png
 !textures/testninebox.png
 !textures/testbutton.png
+!textures/testtogglebutton.png
 
 # Models files
 !models/

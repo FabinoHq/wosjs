@@ -37,26 +37,40 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      assets.js : WOS Assets management                                     //
+//      renderer/togglebuttonshader.js : Toggle button shader management      //
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// WOS textures assets
-var TexturesAssets = [
-    "cursor.png",
-    "testsprite.png",
-    "testninebox.png",
-    "testbutton.png",
-    "testtogglebutton.png"
-];
-
-// WOS models assets
-var ModelsAssets = [
-    "testmodel.wmsh",
-    "testskeletal.wmsh"
-];
-
-// WOS sounds assets
-var SoundsAssets = [
-    "test.wav"
-];
+////////////////////////////////////////////////////////////////////////////////
+//  Toggle button fragment shader                                             //
+////////////////////////////////////////////////////////////////////////////////
+const toggleButtonFragmentShaderSrc = [
+    "precision mediump float;",
+    "precision mediump int;",
+    "uniform sampler2D texture;",
+    "varying vec2 texCoord;",
+    "uniform float alpha;",
+    "uniform int buttonState;",
+    "void main()",
+    "{",
+    "    vec2 buttonCoord = vec2(texCoord.x*0.5, texCoord.y*0.25);",
+    "    if (buttonState == 1) { buttonCoord.x += 0.5; }",
+    "    else if (buttonState == 2) { buttonCoord.y += 0.25; }",
+    "    else if (buttonState == 3)",
+    "    {",
+    "        buttonCoord.x += 0.5; buttonCoord.y += 0.25;",
+    "    }",
+    "    else if (buttonState == 4) { buttonCoord.y += 0.5; }",
+    "    else if (buttonState == 5)",
+    "    {",
+    "        buttonCoord.x += 0.5; buttonCoord.y += 0.5;",
+    "    }",
+    "    else if (buttonState == 6) { buttonCoord.y += 0.75; }",
+    "    else if (buttonState == 7)",
+    "    {",
+    "        buttonCoord.x += 0.5; buttonCoord.y += 0.75;",
+    "    }",
+    "    vec4 texColor = texture2D(texture, buttonCoord);",
+    "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
+    "}"
+].join("\n");

@@ -61,6 +61,7 @@ function Loader(renderer, audio)
     this.nineboxShader = null;
     this.animSpriteShader = null;
     this.buttonShader = null;
+    this.toggleButtonShader = null;
     this.textShader = null;
     this.staticMeshShader = null;
     this.skeletalMeshShader = null;
@@ -97,6 +98,7 @@ Loader.prototype = {
         this.nineboxShader = null;
         this.animSpriteShader = null;
         this.buttonShader = null;
+        this.toggleButtonShader = null;
         this.textShader = null;
         this.staticMeshShader = null;
         this.skeletalMeshShader = null;
@@ -168,6 +170,14 @@ Loader.prototype = {
         this.buttonShader = new Shader(this.renderer.gl);
         if (!this.buttonShader.init(
             defaultVertexShaderSrc, buttonFragmentShaderSrc))
+        {
+            return false;
+        }
+
+        // Init toggle button shader
+        this.toggleButtonShader = new Shader(this.renderer.gl);
+        if (!this.toggleButtonShader.init(
+            defaultVertexShaderSrc, toggleButtonFragmentShaderSrc))
         {
             return false;
         }
