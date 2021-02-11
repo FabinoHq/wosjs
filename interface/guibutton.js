@@ -71,6 +71,9 @@ function GuiButton(renderer, buttonShader)
     this.alpha = 1.0;
     // Button state
     this.buttonState = 0;
+
+    // Round button
+    this.isRound = false;
 }
 
 GuiButton.prototype = {
@@ -79,8 +82,9 @@ GuiButton.prototype = {
     //  param texture : Texture pointer                                       //
     //  param width : Button width                                            //
     //  param height : Button height                                          //
+    //  param round : Round button                                            //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(texture, width, height)
+    init: function(texture, width, height, round)
     {
         // Reset button
         this.alphaUniform = -1;
@@ -91,6 +95,7 @@ GuiButton.prototype = {
         this.size = new Vector2(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
+        if (round !== undefined) { if (round) this.isRound = true; }
         this.alpha = 1.0;
         this.buttonState = 0;
 
@@ -344,8 +349,23 @@ GuiButton.prototype = {
             (mouseY >= this.position.vec[1]) &&
             (mouseY <= (this.position.vec[1] + this.size.vec[1])))
         {
-            // Button is picking
-            return true;
+            if (this.isRound)
+            {
+                var rayx = this.size.vec[0]*0.5;
+                var rayy = this.size.vec[1]*0.5;
+                var dx = (mouseX - (this.position.vec[0] + rayx));
+                var dy = (mouseY - (this.position.vec[1] + rayy));
+                if (((dx*dx)/(rayx*rayx) + (dy*dy)/(rayy*rayy)) < 1.0)
+                {
+                    // Button is picking
+                    return true;
+                }
+            }
+            else
+            {
+                // Button is picking
+                return true;
+            }
         }
 
         // Button is not picking
