@@ -315,7 +315,7 @@ Wos.prototype = {
         this.backrenderer = new BackRenderer(
             this.renderer, this.loader.backrendererShader
         );
-        this.backrenderer.init(1, 1);
+        this.backrenderer.init(1024, 1024);
         this.backrenderer.clear();
 
         // Play test sound
@@ -583,6 +583,7 @@ Wos.prototype = {
 
         // Render into background renderer
         //this.backrenderer.clear();
+        //this.backrenderer.setActive();
 
         // Set renderer as active
         //this.renderer.setActive();

@@ -73,13 +73,6 @@ function Renderer()
     this.vpoffx = 0.0;
     this.vpoffy = 0.0;
 
-    // Renderer subzone
-    this.subzone = false;
-    this.subwidth = 1.0;
-    this.subheight = 1.0;
-    this.suboffsetx = 0.0;
-    this.suboffsety = 0.0;
-
     // Default graphics pipeline
     this.vertexBuffer = null;
     this.shader = null;
@@ -119,11 +112,6 @@ Renderer.prototype = {
         this.vpheight = 0.0;
         this.vpoffx = 0.0;
         this.vpoffy = 0.0;
-        this.subzone = false;
-        this.subwidth = 1.0;
-        this.subheight = 1.0;
-        this.suboffsetx = 0.0;
-        this.suboffsety = 0.0;
         this.vertexBuffer = null;
         this.shader = null;
         this.projMatrix = null;
@@ -283,6 +271,9 @@ Renderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     clear: function()
     {
+        // Unbind framebuffer
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, null);
+
         // Update context size
         this.context.width = this.width;
         this.context.height = this.height;
@@ -345,25 +336,12 @@ Renderer.prototype = {
 
         // Update viewport
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
-        if (this.subzone)
-        {
-            this.gl.scissor(
-                this.vpoffx+
-                (((this.suboffsetx/this.ratio)+1.0)*0.5*this.vpwidth),
-                this.vpoffy+((this.suboffsety+1.0)*0.5*this.vpheight),
-                this.vpwidth/this.ratio*0.5*this.subwidth,
-                this.vpheight*0.5*this.subheight
-            );
-            this.gl.enable(this.gl.SCISSOR_TEST);
-        }
-        else
-        {
-            this.gl.scissor(
-                this.vpoffx, this.vpoffy,
-                this.vpwidth, this.vpheight
-            );
-            this.gl.disable(this.gl.SCISSOR_TEST);
-        }
+
+        // Disable subzone
+        this.disableSubzone();
+
+        // Set default view
+        this.setDefaultView();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -375,18 +353,13 @@ Renderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSubzone: function(width, height, offsetX, offsetY)
     {
-        this.subwidth = width;
-        this.subheight = height;
-        this.suboffsetx = offsetX;
-        this.suboffsety = offsetY;
         this.gl.scissor(
-            this.vpoffx+(((this.suboffsetx/this.ratio)+1.0)*0.5*this.vpwidth),
-            this.vpoffy+((this.suboffsety+1.0)*0.5*this.vpheight),
-            this.vpwidth/this.ratio*0.5*this.subwidth,
-            this.vpheight*0.5*this.subheight
+            this.vpoffx+(((offsetX/this.ratio)+1.0)*0.5*this.vpwidth),
+            this.vpoffy+((offsetY+1.0)*0.5*this.vpheight),
+            this.vpwidth/this.ratio*0.5*width,
+            this.vpheight*0.5*height
         );
         this.gl.enable(this.gl.SCISSOR_TEST);
-        this.subzone = true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -394,13 +367,8 @@ Renderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     disableSubzone: function()
     {
-        this.subwidth = 1.0;
-        this.subheight = 1.0;
-        this.suboffsetx = 0.0;
-        this.suboffsety = 0.0;
         this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
         this.gl.disable(this.gl.SCISSOR_TEST);
-        this.subzone = false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -410,8 +378,17 @@ Renderer.prototype = {
     {
         if (this.view)
         {
+            // Reset projection matrix
+            this.projMatrix.setOrthographic(
+                -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
+            );
+            this.projMatrix.translateZ(-1.0);
+
             // Reset view
             this.view.reset();
+
+            // Disable depth buffer
+            this.gl.disable(this.gl.DEPTH_TEST);
 
             // Bind shader
             this.shader.bind();
@@ -434,10 +411,16 @@ Renderer.prototype = {
     {
         if (view)
         {
+            // Reset projection matrix
+            this.projMatrix.setOrthographic(
+                -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
+            );
+            this.projMatrix.translateZ(-1.0);
+
             // Set current view
             this.view = view;
 
-            // Enable depth buffer
+            // Disable depth buffer
             this.gl.disable(this.gl.DEPTH_TEST);
 
             // Bind shader

@@ -64,13 +64,10 @@ function BackRenderer(renderer, backrendererShader)
 
     // Background renderer framebuffer
     this.framebuffer = null;
+    // Background renderer depth buffer
+    this.depthbuffer = null;
     // Background renderer texture
     this.texture = null;
-
-    // Background renderer view and camera
-    this.projMatrix = null;
-    this.view = null;
-    this.camera = null;
 
     // Background renderer model matrix
     this.modelMatrix = null;
@@ -99,10 +96,8 @@ BackRenderer.prototype = {
         this.ratio = 1.0;
         if (this.height > 0.0) this.ratio = this.width/this.height;
         this.framebuffer = null;
+        this.depthbuffer = null;
         this.texture = null;
-        this.projMatrix = null;
-        this.view = null;
-        this.camera = null;
         this.modelMatrix = null;
         this.position = new Vector2(0.0, 0.0);
         this.size = new Vector2(1.0, 1.0);
@@ -132,6 +127,27 @@ BackRenderer.prototype = {
         }
         this.renderer.gl.bindFramebuffer(
             this.renderer.gl.FRAMEBUFFER, this.framebuffer
+        );
+
+        // Init background renderer depth buffer
+        this.depthbuffer = this.renderer.gl.createRenderbuffer();
+        if (!this.depthbuffer)
+        {
+            // Could not create depth buffer
+            return false;
+        }
+        this.renderer.gl.bindRenderbuffer(
+            this.renderer.gl.RENDERBUFFER, this.depthbuffer
+        );
+
+        // Attach depth buffer to framebuffer
+        this.renderer.gl.renderbufferStorage(
+            this.renderer.gl.RENDERBUFFER, this.renderer.gl.DEPTH_COMPONENT16,
+            this.width, this.height
+        );
+        this.renderer.gl.framebufferRenderbuffer(
+            this.renderer.gl.FRAMEBUFFER, this.renderer.gl.DEPTH_ATTACHMENT,
+            this.renderer.gl.RENDERBUFFER, this.depthbuffer
         );
 
         // Init background renderer texture
@@ -178,30 +194,20 @@ BackRenderer.prototype = {
             this.renderer.gl.TEXTURE_2D, this.texture, 0
         );
 
+        // Check framebuffer status
+        if (this.renderer.gl.checkFramebufferStatus(
+            this.renderer.gl.FRAMEBUFFER) !=
+            this.renderer.gl.FRAMEBUFFER_COMPLETE)
+        {
+            // Invalid framebuffer status
+            return false;
+        }
+
         // Unbind texture
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
         // Unbind framebuffer
         this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
-
-        // Init projection matrix
-        this.projMatrix = new Matrix4x4();
-        if (!this.projMatrix)
-        {
-            return false;
-        }
-
-        // Set projection matrix
-        this.projMatrix.setOrthographic(
-            -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
-        );
-        this.projMatrix.translateZ(-1.0);
-
-        // Init view
-        this.view = new View();
-
-        // Init camera
-        this.camera = new Camera();
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
@@ -226,7 +232,7 @@ BackRenderer.prototype = {
         this.renderer.gl.disable(this.renderer.gl.SCISSOR_TEST);
 
         // Set background renderer clear color
-        this.renderer.gl.clearColor(0.0, 0.0, 1.0, 1.0);
+        this.renderer.gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
         // Clear background renderer
         this.renderer.gl.clear(
@@ -250,6 +256,109 @@ BackRenderer.prototype = {
         this.renderer.gl.viewport(0, 0, this.width, this.height);
         this.renderer.gl.scissor(0, 0, this.width, this.height);
         this.renderer.gl.disable(this.renderer.gl.SCISSOR_TEST);
+
+        // Set default view
+        this.setDefaultView();
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setDefaultView : Set default back renderer view                       //
+    ////////////////////////////////////////////////////////////////////////////
+    setDefaultView: function()
+    {
+        if (this.renderer.view)
+        {
+            // Reset projection matrix
+            this.renderer.projMatrix.setOrthographic(
+                -this.ratio, this.ratio, -1.0, 1.0, -2.0, 2.0
+            );
+            this.renderer.projMatrix.translateZ(-1.0);
+
+            // Reset view
+            this.renderer.view.reset();
+
+            // Disable depth buffer
+            this.renderer.gl.disable(this.renderer.gl.DEPTH_TEST);
+
+            // Bind shader
+            this.renderer.shader.bind();
+
+            // Update view matrix
+            this.renderer.view.compute();
+            this.renderer.shader.sendProjectionMatrix(this.renderer.projMatrix);
+            this.renderer.shader.sendViewMatrix(this.renderer.view.viewMatrix);
+
+            // Unbind shader
+            this.renderer.shader.unbind();
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setView : Set back renderer view                                      //
+    //  param view : View matrix to use for back rendering                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setView: function(view)
+    {
+        if (view)
+        {
+            // Reset projection matrix
+            this.renderer.projMatrix.setOrthographic(
+                -this.ratio, this.ratio, -1.0, 1.0, -2.0, 2.0
+            );
+            this.renderer.projMatrix.translateZ(-1.0);
+
+            // Set current view
+            this.renderer.view = view;
+
+            // Disable depth buffer
+            this.renderer.gl.disable(this.renderer.gl.DEPTH_TEST);
+
+            // Bind shader
+            this.renderer.shader.bind();
+
+            // Update view matrix
+            this.renderer.view.compute();
+            this.renderer.shader.sendProjectionMatrix(this.renderer.projMatrix);
+            this.renderer.shader.sendViewMatrix(this.renderer.view.viewMatrix);
+
+            // Unbind shader
+            this.renderer.shader.unbind();
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setCamera : Set back renderer camera                                  //
+    //  param camera : Camera to use for back rendering                       //
+    ////////////////////////////////////////////////////////////////////////////
+    setCamera: function(camera)
+    {
+        if (camera)
+        {
+            // Set current view
+            this.renderer.camera = camera;
+
+            // Enable depth buffer
+            this.renderer.gl.enable(this.renderer.gl.DEPTH_TEST);
+
+            // Clear depth buffer
+            this.renderer.gl.clear(this.renderer.gl.DEPTH_BUFFER_BIT);
+
+            // Bind shader
+            this.renderer.shader.bind();
+
+            // Update view matrix
+            this.renderer.camera.compute(this.ratio);
+            this.renderer.camera.projMatrix.scaleY(-1.0);
+            this.renderer.shader.sendProjectionMatrix(
+                this.renderer.camera.projMatrix
+            );
+            this.renderer.shader.sendViewMatrix(
+                this.renderer.camera.viewMatrix
+            );
+
+            // Unbind shader
+            this.renderer.shader.unbind();
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
