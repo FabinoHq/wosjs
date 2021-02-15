@@ -30,6 +30,7 @@
 !renderer/renderer.js
 !renderer/backrenderer.js
 !renderer/vertexbuffer.js
+!renderer/meshvertexbuffer.js
 !renderer/skeletalvertexbuffer.js
 !renderer/shader.js
 !renderer/texture.js

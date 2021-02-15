@@ -42,6 +42,27 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+//  Static mesh vertex shader                                                 //
+////////////////////////////////////////////////////////////////////////////////
+const staticMeshVertexShaderSrc = [
+    "precision mediump float;",
+    "precision mediump int;",
+    "attribute vec3 vertexPos;",
+    "attribute vec2 vertexCoord;",
+    "attribute vec3 vertexNorm;",
+    "uniform mat4 projMatrix;",
+    "uniform mat4 viewMatrix;",
+    "uniform mat4 modelMatrix;",
+    "varying vec2 texCoord;",
+    "varying vec3 normal;",
+    "void main()",
+    "{",
+    "    normal = vertexNorm; texCoord = vertexCoord;",
+    "    gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
+    "}"
+].join("\n");
+
+////////////////////////////////////////////////////////////////////////////////
 //  Static mesh fragment shader                                               //
 ////////////////////////////////////////////////////////////////////////////////
 const staticMeshFragmentShaderSrc = [
@@ -49,6 +70,7 @@ const staticMeshFragmentShaderSrc = [
     "precision mediump int;",
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
+    "varying vec3 normal;",
     "uniform float alpha;",
     "void main()",
     "{",

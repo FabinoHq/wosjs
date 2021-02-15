@@ -111,12 +111,12 @@ StaticMesh.prototype = {
         if (!texture) return false;
 
         // Init vertex buffer
-        this.vertexBuffer = new VertexBuffer(this.renderer.gl);
+        this.vertexBuffer = new MeshVertexBuffer(this.renderer.gl);
         if ((model.facesCount > 0) && model.vertices &&
             model.texCoords && model.indices)
         {
             if (!this.vertexBuffer.init(model.facesCount, model.vertices,
-                model.texCoords, model.indices))
+                model.texCoords, model.normals, model.indices))
             {
                 // Could not create vertex buffer
                 return false;

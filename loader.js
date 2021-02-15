@@ -203,7 +203,7 @@ Loader.prototype = {
         // Init static mesh shader
         this.staticMeshShader = new Shader(this.renderer.gl);
         if (!this.staticMeshShader.init(
-            defaultVertexShaderSrc, staticMeshFragmentShaderSrc))
+            staticMeshVertexShaderSrc, staticMeshFragmentShaderSrc))
         {
             return false;
         }
@@ -481,4 +481,3 @@ Loader.prototype = {
         return null;
     }
 };
-

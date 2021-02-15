@@ -142,10 +142,10 @@ SkeletalMesh.prototype = {
         // Init vertex buffer
         this.vertexBuffer = new SkeletalVertexBuffer(this.renderer.gl);
         if ((model.facesCount > 0) && model.vertices &&
-            model.texCoords && model.indices)
+            model.texCoords && model.normals && model.indices)
         {
             if (!this.vertexBuffer.init(model.facesCount, model.vertices,
-                model.texCoords, model.indices,
+                model.texCoords, model.normals, model.indices,
                 model.bonesIndices, model.bonesWeights))
             {
                 // Could not create vertex buffer

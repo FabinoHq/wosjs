@@ -61,6 +61,8 @@ function ModelData()
     this.vertices = null;
     // Texture coordinates
     this.texCoords = null;
+    // Normals
+    this.normals = null;
     // Indices
     this.indices = null;
     // Bones count
@@ -156,11 +158,12 @@ ModelData.prototype = {
 
                 // Check model data count
                 if ((vertCount > 0) && (texCoordsCount > 0) &&
-                    (normalsCount == 0) && (this.facesCount > 0))
+                    (normalsCount >= 0) && (this.facesCount > 0))
                 {
                     // Create model data arrays
                     this.vertices = new GLArrayDataType(vertCount);
                     this.texCoords = new GLArrayDataType(texCoordsCount);
+                    this.normals = new GLArrayDataType(normalsCount);
                     this.indices = new GLIndexDataType(this.facesCount);
                     if (this.skeletalModel)
                     {
@@ -202,6 +205,18 @@ ModelData.prototype = {
                         }
                     }
                     currentRead += texCoordsCount;
+
+                    // Read normals
+                    currentIndex = 0;
+                    for (i = currentRead; i < (currentRead+normalsCount); ++i)
+                    {
+                        if (i < modelDataLen)
+                        {
+                            this.normals[currentIndex++] =
+                                parseFloat(modelData[i]);
+                        }
+                    }
+                    currentRead += normalsCount;
 
                     // Read indices
                     currentIndex = 0;

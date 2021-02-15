@@ -37,35 +37,25 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/skeletalvertexbuffer.js : Skeletal VBO management            //
+//      renderer/meshvertexbuffer.js : Static mesh VBO management             //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Default skeletal vertex buffer bones indices                              //
+//  Default vertex buffer normals                                             //
 ////////////////////////////////////////////////////////////////////////////////
-var defaultBonesIndices = new GLIndexDataType([
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0,
-    0, 0, 0, 0
-]);
-
-////////////////////////////////////////////////////////////////////////////////
-//  Default skeletal vertex buffer bones weights                              //
-////////////////////////////////////////////////////////////////////////////////
-var defaultBonesWeights = new GLArrayDataType([
-    1.0, 0.0, 0.0, 0.0,
-    1.0, 0.0, 0.0, 0.0,
-    1.0, 0.0, 0.0, 0.0,
-    1.0, 0.0, 0.0, 0.0
+var defaultNormals = new GLArrayDataType([
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0
 ]);
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  SkeletalVertexBuffer class definition                                     //
+//  MeshVertexBuffer class definition                                         //
 ////////////////////////////////////////////////////////////////////////////////
-function SkeletalVertexBuffer(glPointer)
+function MeshVertexBuffer(glPointer)
 {
     // WebGL functions pointer
     this.gl = glPointer;
@@ -79,10 +69,6 @@ function SkeletalVertexBuffer(glPointer)
     this.texCoordsOffset = 0;
     // Normals offset
     this.normalsOffset = 0;
-    // Bones indices offset
-    this.bonesIndicesOffset = 0;
-    // Bones weights offset
-    this.bonesWeightsOffset = 0;
 
     // Geometry data
     this.verticesData = null;
@@ -90,11 +76,9 @@ function SkeletalVertexBuffer(glPointer)
     this.normalsData = null;
     this.indicesData = null;
     this.vertCount = 0;
-    this.bonesIndicesData = null;
-    this.bonesWeightsData = null;
 }
 
-SkeletalVertexBuffer.prototype = {
+MeshVertexBuffer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init vertex buffer object                                      //
     //  param vertCount : Vertices count                                      //
@@ -102,11 +86,8 @@ SkeletalVertexBuffer.prototype = {
     //  param texcoords : Texture coordinates                                 //
     //  param normals : Normals                                               //
     //  param indices : Triangles indices                                     //
-    //  param bonesIndices : Bones indices                                    //
-    //  param bonesWeights : Bones weights                                    //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(vertCount, vertices, texcoords, normals, indices,
-        bonesIndices, bonesWeights)
+    init: function(vertCount, vertices, texcoords, normals, indices)
     {
         // Check gl pointer
         if (!this.gl)
@@ -115,8 +96,7 @@ SkeletalVertexBuffer.prototype = {
         }
 
         // Check vertex buffer data
-        if ((vertCount > 0) && vertices && texcoords && normals && indices &&
-            bonesIndices && bonesWeights)
+        if ((vertCount > 0) && vertices && texcoords && normals && indices)
         {
             // Set vertex buffer data
             this.vertCount = vertCount;
@@ -124,8 +104,6 @@ SkeletalVertexBuffer.prototype = {
             this.texCoordsData = texcoords;
             this.normalsData = normals;
             this.indicesData = indices;
-            this.bonesIndicesData = bonesIndices;
-            this.bonesWeightsData = bonesWeights;
         }
         else
         {
@@ -135,8 +113,6 @@ SkeletalVertexBuffer.prototype = {
             this.texCoordsData = defaultTexCoords;
             this.normalsData = defaultNormals;
             this.indicesData = defaultIndices;
-            this.bonesIndicesData = defaultBonesIndices;
-            this.bonesWeightsData = defaultBonesWeights;
         }
 
         // Create VBO
@@ -192,13 +168,9 @@ SkeletalVertexBuffer.prototype = {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
         this.texCoordsOffset = this.verticesData.byteLength;
         this.normalsOffset = this.texCoordsOffset+this.texCoordsData.byteLength;
-        this.bonesIndicesOffset =
-            this.normalsOffset+this.normalsData.byteLength;
-        this.bonesWeightsOffset =
-            this.bonesIndicesOffset+this.bonesIndicesData.byteLength;
         this.gl.bufferData(
             this.gl.ARRAY_BUFFER,
-            this.bonesWeightsOffset+this.bonesWeightsData.byteLength,
+            this.normalsOffset+this.normalsData.byteLength,
             this.gl.STATIC_DRAW
         );
 
@@ -219,20 +191,6 @@ SkeletalVertexBuffer.prototype = {
             this.normalsData
         );
 
-        // Send bones indices data
-        this.gl.bufferSubData(
-            this.gl.ARRAY_BUFFER,
-            this.bonesIndicesOffset,
-            this.bonesIndicesData
-        );
-
-        // Send bones weights data
-        this.gl.bufferSubData(
-            this.gl.ARRAY_BUFFER,
-            this.bonesWeightsOffset,
-            this.bonesWeightsData
-        );
-
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
 
         // Send indexes data
@@ -244,7 +202,7 @@ SkeletalVertexBuffer.prototype = {
         );
         this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
     },
-    
+
     ////////////////////////////////////////////////////////////////////////////
     //  render : Render the vertex buffer object                              //
     //  param shader : Shader program to render with                          //
@@ -273,22 +231,6 @@ SkeletalVertexBuffer.prototype = {
             shader.normalsLocation, 3,
             this.gl.FLOAT, this.gl.FALSE,
             0, this.normalsOffset
-        );
-
-        // Enable bones indices array
-        this.gl.enableVertexAttribArray(shader.bonesIndicesLocation);
-        this.gl.vertexAttribPointer(
-            shader.bonesIndicesLocation, 4,
-            this.gl.UNSIGNED_SHORT, this.gl.FALSE,
-            0, this.bonesIndicesOffset
-        );
-
-        // Enable bones weights array
-        this.gl.enableVertexAttribArray(shader.bonesWeightsLocation);
-        this.gl.vertexAttribPointer(
-            shader.bonesWeightsLocation, 4,
-            this.gl.FLOAT, this.gl.FALSE,
-            0, this.bonesWeightsOffset
         );
 
         // Draw triangles
