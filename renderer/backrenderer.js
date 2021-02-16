@@ -211,6 +211,7 @@ BackRenderer.prototype = {
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Background renderer successfully loaded
         return true;
@@ -280,16 +281,8 @@ BackRenderer.prototype = {
             // Disable depth buffer
             this.renderer.gl.disable(this.renderer.gl.DEPTH_TEST);
 
-            // Bind shader
-            this.renderer.shader.bind();
-
             // Update view matrix
             this.renderer.view.compute();
-            this.renderer.shader.sendProjectionMatrix(this.renderer.projMatrix);
-            this.renderer.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-
-            // Unbind shader
-            this.renderer.shader.unbind();
         }
     },
 
@@ -313,16 +306,8 @@ BackRenderer.prototype = {
             // Disable depth buffer
             this.renderer.gl.disable(this.renderer.gl.DEPTH_TEST);
 
-            // Bind shader
-            this.renderer.shader.bind();
-
             // Update view matrix
             this.renderer.view.compute();
-            this.renderer.shader.sendProjectionMatrix(this.renderer.projMatrix);
-            this.renderer.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-
-            // Unbind shader
-            this.renderer.shader.unbind();
         }
     },
 
@@ -343,21 +328,9 @@ BackRenderer.prototype = {
             // Clear depth buffer
             this.renderer.gl.clear(this.renderer.gl.DEPTH_BUFFER_BIT);
 
-            // Bind shader
-            this.renderer.shader.bind();
-
             // Update view matrix
             this.renderer.camera.compute(this.ratio);
             this.renderer.camera.projMatrix.scaleY(-1.0);
-            this.renderer.shader.sendProjectionMatrix(
-                this.renderer.camera.projMatrix
-            );
-            this.renderer.shader.sendViewMatrix(
-                this.renderer.camera.viewMatrix
-            );
-
-            // Unbind shader
-            this.renderer.shader.unbind();
         }
     },
 
@@ -597,10 +570,14 @@ BackRenderer.prototype = {
         // Bind background renderer shader
         this.backrendererShader.bind();
 
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
         // Send shader uniforms
-        this.backrendererShader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.backrendererShader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.backrendererShader.sendModelMatrix(this.modelMatrix);
+        this.backrendererShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.backrendererShader.sendUniform(this.alphaUniform, this.alpha);
 
         // Bind texture

@@ -141,12 +141,13 @@ AnimSprite.prototype = {
         this.interpUniform = this.animShader.getUniform("interp");
         this.animShader.unbind();
 
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-
         // Set texture
         this.texture = tex;
         if (!this.texture) return false;
+
+        // Create model matrix
+        this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Sprite loaded
         return true;
@@ -604,10 +605,14 @@ AnimSprite.prototype = {
         // Bind shader
         this.animShader.bind();
 
-        // Send shader uniforms
-        this.animShader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.animShader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.animShader.sendModelMatrix(this.modelMatrix);
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
+        // Send animated sprite shader uniforms
+        this.animShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.animShader.sendUniform(this.alphaUniform, this.alpha);
         this.animShader.sendUniformVec2(this.countUniform, this.count);
         this.animShader.sendUniformVec2(this.currentUniform, this.current);

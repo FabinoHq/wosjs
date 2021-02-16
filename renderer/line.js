@@ -127,6 +127,7 @@ Line.prototype = {
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Line loaded
         return true;
@@ -427,10 +428,14 @@ Line.prototype = {
         // Bind line shader
         this.lineShader.bind();
 
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
         // Send line shader uniforms
-        this.lineShader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.lineShader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.lineShader.sendModelMatrix(this.modelMatrix);
+        this.lineShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.lineShader.sendUniformVec3(this.colorUniform, this.color);
         this.lineShader.sendUniform(this.alphaUniform, this.alpha);
         this.lineShader.sendUniform(this.ratioUniform, ratio);

@@ -219,12 +219,13 @@ SkeletalMesh.prototype = {
         // Create bones array
         this.bonesArray = new GLArrayDataType(this.bonesCount*16);
 
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
+
+        // Create model matrix
+        this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Skeletal mesh loaded
         return true;
@@ -592,12 +593,14 @@ SkeletalMesh.prototype = {
         // Bind skeletal mesh shader
         this.skeletalShader.bind();
 
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.camera.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
         // Send shader uniforms
-        this.skeletalShader.sendProjectionMatrix(
-            this.renderer.camera.projMatrix
-        );
-        this.skeletalShader.sendViewMatrix(this.renderer.camera.viewMatrix);
-        this.skeletalShader.sendModelMatrix(this.modelMatrix);
+        this.skeletalShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.skeletalShader.sendUniform(this.alphaUniform, this.alpha);
         this.skeletalShader.sendUniform(
             this.bonesCountUniform, this.bonesCount

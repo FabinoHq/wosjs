@@ -591,7 +591,6 @@ Wos.prototype = {
         // Render background renderer texture
         //this.backrenderer.setX(-this.backrenderer.getWidth()*0.5);
         //this.backrenderer.setY(-this.backrenderer.getHeight()*0.5);
-        //this.backrenderer.setSize(1.0, 1.0);
         //this.backrenderer.render();
 
         // Render test line

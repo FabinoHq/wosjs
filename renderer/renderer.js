@@ -76,6 +76,7 @@ function Renderer()
     // Default graphics pipeline
     this.vertexBuffer = null;
     this.shader = null;
+    this.worldMatrix = null;
     this.projMatrix = null;
     this.view = null;
     this.camera = null;
@@ -114,6 +115,7 @@ Renderer.prototype = {
         this.vpoffy = 0.0;
         this.vertexBuffer = null;
         this.shader = null;
+        this.worldMatrix = null;
         this.projMatrix = null;
         this.view = null;
         this.camera = null;
@@ -194,7 +196,6 @@ Renderer.prototype = {
         this.shader = new Shader(this.gl);
         if (!this.shader) return false;
         if (!this.shader.init()) return false;
-        this.shader.bind();
 
         // Set renderer clear color
         this.gl.clearColor(
@@ -225,10 +226,22 @@ Renderer.prototype = {
         this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
         this.gl.disable(this.gl.SCISSOR_TEST);
 
+        // Init world matrix
+        this.worldMatrix = new Matrix4x4();
+        if (!this.worldMatrix)
+        {
+            // Could not init world matrix
+            return false;
+        }
+
+        // Set default world matrix
+        this.worldMatrix.setIdentity();
+
         // Init projection matrix
         this.projMatrix = new Matrix4x4();
         if (!this.projMatrix)
         {
+            // Could not init projection matrix
             return false;
         }
 
@@ -237,11 +250,9 @@ Renderer.prototype = {
             -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
         );
         this.projMatrix.translateZ(-1.0);
-        this.shader.sendProjectionMatrix(this.projMatrix);
 
         // Init view
         this.view = new View();
-        this.shader.sendViewMatrix(this.view.viewMatrix);
 
         // Init camera
         this.camera = new Camera();
@@ -254,9 +265,6 @@ Renderer.prototype = {
         this.gl.enable(this.gl.BLEND);
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
         this.gl.blendEquation(this.gl.FUNC_ADD);
-
-        // Unbind default shader
-        this.shader.unbind();
 
         // Set texture 0 as active texture
         this.gl.activeTexture(this.gl.TEXTURE0);
@@ -304,11 +312,6 @@ Renderer.prototype = {
             -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
         );
         this.projMatrix.translateZ(-1.0);
-
-        // Update projection matrix
-        this.shader.bind();
-        this.shader.sendProjectionMatrix(this.projMatrix);
-        this.shader.unbind();
 
         // Set renderer clear color
         this.gl.clearColor(
@@ -390,16 +393,8 @@ Renderer.prototype = {
             // Disable depth buffer
             this.gl.disable(this.gl.DEPTH_TEST);
 
-            // Bind shader
-            this.shader.bind();
-
             // Update view matrix
             this.view.compute();
-            this.shader.sendProjectionMatrix(this.projMatrix);
-            this.shader.sendViewMatrix(this.view.viewMatrix);
-
-            // Unbind shader
-            this.shader.unbind();
         }
     },
 
@@ -423,16 +418,8 @@ Renderer.prototype = {
             // Disable depth buffer
             this.gl.disable(this.gl.DEPTH_TEST);
 
-            // Bind shader
-            this.shader.bind();
-
             // Update view matrix
             this.view.compute();
-            this.shader.sendProjectionMatrix(this.projMatrix);
-            this.shader.sendViewMatrix(this.view.viewMatrix);
-
-            // Unbind shader
-            this.shader.unbind();
         }
     },
 
@@ -453,16 +440,8 @@ Renderer.prototype = {
             // Clear depth buffer
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
 
-            // Bind shader
-            this.shader.bind();
-
             // Update view matrix
             this.camera.compute(this.ratio);
-            this.shader.sendProjectionMatrix(this.camera.projMatrix);
-            this.shader.sendViewMatrix(this.camera.viewMatrix);
-
-            // Unbind shader
-            this.shader.unbind();
         }
     },
 

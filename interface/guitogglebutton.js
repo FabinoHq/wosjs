@@ -111,12 +111,13 @@ GuiToggleButton.prototype = {
         this.stateUniform = this.toggleButtonShader.getUniform("buttonState");
         this.toggleButtonShader.unbind();
 
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
+
+        // Create model matrix
+        this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Toggle button loaded
         return true;
@@ -522,10 +523,14 @@ GuiToggleButton.prototype = {
         // Bind toggle button shader
         this.toggleButtonShader.bind();
 
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
         // Send shader uniforms
-        this.toggleButtonShader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.toggleButtonShader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.toggleButtonShader.sendModelMatrix(this.modelMatrix);
+        this.toggleButtonShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.toggleButtonShader.sendUniform(this.alphaUniform, this.alpha);
         this.toggleButtonShader.sendIntUniform(
             this.stateUniform, this.buttonState

@@ -191,9 +191,6 @@ GuiText.prototype = {
         this.alphaUniform = this.textShader.getUniform("alpha");
         this.textShader.unbind();
 
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-
         // Set text width
         this.size.vec[0] = this.renderer.getTextWidth(
             this.text, this.fontsize
@@ -262,6 +259,10 @@ GuiText.prototype = {
         );
 
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+
+        // Create model matrix
+        this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Text loaded
         return true;
@@ -720,10 +721,14 @@ GuiText.prototype = {
         // Bind text shader
         this.textShader.bind();
 
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
         // Send shader uniforms
-        this.textShader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.textShader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.textShader.sendModelMatrix(this.modelMatrix);
+        this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.textShader.sendUniformVec3(this.colorUniform, this.color);
         this.textShader.sendUniform(this.alphaUniform, this.alpha);
 

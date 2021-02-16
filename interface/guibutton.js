@@ -111,12 +111,13 @@ GuiButton.prototype = {
         this.stateUniform = this.buttonShader.getUniform("buttonState");
         this.buttonShader.unbind();
 
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
+
+        // Create model matrix
+        this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Button loaded
         return true;
@@ -430,10 +431,14 @@ GuiButton.prototype = {
         // Bind button shader
         this.buttonShader.bind();
 
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
         // Send shader uniforms
-        this.buttonShader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.buttonShader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.buttonShader.sendModelMatrix(this.modelMatrix);
+        this.buttonShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.buttonShader.sendUniform(this.alphaUniform, this.alpha);
         this.buttonShader.sendIntUniform(this.stateUniform, this.buttonState);
 

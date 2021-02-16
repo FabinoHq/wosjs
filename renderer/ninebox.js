@@ -117,12 +117,13 @@ Ninebox.prototype = {
         this.uvFactorUniform = this.nineboxShader.getUniform("uvFactor");
         this.nineboxShader.unbind();
 
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
+
+        // Create model matrix
+        this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Ninebox loaded
         return true;
@@ -364,12 +365,14 @@ Ninebox.prototype = {
         // Bind ninebox shader
         this.nineboxShader.bind();
 
-        // Send shader uniforms
-        this.nineboxShader.sendProjectionMatrix(
-            this.renderer.projMatrix
-        );
-        this.nineboxShader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.nineboxShader.sendModelMatrix(this.modelMatrix);
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
+        // Send ninebox shader uniforms
+        this.nineboxShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.nineboxShader.sendUniform(this.alphaUniform, this.alpha);
         this.nineboxShader.sendUniformVec2(this.uvSizeUniform, this.size);
         this.nineboxShader.sendUniform(this.uvFactorUniform, this.uvFactor);

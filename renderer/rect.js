@@ -121,6 +121,7 @@ Rect.prototype = {
 
         // Create model matrix
         this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Rect loaded
         return true;
@@ -386,10 +387,14 @@ Rect.prototype = {
         // Bind rect shader
         this.rectShader.bind();
 
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
         // Send rect shader uniforms
-        this.rectShader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.rectShader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.rectShader.sendModelMatrix(this.modelMatrix);
+        this.rectShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.rectShader.sendUniformVec3(this.colorUniform, this.color);
         this.rectShader.sendUniform(this.alphaUniform, this.alpha);
         this.rectShader.sendUniform(this.widthUniform, this.size.vec[0]);

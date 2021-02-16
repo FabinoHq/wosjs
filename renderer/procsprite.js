@@ -100,9 +100,6 @@ ProcSprite.prototype = {
         // Check gl pointer
         if (!this.renderer.gl) return false;
 
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-
         // Init shader
         this.shader = new Shader(this.renderer.gl);
         if (!this.shader) return false;
@@ -114,6 +111,10 @@ ProcSprite.prototype = {
         this.timeUniform = this.shader.getUniform("time");
         this.offsetUniform = this.shader.getUniform("offset");
         this.shader.unbind();
+
+        // Create model matrix
+        this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Procedural sprite loaded
         return true;
@@ -412,14 +413,18 @@ ProcSprite.prototype = {
         // Bind procedural shader
         this.shader.bind();
 
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
         // Send shader uniforms
-        this.shader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.shader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.shader.sendModelMatrix(this.modelMatrix);
+        this.shader.sendWorldMatrix(this.renderer.worldMatrix);
         this.shader.sendUniform(this.alphaUniform, this.alpha);
         this.shader.sendUniform(this.timeUniform, this.time);
         this.shader.sendUniformVec2(this.offsetUniform, this.offset);
-        
+
         // Render VBO
         this.renderer.vertexBuffer.bind();
         this.renderer.vertexBuffer.render(this.shader);

@@ -68,9 +68,7 @@ function Shader(glPointer)
 
     // Shader uniforms locations
     this.textureLocation = -1;
-    this.projMatrixLocation = -1;
-    this.viewMatrixLocation = -1;
-    this.modelMatrixLocation = -1;
+    this.worldMatrixLocation = -1;
 }
 
 Shader.prototype = {
@@ -91,9 +89,7 @@ Shader.prototype = {
         this.texCoordsLocation = -1;
         this.normalsLocation = -1;
         this.textureLocation = -1;
-        this.projMatrixLocation = -1;
-        this.viewMatrixLocation = -1;
-        this.modelMatrixLocation = -1;
+        this.worldMatrixLocation = -1;
 
         // Check gl pointer
         if (!this.gl)
@@ -227,23 +223,11 @@ Shader.prototype = {
         if (this.textureLocation == -1) return false;
         this.gl.uniform1i(this.textureLocation, 0);
 
-        // Get projection matrix location
-        this.projMatrixLocation = this.gl.getUniformLocation(
-            this.shaderProgram, "projMatrix"
+        // Get world matrix location
+        this.worldMatrixLocation = this.gl.getUniformLocation(
+            this.shaderProgram, "worldMatrix"
         );
-        if (this.projMatrixLocation == -1) return false;
-
-        // Get view matrix location
-        this.viewMatrixLocation = this.gl.getUniformLocation(
-            this.shaderProgram, "viewMatrix"
-        );
-        if (this.viewMatrixLocation == -1) return false;
-
-        // Get model matrix location
-        this.modelMatrixLocation = this.gl.getUniformLocation(
-            this.shaderProgram, "modelMatrix"
-        );
-        if (this.modelMatrixLocation == -1) return false;
+        if (this.worldMatrixLocation == -1) return false;
 
         this.gl.useProgram(null);
 
@@ -268,38 +252,14 @@ Shader.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  sendProjectionMatrix : Send projection matrix to use with this shader //
-    //  param projectionMatrix : 4x4 Projection matrix to use                 //
+    //  sendWorldMatrix : Send world matrix to use with this shader           //
+    //  param modelMatrix : 4x4 World matrix to use                           //
     ////////////////////////////////////////////////////////////////////////////
-    sendProjectionMatrix: function(projectionMatrix)
+    sendWorldMatrix: function(worldMatrix)
     {
         this.gl.uniformMatrix4fv(
-            this.projMatrixLocation,
-            false, projectionMatrix.matrix
-        );
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  sendViewMatrix : Send view matrix to use with this shader             //
-    //  param viewMatrix : 4x4 View matrix to use                             //
-    ////////////////////////////////////////////////////////////////////////////
-    sendViewMatrix: function(viewMatrix)
-    {
-        this.gl.uniformMatrix4fv(
-            this.viewMatrixLocation,
-            false, viewMatrix.matrix
-        );
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  sendModelMatrix : Send model matrix to use with this shader           //
-    //  param modelMatrix : 4x4 Model matrix to use                           //
-    ////////////////////////////////////////////////////////////////////////////
-    sendModelMatrix: function(modelMatrix)
-    {
-        this.gl.uniformMatrix4fv(
-            this.modelMatrixLocation,
-            false, modelMatrix.matrix
+            this.worldMatrixLocation,
+            false, worldMatrix.matrix
         );
     },
 

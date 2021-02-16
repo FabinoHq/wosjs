@@ -52,9 +52,7 @@ const skeletalMeshVertexShaderSrc = [
     "attribute vec3 vertexNorm;",
     "attribute vec4 bonesIndices;",
     "attribute vec4 bonesWeights;",
-    "uniform mat4 projMatrix;",
-    "uniform mat4 viewMatrix;",
-    "uniform mat4 modelMatrix;",
+    "uniform mat4 worldMatrix;",
     "uniform float bonesCount;",
     "uniform sampler2D bonesMatrices;",
     "varying vec2 texCoord;",
@@ -77,7 +75,7 @@ const skeletalMeshVertexShaderSrc = [
     "        boneMatrix(bonesIndices[2])*bonesWeights[2]*vec4(vertexPos, 1.0)+",
     "        boneMatrix(bonesIndices[3])*bonesWeights[3]*vec4(vertexPos, 1.0)",
     "    );",
-    "    gl_Position = projMatrix*viewMatrix*modelMatrix*vertPos;",
+    "    gl_Position = worldMatrix*vertPos;",
     "    ;",
     "}"
 ].join("\n");

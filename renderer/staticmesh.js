@@ -128,12 +128,13 @@ StaticMesh.prototype = {
             return false;
         }
 
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
+
+        // Create model matrix
+        this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Static mesh loaded
         return true;
@@ -443,10 +444,14 @@ StaticMesh.prototype = {
         // Bind static mesh shader
         this.meshShader.bind();
 
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.camera.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
         // Send shader uniforms
-        this.meshShader.sendProjectionMatrix(this.renderer.camera.projMatrix);
-        this.meshShader.sendViewMatrix(this.renderer.camera.viewMatrix);
-        this.meshShader.sendModelMatrix(this.modelMatrix);
+        this.meshShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.meshShader.sendUniform(this.alphaUniform, this.alpha);
 
         // Bind texture

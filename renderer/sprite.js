@@ -115,12 +115,13 @@ Sprite.prototype = {
         this.uvSizeUniform = this.spriteShader.getUniform("uvSize");
         this.spriteShader.unbind();
 
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
+
+        // Create model matrix
+        this.modelMatrix = new Matrix4x4();
+        if (!this.modelMatrix) return false;
 
         // Sprite loaded
         return true;
@@ -417,10 +418,14 @@ Sprite.prototype = {
         // Bind sprite shader
         this.spriteShader.bind();
 
+        // Compute world matrix
+        this.renderer.worldMatrix.setIdentity();
+        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
+        this.renderer.worldMatrix.multiply(this.modelMatrix);
+
         // Send shader uniforms
-        this.spriteShader.sendProjectionMatrix(this.renderer.projMatrix);
-        this.spriteShader.sendViewMatrix(this.renderer.view.viewMatrix);
-        this.spriteShader.sendModelMatrix(this.modelMatrix);
+        this.spriteShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.spriteShader.sendUniform(this.alphaUniform, this.alpha);
         this.spriteShader.sendUniformVec2(this.uvOffsetUniform, this.uvOffset);
         this.spriteShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);

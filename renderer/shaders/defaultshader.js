@@ -49,14 +49,12 @@ const defaultVertexShaderSrc = [
     "precision mediump int;",
     "attribute vec3 vertexPos;",
     "attribute vec2 vertexCoord;",
-    "uniform mat4 projMatrix;",
-    "uniform mat4 viewMatrix;",
-    "uniform mat4 modelMatrix;",
+    "uniform mat4 worldMatrix;",
     "varying vec2 texCoord;",
     "void main()",
     "{",
     "    texCoord = vertexCoord;",
-    "    gl_Position = projMatrix*viewMatrix*modelMatrix*vec4(vertexPos, 1.0);",
+    "    gl_Position = worldMatrix*vec4(vertexPos, 1.0);",
     "}"
 ].join("\n");
 
