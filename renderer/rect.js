@@ -104,8 +104,8 @@ Rect.prototype = {
         this.thickness = 0.01;
         if (thickness !== undefined) this.thickness = thickness;
 
-        // Check gl pointer
-        if (!this.renderer.gl) return false;
+        // Check renderer pointer
+        if (!this.renderer) return false;
 
         // Check rect shader pointer
         if (!this.rectShader) return false;

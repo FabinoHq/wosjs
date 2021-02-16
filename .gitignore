@@ -47,6 +47,7 @@
 !renderer/skeletalmesh.js
 !renderer/view.js
 !renderer/camera.js
+!renderer/worldlight.js
 !renderer/shaders/
 !renderer/shaders/defaultshader.js
 !renderer/shaders/backrenderershader.js

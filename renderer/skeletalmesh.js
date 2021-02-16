@@ -57,6 +57,9 @@ function SkeletalMesh(renderer, skeletalShader)
     // Skeletal mesh shader uniforms locations
     this.bonesMatricesLocation = -1;
     this.bonesCountUniform = -1;
+    this.worldLightVecUniform = -1;
+    this.worldLightColorUniform = -1;
+    this.worldLightAmbientUniform = -1;
     this.alphaUniform = -1;
 
     // Skeletal mesh vertex buffer
@@ -117,6 +120,9 @@ SkeletalMesh.prototype = {
         this.angles = new Vector3(0.0, 0.0, 0.0);
         this.alpha = 1.0;
 
+        // Check renderer pointer
+        if (!this.renderer) return false;
+
         // Check gl pointer
         if (!this.renderer.gl) return false;
 
@@ -129,8 +135,14 @@ SkeletalMesh.prototype = {
             "bonesMatrices"
         );
         this.skeletalShader.sendIntUniform(this.bonesMatricesLocation, 1);
-        this.alphaUniform = this.skeletalShader.getUniform("alpha");
         this.bonesCountUniform = this.skeletalShader.getUniform("bonesCount");
+        this.worldLightVecUniform =
+            this.skeletalShader.getUniform("worldLightVec");
+        this.worldLightColorUniform =
+            this.skeletalShader.getUniform("worldLightColor");
+        this.worldLightAmbientUniform =
+            this.skeletalShader.getUniform("worldLightAmbient");
+        this.alphaUniform = this.skeletalShader.getUniform("alpha");
         this.skeletalShader.unbind();
 
         // Check model pointer
@@ -599,12 +611,27 @@ SkeletalMesh.prototype = {
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
+        // Compute light matrix
+        this.renderer.lightMatrix.setIdentity();
+        this.renderer.lightMatrix.multiply(this.renderer.camera.viewMatrix);
+        this.renderer.lightMatrix.multiply(this.modelMatrix);
+
         // Send shader uniforms
         this.skeletalShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.skeletalShader.sendUniform(this.alphaUniform, this.alpha);
+        this.skeletalShader.sendLightMatrix(this.renderer.lightMatrix);
         this.skeletalShader.sendUniform(
             this.bonesCountUniform, this.bonesCount
         );
+        this.skeletalShader.sendUniformVec3(
+            this.worldLightVecUniform, this.renderer.worldLight.direction
+        );
+        this.skeletalShader.sendUniformVec4(
+            this.worldLightColorUniform, this.renderer.worldLight.color
+        );
+        this.skeletalShader.sendUniformVec4(
+            this.worldLightAmbientUniform, this.renderer.worldLight.ambient
+        );
+        this.skeletalShader.sendUniform(this.alphaUniform, this.alpha);
 
         // Bind texture
         this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);

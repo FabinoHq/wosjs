@@ -102,8 +102,8 @@ Sprite.prototype = {
         this.uvOffset = new Vector2(0.0, 0.0);
         this.alpha = 1.0;
 
-        // Check gl pointer
-        if (!this.renderer.gl) return false;
+        // Check renderer pointer
+        if (!this.renderer) return false;
 
         // Check sprite shader pointer
         if (!this.spriteShader) return false;

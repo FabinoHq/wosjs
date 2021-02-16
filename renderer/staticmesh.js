@@ -55,6 +55,9 @@ function StaticMesh(renderer, meshShader)
     this.meshShader = meshShader;
 
     // Static mesh shader uniforms locations
+    this.worldLightVecUniform = -1;
+    this.worldLightColorUniform = -1;
+    this.worldLightAmbientUniform = -1;
     this.alphaUniform = -1;
 
     // Static mesh vertex buffer
@@ -84,6 +87,9 @@ StaticMesh.prototype = {
     init: function(model, texture)
     {
         // Reset static mesh
+        this.worldLightVecUniform = -1;
+        this.worldLightColorUniform = -1;
+        this.worldLightAmbientUniform = -1;
         this.alphaUniform = -1;
         this.vertexBuffer = null;
         this.texture = null;
@@ -93,6 +99,9 @@ StaticMesh.prototype = {
         this.angles = new Vector3(0.0, 0.0, 0.0);
         this.alpha = 1.0;
 
+        // Check renderer pointer
+        if (!this.renderer) return false;
+
         // Check gl pointer
         if (!this.renderer.gl) return false;
 
@@ -101,6 +110,12 @@ StaticMesh.prototype = {
 
         // Get static mesh shader uniforms locations
         this.meshShader.bind();
+        this.worldLightVecUniform =
+            this.meshShader.getUniform("worldLightVec");
+        this.worldLightColorUniform =
+            this.meshShader.getUniform("worldLightColor");
+        this.worldLightAmbientUniform =
+            this.meshShader.getUniform("worldLightAmbient");
         this.alphaUniform = this.meshShader.getUniform("alpha");
         this.meshShader.unbind();
 
@@ -450,8 +465,23 @@ StaticMesh.prototype = {
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
+        // Compute light matrix
+        this.renderer.lightMatrix.setIdentity();
+        this.renderer.lightMatrix.multiply(this.renderer.camera.viewMatrix);
+        this.renderer.lightMatrix.multiply(this.modelMatrix);
+
         // Send shader uniforms
         this.meshShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.meshShader.sendLightMatrix(this.renderer.lightMatrix);
+        this.meshShader.sendUniformVec3(
+            this.worldLightVecUniform, this.renderer.worldLight.direction
+        );
+        this.meshShader.sendUniformVec4(
+            this.worldLightColorUniform, this.renderer.worldLight.color
+        );
+        this.meshShader.sendUniformVec4(
+            this.worldLightAmbientUniform, this.renderer.worldLight.ambient
+        );
         this.meshShader.sendUniform(this.alphaUniform, this.alpha);
 
         // Bind texture

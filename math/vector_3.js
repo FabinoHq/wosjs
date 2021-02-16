@@ -43,6 +43,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Vector3 class definition                                                  //
+//  param x : Optional X value of the vector                                  //
+//  param y : Optional Y value of the vector                                  //
+//  param z : Optional Z value of the vector                                  //
 ////////////////////////////////////////////////////////////////////////////////
 function Vector3(x, y, z)
 {

@@ -180,9 +180,6 @@ GuiTextBox.prototype = {
         // Check renderer pointer
         if (!this.renderer) return false;
 
-        // Check gl pointer
-        if (!this.renderer.gl) return false;
-
         // Init text
         this.guitext = new GuiText(this.renderer, this.textShader);
         this.guitext.init(text, this.size.vec[1]*0.9, hide);

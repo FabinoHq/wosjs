@@ -43,6 +43,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //  ProcSprite class definition                                               //
+//  param renderer : Renderer pointer                                         //
 ////////////////////////////////////////////////////////////////////////////////
 function ProcSprite(renderer)
 {
@@ -96,6 +97,9 @@ ProcSprite.prototype = {
         this.offset = new Vector2(0.0, 0.0);
         this.time = 0.0;
         this.alpha = 1.0;
+
+        // Check renderer pointer
+        if (!this.renderer) return false;
 
         // Check gl pointer
         if (!this.renderer.gl) return false;

@@ -126,8 +126,8 @@ AnimSprite.prototype = {
         this.currentTime = 0.0;
         this.interpOffset = 0.0;
 
-        // Check gl pointer
-        if (!this.renderer.gl) return false;
+        // Check renderer pointer
+        if (!this.renderer) return false;
 
         // Check animated sprite shader pointer
         if (!this.animShader) return false;

@@ -69,6 +69,7 @@ function Shader(glPointer)
     // Shader uniforms locations
     this.textureLocation = -1;
     this.worldMatrixLocation = -1;
+    this.lightMatrixLocation = -1;
 }
 
 Shader.prototype = {
@@ -90,6 +91,7 @@ Shader.prototype = {
         this.normalsLocation = -1;
         this.textureLocation = -1;
         this.worldMatrixLocation = -1;
+        this.lightMatrixLocation = -1;
 
         // Check gl pointer
         if (!this.gl)
@@ -229,6 +231,11 @@ Shader.prototype = {
         );
         if (this.worldMatrixLocation == -1) return false;
 
+        // Get light matrix location
+        this.lightMatrixLocation = this.gl.getUniformLocation(
+            this.shaderProgram, "lightMatrix"
+        );
+
         this.gl.useProgram(null);
 
         // Shader successfully loaded
@@ -253,13 +260,25 @@ Shader.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  sendWorldMatrix : Send world matrix to use with this shader           //
-    //  param modelMatrix : 4x4 World matrix to use                           //
+    //  param worldMatrix : 4x4 World matrix to use                           //
     ////////////////////////////////////////////////////////////////////////////
     sendWorldMatrix: function(worldMatrix)
     {
         this.gl.uniformMatrix4fv(
             this.worldMatrixLocation,
             false, worldMatrix.matrix
+        );
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendLightMatrix : Send light matrix to use with this shader           //
+    //  param lightMatrix : 4x4 Light matrix to use                           //
+    ////////////////////////////////////////////////////////////////////////////
+    sendLightMatrix: function(lightMatrix)
+    {
+        this.gl.uniformMatrix4fv(
+            this.lightMatrixLocation,
+            false, lightMatrix.matrix
         );
     },
 
@@ -311,5 +330,15 @@ Shader.prototype = {
     sendUniformVec3: function(uniformLoc, uniformVec3)
     {
         this.gl.uniform3fv(uniformLoc, uniformVec3.vec);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendUniformVec4 : Send shader uniform 4 components vector             //
+    //  param uniformLoc : Location index of the shader uniform               //
+    //  param uniformVec4 : Uniform 4 components vector to upload             //
+    ////////////////////////////////////////////////////////////////////////////
+    sendUniformVec4: function(uniformLoc, uniformVec4)
+    {
+        this.gl.uniform4fv(uniformLoc, uniformVec4.vec);
     }
 };

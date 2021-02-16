@@ -37,144 +37,124 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      math/vector_2.js : 2 components vector management                     //
+//      renderer/worldlight.js : World light management                       //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Vector2 class definition                                                  //
-//  param x : Optional X value of the vector                                  //
-//  param y : Optional Y value of the vector                                  //
+//  WorldLight class definition                                               //
+//  param renderer : Renderer pointer                                         //
 ////////////////////////////////////////////////////////////////////////////////
-function Vector2(x, y)
+function WorldLight(renderer)
 {
-    // 2 components vector representation
-    this.vec = new GLArrayDataType(2);
-    this.vec[0] = 0.0;
-    this.vec[1] = 0.0;
-    if (x !== undefined) this.vec[0] = x;
-    if (y !== undefined) this.vec[1] = y;
+    // Renderer pointer
+    this.renderer = renderer;
+
+    // Light direction
+    this.direction = new Vector3(0.0, 0.0, 0.0);
+    // Light color
+    this.color = new Vector4(0.0, 0.0, 0.0, 0.0);
+    // Ambient color
+    this.ambient = new Vector4(0.0, 0.0, 0.0, 0.0);
 }
 
-Vector2.prototype = {
+WorldLight.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  reset : Reset vector to zero                                          //
+    //  init : Init world light                                               //
+    //  param direction : Direction of the world light                        //
+    //  param color : Color of the world light                                //
+    //  param ambient : Ambient color of the world light                      //
     ////////////////////////////////////////////////////////////////////////////
-    reset: function()
+    init: function(direction, color, ambient)
     {
-        this.vec[0] = 0.0;
-        this.vec[1] = 0.0;
+        // Reset world light
+        this.direction.reset();
+        this.color.reset();
+        this.ambient.reset();
+
+        // Set world light direction
+        if (direction) this.direction.setVector(direction);
+
+        // Set world light color
+        if (color) this.color.setVector(color);
+
+        // Set world light ambient color
+        if (ambient) this.ambient.setVector(ambient);
+
+        // Check renderer pointer
+        if (!this.renderer) return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  set : Set vector components from a vector                             //
-    //  param vector : New vector components                                  //
+    //  setDirectionVec3 : Set world light's direction from a Vector3         //
+    //  param direction : Direction of the world light                        //
     ////////////////////////////////////////////////////////////////////////////
-    set: function(vector)
+    setDirectionVec3: function(direction)
     {
-        this.vec[0] = vector.vec[0];
-        this.vec[1] = vector.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setXY : Set vector values from seperate components                    //
-    //  param x : X value of the vector                                       //
-    //  param y : Y value of the vector                                       //
-    ////////////////////////////////////////////////////////////////////////////
-    setXY: function(x, y)
-    {
-        this.vec[0] = x;
-        this.vec[1] = y;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setX : Set vector X components                                        //
-    //  param x : X components of the vector                                  //
-    ////////////////////////////////////////////////////////////////////////////
-    setX: function(x)
-    {
-        this.vec[0] = x;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setY : Set vector Y position                                          //
-    //  param y : Y position of the vector                                    //
-    ////////////////////////////////////////////////////////////////////////////
-    setY: function(y)
-    {
-        this.vec[1] = y;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getX : Get vector X position                                          //
-    //  return : X position of the vector                                     //
-    ////////////////////////////////////////////////////////////////////////////
-    getX: function()
-    {
-        return this.vec[0];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getY : Get vector Y position                                          //
-    //  return : Y position of the vector                                     //
-    ////////////////////////////////////////////////////////////////////////////
-    getY: function()
-    {
-        return this.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  add : Vectorial addition                                              //
-    //  param vector : Vector to add                                          //
-    ////////////////////////////////////////////////////////////////////////////
-    add: function(vector)
-    {
-        this.vec[0] += vector.vec[0];
-        this.vec[1] += vector.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  addXY : Vectorial addition from seperate components                   //
-    //  param x : Value to add to the vector's X component                    //
-    //  param y : Value to add to the vector's Y component                    //
-    ////////////////////////////////////////////////////////////////////////////
-    addXY: function(x, y)
-    {
-        this.vec[0] += x;
-        this.vec[1] += y;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  addX : Add a value to the vector's X component                        //
-    //  param x : Value to add to the vector's X component                    //
-    ////////////////////////////////////////////////////////////////////////////
-    addX: function(x)
-    {
-        this.vec[0] += x;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  addY : Add a value to the vector's Y component                        //
-    //  param y : Value to add to the vector's Y component                    //
-    ////////////////////////////////////////////////////////////////////////////
-    addY: function(y)
-    {
-        this.vec[1] += y;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  normalize : Normalize vector                                          //
-    ////////////////////////////////////////////////////////////////////////////
-    normalize: function()
-    {
-        var length = (this.vec[0]*this.vec[0])+(this.vec[1]*this.vec[1]);
-        var invLength = 1.0;
-        if (length > 0.0)
+        // Set world light direction
+        if (direction)
         {
-            length = Math.sqrt(length);
-            invLength = 1.0/length;
-            this.vec[0] *= invLength;
-            this.vec[1] *= invLength;
+            this.direction.setVector(direction);
+            this.direction.normalize();
         }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setDirection : Set world light's direction from 3 seperate components //
+    //  param x : X direction of the world light                              //
+    //  param y : Y direction of the world light                              //
+    //  param z : Z direction of the world light                              //
+    ////////////////////////////////////////////////////////////////////////////
+    setDirection: function(x, y, z)
+    {
+        // Set world light direction
+        this.direction.setXYZ(x, y, z);
+        this.direction.normalize();
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setColorVec4 : Set world light's color from a Vector4                 //
+    //  param color : Color of the world light                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setColorVec4: function(color)
+    {
+        // Set world light color
+        if (color) this.color.setVector(color);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setDirection : Set world light's color from 4 seperate components     //
+    //  param r : Red color component of the world light                      //
+    //  param g : Green color component of the world light                    //
+    //  param b : Blue color component of the world light                     //
+    //  param a : Alpha color component of the world light                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setColor: function(r, g, b, a)
+    {
+        // Set world light color
+        this.color.setXYZW(r, g, b, a);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setColorVec4 : Set world light's ambient color from a Vector4         //
+    //  param ambient : Ambient color of the world light                      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAmbientVec4: function(ambient)
+    {
+        // Set world light ambient color
+        if (ambient) this.ambient.setVector(ambient);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setDirection : Set world light's ambient color                        //
+    //  param r : Red ambient color component of the world light              //
+    //  param g : Green ambient color component of the world light            //
+    //  param b : Blue ambient color component of the world light             //
+    //  param a : Alpha ambient color component of the world light            //
+    ////////////////////////////////////////////////////////////////////////////
+    setAmbient: function(r, g, b, a)
+    {
+        // Set world light ambient color
+        this.ambient.setXYZW(r, g, b, a);
     }
 };

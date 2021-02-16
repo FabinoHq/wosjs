@@ -54,6 +54,7 @@ var defaultNormals = new GLArrayDataType([
 
 ////////////////////////////////////////////////////////////////////////////////
 //  MeshVertexBuffer class definition                                         //
+//  param glPointer : WebGL functions pointer                                 //
 ////////////////////////////////////////////////////////////////////////////////
 function MeshVertexBuffer(glPointer)
 {

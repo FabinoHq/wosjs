@@ -43,6 +43,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //  BackRenderer class definition                                             //
+//  param renderer : Renderer pointer                                         //
+//  param backrendererShader : Background renderer shader pointer             //
 ////////////////////////////////////////////////////////////////////////////////
 function BackRenderer(renderer, backrendererShader)
 {

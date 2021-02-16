@@ -64,6 +64,7 @@ var defaultBonesWeights = new GLArrayDataType([
 
 ////////////////////////////////////////////////////////////////////////////////
 //  SkeletalVertexBuffer class definition                                     //
+//  param glPointer : WebGL functions pointer                                 //
 ////////////////////////////////////////////////////////////////////////////////
 function SkeletalVertexBuffer(glPointer)
 {

@@ -72,6 +72,7 @@ var defaultIndices = new GLIndexDataType([
 
 ////////////////////////////////////////////////////////////////////////////////
 //  VertexBuffer class definition                                             //
+//  param glPointer : WebGL functions pointer                                 //
 ////////////////////////////////////////////////////////////////////////////////
 function VertexBuffer(glPointer)
 {

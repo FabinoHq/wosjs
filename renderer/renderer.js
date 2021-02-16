@@ -77,9 +77,13 @@ function Renderer()
     this.vertexBuffer = null;
     this.shader = null;
     this.worldMatrix = null;
+    this.lightMatrix = null;
     this.projMatrix = null;
     this.view = null;
     this.camera = null;
+
+    // Lighting
+    this.worldLight = null;
 }
 
 Renderer.prototype = {
@@ -116,6 +120,7 @@ Renderer.prototype = {
         this.vertexBuffer = null;
         this.shader = null;
         this.worldMatrix = null;
+        this.lightMatrix = null;
         this.projMatrix = null;
         this.view = null;
         this.camera = null;
@@ -226,37 +231,6 @@ Renderer.prototype = {
         this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
         this.gl.disable(this.gl.SCISSOR_TEST);
 
-        // Init world matrix
-        this.worldMatrix = new Matrix4x4();
-        if (!this.worldMatrix)
-        {
-            // Could not init world matrix
-            return false;
-        }
-
-        // Set default world matrix
-        this.worldMatrix.setIdentity();
-
-        // Init projection matrix
-        this.projMatrix = new Matrix4x4();
-        if (!this.projMatrix)
-        {
-            // Could not init projection matrix
-            return false;
-        }
-
-        // Set projection matrix
-        this.projMatrix.setOrthographic(
-            -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
-        );
-        this.projMatrix.translateZ(-1.0);
-
-        // Init view
-        this.view = new View();
-
-        // Init camera
-        this.camera = new Camera();
-
         // Disable dithering
         this.gl.disable(this.gl.DITHER);
 
@@ -268,6 +242,49 @@ Renderer.prototype = {
 
         // Set texture 0 as active texture
         this.gl.activeTexture(this.gl.TEXTURE0);
+
+        // Init world matrix
+        this.worldMatrix = new Matrix4x4();
+        if (!this.worldMatrix)
+        {
+            // Could not init world matrix
+            return false;
+        }
+
+        // Init light matrix
+        this.lightMatrix = new Matrix4x4();
+        if (!this.lightMatrix)
+        {
+            // Could not init light matrix
+            return false;
+        }
+
+        // Init projection matrix
+        this.projMatrix = new Matrix4x4();
+        if (!this.projMatrix)
+        {
+            // Could not init projection matrix
+            return false;
+        }
+
+        // Set default projection matrix
+        this.projMatrix.setOrthographic(
+            -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
+        );
+        this.projMatrix.translateZ(-1.0);
+
+        // Init view
+        this.view = new View();
+
+        // Init camera
+        this.camera = new Camera();
+
+        // Init world light
+        this.worldLight = new WorldLight(this);
+        this.worldLight.init();
+        this.worldLight.setDirection(0.2, 0.1, 0.9);
+        this.worldLight.setColor(1.0, 1.0, 1.0, 0.8);
+        this.worldLight.setAmbient(1.0, 1.0, 1.0, 0.2);
 
         // Renderer is successfully loaded
         this.loaded = true;

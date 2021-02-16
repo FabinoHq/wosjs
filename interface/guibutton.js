@@ -99,8 +99,8 @@ GuiButton.prototype = {
         this.alpha = 1.0;
         this.buttonState = 0;
 
-        // Check gl pointer
-        if (!this.renderer.gl) return false;
+        // Check renderer pointer
+        if (!this.renderer) return false;
 
         // Check button shader pointer
         if (!this.buttonShader) return false;

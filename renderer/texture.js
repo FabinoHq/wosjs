@@ -43,6 +43,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Texture class definition                                                  //
+//  param renderer : Renderer pointer                                         //
 ////////////////////////////////////////////////////////////////////////////////
 function Texture(renderer)
 {
@@ -81,7 +82,7 @@ Texture.prototype = {
         this.height = 0;
         this.smooth = true;
 
-        // Check renderer
+        // Check renderer pointer
         if (!this.renderer) return false;
 
         // Check gl pointer

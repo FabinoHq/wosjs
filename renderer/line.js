@@ -111,8 +111,8 @@ Line.prototype = {
         if (thickness !== undefined) this.thickness = thickness;
         this.smoothness = 0.0;
 
-        // Check gl pointer
-        if (!this.renderer.gl) return false;
+        // Check renderer pointer
+        if (!this.renderer) return false;
 
         // Check line shader pointer
         if (!this.lineShader) return false;

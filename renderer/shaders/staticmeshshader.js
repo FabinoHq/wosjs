@@ -51,11 +51,12 @@ const staticMeshVertexShaderSrc = [
     "attribute vec2 vertexCoord;",
     "attribute vec3 vertexNorm;",
     "uniform mat4 worldMatrix;",
+    "uniform mat4 lightMatrix;",
     "varying vec2 texCoord;",
     "varying vec3 normal;",
     "void main()",
     "{",
-    "    normal = vertexNorm; texCoord = vertexCoord;",
+    "    normal = mat3(lightMatrix)*vertexNorm; texCoord = vertexCoord;",
     "    gl_Position = worldMatrix*vec4(vertexPos, 1.0);",
     "}"
 ].join("\n");
@@ -69,10 +70,18 @@ const staticMeshFragmentShaderSrc = [
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "varying vec3 normal;",
+    "uniform vec3 worldLightVec;",
+    "uniform vec4 worldLightColor;",
+    "uniform vec4 worldLightAmbient;",
     "uniform float alpha;",
     "void main()",
     "{",
     "    vec4 texColor = texture2D(texture, texCoord);",
+    "    vec3 fNormal = normalize(normal);",
+    "    float fLight = clamp(dot(fNormal, worldLightVec), 0.0, 1.0);",
+    "    vec3 worldLight = worldLightColor.rgb*worldLightColor.a*fLight;",
+    "    vec3 ambientLight = worldLightAmbient.rgb*worldLightAmbient.a;",
+    "    texColor.rgb *= (ambientLight+worldLight);",
     "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
     "}"
 ].join("\n");
