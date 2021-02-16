@@ -20,6 +20,7 @@
 !math/math.js
 !math/vector_2.js
 !math/vector_3.js
+!math/vector_4.js
 !math/matrix_4_4.js
 
 !physics/collision.js

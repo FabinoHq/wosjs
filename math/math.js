@@ -217,4 +217,3 @@ function fractalHeigthmap(seed, i, j)
     // Final fractal heightmap
     return (bilinear1*0.7+bilinear2*0.2+bilinear3*0.1);
 }
-

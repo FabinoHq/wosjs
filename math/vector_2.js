@@ -76,8 +76,8 @@ Vector2.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setXY : Set vector values from seperate components                    //
-    //  param X : X value of the vector                                       //
-    //  param Y : Y value of the vector                                       //
+    //  param x : X value of the vector                                       //
+    //  param y : Y value of the vector                                       //
     ////////////////////////////////////////////////////////////////////////////
     setXY: function(x, y)
     {
@@ -87,7 +87,7 @@ Vector2.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setX : Set vector X components                                        //
-    //  param X : X components of the vector                                  //
+    //  param x : X components of the vector                                  //
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
     {
@@ -96,7 +96,7 @@ Vector2.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setY : Set vector Y position                                          //
-    //  param Y : Y position of the vector                                    //
+    //  param y : Y position of the vector                                    //
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
     {
@@ -176,4 +176,3 @@ Vector2.prototype = {
         }
     }
 };
-

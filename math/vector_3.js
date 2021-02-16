@@ -80,9 +80,9 @@ Vector3.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setXYZ : Set vector values from seperate components                   //
-    //  param X : X value of the vector                                       //
-    //  param Y : Y value of the vector                                       //
-    //  param Z : Z value of the vector                                       //
+    //  param x : X value of the vector                                       //
+    //  param y : Y value of the vector                                       //
+    //  param z : Z value of the vector                                       //
     ////////////////////////////////////////////////////////////////////////////
     setXYZ: function(x, y, z)
     {
@@ -93,7 +93,7 @@ Vector3.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setX : Set vector X components                                        //
-    //  param X : X components of the vector                                  //
+    //  param x : X components of the vector                                  //
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
     {
@@ -102,7 +102,7 @@ Vector3.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setY : Set vector Y component                                         //
-    //  param Y : Y component of the vector                                   //
+    //  param y : Y component of the vector                                   //
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
     {
@@ -111,7 +111,7 @@ Vector3.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setZ : Set vector Z component                                         //
-    //  param Z : Z component of the vector                                   //
+    //  param z : Z component of the vector                                   //
     ////////////////////////////////////////////////////////////////////////////
     setZ: function(z)
     {
@@ -201,7 +201,7 @@ Vector3.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     normalize: function()
     {
-        var length = (this.vec[0]*this.vec[0]) + 
+        var length = (this.vec[0]*this.vec[0]) +
                     (this.vec[1]*this.vec[1]) +
                     (this.vec[2]*this.vec[2]);
         var invLength = 1.0;
@@ -215,4 +215,3 @@ Vector3.prototype = {
         }
     }
 };
-
