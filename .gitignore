@@ -17,6 +17,7 @@
 !assets.js
 !loader.js
 
+!math/
 !math/math.js
 !math/vector_2.js
 !math/vector_3.js
