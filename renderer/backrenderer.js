@@ -72,12 +72,12 @@ function BackRenderer(renderer, backrendererShader)
     this.texture = null;
 
     // Background renderer model matrix
-    this.modelMatrix = null;
+    this.modelMatrix = new Matrix4x4();
 
     // Background renderer position
-    this.position = null;
+    this.position = new Vector2(0.0, 0.0);
     // Background renderer size
-    this.size = null;
+    this.size = new Vector2(1.0, 1.0);
     // Background renderer rotation angle
     this.angle = 0.0;
     // Background renderer alpha
@@ -100,9 +100,9 @@ BackRenderer.prototype = {
         this.framebuffer = null;
         this.depthbuffer = null;
         this.texture = null;
-        this.modelMatrix = null;
-        this.position = new Vector2(0.0, 0.0);
-        this.size = new Vector2(1.0, 1.0);
+        this.modelMatrix.setIdentity();
+        this.position.reset();
+        this.size.setXY(1.0, 1.0);
         this.angle = 0.0;
         this.alpha = 1.0;
 
@@ -211,10 +211,6 @@ BackRenderer.prototype = {
         // Unbind framebuffer
         this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
 
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-        if (!this.modelMatrix) return false;
-
         // Background renderer successfully loaded
         return true;
     },
@@ -316,8 +312,9 @@ BackRenderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  setCamera : Set back renderer camera                                  //
     //  param camera : Camera to use for back rendering                       //
+    //  param frametime : Frametime to compute camera movements               //
     ////////////////////////////////////////////////////////////////////////////
-    setCamera: function(camera)
+    setCamera: function(camera, frametime)
     {
         if (camera)
         {
@@ -331,7 +328,7 @@ BackRenderer.prototype = {
             this.renderer.gl.clear(this.renderer.gl.DEPTH_BUFFER_BIT);
 
             // Update view matrix
-            this.renderer.camera.compute(this.ratio);
+            this.renderer.camera.compute(this.ratio, frametime);
             this.renderer.camera.projMatrix.scaleY(-1.0);
         }
     },
@@ -573,8 +570,7 @@ BackRenderer.prototype = {
         this.backrendererShader.bind();
 
         // Compute world matrix
-        this.renderer.worldMatrix.setIdentity();
-        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 

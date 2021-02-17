@@ -66,14 +66,14 @@ function StaticMesh(renderer, meshShader)
     // Static mesh texture
     this.texture = null;
     // Static mesh model matrix
-    this.modelMatrix = null;
+    this.modelMatrix = new Matrix4x4();
 
     // Static mesh position
-    this.position = null;
+    this.position = new Vector3(0.0, 0.0, 0.0);
     // Static mesh size
-    this.size = null;
+    this.size = new Vector3(1.0, 1.0, 1.0);
     // Static mesh rotation angles
-    this.angles = null;
+    this.angles = new Vector3(0.0, 0.0, 0.0);
     // Static mesh alpha
     this.alpha = 1.0;
 }
@@ -93,10 +93,10 @@ StaticMesh.prototype = {
         this.alphaUniform = -1;
         this.vertexBuffer = null;
         this.texture = null;
-        this.modelMatrix = null;
-        this.position = new Vector3(0.0, 0.0, 0.0);
-        this.size = new Vector3(1.0, 1.0, 1.0);
-        this.angles = new Vector3(0.0, 0.0, 0.0);
+        this.modelMatrix.setIdentity();
+        this.position.reset();
+        this.size.setXYZ(1.0, 1.0, 1.0);
+        this.angles.reset();
         this.alpha = 1.0;
 
         // Check renderer pointer
@@ -146,10 +146,6 @@ StaticMesh.prototype = {
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
-
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-        if (!this.modelMatrix) return false;
 
         // Static mesh loaded
         return true;
@@ -460,15 +456,12 @@ StaticMesh.prototype = {
         this.meshShader.bind();
 
         // Compute world matrix
-        this.renderer.worldMatrix.setIdentity();
-        this.renderer.worldMatrix.multiply(this.renderer.camera.projMatrix);
+        this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Compute light matrix
-        this.renderer.lightMatrix.setIdentity();
-        this.renderer.lightMatrix.multiply(this.renderer.camera.viewMatrix);
-        this.renderer.lightMatrix.multiply(this.modelMatrix);
+        this.renderer.lightMatrix.setMatrix(this.modelMatrix);
 
         // Send shader uniforms
         this.meshShader.sendWorldMatrix(this.renderer.worldMatrix);

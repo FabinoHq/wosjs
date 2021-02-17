@@ -64,28 +64,28 @@ function AnimSprite(renderer, animShader)
     // Animated sprite texture
     this.texture = null;
     // Animated sprite model matrix
-    this.modelMatrix = null;
+    this.modelMatrix = new Matrix4x4();
 
     // Animated sprite position
-    this.position = null;
+    this.position = new Vector2(0.0, 0.0);
     // Animated sprite size
-    this.size = null;
+    this.size = new Vector2(1.0, 1.0);
     // Animated sprite rotation angle
     this.angle = 0.0;
     // Animated sprite frame count
-    this.count = null;
+    this.count = new Vector2(1, 1);
     // Animated sprite start frame
-    this.start = null;
+    this.start = new Vector2(0, 0);
     // Animated sprite end frame
-    this.end = null;
+    this.end = new Vector2(0, 0);
     // Animated sprite frametime in seconds
     this.frametime = 1.0;
     // Animated sprite alpha
     this.alpha = 1.0;
 
     // Animated sprite current states
-    this.current = null;
-    this.next = null;
+    this.current = new Vector2(0, 0);
+    this.next = new Vector2(0, 0);
     this.currentTime = 0.0;
     this.interpOffset = 0.0;
 }
@@ -108,21 +108,21 @@ AnimSprite.prototype = {
         this.nextUniform = -1;
         this.interpUniform = -1;
         this.texture = null;
-        this.modelMatrix = null;
-        this.position = new Vector2(0.0, 0.0);
-        this.size = new Vector2(1.0, 1.0);
+        this.modelMatrix.setIdentity();
+        this.position.reset();
+        this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.angle = 0.0;
-        this.count = new Vector2(1, 1);
+        this.count.setXY(1, 1);
         if (countX !== undefined) this.count.vec[0] = countX;
         if (countY !== undefined) this.count.vec[1] = countY;
-        this.start = new Vector2(0, 0);
-        this.end = new Vector2(0, 0);
+        this.start.setXY(0, 0);
+        this.end.setXY(0, 0);
         this.frametime = 1.0;
         this.alpha = 1.0;
-        this.current = new Vector2(0, 0);
-        this.next = new Vector2(0, 0);
+        this.current.setXY(0, 0);
+        this.next.setXY(0, 0);
         this.currentTime = 0.0;
         this.interpOffset = 0.0;
 
@@ -144,10 +144,6 @@ AnimSprite.prototype = {
         // Set texture
         this.texture = tex;
         if (!this.texture) return false;
-
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-        if (!this.modelMatrix) return false;
 
         // Sprite loaded
         return true;
@@ -606,8 +602,7 @@ AnimSprite.prototype = {
         this.animShader.bind();
 
         // Compute world matrix
-        this.renderer.worldMatrix.setIdentity();
-        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 

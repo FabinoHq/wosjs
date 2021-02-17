@@ -53,7 +53,7 @@ function ProcSprite(renderer)
     // Procedural sprite shader
     this.shader = null;
     // Procedural sprite model matrix
-    this.modelMatrix = null;
+    this.modelMatrix = new Matrix4x4();
 
     // Procedural sprite shader uniforms locations
     this.alphaUniform = -1;
@@ -61,13 +61,13 @@ function ProcSprite(renderer)
     this.offsetUniform = -1;
 
     // Procedural sprite position
-    this.position = null;
+    this.position = new Vector2(0.0, 0.0);
     // Procedural sprite size
-    this.size = null;
+    this.size = new Vector2(1.0, 1.0);
     // Procedural sprite rotation angle
     this.angle = 0.0;
     // Procedural sprite offset
-    this.offset = null;
+    this.offset = new Vector2(0.0, 0.0);
     // Procedural sprite time
     this.time = 0.0;
     // Procedural sprite alpha
@@ -85,16 +85,16 @@ ProcSprite.prototype = {
     {
         // Reset procedural sprite
         this.shader = null;
-        this.modelMatrix = null;
+        this.modelMatrix.setIdentity();
         this.alphaUniform = -1;
         this.timeUniform = -1;
         this.offsetUniform = -1;
-        this.position = new Vector2(0.0, 0.0);
-        this.size = new Vector2(1.0, 1.0);
+        this.position.reset();
+        this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.angle = 0.0;
-        this.offset = new Vector2(0.0, 0.0);
+        this.offset.reset();
         this.time = 0.0;
         this.alpha = 1.0;
 
@@ -115,10 +115,6 @@ ProcSprite.prototype = {
         this.timeUniform = this.shader.getUniform("time");
         this.offsetUniform = this.shader.getUniform("offset");
         this.shader.unbind();
-
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-        if (!this.modelMatrix) return false;
 
         // Procedural sprite loaded
         return true;
@@ -418,8 +414,7 @@ ProcSprite.prototype = {
         this.shader.bind();
 
         // Compute world matrix
-        this.renderer.worldMatrix.setIdentity();
-        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 

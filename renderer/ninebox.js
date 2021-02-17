@@ -62,16 +62,16 @@ function Ninebox(renderer, nineboxShader)
     // Ninebox texture
     this.texture = null;
     // Ninebox model matrix
-    this.modelMatrix = null;
+    this.modelMatrix = new Matrix4x4();
 
     // Ninebox position
-    this.position = null;
+    this.position = new Vector2(0.0, 0.0);
     // Ninebox size
-    this.size = null;
+    this.size = new Vector2(1.0, 1.0);
     // Ninebox rotation angle
     this.angle = 0.0;
     // Ninebox texture UV size
-    this.uvSize = null;
+    this.uvSize = new Vector2(1.0, 1.0);
     // Ninebox texture UV factor
     this.uvFactor = null;
     // Ninebox alpha
@@ -93,13 +93,13 @@ Ninebox.prototype = {
         this.uvSizeUniform = -1;
         this.uvFactorUniform = -1;
         this.texture = null;
-        this.modelMatrix = null;
-        this.position = new Vector2(0.0, 0.0);
-        this.size = new Vector2(1.0, 1.0);
+        this.modelMatrix.setIdentity();
+        this.position.reset();
+        this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.angle = 0.0;
-        this.uvSize = new Vector2(1.0, 1.0);
+        this.uvSize.setXY(1.0, 1.0);
         this.uvFactor = 1.0;
         if (factor !== undefined) this.uvFactor = factor;
         this.alpha = 1.0;
@@ -120,10 +120,6 @@ Ninebox.prototype = {
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
-
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-        if (!this.modelMatrix) return false;
 
         // Ninebox loaded
         return true;
@@ -366,8 +362,7 @@ Ninebox.prototype = {
         this.nineboxShader.bind();
 
         // Compute world matrix
-        this.renderer.worldMatrix.setIdentity();
-        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 

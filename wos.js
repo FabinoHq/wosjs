@@ -180,6 +180,42 @@ window.addEventListener('touchmove', function(event)
 }, false);
 
 ////////////////////////////////////////////////////////////////////////////////
+//  document.exitPointerLock : Pointer lock exit event                        //
+////////////////////////////////////////////////////////////////////////////////
+document.exitPointerLock = document.exitPointerLock ||
+    document.mozExitPointerLock ||
+    document.webkitExitPointerLock;
+
+////////////////////////////////////////////////////////////////////////////////
+//  window.pointerLockChange : Pointer lock status changed                    //
+////////////////////////////////////////////////////////////////////////////////
+window.pointerLockChange = function()
+{
+    if (document.pointerLockElement || document.mozPointerLockElement)
+    {
+        document.addEventListener("mousemove", window.onmousetrack, false);
+    }
+    else
+    {
+        document.removeEventListener("mousemove", window.onmousetrack, false);
+    }
+}
+document.addEventListener(
+    "pointerlockchange", window.pointerLockChange, false
+);
+document.addEventListener(
+    "mozpointerlockchange", window.pointerLockChange, false
+);
+
+////////////////////////////////////////////////////////////////////////////////
+//  window.onmousetrack : Mouse tracking event                                //
+////////////////////////////////////////////////////////////////////////////////
+window.onmousetrack = function(event)
+{
+    if (wos) wos.handleMouseTrack(event.movementX, event.movementY);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 //  window.onmousedown : Triggered when a mouse button is pressed             //
 ////////////////////////////////////////////////////////////////////////////////
 window.onmousedown = function(event)
@@ -233,6 +269,11 @@ function Wos()
     // Mouse position adjusted to WOS render size
     this.realMouseX = 0.0;
     this.realMouseY = 0.0;
+    // Previous mouse position
+    this.prevMouseX = 0.0;
+    this.prevMouseY = 0.0;
+    // Mouse sensitivity
+    this.mouseSensitivity = 1.0;
 
     // WOS renderer
     this.renderer = null;
@@ -245,6 +286,8 @@ function Wos()
 
     // Test camera
     this.camera = null;
+    // Test freefly camera
+    this.freeflycam = null;
 
     // Test line
     this.testline = null;
@@ -396,6 +439,17 @@ Wos.prototype = {
 
         // Init test camera
         this.camera = new Camera();
+        this.camera.reset();
+        this.camera.rotateX(0.0);
+        this.camera.moveY(0.0);
+        this.camera.moveZ(-3.0);
+
+        // Init test freefly camera
+        this.freeflycam = new FreeflyCam();
+        this.freeflycam.reset();
+        this.freeflycam.rotateX(0.0);
+        this.freeflycam.moveY(0.0);
+        this.freeflycam.moveZ(-2.0);
 
         // Init test static mesh
         this.staticmesh = new StaticMesh(
@@ -452,6 +506,26 @@ Wos.prototype = {
     handleKeyDown: function(key)
     {
         //if (this.testtextbox) this.testtextbox.keyPress(key);
+        /*if (this.freeflycam)
+        {
+            switch (key)
+            {
+                case "ArrowUp": case "Up": case "Z": case "z":
+                    this.freeflycam.setForward(true);
+                    break;
+                case "ArrowDown": case "Down": case "S": case "s":
+                    this.freeflycam.setBackward(true);
+                    break;
+                case "ArrowLeft": case "Left": case "Q": case "q":
+                    this.freeflycam.setLeftward(true);
+                    break;
+                case "ArrowRight": case "Right": case "D": case "d":
+                    this.freeflycam.setRightward(true);
+                    break;
+                default:
+                    break;
+            }
+        }*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -461,6 +535,26 @@ Wos.prototype = {
     handleKeyUp: function(key)
     {
         //if (this.testtextbox) this.testtextbox.keyRelease(key);
+        /*if (this.freeflycam)
+        {
+            switch (key)
+            {
+                case "ArrowUp": case "Up": case "Z": case "z":
+                    this.freeflycam.setForward(false);
+                    break;
+                case "ArrowDown": case "Down": case "S": case "s":
+                    this.freeflycam.setBackward(false);
+                    break;
+                case "ArrowLeft": case "Left": case "Q": case "q":
+                    this.freeflycam.setLeftward(false);
+                    break;
+                case "ArrowRight": case "Right": case "D": case "d":
+                    this.freeflycam.setRightward(false);
+                    break;
+                default:
+                    break;
+            }
+        }*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -482,6 +576,22 @@ Wos.prototype = {
         /*if (this.testtextbox)
         {
             this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);
+        }*/
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  handleMouseTrack : Handle mouse tracking                              //
+    //  param mouseX : Mouse X offset position                                //
+    //  param mouseX : Mouse Y offset position                                //
+    ////////////////////////////////////////////////////////////////////////////
+    handleMouseTrack: function(mouseX, mouseY)
+    {
+        // Adjust to mouse sensitivity
+        /*mouseX *= this.mouseSensitivity;
+        mouseY *= this.mouseSensitivity;
+        if (this.freeflycam)
+        {
+            this.freeflycam.mouseMove(mouseX, mouseY);
         }*/
     },
 
@@ -553,6 +663,8 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     updateMousePosition: function(mouseX, mouseY)
     {
+        this.prevMouseX = this.realMouseX;
+        this.prevMouseY = this.realMouseY;
         this.mouseX = mouseX;
         this.mouseY = mouseY;
         this.curMouseX = ((this.mouseX/this.renderer.width)*2.0*
@@ -644,11 +756,10 @@ Wos.prototype = {
         //this.testtextbox.render();
 
         // Set camera
-        //this.camera.reset();
-        //this.camera.rotateX(0.0);
-        //this.camera.moveY(0.0);
-        //this.camera.moveZ(-3.0);
         //this.renderer.setCamera(this.camera);
+
+        // Set freefly camera
+        //this.renderer.setCamera(this.freeflycam, this.frametime);
 
         // Render test static mesh
         //this.staticmesh.rotateX(this.frametime*30.0);

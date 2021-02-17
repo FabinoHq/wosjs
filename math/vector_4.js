@@ -237,23 +237,29 @@ Vector4.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  normalize : Normalize vector                                          //
+    //  length : Get vector length                                            //
     ////////////////////////////////////////////////////////////////////////////
-    normalize: function()
+    length: function()
     {
         var length = (this.vec[0]*this.vec[0]) +
                     (this.vec[1]*this.vec[1]) +
                     (this.vec[2]*this.vec[2]) +
                     (this.vec[3]*this.vec[3]);
-        var invLength = 1.0;
+        return Math.sqrt(length);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  normalize : Normalize vector                                          //
+    ////////////////////////////////////////////////////////////////////////////
+    normalize: function()
+    {
+        var length = this.length();
         if (length > 0.0)
         {
-            length = Math.sqrt(length);
-            invLength = 1.0/length;
-            this.vec[0] *= invLength;
-            this.vec[1] *= invLength;
-            this.vec[2] *= invLength;
-            this.vec[3] *= invLength;
+            this.vec[0] /= length;
+            this.vec[1] /= length;
+            this.vec[2] /= length;
+            this.vec[3] /= length;
         }
     }
 };

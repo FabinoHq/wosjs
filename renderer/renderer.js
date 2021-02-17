@@ -162,6 +162,12 @@ Renderer.prototype = {
         // Get canvas context
         this.ctx = this.context.getContext("2d");
 
+        // Set context pointer lock function
+        this.context.requestPointerLock =
+            this.context.requestPointerLock ||
+            this.context.mozRequestPointerLock ||
+            this.context.webkitRequestPointerLock;
+
         // Init context handlers
         this.context.addEventListener(
             "webglcontextlost", 
@@ -443,8 +449,9 @@ Renderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  setCamera : Set rendering camera                                      //
     //  param camera : Camera to use for rendering                            //
+    //  param frametime : Frametime to compute camera movements               //
     ////////////////////////////////////////////////////////////////////////////
-    setCamera: function(camera)
+    setCamera: function(camera, frametime)
     {
         if (camera)
         {
@@ -458,7 +465,7 @@ Renderer.prototype = {
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
 
             // Update view matrix
-            this.camera.compute(this.ratio);
+            this.camera.compute(this.ratio, frametime);
         }
     },
 
@@ -490,6 +497,23 @@ Renderer.prototype = {
     handleContextRestored: function()
     {
         console.log("context restored");
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setMouseLock : Set mouse locked status                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setMouseLock: function(lock)
+    {
+        if (lock)
+        {
+            // Request pointer lock
+            this.context.requestPointerLock();
+        }
+        else
+        {
+            // Exit pointer lock
+            document.exitPointerLock();
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////

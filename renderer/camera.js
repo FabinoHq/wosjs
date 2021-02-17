@@ -70,6 +70,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     reset: function()
     {
+        // Reset camera
         this.projMatrix.setIdentity();
         this.viewMatrix.setIdentity();
         this.position.reset();
@@ -81,13 +82,17 @@ Camera.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  compute : Compute the camera matrix                                   //
+    //  param ratio : Ratio of the rendering zone                             //
     ////////////////////////////////////////////////////////////////////////////
     compute: function(ratio)
     {
+        // Compute projection matrix
         this.projMatrix.setIdentity();
         this.projMatrix.setPerspective(
             this.fovy, ratio, this.nearPlane, this.farPlane
         );
+
+        // Compute view matrix
         this.viewMatrix.setIdentity();
         this.viewMatrix.rotateX(this.angles.vec[0]);
         this.viewMatrix.rotateY(this.angles.vec[1]);

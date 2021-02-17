@@ -200,21 +200,37 @@ Vector3.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  normalize : Normalize vector                                          //
+    //  crossProduct : Set this vector as a cross product from 2 vectors      //
     ////////////////////////////////////////////////////////////////////////////
-    normalize: function()
+    crossProduct: function(v1, v2)
+    {
+        this.vec[0] = (v2.vec[1]*v1.vec[2]) - (v2.vec[2]*v1.vec[1]);
+        this.vec[1] = (v2.vec[2]*v1.vec[0]) - (v2.vec[0]*v1.vec[2]);
+        this.vec[2] = (v2.vec[0]*v1.vec[1]) - (v2.vec[1]*v1.vec[0]);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  length : Get vector length                                            //
+    ////////////////////////////////////////////////////////////////////////////
+    length: function()
     {
         var length = (this.vec[0]*this.vec[0]) +
                     (this.vec[1]*this.vec[1]) +
                     (this.vec[2]*this.vec[2]);
-        var invLength = 1.0;
+        return Math.sqrt(length);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  normalize : Normalize vector                                          //
+    ////////////////////////////////////////////////////////////////////////////
+    normalize: function()
+    {
+        var length = this.length();
         if (length > 0.0)
         {
-            length = Math.sqrt(length);
-            invLength = 1.0/length;
-            this.vec[0] *= invLength;
-            this.vec[1] *= invLength;
-            this.vec[2] *= invLength;
+            this.vec[0] /= length;
+            this.vec[1] /= length;
+            this.vec[2] /= length;
         }
     }
 };

@@ -61,12 +61,12 @@ function GuiToggleButton(renderer, toggleButtonShader)
     // Toggle button texture
     this.texture = null;
     // Toggle button model matrix
-    this.modelMatrix = null;
+    this.modelMatrix = new Matrix4x4();
 
     // Toggle button position
-    this.position = null;
+    this.position = new Vector2(0.0, 0.0);
     // Toggle button size
-    this.size = null;
+    this.size = new Vector2(1.0, 1.0);
     // Toggle button alpha
     this.alpha = 1.0;
     // Toggle button state
@@ -90,9 +90,9 @@ GuiToggleButton.prototype = {
         this.alphaUniform = -1;
         this.buttonStateUniform = -1;
         this.texture = null;
-        this.modelMatrix = null;
-        this.position = new Vector2(0.0, 0.0);
-        this.size = new Vector2(1.0, 1.0);
+        this.modelMatrix.setIdentity();
+        this.position.reset();
+        this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         if (round !== undefined) { if (round) this.isRound = true; }
@@ -114,10 +114,6 @@ GuiToggleButton.prototype = {
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
-
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-        if (!this.modelMatrix) return false;
 
         // Toggle button loaded
         return true;
@@ -524,8 +520,7 @@ GuiToggleButton.prototype = {
         this.toggleButtonShader.bind();
 
         // Compute world matrix
-        this.renderer.worldMatrix.setIdentity();
-        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 

@@ -62,16 +62,16 @@ function Rect(renderer, rectShader)
     this.thicknessUniform = -1;
 
     // Rect model matrix
-    this.modelMatrix = null;
+    this.modelMatrix = new Matrix4x4();
 
     // Rect position
-    this.position = null;
+    this.position = new Vector2(0.0, 0.0);
     // Rect size
-    this.size = null;
+    this.size = new Vector2(1.0, 1.0);
     // Rect rotation angle
     this.angle = 0.0;
     // Rect color
-    this.color = null;
+    this.color = new Vector3(1.0, 1.0, 1.0);
     // Rect alpha
     this.alpha = 1.0;
     // Rect thickness
@@ -93,13 +93,13 @@ Rect.prototype = {
         this.widthUniform = -1;
         this.heightUniform = -1;
         this.thicknessUniform = -1;
-        this.modelMatrix = null;
-        this.position = new Vector2(0.0, 0.0);
-        this.size = new Vector2(1.0, 1.0);
+        this.modelMatrix.setIdentity();
+        this.position.reset();
+        this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.angle = 0.0;
-        this.color = new Vector3(1.0, 1.0, 1.0);
+        this.color.setXYZ(1.0, 1.0, 1.0);
         this.alpha = 1.0;
         this.thickness = 0.01;
         if (thickness !== undefined) this.thickness = thickness;
@@ -118,10 +118,6 @@ Rect.prototype = {
         this.heightUniform = this.rectShader.getUniform("height");
         this.thicknessUniform = this.rectShader.getUniform("thickness");
         this.rectShader.unbind();
-
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-        if (!this.modelMatrix) return false;
 
         // Rect loaded
         return true;
@@ -388,8 +384,7 @@ Rect.prototype = {
         this.rectShader.bind();
 
         // Compute world matrix
-        this.renderer.worldMatrix.setIdentity();
-        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 

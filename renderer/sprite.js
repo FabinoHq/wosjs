@@ -62,18 +62,18 @@ function Sprite(renderer, spriteShader)
     // Sprite texture
     this.texture = null;
     // Sprite model matrix
-    this.modelMatrix = null;
+    this.modelMatrix = new Matrix4x4();
 
     // Sprite position
-    this.position = null;
+    this.position = new Vector2(0.0, 0.0);
     // Sprite size
-    this.size = null;
+    this.size = new Vector2(1.0, 1.0);
     // Sprite rotation angle
     this.angle = 0.0;
     // Sprite texture UV size
-    this.uvSize = null;
+    this.uvSize = new Vector2(1.0, 1.0);
     // Sprite texture UV offset
-    this.uvOffset = null;
+    this.uvOffset = new Vector2(0.0, 0.0);
     // Sprite alpha
     this.alpha = 1.0;
 }
@@ -92,14 +92,14 @@ Sprite.prototype = {
         this.uvSizeUniform = -1;
         this.uvOffsetUniform = -1;
         this.texture = null;
-        this.modelMatrix = null;
-        this.position = new Vector2(0.0, 0.0);
-        this.size = new Vector2(1.0, 1.0);
+        this.modelMatrix.setIdentity();
+        this.position.reset();
+        this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.angle = 0.0;
-        this.uvSize = new Vector2(1.0, 1.0);
-        this.uvOffset = new Vector2(0.0, 0.0);
+        this.uvSize.setXY(1.0, 1.0);
+        this.uvOffset.reset();
         this.alpha = 1.0;
 
         // Check renderer pointer
@@ -118,10 +118,6 @@ Sprite.prototype = {
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
-
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-        if (!this.modelMatrix) return false;
 
         // Sprite loaded
         return true;
@@ -419,8 +415,7 @@ Sprite.prototype = {
         this.spriteShader.bind();
 
         // Compute world matrix
-        this.renderer.worldMatrix.setIdentity();
-        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 

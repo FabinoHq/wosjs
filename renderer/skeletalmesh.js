@@ -68,7 +68,7 @@ function SkeletalMesh(renderer, skeletalShader)
     // Skeletal mesh texture
     this.texture = null;
     // Skeletal mesh model matrix
-    this.modelMatrix = null;
+    this.modelMatrix = new Matrix4x4();
 
     // Bones count
     this.bonesCount = 0;
@@ -88,11 +88,11 @@ function SkeletalMesh(renderer, skeletalShader)
     this.bonesArray = null;
 
     // Skeletal mesh position
-    this.position = null;
+    this.position = new Vector3(0.0, 0.0, 0.0);
     // Skeletal mesh size
-    this.size = null;
+    this.size = new Vector3(1.0, 1.0, 1.0);
     // Skeletal mesh rotation angles
-    this.angles = null;
+    this.angles = new Vector3(0.0, 0.0, 0.0);
     // Skeletal mesh alpha
     this.alpha = 1.0;
 }
@@ -110,14 +110,24 @@ SkeletalMesh.prototype = {
         // Reset skeletal mesh
         this.bonesMatricesLocation = -1;
         this.bonesCountUniform = -1;
+        this.worldLightVecUniform = -1;
+        this.worldLightColorUniform = -1;
+        this.worldLightAmbientUniform = -1;
         this.alphaUniform = -1;
         this.vertexBuffer = null;
         this.texture = null;
-        this.modelMatrix = null;
+        this.modelMatrix.setIdentity();
+        this.bonesCount = 0;
+        this.bonesParents = null;
+        this.bonesPositions = null;
+        this.bonesAngles = null;
+        this.bonesMatrices = null;
+        this.bonesInverses = null;
         this.bonesTexture = null;
-        this.position = new Vector3(0.0, 0.0, 0.0);
-        this.size = new Vector3(1.0, 1.0, 1.0);
-        this.angles = new Vector3(0.0, 0.0, 0.0);
+        this.bonesArray = null;
+        this.position.reset();
+        this.size.setXYZ(1.0, 1.0, 1.0);
+        this.angles.reset();
         this.alpha = 1.0;
 
         // Check renderer pointer
@@ -234,10 +244,6 @@ SkeletalMesh.prototype = {
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
-
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-        if (!this.modelMatrix) return false;
 
         // Skeletal mesh loaded
         return true;
@@ -606,15 +612,12 @@ SkeletalMesh.prototype = {
         this.skeletalShader.bind();
 
         // Compute world matrix
-        this.renderer.worldMatrix.setIdentity();
-        this.renderer.worldMatrix.multiply(this.renderer.camera.projMatrix);
+        this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Compute light matrix
-        this.renderer.lightMatrix.setIdentity();
-        this.renderer.lightMatrix.multiply(this.renderer.camera.viewMatrix);
-        this.renderer.lightMatrix.multiply(this.modelMatrix);
+        this.renderer.lightMatrix.setMatrix(this.modelMatrix);
 
         // Send shader uniforms
         this.skeletalShader.sendWorldMatrix(this.renderer.worldMatrix);

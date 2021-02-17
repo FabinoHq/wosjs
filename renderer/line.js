@@ -61,14 +61,14 @@ function Line(renderer, lineShader)
     this.smoothUniform = -1;
 
     // Line model matrix
-    this.modelMatrix = null;
+    this.modelMatrix = new Matrix4x4();
 
     // Line origin position
-    this.origin = null;
+    this.origin = new Vector2(0.0, 0.0);
     // Line target position
-    this.target = null;
+    this.target = new Vector2(1.0, 1.0);
      // Line color
-    this.color = null;
+    this.color = new Vector3(1.0, 1.0, 1.0);
     // Line alpha
     this.alpha = 1.0;
     // Line thickness
@@ -95,9 +95,9 @@ Line.prototype = {
         this.alphaUniform = -1;
         this.ratioUniform = -1;
         this.smoothUniform = -1;
-        this.modelMatrix = null;
-        this.origin = new Vector2(0.0, 0.0);
-        this.target = new Vector2(1.0, 1.0);
+        this.modelMatrix.setIdentity();
+        this.origin.reset();
+        this.target.setXY(1.0, 1.0);
         if (originX !== undefined) this.origin.vec[0] = originX;
         if (originY !== undefined) this.origin.vec[1] = originY;
         if (targetX !== undefined) this.target.vec[0] = targetX;
@@ -105,7 +105,7 @@ Line.prototype = {
         dx = this.target.vec[0]-this.origin.vec[0];
         dy = this.target.vec[1]-this.origin.vec[1];
         length = Math.sqrt(dx*dx+dy*dy);
-        this.color = new Vector3(1.0, 1.0, 1.0);
+        this.color.setXYZ(1.0, 1.0, 1.0);
         this.alpha = 1.0;
         this.thickness = 0.01;
         if (thickness !== undefined) this.thickness = thickness;
@@ -124,10 +124,6 @@ Line.prototype = {
         this.ratioUniform = this.lineShader.getUniform("ratio");
         this.smoothUniform = this.lineShader.getUniform("smooth");
         this.lineShader.unbind();
-
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-        if (!this.modelMatrix) return false;
 
         // Line loaded
         return true;
@@ -429,8 +425,7 @@ Line.prototype = {
         this.lineShader.bind();
 
         // Compute world matrix
-        this.renderer.worldMatrix.setIdentity();
-        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 

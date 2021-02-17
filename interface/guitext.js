@@ -81,16 +81,16 @@ function GuiText(renderer, textShader)
     // GuiText generated texture
     this.texture = null;
     // GuiText model matrix
-    this.modelMatrix = null;
+    this.modelMatrix = new Matrix4x4();
 
     // GuiText position
-    this.position = null;
+    this.position = new Vector2(0.0, 0.0);
     // GuiText size
-    this.size = null;
+    this.size = new Vector2(0.05, 0.05);
     // GuiText rotation angle
     this.angle = 0.0;
     // GuiText color
-    this.color = null;
+    this.color = new Vector3(1.0, 1.0, 1.0);
     // GuiText alpha
     this.alpha = 1.0;
 
@@ -125,11 +125,11 @@ GuiText.prototype = {
         this.colorUniform = -1;
         this.alphaUniform = -1;
         this.texture = null;
-        this.modelMatrix = null;
-        this.position = new Vector2(0.0, 0.0);
+        this.modelMatrix.setIdentity();
+        this.position.reset();
         this.angle = 0.0;
-        this.size = new Vector2(0.05, 0.05);
-        this.color = new Vector3(1.0, 1.0, 1.0);
+        this.size.setXY(0.05, 0.05);
+        this.color.setXYZ(1.0, 1.0, 1.0);
         this.alpha = 1.0;
         this.text = "";
         this.textLength = 0;
@@ -259,10 +259,6 @@ GuiText.prototype = {
         );
 
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-
-        // Create model matrix
-        this.modelMatrix = new Matrix4x4();
-        if (!this.modelMatrix) return false;
 
         // Text loaded
         return true;
@@ -722,8 +718,7 @@ GuiText.prototype = {
         this.textShader.bind();
 
         // Compute world matrix
-        this.renderer.worldMatrix.setIdentity();
-        this.renderer.worldMatrix.multiply(this.renderer.projMatrix);
+        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 

@@ -163,18 +163,24 @@ Vector2.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  length : Get vector length                                            //
+    ////////////////////////////////////////////////////////////////////////////
+    length: function()
+    {
+        var length = (this.vec[0]*this.vec[0])+(this.vec[1]*this.vec[1]);
+        return Math.sqrt(length);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  normalize : Normalize vector                                          //
     ////////////////////////////////////////////////////////////////////////////
     normalize: function()
     {
-        var length = (this.vec[0]*this.vec[0])+(this.vec[1]*this.vec[1]);
-        var invLength = 1.0;
+        var length = this.length();
         if (length > 0.0)
         {
-            length = Math.sqrt(length);
-            invLength = 1.0/length;
-            this.vec[0] *= invLength;
-            this.vec[1] *= invLength;
+            this.vec[0] /= length;
+            this.vec[1] /= length;
         }
     }
 };
