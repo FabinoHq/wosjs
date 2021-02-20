@@ -892,5 +892,30 @@ Matrix4x4.prototype = {
             invMat.matrix[15] *= det;
             this.matrix = invMat.matrix;
         }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  transpose : Transpose 4x4 matrix                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    transpose: function()
+    {
+        var transposeMat = new Matrix4x4();
+        transposeMat.matrix[0] = this.matrix[0];
+        transposeMat.matrix[1] = this.matrix[4];
+        transposeMat.matrix[2] = this.matrix[8];
+        transposeMat.matrix[3] = this.matrix[12];
+        transposeMat.matrix[4] = this.matrix[1];
+        transposeMat.matrix[5] = this.matrix[5];
+        transposeMat.matrix[6] = this.matrix[9];
+        transposeMat.matrix[7] = this.matrix[13];
+        transposeMat.matrix[8] = this.matrix[2];
+        transposeMat.matrix[9] = this.matrix[6];
+        transposeMat.matrix[10] = this.matrix[10];
+        transposeMat.matrix[11] = this.matrix[14];
+        transposeMat.matrix[12] = this.matrix[3];
+        transposeMat.matrix[13] = this.matrix[7];
+        transposeMat.matrix[14] = this.matrix[11];
+        transposeMat.matrix[15] = this.matrix[15];
+        this.matrix = transposeMat.matrix;
     }
 };

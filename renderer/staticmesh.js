@@ -462,6 +462,8 @@ StaticMesh.prototype = {
 
         // Compute light matrix
         this.renderer.lightMatrix.setMatrix(this.modelMatrix);
+        this.renderer.lightMatrix.inverse();
+        this.renderer.lightMatrix.transpose();
 
         // Send shader uniforms
         this.meshShader.sendWorldMatrix(this.renderer.worldMatrix);
