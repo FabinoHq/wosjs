@@ -70,10 +70,10 @@ function StaticMesh(renderer, meshShader)
 
     // Static mesh position
     this.position = new Vector3(0.0, 0.0, 0.0);
-    // Static mesh size
-    this.size = new Vector3(1.0, 1.0, 1.0);
     // Static mesh rotation angles
     this.angles = new Vector3(0.0, 0.0, 0.0);
+    // Static mesh scale
+    this.scale = 1.0;
     // Static mesh alpha
     this.alpha = 1.0;
 }
@@ -95,8 +95,8 @@ StaticMesh.prototype = {
         this.texture = null;
         this.modelMatrix.setIdentity();
         this.position.reset();
-        this.size.setXYZ(1.0, 1.0, 1.0);
         this.angles.reset();
+        this.scale = 1.0;
         this.alpha = 1.0;
 
         // Check renderer pointer
@@ -254,57 +254,6 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSize : Set static mesh size                                        //
-    //  param width : Static mesh width to set                                //
-    //  param height : Static mesh height to set                              //
-    //  param depth : Static mesh depth to set                                //
-    ////////////////////////////////////////////////////////////////////////////
-    setSize: function(width, height, depth)
-    {
-        this.size.vec[0] = width;
-        this.size.vec[1] = height;
-        this.size.vec[2] = depth;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setSizeVec3 : Set static mesh size from a 3 components vector         //
-    //  param vector : 3 components vector to set static mesh size from       //
-    ////////////////////////////////////////////////////////////////////////////
-    setSizeVec3: function(vector)
-    {
-        this.size.vec[0] = vector.vec[0];
-        this.size.vec[1] = vector.vec[1];
-        this.size.vec[2] = vector.vec[2];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setWidth : Set static mesh width                                      //
-    //  param width : Static mesh width to set                                //
-    ////////////////////////////////////////////////////////////////////////////
-    setWidth: function(width)
-    {
-        this.size.vec[0] = width;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setHeight : Set static mesh height                                    //
-    //  param height : Static mesh height to set                              //
-    ////////////////////////////////////////////////////////////////////////////
-    setHeight: function(height)
-    {
-        this.size.vec[1] = height;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setDepth : Set static mesh depth                                      //
-    //  param depth : Static mesh depth to set                                //
-    ////////////////////////////////////////////////////////////////////////////
-    setDepth: function(depth)
-    {
-        this.size.vec[2] = depth;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setAngles : Set static mesh rotation angles                           //
     //  param angle : Static mesh rotation angle to set in degrees            //
     ////////////////////////////////////////////////////////////////////////////
@@ -340,6 +289,24 @@ StaticMesh.prototype = {
     rotateZ: function(angleZ)
     {
         this.angles.vec[2] += angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setScale : Set static mesh scale                                      //
+    //  param scale : Static mesh scale to set                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setScale: function(scale)
+    {
+        this.scale = scale;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  scale : Scale static mesh                                             //
+    //  param scale : Static mesh scale factor to apply                       //
+    ////////////////////////////////////////////////////////////////////////////
+    scale: function(scale)
+    {
+        this.scale *= scale;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -379,33 +346,6 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get static mesh width                                      //
-    //  return : Static mesh width                                            //
-    ////////////////////////////////////////////////////////////////////////////
-    getWidth: function()
-    {
-        return this.size.vec[0];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get static mesh height                                    //
-    //  return : Static mesh height                                           //
-    ////////////////////////////////////////////////////////////////////////////
-    getHeight: function()
-    {
-        return this.size.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get static mesh depth                                     //
-    //  return : Static mesh depth                                            //
-    ////////////////////////////////////////////////////////////////////////////
-    getDepth: function()
-    {
-        return this.size.vec[2];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  getAngleX : Get static mesh X rotation angle                          //
     //  return : Static mesh X rotation angle in degrees                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -433,6 +373,15 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  getScale : Get static mesh scale                                      //
+    //  return : Static mesh scale                                            //
+    ////////////////////////////////////////////////////////////////////////////
+    getScale: function()
+    {
+        return this.scale;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  getAlpha : Get static mesh alpha                                      //
     //  return : Static mesh alpha                                            //
     ////////////////////////////////////////////////////////////////////////////
@@ -450,7 +399,7 @@ StaticMesh.prototype = {
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec3(this.position);
         this.modelMatrix.rotateVec3(this.angles);
-        this.modelMatrix.scaleVec3(this.size);
+        this.modelMatrix.scale(this.scale, this.scale, this.scale);
 
         // Bind static mesh shader
         this.meshShader.bind();
@@ -460,14 +409,9 @@ StaticMesh.prototype = {
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
-        // Compute light matrix
-        this.renderer.lightMatrix.setMatrix(this.modelMatrix);
-        this.renderer.lightMatrix.inverse();
-        this.renderer.lightMatrix.transpose();
-
         // Send shader uniforms
         this.meshShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.meshShader.sendLightMatrix(this.renderer.lightMatrix);
+        this.meshShader.sendModelMatrix(this.modelMatrix);
         this.meshShader.sendUniformVec3(
             this.worldLightVecUniform, this.renderer.worldLight.direction
         );

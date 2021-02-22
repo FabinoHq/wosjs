@@ -51,12 +51,12 @@ const staticMeshVertexShaderSrc = [
     "attribute vec2 vertexCoord;",
     "attribute vec3 vertexNorm;",
     "uniform mat4 worldMatrix;",
-    "uniform mat4 lightMatrix;",
+    "uniform mat4 modelMatrix;",
     "varying vec2 texCoord;",
     "varying vec3 normal;",
     "void main()",
     "{",
-    "    normal = mat3(lightMatrix)*vertexNorm; texCoord = vertexCoord;",
+    "    normal = mat3(modelMatrix)*vertexNorm; texCoord = vertexCoord;",
     "    gl_Position = worldMatrix*vec4(vertexPos, 1.0);",
     "}"
 ].join("\n");

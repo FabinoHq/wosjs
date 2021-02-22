@@ -69,7 +69,7 @@ function Shader(glPointer)
     // Shader uniforms locations
     this.textureLocation = -1;
     this.worldMatrixLocation = -1;
-    this.lightMatrixLocation = -1;
+    this.modelMatrixLocation = -1;
 }
 
 Shader.prototype = {
@@ -91,7 +91,7 @@ Shader.prototype = {
         this.normalsLocation = -1;
         this.textureLocation = -1;
         this.worldMatrixLocation = -1;
-        this.lightMatrixLocation = -1;
+        this.modelMatrixLocation = -1;
 
         // Check gl pointer
         if (!this.gl)
@@ -231,9 +231,9 @@ Shader.prototype = {
         );
         if (this.worldMatrixLocation == -1) return false;
 
-        // Get light matrix location
-        this.lightMatrixLocation = this.gl.getUniformLocation(
-            this.shaderProgram, "lightMatrix"
+        // Get model matrix location
+        this.modelMatrixLocation = this.gl.getUniformLocation(
+            this.shaderProgram, "modelMatrix"
         );
 
         this.gl.useProgram(null);
@@ -271,14 +271,14 @@ Shader.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  sendLightMatrix : Send light matrix to use with this shader           //
-    //  param lightMatrix : 4x4 Light matrix to use                           //
+    //  sendModelMatrix : Send model matrix to use with this shader           //
+    //  param modelMatrix : 4x4 Model matrix to use                           //
     ////////////////////////////////////////////////////////////////////////////
-    sendLightMatrix: function(lightMatrix)
+    sendModelMatrix: function(modelMatrix)
     {
         this.gl.uniformMatrix4fv(
-            this.lightMatrixLocation,
-            false, lightMatrix.matrix
+            this.modelMatrixLocation,
+            false, modelMatrix.matrix
         );
     },
 

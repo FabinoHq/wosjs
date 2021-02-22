@@ -89,10 +89,10 @@ function SkeletalMesh(renderer, skeletalShader)
 
     // Skeletal mesh position
     this.position = new Vector3(0.0, 0.0, 0.0);
-    // Skeletal mesh size
-    this.size = new Vector3(1.0, 1.0, 1.0);
     // Skeletal mesh rotation angles
     this.angles = new Vector3(0.0, 0.0, 0.0);
+    // Skeletal mesh scale
+    this.scale = 1.0;
     // Skeletal mesh alpha
     this.alpha = 1.0;
 }
@@ -126,8 +126,8 @@ SkeletalMesh.prototype = {
         this.bonesTexture = null;
         this.bonesArray = null;
         this.position.reset();
-        this.size.setXYZ(1.0, 1.0, 1.0);
         this.angles.reset();
+        this.scale = 1.0;
         this.alpha = 1.0;
 
         // Check renderer pointer
@@ -352,57 +352,6 @@ SkeletalMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSize : Set skeletal mesh size                                      //
-    //  param width : Skeletal mesh width to set                              //
-    //  param height : Skeletal mesh height to set                            //
-    //  param depth : Skeletal mesh depth to set                              //
-    ////////////////////////////////////////////////////////////////////////////
-    setSize: function(width, height, depth)
-    {
-        this.size.vec[0] = width;
-        this.size.vec[1] = height;
-        this.size.vec[2] = depth;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setSizeVec3 : Set skeletal mesh size from a 3 components vector       //
-    //  param vector : 3 components vector to set skeletal mesh size from     //
-    ////////////////////////////////////////////////////////////////////////////
-    setSizeVec3: function(vector)
-    {
-        this.size.vec[0] = vector.vec[0];
-        this.size.vec[1] = vector.vec[1];
-        this.size.vec[2] = vector.vec[2];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setWidth : Set skeletal mesh width                                    //
-    //  param width : Skeletal mesh width to set                              //
-    ////////////////////////////////////////////////////////////////////////////
-    setWidth: function(width)
-    {
-        this.size.vec[0] = width;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setHeight : Set skeletal mesh height                                  //
-    //  param height : Skeletal mesh height to set                            //
-    ////////////////////////////////////////////////////////////////////////////
-    setHeight: function(height)
-    {
-        this.size.vec[1] = height;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setDepth : Set skeletal mesh depth                                    //
-    //  param depth : Skeletal mesh depth to set                              //
-    ////////////////////////////////////////////////////////////////////////////
-    setDepth: function(depth)
-    {
-        this.size.vec[2] = depth;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setAngles : Set skeletal mesh rotation angles                         //
     //  param angle : Skeletal mesh rotation angle to set in degrees          //
     ////////////////////////////////////////////////////////////////////////////
@@ -438,6 +387,24 @@ SkeletalMesh.prototype = {
     rotateZ: function(angleZ)
     {
         this.angles.vec[2] += angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setScale : Set skeletal mesh scale                                    //
+    //  param scale : Skeletal mesh scale to set                              //
+    ////////////////////////////////////////////////////////////////////////////
+    setScale: function(scale)
+    {
+        this.scale = scale;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  scale : Scale skeletal mesh                                           //
+    //  param scale : Skeletal mesh scale factor to apply                     //
+    ////////////////////////////////////////////////////////////////////////////
+    scale: function(scale)
+    {
+        this.scale *= scale;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -477,33 +444,6 @@ SkeletalMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get skeletal mesh width                                    //
-    //  return : Skeletal mesh width                                          //
-    ////////////////////////////////////////////////////////////////////////////
-    getWidth: function()
-    {
-        return this.size.vec[0];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get skeletal mesh height                                  //
-    //  return : Skeletal mesh height                                         //
-    ////////////////////////////////////////////////////////////////////////////
-    getHeight: function()
-    {
-        return this.size.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get skeletal mesh depth                                   //
-    //  return : Skeletal mesh depth                                          //
-    ////////////////////////////////////////////////////////////////////////////
-    getDepth: function()
-    {
-        return this.size.vec[2];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  getAngleX : Get skeletal mesh X rotation angle                        //
     //  return : Skeletal mesh X rotation angle in degrees                    //
     ////////////////////////////////////////////////////////////////////////////
@@ -528,6 +468,15 @@ SkeletalMesh.prototype = {
     getAngleZ: function()
     {
         return this.angles.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getScale : Get skeletal mesh scale                                    //
+    //  return : Skeletal mesh scale                                          //
+    ////////////////////////////////////////////////////////////////////////////
+    getScale: function()
+    {
+        return this.scale;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -606,7 +555,7 @@ SkeletalMesh.prototype = {
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec3(this.position);
         this.modelMatrix.rotateVec3(this.angles);
-        this.modelMatrix.scaleVec3(this.size);
+        this.modelMatrix.scale(this.scale, this.scale, this.scale);
 
         // Bind skeletal mesh shader
         this.skeletalShader.bind();
@@ -616,14 +565,9 @@ SkeletalMesh.prototype = {
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
-        // Compute light matrix
-        this.renderer.lightMatrix.setMatrix(this.modelMatrix);
-        this.renderer.lightMatrix.inverse();
-        this.renderer.lightMatrix.transpose();
-
         // Send shader uniforms
         this.skeletalShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.skeletalShader.sendLightMatrix(this.renderer.lightMatrix);
+        this.skeletalShader.sendModelMatrix(this.modelMatrix);
         this.skeletalShader.sendUniform(
             this.bonesCountUniform, this.bonesCount
         );

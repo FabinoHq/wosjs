@@ -42,6 +42,17 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+//  WOS WebGL context names                                                   //
+////////////////////////////////////////////////////////////////////////////////
+const WOSGLContextNames = [
+    "webgl", 
+    "experimental-webgl",
+    "webkit-3d",
+    "moz-webgl"
+];
+
+
+////////////////////////////////////////////////////////////////////////////////
 //  Renderer class definition                                                 //
 ////////////////////////////////////////////////////////////////////////////////
 function Renderer()
@@ -76,9 +87,8 @@ function Renderer()
     // Default graphics pipeline
     this.vertexBuffer = null;
     this.shader = null;
-    this.worldMatrix = null;
-    this.lightMatrix = null;
-    this.projMatrix = null;
+    this.worldMatrix = new Matrix4x4();
+    this.projMatrix = new Matrix4x4();
     this.view = null;
     this.camera = null;
 
@@ -93,13 +103,6 @@ Renderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     init: function(canvas)
     {
-        // WebGL names
-        var glContextNames = [
-            "webgl", 
-            "experimental-webgl",
-            "webkit-3d",
-            "moz-webgl"
-        ];
         var i = 0;
         var texFloatExt = 0;
         
@@ -119,9 +122,8 @@ Renderer.prototype = {
         this.vpoffy = 0.0;
         this.vertexBuffer = null;
         this.shader = null;
-        this.worldMatrix = null;
-        this.lightMatrix = null;
-        this.projMatrix = null;
+        this.worldMatrix.setIdentity();
+        this.projMatrix.setIdentity();
         this.view = null;
         this.camera = null;
 
@@ -135,16 +137,19 @@ Renderer.prototype = {
         if (!window.WebGLRenderingContext) return false;
 
         // Check valid context
-        for (i = 0; i < glContextNames.length; ++i)
+        for (i = 0; i < WOSGLContextNames.length; ++i)
         {
-            try {
+            try
+            {
                 this.gl = this.context.getContext(
-                    glContextNames[i], { alpha: false, antialias: true }
+                    WOSGLContextNames[i], { alpha: false, antialias: true }
                 );
-            } catch(e) {
+            }
+            catch(e)
+            {
                 this.gl = null;
             }
-            
+
             if (this.gl)
             {
                 // Valid context found
@@ -249,29 +254,8 @@ Renderer.prototype = {
         // Set texture 0 as active texture
         this.gl.activeTexture(this.gl.TEXTURE0);
 
-        // Init world matrix
-        this.worldMatrix = new Matrix4x4();
-        if (!this.worldMatrix)
-        {
-            // Could not init world matrix
-            return false;
-        }
-
-        // Init light matrix
-        this.lightMatrix = new Matrix4x4();
-        if (!this.lightMatrix)
-        {
-            // Could not init light matrix
-            return false;
-        }
-
-        // Init projection matrix
-        this.projMatrix = new Matrix4x4();
-        if (!this.projMatrix)
-        {
-            // Could not init projection matrix
-            return false;
-        }
+        // Set default world matrix
+        this.worldMatrix.setIdentity();
 
         // Set default projection matrix
         this.projMatrix.setOrthographic(
