@@ -51,6 +51,7 @@
 !renderer/worldlight.js
 !renderer/dynamiclights.js
 !renderer/pointlight.js
+!renderer/spotlight.js
 !renderer/shaders/
 !renderer/shaders/defaultshader.js
 !renderer/shaders/backrenderershader.js

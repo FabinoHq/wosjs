@@ -310,8 +310,10 @@ function Wos()
     // Test freefly camera
     this.freeflycam = null;
 
-    // Test point ligth
+    // Test point light
     this.pointLight = null;
+    // Test spot light
+    this.spotLight = null;
 
     // Test static mesh
     this.staticmesh = null;
@@ -461,8 +463,19 @@ Wos.prototype = {
         this.pointLight.setRadius(5.0);
         this.pointLight.setFalloffRadius(12.0);
 
+        // Init test spot light
+        this.spotLight = new SpotLight();
+        this.spotLight.setPosition(0.0, 1.5, 0.0);
+        this.spotLight.setDirection(0.0, -1.0, 0.0);
+        this.spotLight.setColor(0.0, 0.0, 1.0, 0.8);
+        this.spotLight.setRadius(5.0);
+        this.spotLight.setFalloffRadius(12.0);
+        this.spotLight.setFocal(0.98);
+        this.spotLight.setFalloffFocal(0.97);
+
         this.renderer.dynamicLights.clear();
         this.renderer.dynamicLights.addPointLight(this.pointLight);
+        this.renderer.dynamicLights.addSpotLight(this.spotLight);
         this.renderer.dynamicLights.update();
 
         // Init test static mesh
