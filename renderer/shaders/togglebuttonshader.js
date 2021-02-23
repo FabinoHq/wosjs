@@ -51,6 +51,7 @@ const toggleButtonFragmentShaderSrc = [
     "varying vec2 texCoord;",
     "uniform float alpha;",
     "uniform int buttonState;",
+    "",
     "void main()",
     "{",
     "    vec2 buttonCoord = vec2(texCoord.x*0.5, texCoord.y*0.25);",
@@ -72,5 +73,6 @@ const toggleButtonFragmentShaderSrc = [
     "    }",
     "    vec4 texColor = texture2D(texture, buttonCoord);",
     "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
-    "}"
+    "}",
+    ""
 ].join("\n");

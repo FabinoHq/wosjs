@@ -94,6 +94,7 @@ function Renderer()
 
     // Lighting
     this.worldLight = null;
+    this.dynamicLights = null;
 }
 
 Renderer.prototype = {
@@ -126,6 +127,8 @@ Renderer.prototype = {
         this.projMatrix.setIdentity();
         this.view = null;
         this.camera = null;
+        this.worldLight = null;
+        this.dynamicLights = null;
 
         // Get html canvas
         this.context = document.getElementById(canvas);
@@ -275,6 +278,10 @@ Renderer.prototype = {
         this.worldLight.setDirection(0.2, 0.1, 0.9);
         this.worldLight.setColor(1.0, 1.0, 1.0, 0.8);
         this.worldLight.setAmbient(1.0, 1.0, 1.0, 0.2);
+
+        // Init dynamic lights
+        this.dynamicLights = new DynamicLights(this);
+        this.dynamicLights.init();
 
         // Renderer is successfully loaded
         this.loaded = true;

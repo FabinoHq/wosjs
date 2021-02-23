@@ -51,9 +51,11 @@ const textFragmentShaderSrc = [
     "varying vec2 texCoord;",
     "uniform vec3 color;",
     "uniform float alpha;",
+    "",
     "void main()",
     "{",
     "    float textAlpha = texture2D(texture, texCoord).a;",
     "    gl_FragColor = vec4(color, textAlpha*alpha);",
-    "}"
+    "}",
+    ""
 ].join("\n");

@@ -52,6 +52,7 @@ const buttonFragmentShaderSrc = [
     "uniform float alpha;",
     "uniform int buttonState;",
     "void main()",
+    "",
     "{",
     "    vec2 buttonCoord = texCoord*0.5;",
     "    if (buttonState == 1) { buttonCoord.x += 0.5; }",
@@ -59,5 +60,6 @@ const buttonFragmentShaderSrc = [
     "    else if (buttonState == 3) { buttonCoord += 0.5; }",
     "    vec4 texColor = texture2D(texture, buttonCoord);",
     "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
-    "}"
+    "}",
+    ""
 ].join("\n");

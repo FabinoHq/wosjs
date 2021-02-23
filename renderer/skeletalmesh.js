@@ -55,11 +55,15 @@ function SkeletalMesh(renderer, skeletalShader)
     this.skeletalShader = skeletalShader;
 
     // Skeletal mesh shader uniforms locations
+    this.cameraPosLocation = -1;
+    this.lightsCountLocation = -1;
     this.bonesMatricesLocation = -1;
     this.bonesCountUniform = -1;
+    this.lightsTextureLocation = -1;
     this.worldLightVecUniform = -1;
     this.worldLightColorUniform = -1;
     this.worldLightAmbientUniform = -1;
+    this.specularityUniform = -1;
     this.alphaUniform = -1;
 
     // Skeletal mesh vertex buffer
@@ -95,6 +99,8 @@ function SkeletalMesh(renderer, skeletalShader)
     this.scale = 1.0;
     // Skeletal mesh alpha
     this.alpha = 1.0;
+    // Static mesh specularity
+    this.specularity = 0.0;
 }
 
 SkeletalMesh.prototype = {
@@ -108,11 +114,15 @@ SkeletalMesh.prototype = {
         var i = 0;
 
         // Reset skeletal mesh
+        this.cameraPosLocation = -1;
+        this.lightsCountLocation = -1;
         this.bonesMatricesLocation = -1;
         this.bonesCountUniform = -1;
+        this.lightsTextureLocation = -1;
         this.worldLightVecUniform = -1;
         this.worldLightColorUniform = -1;
         this.worldLightAmbientUniform = -1;
+        this.specularityUniform = -1;
         this.alphaUniform = -1;
         this.vertexBuffer = null;
         this.texture = null;
@@ -129,6 +139,7 @@ SkeletalMesh.prototype = {
         this.angles.reset();
         this.scale = 1.0;
         this.alpha = 1.0;
+        this.specularity = 0.0;
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -141,17 +152,26 @@ SkeletalMesh.prototype = {
 
         // Get skeletal mesh shader uniforms locations
         this.skeletalShader.bind();
+        this.cameraPosLocation = this.skeletalShader.getUniform("cameraPos");
+        this.lightsCountLocation = this.skeletalShader.getUniform(
+            "lightsCount"
+        );
         this.bonesMatricesLocation = this.skeletalShader.getUniform(
             "bonesMatrices"
         );
         this.skeletalShader.sendIntUniform(this.bonesMatricesLocation, 1);
         this.bonesCountUniform = this.skeletalShader.getUniform("bonesCount");
+        this.lightsTextureLocation = this.skeletalShader.getUniform(
+            "lightsTexture"
+        );
+        this.skeletalShader.sendIntUniform(this.lightsTextureLocation, 2);
         this.worldLightVecUniform =
             this.skeletalShader.getUniform("worldLightVec");
         this.worldLightColorUniform =
             this.skeletalShader.getUniform("worldLightColor");
         this.worldLightAmbientUniform =
             this.skeletalShader.getUniform("worldLightAmbient");
+        this.specularityUniform = this.skeletalShader.getUniform("specularity");
         this.alphaUniform = this.skeletalShader.getUniform("alpha");
         this.skeletalShader.unbind();
 
@@ -408,6 +428,15 @@ SkeletalMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setSpecularity : Set skeletal mesh specularity                        //
+    //  param specularity : Skeletal mesh specularity to set                  //
+    ////////////////////////////////////////////////////////////////////////////
+    setSpecularity: function(specularity)
+    {
+        this.specularity = specularity;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setAlpha : Set skeletal mesh alpha                                    //
     //  param alpha : Skeletal mesh alpha to set                              //
     ////////////////////////////////////////////////////////////////////////////
@@ -477,6 +506,15 @@ SkeletalMesh.prototype = {
     getScale: function()
     {
         return this.scale;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getSpecularity : Get skeletal mesh specularity                        //
+    //  return : Skeletal mesh specularity                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    getSpecularity: function()
+    {
+        return this.specularity;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -568,6 +606,12 @@ SkeletalMesh.prototype = {
         // Send shader uniforms
         this.skeletalShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.skeletalShader.sendModelMatrix(this.modelMatrix);
+        this.skeletalShader.sendUniformVec3(
+            this.cameraPosLocation, this.renderer.camera.position
+        );
+        this.skeletalShader.sendUniform(
+            this.lightsCountLocation, this.renderer.dynamicLights.lightsCount
+        );
         this.skeletalShader.sendUniform(
             this.bonesCountUniform, this.bonesCount
         );
@@ -580,6 +624,9 @@ SkeletalMesh.prototype = {
         this.skeletalShader.sendUniformVec4(
             this.worldLightAmbientUniform, this.renderer.worldLight.ambient
         );
+        this.skeletalShader.sendUniform(
+            this.specularityUniform, this.specularity
+        );
         this.skeletalShader.sendUniform(this.alphaUniform, this.alpha);
 
         // Bind texture
@@ -589,6 +636,11 @@ SkeletalMesh.prototype = {
         this.renderer.gl.bindTexture(
             this.renderer.gl.TEXTURE_2D, this.bonesTexture
         );
+        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
+        this.renderer.gl.bindTexture(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.dynamicLights.lightsTexture
+        );
 
         // Render VBO
         this.vertexBuffer.bind();
@@ -596,6 +648,8 @@ SkeletalMesh.prototype = {
         this.vertexBuffer.unbind();
 
         // Unbind texture
+        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
         this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
         this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);

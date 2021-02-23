@@ -51,11 +51,13 @@ const defaultVertexShaderSrc = [
     "attribute vec2 vertexCoord;",
     "uniform mat4 worldMatrix;",
     "varying vec2 texCoord;",
+    "",
     "void main()",
     "{",
     "    texCoord = vertexCoord;",
     "    gl_Position = worldMatrix*vec4(vertexPos, 1.0);",
-    "}"
+    "}",
+    ""
 ].join("\n");
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -65,8 +67,10 @@ const defaultFragmentShaderSrc = [
     "precision mediump float;",
     "precision mediump int;",
     "varying vec2 texCoord;",
+    "",
     "void main()",
     "{",
     "    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);",
-    "}"
+    "}",
+    ""
 ].join("\n");

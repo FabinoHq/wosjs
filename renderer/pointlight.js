@@ -37,127 +37,135 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/worldlight.js : World light management                       //
+//      renderer/pointlight.js : Point light management                       //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  WorldLight class definition                                               //
+//  PointLight class definition                                               //
 //  param renderer : Renderer pointer                                         //
 ////////////////////////////////////////////////////////////////////////////////
-function WorldLight(renderer)
+function PointLight(renderer)
 {
     // Renderer pointer
     this.renderer = renderer;
 
-    // Light direction
-    this.direction = new Vector3(0.0, 0.0, 0.0);
-    // Light color
+    // Point light position
+    this.position = new Vector3(0.0, 0.0, 0.0);
+    // Point light color
     this.color = new Vector4(0.0, 0.0, 0.0, 0.0);
-    // Ambient color
-    this.ambient = new Vector4(0.0, 0.0, 0.0, 0.0);
 }
 
-WorldLight.prototype = {
+PointLight.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init world light                                               //
-    //  param direction : Direction of the world light                        //
-    //  param color : Color of the world light                                //
-    //  param ambient : Ambient color of the world light                      //
+    //  init : Init point light                                               //
+    //  param position : Position of the point light                          //
+    //  param color : Color of the point light                                //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(direction, color, ambient)
+    init: function(position, color)
     {
-        // Reset world light
-        this.direction.reset();
+        // Reset point light
+        this.position.reset();
         this.color.reset();
-        this.ambient.reset();
 
-        // Set world light direction
-        if (direction) this.direction.setVector(direction);
+        // Set point light position
+        if (position) this.position.setVector(position);
 
-        // Set world light color
+        // Set point light color
         if (color) this.color.setVector(color);
-
-        // Set world light ambient color
-        if (ambient) this.ambient.setVector(ambient);
 
         // Check renderer pointer
         if (!this.renderer) return false;
 
-        // World light loaded
+        // Point light loaded
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setDirectionVec3 : Set world light's direction from a Vector3         //
-    //  param direction : Direction of the world light                        //
+    //  reset : Reset point light                                             //
     ////////////////////////////////////////////////////////////////////////////
-    setDirectionVec3: function(direction)
+    reset: function()
     {
-        // Set world light direction
-        if (direction)
+        // Reset point light
+        this.position.reset();
+        this.color.reset();
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setDirectionVec3 : Set point light's position from a Vector3          //
+    //  param position : Position of the point light                          //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec3: function(position)
+    {
+        // Set point light position
+        if (position)
         {
-            this.direction.setVector(direction);
-            this.direction.normalize();
+            this.position.setVector(position);
         }
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setDirection : Set world light's direction from 3 seperate components //
-    //  param x : X direction of the world light                              //
-    //  param y : Y direction of the world light                              //
-    //  param z : Z direction of the world light                              //
+    //  setPosition : Set point light's position from 3 seperate components   //
+    //  param x : X position of the point light                               //
+    //  param y : Y position of the point light                               //
+    //  param z : Z position of the point light                               //
     ////////////////////////////////////////////////////////////////////////////
-    setDirection: function(x, y, z)
+    setPosition: function(x, y, z)
     {
-        // Set world light direction
-        this.direction.setXYZ(x, y, z);
-        this.direction.normalize();
+        // Set point light position
+        this.position.setXYZ(x, y, z);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setColorVec4 : Set world light's color from a Vector4                 //
-    //  param color : Color of the world light                                //
+    //  setX : Set point light's X position                                   //
+    //  param x : X position of the point light                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setX: function(x)
+    {
+        // Set point light X position
+        this.position.setX(x);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setY : Set point light's Y position                                   //
+    //  param y : Y position of the point light                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setY: function(y)
+    {
+        // Set point light Y position
+        this.position.setX(y);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setZ : Set point light's Z position                                   //
+    //  param z : Z position of the point light                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setZ: function(z)
+    {
+        // Set point light Z position
+        this.position.setX(z);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setColorVec4 : Set point light's color from a Vector4                 //
+    //  param color : Color of the point light                                //
     ////////////////////////////////////////////////////////////////////////////
     setColorVec4: function(color)
     {
-        // Set world light color
+        // Set point light color
         if (color) this.color.setVector(color);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setDirection : Set world light's color from 4 seperate components     //
-    //  param r : Red color component of the world light                      //
-    //  param g : Green color component of the world light                    //
-    //  param b : Blue color component of the world light                     //
-    //  param a : Alpha color component of the world light                    //
+    //  setDirection : Set point light's color from 4 seperate components     //
+    //  param r : Red color component of the point light                      //
+    //  param g : Green color component of the point light                    //
+    //  param b : Blue color component of the point light                     //
+    //  param a : Alpha color component of the point light                    //
     ////////////////////////////////////////////////////////////////////////////
     setColor: function(r, g, b, a)
     {
-        // Set world light color
+        // Set point light color
         this.color.setXYZW(r, g, b, a);
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setColorVec4 : Set world light's ambient color from a Vector4         //
-    //  param ambient : Ambient color of the world light                      //
-    ////////////////////////////////////////////////////////////////////////////
-    setAmbientVec4: function(ambient)
-    {
-        // Set world light ambient color
-        if (ambient) this.ambient.setVector(ambient);
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setDirection : Set world light's ambient color                        //
-    //  param r : Red ambient color component of the world light              //
-    //  param g : Green ambient color component of the world light            //
-    //  param b : Blue ambient color component of the world light             //
-    //  param a : Alpha ambient color component of the world light            //
-    ////////////////////////////////////////////////////////////////////////////
-    setAmbient: function(r, g, b, a)
-    {
-        // Set world light ambient color
-        this.ambient.setXYZW(r, g, b, a);
     }
 };

@@ -50,9 +50,11 @@ const backrendererFragmentShaderSrc = [
     "uniform sampler2D texture;",
     "varying vec2 texCoord;",
     "uniform float alpha;",
+    "",
     "void main()",
     "{",
     "    vec4 texColor = texture2D(texture, texCoord);",
     "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
-    "}"
+    "}",
+    ""
 ].join("\n");

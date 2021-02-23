@@ -53,10 +53,12 @@ const rectFragmentShaderSrc = [
     "uniform float width;",
     "uniform float height;",
     "uniform float thickness;",
+    "",
     "void main()",
     "{",
     "    vec2 rect = step(1.0-(thickness/vec2(abs(width), abs(height))),",
     "        abs(texCoord-0.5)*2.0);",
     "    gl_FragColor = vec4(color, clamp(rect.x+rect.y, 0.0, 1.0)*alpha);",
-    "}"
+    "}",
+    ""
 ].join("\n");

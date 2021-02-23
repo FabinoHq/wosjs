@@ -52,6 +52,7 @@ const nineboxFragmentShaderSrc = [
     "uniform float alpha;",
     "uniform vec2 uvSize;",
     "uniform float uvFactor;",
+    "",
     "void main()",
     "{",
     "    vec2 nineSize = abs(uvSize*uvFactor);",
@@ -82,5 +83,6 @@ const nineboxFragmentShaderSrc = [
     "    if (nineSize.y <= 0.5) { curCoord.y = texCoord.y; }",
     "    vec4 texColor = texture2D(texture, curCoord);",
     "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
-    "}"
+    "}",
+    ""
 ].join("\n");

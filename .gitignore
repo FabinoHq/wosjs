@@ -49,6 +49,8 @@
 !renderer/camera.js
 !renderer/freeflycam.js
 !renderer/worldlight.js
+!renderer/dynamiclights.js
+!renderer/pointlight.js
 !renderer/shaders/
 !renderer/shaders/defaultshader.js
 !renderer/shaders/backrenderershader.js

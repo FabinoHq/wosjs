@@ -284,11 +284,6 @@ function Wos()
     // WOS assets loader
     this.loader = null;
 
-    // Test camera
-    this.camera = null;
-    // Test freefly camera
-    this.freeflycam = null;
-
     // Test line
     this.testline = null;
     // Test rect
@@ -309,6 +304,14 @@ function Wos()
     this.testtext = null;
     // Test text box
     this.testtextbox = null;
+
+    // Test camera
+    this.camera = null;
+    // Test freefly camera
+    this.freeflycam = null;
+
+    // Test point ligth
+    this.pointLight = null;
 
     // Test static mesh
     this.staticmesh = null;
@@ -450,6 +453,15 @@ Wos.prototype = {
         this.freeflycam.rotateX(0.0);
         this.freeflycam.moveY(0.0);
         this.freeflycam.moveZ(-2.0);
+
+        // Init test point light
+        this.pointLight = new PointLight();
+        this.pointLight.setPosition(0.5, 0.5, 0.5);
+        this.pointLight.setColor(1.0, 1.0, 1.0, 0.8);
+
+        this.renderer.dynamicLights.clear();
+        this.renderer.dynamicLights.addPointLight(this.pointLight);
+        this.renderer.dynamicLights.update();
 
         // Init test static mesh
         this.staticmesh = new StaticMesh(
