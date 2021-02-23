@@ -54,6 +54,10 @@ function PointLight(renderer)
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Point light color
     this.color = new Vector4(0.0, 0.0, 0.0, 0.0);
+    // Point light radius
+    this.radius = 1.0;
+    // Point light falloff radius
+    this.falloffRadius = 2.0;
 }
 
 PointLight.prototype = {
@@ -67,6 +71,8 @@ PointLight.prototype = {
         // Reset point light
         this.position.reset();
         this.color.reset();
+        this.radius = 1.0;
+        this.falloffRadius = 2.0;
 
         // Set point light position
         if (position) this.position.setVector(position);
@@ -89,6 +95,24 @@ PointLight.prototype = {
         // Reset point light
         this.position.reset();
         this.color.reset();
+        this.radius = 1.0;
+        this.falloffRadius = 2.0;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPointLight : Set point light from another point light              //
+    //  param pointLight : Point light to set                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    setPointLight: function(pointLight)
+    {
+        if (pointLight)
+        {
+            // Set point light
+            this.position.setVector(pointLight.position);
+            this.color.setVector(pointLight.color);
+            this.radius = pointLight.radius;
+            this.falloffRadius = pointLight.falloffRadius;
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -98,10 +122,7 @@ PointLight.prototype = {
     setPositionVec3: function(position)
     {
         // Set point light position
-        if (position)
-        {
-            this.position.setVector(position);
-        }
+        if (position) this.position.setVector(position);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -167,5 +188,25 @@ PointLight.prototype = {
     {
         // Set point light color
         this.color.setXYZW(r, g, b, a);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setRadius : Set point light radius                                    //
+    //  param radius : Radius of the point light                              //
+    ////////////////////////////////////////////////////////////////////////////
+    setRadius: function(radius)
+    {
+        // Set point light radius
+        this.radius = radius;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setFalloffRadius : Set point light falloff radius                     //
+    //  param radius : Falloff radius of the point light                      //
+    ////////////////////////////////////////////////////////////////////////////
+    setFalloffRadius: function(falloffRadius)
+    {
+        // Set point light falloff radius
+        this.falloffRadius = falloffRadius;
     }
 };

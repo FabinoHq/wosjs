@@ -456,8 +456,10 @@ Wos.prototype = {
 
         // Init test point light
         this.pointLight = new PointLight();
-        this.pointLight.setPosition(0.5, 0.5, 0.5);
+        this.pointLight.setPosition(0.0, 2.5, 0.0);
         this.pointLight.setColor(1.0, 1.0, 1.0, 0.8);
+        this.pointLight.setRadius(5.0);
+        this.pointLight.setFalloffRadius(12.0);
 
         this.renderer.dynamicLights.clear();
         this.renderer.dynamicLights.addPointLight(this.pointLight);

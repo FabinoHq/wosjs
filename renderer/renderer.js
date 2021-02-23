@@ -276,7 +276,7 @@ Renderer.prototype = {
         this.worldLight = new WorldLight(this);
         this.worldLight.init();
         this.worldLight.setDirection(0.2, 0.1, 0.9);
-        this.worldLight.setColor(1.0, 1.0, 1.0, 0.8);
+        this.worldLight.setColor(1.0, 1.0, 1.0, 0.3);
         this.worldLight.setAmbient(1.0, 1.0, 1.0, 0.2);
 
         // Init dynamic lights

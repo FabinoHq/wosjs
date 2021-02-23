@@ -140,7 +140,10 @@ DynamicLights.prototype = {
     {
         if (pointLight)
         {
-            this.pointLights.push(pointLight);
+            this.pointLights.push(new PointLight());
+            this.pointLights[this.pointLights.length-1].setPointLight(
+                pointLight
+            );
         }
     },
 
@@ -153,29 +156,40 @@ DynamicLights.prototype = {
 
         // Update lights array
         this.lightsCount = 0;
-        this.lightsArray = new GLArrayDataType(this.pointLights.length*8);
+        this.lightsArray = new GLArrayDataType(this.pointLights.length*12);
         for (i = 0; i < this.pointLights.length; ++i)
         {
             // Point light type
-            this.lightsArray[(this.lightsCount*8)] = 0.0;
+            this.lightsArray[(this.lightsCount*12)] = 0.0;
 
             // Point light position
-            this.lightsArray[(this.lightsCount*8)+1] =
+            this.lightsArray[(this.lightsCount*12)+1] =
                 this.pointLights[i].position.vec[0];
-            this.lightsArray[(this.lightsCount*8)+2] =
+            this.lightsArray[(this.lightsCount*12)+2] =
                 this.pointLights[i].position.vec[1];
-            this.lightsArray[(this.lightsCount*8)+3] =
+            this.lightsArray[(this.lightsCount*12)+3] =
                 this.pointLights[i].position.vec[2];
 
             // Point light color
-            this.lightsArray[(this.lightsCount*8)+4] =
+            this.lightsArray[(this.lightsCount*12)+4] =
                 this.pointLights[i].color.vec[0];
-            this.lightsArray[(this.lightsCount*8)+5] =
+            this.lightsArray[(this.lightsCount*12)+5] =
                 this.pointLights[i].color.vec[1];
-            this.lightsArray[(this.lightsCount*8)+6] =
+            this.lightsArray[(this.lightsCount*12)+6] =
                 this.pointLights[i].color.vec[2];
-            this.lightsArray[(this.lightsCount*8)+7] =
+            this.lightsArray[(this.lightsCount*12)+7] =
                 this.pointLights[i].color.vec[3];
+
+            // Point light radius
+            this.lightsArray[(this.lightsCount*12)+8] =
+                this.pointLights[i].radius;
+
+            // Point light falloff radius
+            this.lightsArray[(this.lightsCount*12)+9] =
+                this.pointLights[i].falloffRadius;
+
+            this.lightsArray[(this.lightsCount*12)+10] = 0.0;
+            this.lightsArray[(this.lightsCount*12)+11] = 0.0;
 
             ++this.lightsCount;
         }
@@ -186,7 +200,7 @@ DynamicLights.prototype = {
         );
         this.renderer.gl.texImage2D(
             this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            2, this.lightsCount, 0, this.renderer.gl.RGBA,
+            3, this.lightsCount, 0, this.renderer.gl.RGBA,
             this.renderer.gl.FLOAT, this.lightsArray
         );
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
