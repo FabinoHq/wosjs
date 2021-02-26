@@ -52,6 +52,7 @@
 !renderer/dynamiclights.js
 !renderer/pointlight.js
 !renderer/spotlight.js
+!renderer/shadows.js
 !renderer/shaders/
 !renderer/shaders/defaultshader.js
 !renderer/shaders/backrenderershader.js
@@ -64,7 +65,9 @@
 !renderer/shaders/togglebuttonshader.js
 !renderer/shaders/textshader.js
 !renderer/shaders/staticmeshshader.js
+!renderer/shaders/staticmeshshaderlow.js
 !renderer/shaders/skeletalmeshshader.js
+!renderer/shaders/skeletalmeshshaderlow.js
 
 !interface/
 !interface/guibutton.js

@@ -314,6 +314,8 @@ function Wos()
     this.pointLight = null;
     // Test spot light
     this.spotLight = null;
+    // Test shadows
+    this.shadows = null;
 
     // Test static mesh
     this.staticmesh = null;
@@ -465,22 +467,28 @@ Wos.prototype = {
 
         // Init test spot light
         this.spotLight = new SpotLight();
-        this.spotLight.setPosition(0.0, 1.5, 0.0);
-        this.spotLight.setDirection(0.0, -1.0, 0.0);
+        this.spotLight.setPosition(-1.0, 1.5, 0.0);
+        this.spotLight.setDirection(1.0, -1.0, 0.0);
         this.spotLight.setColor(0.0, 0.0, 1.0, 0.8);
         this.spotLight.setRadius(5.0);
         this.spotLight.setFalloffRadius(12.0);
-        this.spotLight.setFocal(0.98);
-        this.spotLight.setFalloffFocal(0.97);
+        this.spotLight.setFocal(0.99);
+        this.spotLight.setFalloffFocal(0.98);
 
         this.renderer.dynamicLights.clear();
         this.renderer.dynamicLights.addPointLight(this.pointLight);
         this.renderer.dynamicLights.addSpotLight(this.spotLight);
         this.renderer.dynamicLights.update();
 
+        // Init test shadows
+        this.shadows = new Shadows(this.renderer);
+        this.shadows.init(512, 512);
+
         // Init test static mesh
         this.staticmesh = new StaticMesh(
-            this.renderer, this.loader.staticMeshShader
+            this.renderer,
+            this.loader.staticMeshShader,
+            this.loader.staticMeshShaderLow
         );
         this.staticmesh.init(
             this.loader.getModel("testmodel.wmsh"),
@@ -489,7 +497,9 @@ Wos.prototype = {
 
         // Init test skeletal mesh
         this.skeletalmesh = new SkeletalMesh(
-            this.renderer, this.loader.skeletalMeshShader
+            this.renderer,
+            this.loader.skeletalMeshShader,
+            this.loader.skeletalMeshShaderLow
         );
         this.skeletalmesh.init(
             this.loader.getModel("testskeletal.wmsh"),
@@ -785,15 +795,25 @@ Wos.prototype = {
         // Set camera
         //this.renderer.setCamera(this.camera);
 
+        // Render shadows
+        //this.shadows.clear();
+
+        // Render test static mesh shadows
+        //this.staticmesh.render(0);
+
+        // Render test skeletal mesh shadows
+        //this.skeletalmesh.render(0);
+
+        // Set renderer as active
+        //this.renderer.setActive();
+
         // Set freefly camera
         //this.renderer.setCamera(this.freeflycam, this.frametime);
 
         // Render test static mesh
-        //this.staticmesh.rotateX(this.frametime*30.0);
-        //this.staticmesh.rotateY(this.frametime*30.0);
-        //this.staticmesh.render();
+        //this.staticmesh.render(1, this.shadows);
 
         // Render test skeletal mesh
-        //this.skeletalmesh.render();
+        //this.skeletalmesh.render(1, this.shadows);
     }
 };

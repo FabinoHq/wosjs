@@ -106,6 +106,7 @@ Renderer.prototype = {
     {
         var i = 0;
         var texFloatExt = 0;
+        var depthTextureExt = 0;
         
         // Reset renderer
         this.loaded = false;
@@ -166,6 +167,10 @@ Renderer.prototype = {
         // Check texture float extension
         texFloatExt = this.gl.getExtension("OES_texture_float");
         if (!texFloatExt) return false;
+
+        // Check depth texture extension
+        depthTextureExt = this.gl.getExtension("WEBGL_depth_texture");
+        if (!depthTextureExt) return false;
 
         // Get canvas context
         this.ctx = this.context.getContext("2d");
@@ -250,6 +255,8 @@ Renderer.prototype = {
 
         // Init depth and blend functions
         this.gl.disable(this.gl.DEPTH_TEST);
+        this.gl.depthFunc(this.gl.LESS);
+        this.gl.depthMask(true);
         this.gl.enable(this.gl.BLEND);
         this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
         this.gl.blendEquation(this.gl.FUNC_ADD);
@@ -276,8 +283,8 @@ Renderer.prototype = {
         this.worldLight = new WorldLight(this);
         this.worldLight.init();
         this.worldLight.setDirection(0.2, 0.1, 0.9);
-        this.worldLight.setColor(1.0, 1.0, 1.0, 0.3);
-        this.worldLight.setAmbient(1.0, 1.0, 1.0, 0.2);
+        this.worldLight.setColor(1.0, 1.0, 1.0, 0.2);
+        this.worldLight.setAmbient(1.0, 1.0, 1.0, 0.1);
 
         // Init dynamic lights
         this.dynamicLights = new DynamicLights(this);
@@ -321,12 +328,6 @@ Renderer.prototype = {
         this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
         this.gl.disable(this.gl.SCISSOR_TEST);
 
-        // Set projection matrix
-        this.projMatrix.setOrthographic(
-            -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
-        );
-        this.projMatrix.translateZ(-1.0);
-
         // Set renderer clear color
         this.gl.clearColor(
             WOSDefaultClearColorRed,
@@ -341,6 +342,9 @@ Renderer.prototype = {
             this.gl.DEPTH_BUFFER_BIT |
             this.gl.STENCIL_BUFFER_BIT
         );
+
+        // Set default view
+        this.setDefaultView();
     },
 
     ////////////////////////////////////////////////////////////////////////////

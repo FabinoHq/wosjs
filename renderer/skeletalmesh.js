@@ -45,26 +45,33 @@
 //  Skeletal mesh class definition                                            //
 //  param renderer : Renderer pointer                                         //
 //  param skeletalShader : Skeletal mesh shader pointer                       //
+//  param skeletalShaderLow : Low skeletal mesh shader pointer                //
 ////////////////////////////////////////////////////////////////////////////////
-function SkeletalMesh(renderer, skeletalShader)
+function SkeletalMesh(renderer, skeletalShader, skeletalShaderLow)
 {
     // Renderer pointer
     this.renderer = renderer;
 
     // Skeletal mesh shader pointer
     this.skeletalShader = skeletalShader;
+    this.skeletalShaderLow = skeletalShaderLow;
 
     // Skeletal mesh shader uniforms locations
+    this.shadowsTextureLocation = -1;
     this.cameraPosLocation = -1;
     this.lightsCountLocation = -1;
     this.bonesMatricesLocation = -1;
+    this.bonesMatricesLocationLow = -1;
     this.bonesCountUniform = -1;
+    this.bonesCountUniformLow = -1;
     this.lightsTextureLocation = -1;
+    this.shadowsMatrixLocation = -1;
     this.worldLightVecUniform = -1;
     this.worldLightColorUniform = -1;
     this.worldLightAmbientUniform = -1;
     this.specularityUniform = -1;
     this.alphaUniform = -1;
+    this.alphaUniformLow = -1;
 
     // Skeletal mesh vertex buffer
     this.vertexBuffer = null;
@@ -73,6 +80,8 @@ function SkeletalMesh(renderer, skeletalShader)
     this.texture = null;
     // Skeletal mesh model matrix
     this.modelMatrix = new Matrix4x4();
+    // Skeletal mesh shadows matrix
+    this.shadowsMatrix = new Matrix4x4();
 
     // Bones count
     this.bonesCount = 0;
@@ -114,19 +123,25 @@ SkeletalMesh.prototype = {
         var i = 0;
 
         // Reset skeletal mesh
+        this.shadowsTextureLocation = -1;
         this.cameraPosLocation = -1;
         this.lightsCountLocation = -1;
         this.bonesMatricesLocation = -1;
+        this.bonesMatricesLocationLow = -1;
         this.bonesCountUniform = -1;
+        this.bonesCountUniformLow = -1;
         this.lightsTextureLocation = -1;
+        this.shadowsMatrixLocation = -1;
         this.worldLightVecUniform = -1;
         this.worldLightColorUniform = -1;
         this.worldLightAmbientUniform = -1;
         this.specularityUniform = -1;
         this.alphaUniform = -1;
+        this.alphaUniformLow = -1;
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix.setIdentity();
+        this.shadowsMatrix.setIdentity();
         this.bonesCount = 0;
         this.bonesParents = null;
         this.bonesPositions = null;
@@ -150,8 +165,14 @@ SkeletalMesh.prototype = {
         // Check skeletal mesh shader pointer
         if (!this.skeletalShader) return false;
 
+        // Check low skeletal mesh shader pointer
+        if (!this.skeletalShaderLow) return false;
+
         // Get skeletal mesh shader uniforms locations
         this.skeletalShader.bind();
+        this.shadowsMatrixLocation = this.skeletalShader.getUniform(
+            "shadowsMatrix"
+        );
         this.cameraPosLocation = this.skeletalShader.getUniform("cameraPos");
         this.lightsCountLocation = this.skeletalShader.getUniform(
             "lightsCount"
@@ -165,6 +186,10 @@ SkeletalMesh.prototype = {
             "lightsTexture"
         );
         this.skeletalShader.sendIntUniform(this.lightsTextureLocation, 2);
+        this.shadowsTextureLocation = this.skeletalShader.getUniform(
+            "shadowsTexture"
+        );
+        this.skeletalShader.sendIntUniform(this.shadowsTextureLocation, 3);
         this.worldLightVecUniform =
             this.skeletalShader.getUniform("worldLightVec");
         this.worldLightColorUniform =
@@ -174,6 +199,18 @@ SkeletalMesh.prototype = {
         this.specularityUniform = this.skeletalShader.getUniform("specularity");
         this.alphaUniform = this.skeletalShader.getUniform("alpha");
         this.skeletalShader.unbind();
+
+        // Get low skeletal mesh shader uniforms locations
+        this.skeletalShaderLow.bind();
+        this.bonesMatricesLocationLow = this.skeletalShaderLow.getUniform(
+            "bonesMatrices"
+        );
+        this.skeletalShaderLow.sendIntUniform(this.bonesMatricesLocationLow, 1);
+        this.bonesCountUniformLow = this.skeletalShaderLow.getUniform(
+            "bonesCount"
+        );
+        this.alphaUniformLow = this.skeletalShaderLow.getUniform("alpha");
+        this.skeletalShaderLow.unbind();
 
         // Check model pointer
         if (!model) return false;
@@ -586,8 +623,10 @@ SkeletalMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  render : Render skeletal mesh                                         //
+    //  param quality : Skeletal mesh shader quality                          //
+    //  param shadows : Shadows manager pointer                               //
     ////////////////////////////////////////////////////////////////////////////
-    render: function()
+    render: function(quality, shadows)
     {
         // Set skeletal mesh model matrix
         this.modelMatrix.setIdentity();
@@ -595,8 +634,16 @@ SkeletalMesh.prototype = {
         this.modelMatrix.rotateVec3(this.angles);
         this.modelMatrix.scale(this.scale, this.scale, this.scale);
 
-        // Bind skeletal mesh shader
-        this.skeletalShader.bind();
+        if (quality == 0)
+        {
+            // Bind low skeletal mesh shader
+            this.skeletalShaderLow.bind();
+        }
+        else
+        {
+            // Bind skeletal mesh shader
+            this.skeletalShader.bind();
+        }
 
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
@@ -604,43 +651,78 @@ SkeletalMesh.prototype = {
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send shader uniforms
-        this.skeletalShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.skeletalShader.sendModelMatrix(this.modelMatrix);
-        this.skeletalShader.sendUniformVec3(
-            this.cameraPosLocation, this.renderer.camera.position
-        );
-        this.skeletalShader.sendUniform(
-            this.lightsCountLocation, this.renderer.dynamicLights.lightsCount
-        );
-        this.skeletalShader.sendUniform(
-            this.bonesCountUniform, this.bonesCount
-        );
-        this.skeletalShader.sendUniformVec3(
-            this.worldLightVecUniform, this.renderer.worldLight.direction
-        );
-        this.skeletalShader.sendUniformVec4(
-            this.worldLightColorUniform, this.renderer.worldLight.color
-        );
-        this.skeletalShader.sendUniformVec4(
-            this.worldLightAmbientUniform, this.renderer.worldLight.ambient
-        );
-        this.skeletalShader.sendUniform(
-            this.specularityUniform, this.specularity
-        );
-        this.skeletalShader.sendUniform(this.alphaUniform, this.alpha);
+        if (quality == 0)
+        {
+            // Low quality
+            this.skeletalShaderLow.sendWorldMatrix(this.renderer.worldMatrix);
+            this.skeletalShader.sendUniform(
+                this.bonesCountUniformLow, this.bonesCount
+            );
+            this.skeletalShaderLow.sendUniform(
+                this.alphaUniformLow, this.alpha
+            );
 
-        // Bind texture
-        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
-        this.texture.bind();
-        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-        this.renderer.gl.bindTexture(
-            this.renderer.gl.TEXTURE_2D, this.bonesTexture
-        );
-        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
-        this.renderer.gl.bindTexture(
-            this.renderer.gl.TEXTURE_2D,
-            this.renderer.dynamicLights.lightsTexture
-        );
+            // Bind textures
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+            this.texture.bind();
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+            this.renderer.gl.bindTexture(
+                this.renderer.gl.TEXTURE_2D, this.bonesTexture
+            );
+        }
+        else
+        {
+            // High quality
+            this.shadowsMatrix.setMatrix(shadows.projMatrix);
+            this.shadowsMatrix.multiply(shadows.viewMatrix);
+
+            this.skeletalShader.sendWorldMatrix(this.renderer.worldMatrix);
+            this.skeletalShader.sendModelMatrix(this.modelMatrix);
+            this.skeletalShader.sendUniformMat4(
+                this.shadowsMatrixLocation, this.shadowsMatrix
+            );
+            this.skeletalShader.sendUniformVec3(
+                this.cameraPosLocation, this.renderer.camera.position
+            );
+            this.skeletalShader.sendUniform(
+                this.lightsCountLocation,
+                this.renderer.dynamicLights.lightsCount
+            );
+            this.skeletalShader.sendUniform(
+                this.bonesCountUniform, this.bonesCount
+            );
+            this.skeletalShader.sendUniformVec3(
+                this.worldLightVecUniform, this.renderer.worldLight.direction
+            );
+            this.skeletalShader.sendUniformVec4(
+                this.worldLightColorUniform, this.renderer.worldLight.color
+            );
+            this.skeletalShader.sendUniformVec4(
+                this.worldLightAmbientUniform, this.renderer.worldLight.ambient
+            );
+            this.skeletalShader.sendUniform(
+                this.specularityUniform, this.specularity
+            );
+            this.skeletalShader.sendUniform(this.alphaUniform, this.alpha);
+
+            // Bind textures
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+            this.texture.bind();
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+            this.renderer.gl.bindTexture(
+                this.renderer.gl.TEXTURE_2D, this.bonesTexture
+            );
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
+            this.renderer.gl.bindTexture(
+                this.renderer.gl.TEXTURE_2D,
+                this.renderer.dynamicLights.lightsTexture
+            );
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
+            this.renderer.gl.bindTexture(
+                this.renderer.gl.TEXTURE_2D,
+                shadows.depthTexture
+            );
+        }
 
         // Render VBO
         this.vertexBuffer.bind();
@@ -648,14 +730,28 @@ SkeletalMesh.prototype = {
         this.vertexBuffer.unbind();
 
         // Unbind texture
-        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
-        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+        if (quality > 0)
+        {
+            // High quality
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+        }
         this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
         this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
         this.texture.unbind();
 
-        // Unbind skeletal mesh shader
-        this.skeletalShader.unbind();
+        if (quality == 0)
+        {
+            // Unbind low skeletal mesh shader
+            this.skeletalShaderLow.unbind();
+        }
+        else
+        {
+            // Unbind skeletal mesh shader
+            this.skeletalShader.unbind();
+        }
     }
 };

@@ -87,6 +87,8 @@ function BackRenderer(renderer, backrendererShader)
 BackRenderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init background renderer                                       //
+    //  param width : Width of the background renderer                        //
+    //  param height : Height of the background renderer                      //
     ////////////////////////////////////////////////////////////////////////////
     init: function(width, height)
     {
@@ -239,6 +241,9 @@ BackRenderer.prototype = {
             this.renderer.gl.DEPTH_BUFFER_BIT |
             this.renderer.gl.STENCIL_BUFFER_BIT
         );
+
+        // Set default view
+        this.setDefaultView();
     },
 
     ////////////////////////////////////////////////////////////////////////////

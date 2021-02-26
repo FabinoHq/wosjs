@@ -340,5 +340,14 @@ Shader.prototype = {
     sendUniformVec4: function(uniformLoc, uniformVec4)
     {
         this.gl.uniform4fv(uniformLoc, uniformVec4.vec);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendUniformMat4 : Send shader matrix 4x4 uniform                      //
+    //  param matrix : 4x4 matrix to send                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    sendUniformMat4: function(uniformLoc, matrix)
+    {
+        this.gl.uniformMatrix4fv(uniformLoc, false, matrix.matrix);
     }
 };

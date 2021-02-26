@@ -65,7 +65,9 @@ function Loader(renderer, audio)
     this.toggleButtonShader = null;
     this.textShader = null;
     this.staticMeshShader = null;
+    this.staticMeshShaderLow = null;
     this.skeletalMeshShader = null;
+    this.skeletalMeshShaderLow = null;
     this.allShadersLoaded = false;
 
     // Textures array
@@ -103,7 +105,9 @@ Loader.prototype = {
         this.toggleButtonShader = null;
         this.textShader = null;
         this.staticMeshShader = null;
+        this.staticMeshShaderLow = null;
         this.skeletalMeshShader = null;
+        this.skeletalMeshShaderLow = null;
         this.allShadersLoaded = false;
 
         this.textures = new Array();
@@ -208,10 +212,26 @@ Loader.prototype = {
             return false;
         }
 
+        // Init low static mesh shader
+        this.staticMeshShaderLow = new Shader(this.renderer.gl);
+        if (!this.staticMeshShaderLow.init(
+            staticMeshVertexShaderLowSrc, staticMeshFragmentShaderLowSrc))
+        {
+            return false;
+        }
+
         // Init skeletal mesh shader
         this.skeletalMeshShader = new Shader(this.renderer.gl);
         if (!this.skeletalMeshShader.init(
             skeletalMeshVertexShaderSrc, skeletalMeshFragmentShaderSrc))
+        {
+            return false;
+        }
+
+        // Init low skeletal mesh shader
+        this.skeletalMeshShaderLow = new Shader(this.renderer.gl);
+        if (!this.skeletalMeshShaderLow.init(
+            skeletalMeshVertexShaderLowSrc, skeletalMeshFragmentShaderLowSrc))
         {
             return false;
         }

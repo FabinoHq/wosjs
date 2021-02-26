@@ -45,24 +45,29 @@
 //  Static mesh class definition                                              //
 //  param renderer : Renderer pointer                                         //
 //  param meshShader : Static mesh shader pointer                             //
+//  param meshShaderLow : Low static mesh shader pointer                      //
 ////////////////////////////////////////////////////////////////////////////////
-function StaticMesh(renderer, meshShader)
+function StaticMesh(renderer, meshShader, meshShaderLow)
 {
     // Renderer pointer
     this.renderer = renderer;
 
     // Static mesh shader pointer
     this.meshShader = meshShader;
+    this.meshShaderLow = meshShaderLow;
 
     // Static mesh shader uniforms locations
+    this.shadowsTextureLocation = -1;
     this.cameraPosLocation = -1;
     this.lightsCountLocation = -1;
     this.lightsTextureLocation = -1;
+    this.shadowsMatrixLocation = -1;
     this.worldLightVecUniform = -1;
     this.worldLightColorUniform = -1;
     this.worldLightAmbientUniform = -1;
     this.specularityUniform = -1;
     this.alphaUniform = -1;
+    this.alphaUniformLow = -1;
 
     // Static mesh vertex buffer
     this.vertexBuffer = null;
@@ -71,6 +76,8 @@ function StaticMesh(renderer, meshShader)
     this.texture = null;
     // Static mesh model matrix
     this.modelMatrix = new Matrix4x4();
+    // Static mesh shadows matrix
+    this.shadowsMatrix = new Matrix4x4();
 
     // Static mesh position
     this.position = new Vector3(0.0, 0.0, 0.0);
@@ -93,14 +100,17 @@ StaticMesh.prototype = {
     init: function(model, texture)
     {
         // Reset static mesh
+        this.shadowsMatrixLocation = -1;
         this.cameraPosLocation = -1;
         this.lightsCountLocation = -1;
         this.lightsTextureLocation = -1;
+        this.shadowsMatrixLocation = -1;
         this.worldLightVecUniform = -1;
         this.worldLightColorUniform = -1;
         this.worldLightAmbientUniform = -1;
         this.specularityUniform = -1;
         this.alphaUniform = -1;
+        this.alphaUniformLow = -1;
         this.vertexBuffer = null;
         this.texture = null;
         this.modelMatrix.setIdentity();
@@ -119,14 +129,24 @@ StaticMesh.prototype = {
         // Check static mesh shader pointer
         if (!this.meshShader) return false;
 
+        // Check low static mesh shader pointer
+        if (!this.meshShaderLow) return false;
+
         // Get static mesh shader uniforms locations
         this.meshShader.bind();
+        this.shadowsMatrixLocation = this.meshShader.getUniform(
+            "shadowsMatrix"
+        );
         this.cameraPosLocation = this.meshShader.getUniform("cameraPos");
         this.lightsCountLocation = this.meshShader.getUniform("lightsCount");
         this.lightsTextureLocation = this.meshShader.getUniform(
             "lightsTexture"
         );
         this.meshShader.sendIntUniform(this.lightsTextureLocation, 1);
+        this.shadowsTextureLocation = this.meshShader.getUniform(
+            "shadowsTexture"
+        );
+        this.meshShader.sendIntUniform(this.shadowsTextureLocation, 2);
         this.worldLightVecUniform =
             this.meshShader.getUniform("worldLightVec");
         this.worldLightColorUniform =
@@ -136,6 +156,11 @@ StaticMesh.prototype = {
         this.specularityUniform = this.meshShader.getUniform("specularity");
         this.alphaUniform = this.meshShader.getUniform("alpha");
         this.meshShader.unbind();
+
+        // Get low static mesh shader uniforms locations
+        this.meshShaderLow.bind();
+        this.alphaUniformLow = this.meshShaderLow.getUniform("alpha");
+        this.meshShaderLow.unbind();
 
         // Check model pointer
         if (!model) return false;
@@ -428,8 +453,10 @@ StaticMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  render : Render static mesh                                           //
+    //  param quality : Static mesh shader quality                            //
+    //  param shadows : Shadows manager pointer                               //
     ////////////////////////////////////////////////////////////////////////////
-    render: function()
+    render: function(quality, shadows)
     {
         // Set static mesh model matrix
         this.modelMatrix.setIdentity();
@@ -437,8 +464,16 @@ StaticMesh.prototype = {
         this.modelMatrix.rotateVec3(this.angles);
         this.modelMatrix.scale(this.scale, this.scale, this.scale);
 
-        // Bind static mesh shader
-        this.meshShader.bind();
+        if (quality == 0)
+        {
+            // Bind low static mesh shader
+            this.meshShaderLow.bind();
+        }
+        else
+        {
+            // Bind static mesh shader
+            this.meshShader.bind();
+        }
 
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
@@ -446,47 +481,89 @@ StaticMesh.prototype = {
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send shader uniforms
-        this.meshShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.meshShader.sendModelMatrix(this.modelMatrix);
-        this.meshShader.sendUniformVec3(
-            this.cameraPosLocation, this.renderer.camera.position
-        );
-        this.meshShader.sendUniform(
-            this.lightsCountLocation, this.renderer.dynamicLights.lightsCount
-        );
-        this.meshShader.sendUniformVec3(
-            this.worldLightVecUniform, this.renderer.worldLight.direction
-        );
-        this.meshShader.sendUniformVec4(
-            this.worldLightColorUniform, this.renderer.worldLight.color
-        );
-        this.meshShader.sendUniformVec4(
-            this.worldLightAmbientUniform, this.renderer.worldLight.ambient
-        );
-        this.meshShader.sendUniform(this.specularityUniform, this.specularity);
-        this.meshShader.sendUniform(this.alphaUniform, this.alpha);
+        if (quality == 0)
+        {
+            // Low quality
+            this.meshShaderLow.sendWorldMatrix(this.renderer.worldMatrix);
+            this.meshShaderLow.sendUniform(this.alphaUniformLow, this.alpha);
 
-        // Bind texture
-        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
-        this.texture.bind();
-        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-        this.renderer.gl.bindTexture(
-            this.renderer.gl.TEXTURE_2D,
-            this.renderer.dynamicLights.lightsTexture
-        );
+            // Bind texture
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+            this.texture.bind();
+        }
+        else
+        {
+            // High quality
+            this.shadowsMatrix.setMatrix(shadows.projMatrix);
+            this.shadowsMatrix.multiply(shadows.viewMatrix);
 
+            this.meshShader.sendWorldMatrix(this.renderer.worldMatrix);
+            this.meshShader.sendModelMatrix(this.modelMatrix);
+            this.meshShader.sendUniformMat4(
+                this.shadowsMatrixLocation, this.shadowsMatrix
+            );
+            this.meshShader.sendUniformVec3(
+                this.cameraPosLocation, this.renderer.camera.position
+            );
+            this.meshShader.sendUniform(
+                this.lightsCountLocation,
+                this.renderer.dynamicLights.lightsCount
+            );
+            this.meshShader.sendUniformVec3(
+                this.worldLightVecUniform, this.renderer.worldLight.direction
+            );
+            this.meshShader.sendUniformVec4(
+                this.worldLightColorUniform, this.renderer.worldLight.color
+            );
+            this.meshShader.sendUniformVec4(
+                this.worldLightAmbientUniform, this.renderer.worldLight.ambient
+            );
+            this.meshShader.sendUniform(
+                this.specularityUniform, this.specularity
+            );
+            this.meshShader.sendUniform(this.alphaUniform, this.alpha);
+
+            // Bind textures
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+            this.texture.bind();
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+            this.renderer.gl.bindTexture(
+                this.renderer.gl.TEXTURE_2D,
+                this.renderer.dynamicLights.lightsTexture
+            );
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
+            this.renderer.gl.bindTexture(
+                this.renderer.gl.TEXTURE_2D,
+                shadows.depthTexture
+            );
+        }
+        
         // Render VBO
         this.vertexBuffer.bind();
         this.vertexBuffer.render(this.meshShader);
         this.vertexBuffer.unbind();
 
-        // Unbind texture
-        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+        // Unbind textures
+        if (quality > 0)
+        {
+            // High quality
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+        }
         this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
         this.texture.unbind();
 
-        // Unbind static mesh shader
-        this.meshShader.unbind();
+        if (quality == 0)
+        {
+            // Unbind low static mesh shader
+            this.meshShaderLow.unbind();
+        }
+        else
+        {
+            // Unbind static mesh shader
+            this.meshShader.unbind();
+        }
     }
 };
