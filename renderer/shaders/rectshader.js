@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/rectshader.js : Rect shader management                       //
+//      renderer/rectshader.js : Rect shader                                  //
 ////////////////////////////////////////////////////////////////////////////////
 
 

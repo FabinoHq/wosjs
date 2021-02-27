@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/staticmeshshaderlow.js : Low static mesh shader management   //
+//      renderer/staticmeshshaderlow.js : Low static mesh shader              //
 ////////////////////////////////////////////////////////////////////////////////
 
 

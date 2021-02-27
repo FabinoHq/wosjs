@@ -420,6 +420,17 @@ SkeletalMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAnglesVec3 : Set skeletal mesh rotation angles from a vector       //
+    //  param vector : 3 components vector to set rotation angles from        //
+    ////////////////////////////////////////////////////////////////////////////
+    setAnglesVec3: function(vector)
+    {
+        this.angles.vec[0] = vector.vec[0];
+        this.angles.vec[1] = vector.vec[1];
+        this.angles.vec[2] = vector.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  rotateX : Rotate skeletal mesh on the X axis                          //
     //  param angleX : X angle to rotate skeletal mesh by in degrees          //
     ////////////////////////////////////////////////////////////////////////////

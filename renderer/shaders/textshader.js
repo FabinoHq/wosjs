@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/textshader.js : Text shader management                       //
+//      renderer/textshader.js : Text shader                                  //
 ////////////////////////////////////////////////////////////////////////////////
 
 

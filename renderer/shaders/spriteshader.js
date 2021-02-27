@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/spriteshader.js : Sprite shader management                   //
+//      renderer/spriteshader.js : Sprite shader                              //
 ////////////////////////////////////////////////////////////////////////////////
 
 

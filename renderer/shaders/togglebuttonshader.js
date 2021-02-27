@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/togglebuttonshader.js : Toggle button shader management      //
+//      renderer/togglebuttonshader.js : Toggle button shader                 //
 ////////////////////////////////////////////////////////////////////////////////
 
 

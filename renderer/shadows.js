@@ -68,8 +68,19 @@ function Shadows(renderer)
     this.projMatrix = new Matrix4x4();
     // Shadows view matrix
     this.viewMatrix = new Matrix4x4();
-    // Shadows world matrix
-    this.worldMatrix = new Matrix4x4();
+
+    // Shadows position
+    this.position = new Vector3(0.0, 0.0, 0.0);
+
+    // Shadows angles
+    this.angles = new Vector3(0.0, 0.0, 0.0);
+
+    // Shadows fovy
+    this.fovy = 90.0;
+
+    // Shadows near and far planes
+    this.nearPlane = 0.01;
+    this.farPlane = 100.0;
 }
 
 Shadows.prototype = {
@@ -92,7 +103,11 @@ Shadows.prototype = {
         this.depthTexture = null;
         this.projMatrix.setIdentity();
         this.viewMatrix.setIdentity();
-        this.worldMatrix.setIdentity();
+        this.position.reset();
+        this.angles.reset();
+        this.fovy = 90.0;
+        this.nearPlane = 0.01;
+        this.farPlane = 100.0;
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -221,7 +236,9 @@ Shadows.prototype = {
 
         // Set projection matrix
         this.projMatrix.setIdentity();
-        this.projMatrix.setPerspective(90.0, this.ratio, 0.01, 100.0);
+        this.projMatrix.setPerspective(
+            this.fovy, this.ratio, this.nearPlane, this.farPlane
+        );
 
         // Set view matrix
         this.viewMatrix.setIdentity();
@@ -257,6 +274,19 @@ Shadows.prototype = {
             this.renderer.gl.DEPTH_BUFFER_BIT
         );
 
+        // Compute projection matrix
+        this.projMatrix.setIdentity();
+        this.projMatrix.setPerspective(
+            this.fovy, this.ratio, this.nearPlane, this.farPlane
+        );
+
+        // Compute view matrix
+        this.viewMatrix.setIdentity();
+        this.viewMatrix.rotateX(this.angles.vec[0]);
+        this.viewMatrix.rotateY(this.angles.vec[1]);
+        this.viewMatrix.rotateY(this.angles.vec[2]);
+        this.viewMatrix.translateVec3(this.position);
+
         // Set renderer matrices
         this.renderer.camera.projMatrix.setMatrix(this.projMatrix);
         this.renderer.camera.viewMatrix.setMatrix(this.viewMatrix);
@@ -280,8 +310,280 @@ Shadows.prototype = {
         this.renderer.gl.scissor(0, 0, this.width, this.height);
         this.renderer.gl.disable(this.renderer.gl.SCISSOR_TEST);
 
+        // Compute view matrix
+        this.viewMatrix.setIdentity();
+        this.viewMatrix.rotateX(this.angles.vec[0]);
+        this.viewMatrix.rotateY(this.angles.vec[1]);
+        this.viewMatrix.rotateY(this.angles.vec[2]);
+        this.viewMatrix.translateVec3(this.position);
+
         // Set renderer matrices
         this.renderer.camera.projMatrix.setMatrix(this.projMatrix);
         this.renderer.camera.viewMatrix.setMatrix(this.viewMatrix);
+
+        // Set renderer matrices
+        this.renderer.camera.projMatrix.setMatrix(this.projMatrix);
+        this.renderer.camera.viewMatrix.setMatrix(this.viewMatrix);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPosition : Set the shadows caster's position                       //
+    //  param x : X position of the shadows caster                            //
+    //  param y : Y position of the shadows caster                            //
+    //  param z : Z position of the shadows caster                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosition: function(x, y, z)
+    {
+        this.position.vec[0] = -x;
+        this.position.vec[1] = -y;
+        this.position.vec[2] = -z;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPositionVec3 : Set shadows caster's position from a vector         //
+    //  param vector : 3 components vector to set shadows caster position     //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec3: function(vector)
+    {
+        this.position.vec[0] = -vector.vec[0];
+        this.position.vec[1] = -vector.vec[1];
+        this.position.vec[2] = -vector.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setX : Set the shadows caster's X position                            //
+    //  param x : X position of the shadows caster                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setX: function(x)
+    {
+        this.position.vec[0] = -x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setY : Set the shadows caster's Y position                            //
+    //  param y : Y position of the shadows caster                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setY: function(y)
+    {
+        this.position.vec[1] = -y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setZ : Set the shadows caster's Z position                            //
+    //  param z : Z position of the shadows caster                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setZ: function(z)
+    {
+        this.position.vec[2] = -z;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  move : Move the shadows caster                                        //
+    //  param x : Value of the translation on the X axis                      //
+    //  param y : Value of the translation on the Y axis                      //
+    //  param z : Value of the translation on the Z axis                      //
+    ////////////////////////////////////////////////////////////////////////////
+    move: function(x, y, z)
+    {
+        this.position.vec[0] -= x;
+        this.position.vec[1] -= y;
+        this.position.vec[2] -= z;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveVec3 : Move the shadows caster with a 3 components vector         //
+    //  param vector : 3 components vector to move the shadows caster by      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveVec3: function(vector)
+    {
+        this.position.vec[0] -= vector.vec[0];
+        this.position.vec[1] -= vector.vec[1];
+        this.position.vec[2] -= vector.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveX : Move the shadows caster on the X axis                         //
+    //  param x : Value of the translation on the X axis                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveX: function(x)
+    {
+        this.position.vec[0] -= x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveY : Move the shadows caster on the Y axis                         //
+    //  param y : Value of the translation on the Y axis                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveY: function(y)
+    {
+        this.position.vec[1] -= y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  moveZ : Move the shadows caster on the Z axis                         //
+    //  param z : Value of the translation on the Z axis                      //
+    ////////////////////////////////////////////////////////////////////////////
+    moveZ: function(z)
+    {
+        this.position.vec[2] -= z;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngles : Set shadows caster rotation angles                        //
+    //  param angleX : Shadows caster X rotation angle to set in degrees      //
+    //  param angleY : Shadows caster Y rotation angle to set in degrees      //
+    //  param angleZ : Shadows caster Z rotation angle to set in degrees      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngles: function(angleX, angleY, angleZ)
+    {
+        this.angles.vec[0] = -angleX;
+        this.angles.vec[1] = -angleY;
+        this.angles.vec[2] = -angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAnglesVec3 : Set shadows caster rotation angles from a vector      //
+    //  param vector : 3 components vector to set rotation angles from        //
+    ////////////////////////////////////////////////////////////////////////////
+    setAnglesVec3: function(vector)
+    {
+        this.angles.vec[0] = -vector.vec[0];
+        this.angles.vec[1] = -vector.vec[1];
+        this.angles.vec[2] = -vector.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleX : Set shadows caster X rotation angle                       //
+    //  param angleX : Shadows caster X rotation angle to set in degrees      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleX: function(angleX)
+    {
+        this.angles.vec[0] = -angleX;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleY : Set shadows caster Y rotation angle                       //
+    //  param angleY : Shadows caster Y rotation angle to set in degrees      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleY: function(angleY)
+    {
+        this.angles.vec[1] = -angleY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleZ : Set shadows caster Z rotation angle                       //
+    //  param angleZ : Shadows caster Z rotation angle to set in degrees      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleZ: function(angleZ)
+    {
+        this.angles.vec[2] = -angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateX : Rotate the shadows caster along the X axis                  //
+    //  param angleX : Value of the X rotation in degrees                     //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateX: function(angleX)
+    {
+        this.angles.vec[0] -= angleX;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateY : Rotate the shadows caster along the Y axis                  //
+    //  param angleY : Value of the Y rotation in degrees                     //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateY: function(angleX)
+    {
+        this.angles.vec[1] -= angleY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateZ : Rotate the shadows caster along the Z axis                  //
+    //  param angleZ : Value of the Z rotation in degrees                     //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateZ: function(angleZ)
+    {
+        this.angles.vec[2] -= angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setFovy : Set the shadows caster fovy angle                           //
+    //  param fovy : Value of the shadows caster fovy in degrees              //
+    ////////////////////////////////////////////////////////////////////////////
+    setFovy: function(fovy)
+    {
+        this.fovy = fovy;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setNearPlane : Set the shadows caster near plane                      //
+    //  param nearPlane : Value of the shadows caster near plane              //
+    ////////////////////////////////////////////////////////////////////////////
+    setNearPlane: function(nearPlane)
+    {
+        this.nearPlane = nearPlane;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setFarPlane : Set the shadows caster far plane                        //
+    //  param farPlane : Value of the shadows caster far plane                //
+    ////////////////////////////////////////////////////////////////////////////
+    setFarPlane: function(farPlane)
+    {
+        this.farPlane = farPlane;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getX : Get the shadows caster's X position                            //
+    //  return : X position of the shadows caster                             //
+    ////////////////////////////////////////////////////////////////////////////
+    getX: function()
+    {
+        return this.position.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getY : Get the shadows caster's Y position                            //
+    //  return : Y position of the shadows caster                             //
+    ////////////////////////////////////////////////////////////////////////////
+    getY: function()
+    {
+        return this.position.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getZ : Get the shadows caster's Z position                            //
+    //  return : Z position of the shadows caster                             //
+    ////////////////////////////////////////////////////////////////////////////
+    getZ: function()
+    {
+        return this.position.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngle : Get the shadows caster's X rotation angle                  //
+    //  return : X rotation angle of the shadows caster                       //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngleX: function()
+    {
+        return this.angles.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngleY : Get the shadows caster's Y rotation angle                 //
+    //  return : Y rotation angle of the shadows caster                       //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngleY: function()
+    {
+        return this.angles.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngleZ : Get the shadows caster's Z rotation angle                 //
+    //  return : Z rotation angle of the shadows caster                       //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngleZ: function()
+    {
+        return this.angles.vec[2];
     }
 };

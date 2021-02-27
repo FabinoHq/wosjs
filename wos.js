@@ -449,18 +449,18 @@ Wos.prototype = {
         this.camera.reset();
         this.camera.rotateX(0.0);
         this.camera.moveY(0.0);
-        this.camera.moveZ(-3.0);
+        this.camera.moveZ(3.0);
 
         // Init test freefly camera
         this.freeflycam = new FreeflyCam();
         this.freeflycam.reset();
         this.freeflycam.rotateX(0.0);
         this.freeflycam.moveY(0.0);
-        this.freeflycam.moveZ(-2.0);
+        this.freeflycam.moveZ(2.0);
 
         // Init test point light
         this.pointLight = new PointLight();
-        this.pointLight.setPosition(0.0, 2.5, 0.0);
+        this.pointLight.setPosition(3.0, 3.0, -3.0);
         this.pointLight.setColor(1.0, 1.0, 1.0, 0.8);
         this.pointLight.setRadius(5.0);
         this.pointLight.setFalloffRadius(12.0);
@@ -483,6 +483,8 @@ Wos.prototype = {
         // Init test shadows
         this.shadows = new Shadows(this.renderer);
         this.shadows.init(512, 512);
+        this.shadows.setPosition(3.0, 3.0, -3.0);
+        this.shadows.setAngles(75.0, 230.0, 0.0);
 
         // Init test static mesh
         this.staticmesh = new StaticMesh(
@@ -792,9 +794,6 @@ Wos.prototype = {
         //this.testtextbox.setY(-this.testtextbox.getHeight()*0.5);
         //this.testtextbox.render();
 
-        // Set camera
-        //this.renderer.setCamera(this.camera);
-
         // Render shadows
         //this.shadows.clear();
 
@@ -806,6 +805,9 @@ Wos.prototype = {
 
         // Set renderer as active
         //this.renderer.setActive();
+
+        // Set camera
+        //this.renderer.setCamera(this.camera);
 
         // Set freefly camera
         //this.renderer.setCamera(this.freeflycam, this.frametime);

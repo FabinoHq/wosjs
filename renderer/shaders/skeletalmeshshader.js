@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/skeletalmeshshader.js : Skeletal mesh shader management      //
+//      renderer/skeletalmeshshader.js : Skeletal mesh shader                 //
 ////////////////////////////////////////////////////////////////////////////////
 
 

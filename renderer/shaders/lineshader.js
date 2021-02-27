@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/lineshader.js : Line shader management                       //
+//      renderer/lineshader.js : Line shader                                  //
 ////////////////////////////////////////////////////////////////////////////////
 
 

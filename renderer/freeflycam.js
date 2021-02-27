@@ -68,7 +68,7 @@ function FreeflyCam()
 
     // Freefly camera movement vectors
     this.target = new Vector3(0.0, 0.0, 0.0);
-    this.upward = new Vector3(0.0, 0.0, 1.0);
+    this.upward = new Vector3(0.0, 1.0, 0.0);
     this.cross = new Vector3(0.0, 0.0, 0.0);
 
     // Freefly camera key states
@@ -94,7 +94,7 @@ FreeflyCam.prototype = {
         this.farPlane = 1000.0;
         this.speed = 1.0;
         this.target.reset();
-        this.upward.setXYZ(0.0, 0.0, 1.0);
+        this.upward.setXYZ(0.0, 1.0, 0.0);
         this.cross.reset();
         this.forward = false;
         this.backward = false;
@@ -115,10 +115,10 @@ FreeflyCam.prototype = {
 
         // Compute freefly camera target
         this.target.vec[0] = Math.cos(this.angles.vec[0]*Math.PI/180.0);
-        this.target.vec[0] *= Math.cos(this.angles.vec[1]*Math.PI/180.0);
-        this.target.vec[1] = Math.cos(this.angles.vec[0]*Math.PI/180.0);
-        this.target.vec[1] *= Math.sin(this.angles.vec[1]*Math.PI/180.0);
-        this.target.vec[2] = Math.sin(this.angles.vec[0]*Math.PI/180.0);
+        this.target.vec[0] *= Math.sin(this.angles.vec[1]*Math.PI/180.0);
+        this.target.vec[1] = Math.sin(this.angles.vec[0]*Math.PI/180.0);
+        this.target.vec[2] = Math.cos(this.angles.vec[0]*Math.PI/180.0);
+        this.target.vec[2] *= Math.cos(this.angles.vec[1]*Math.PI/180.0);
         this.target.normalize();
 
         // Compute freefly camera cross product
@@ -129,98 +129,98 @@ FreeflyCam.prototype = {
         if (this.forward && !this.backward && !this.leftward && !this.rightward)
         {
             // Move forward
-            this.position.vec[0] += this.target.vec[1]*speed;
-            this.position.vec[1] -= this.target.vec[2]*speed;
-            this.position.vec[2] += this.target.vec[0]*speed;
+            this.position.vec[0] += this.target.vec[0]*speed;
+            this.position.vec[1] -= this.target.vec[1]*speed;
+            this.position.vec[2] += this.target.vec[2]*speed;
         }
         if (this.forward && this.leftward && this.rightward && !this.backward)
         {
             // Move forward
-            this.position.vec[0] += this.target.vec[1]*speed;
-            this.position.vec[1] -= this.target.vec[2]*speed;
-            this.position.vec[2] += this.target.vec[0]*speed;
+            this.position.vec[0] += this.target.vec[0]*speed;
+            this.position.vec[1] -= this.target.vec[1]*speed;
+            this.position.vec[2] += this.target.vec[2]*speed;
         }
         if (this.backward && !this.forward && !this.leftward && !this.rightward)
         {
             // Move backward
-            this.position.vec[0] -= this.target.vec[1]*speed;
-            this.position.vec[1] += this.target.vec[2]*speed;
-            this.position.vec[2] -= this.target.vec[0]*speed;
+            this.position.vec[0] -= this.target.vec[0]*speed;
+            this.position.vec[1] += this.target.vec[1]*speed;
+            this.position.vec[2] -= this.target.vec[2]*speed;
         }
         if (this.backward && this.leftward && this.rightward && !this.forward)
         {
             // Move backward
-            this.position.vec[0] -= this.target.vec[1]*speed;
-            this.position.vec[1] += this.target.vec[2]*speed;
-            this.position.vec[2] -= this.target.vec[0]*speed;
+            this.position.vec[0] -= this.target.vec[0]*speed;
+            this.position.vec[1] += this.target.vec[1]*speed;
+            this.position.vec[2] -= this.target.vec[2]*speed;
         }
         if (this.leftward && !this.rightward && !this.forward && !this.backward)
         {
             // Move leftward
-            this.position.vec[0] += this.cross.vec[1]*speed;
-            this.position.vec[1] -= this.cross.vec[2]*speed;
-            this.position.vec[2] += this.cross.vec[0]*speed;
+            this.position.vec[0] += this.cross.vec[0]*speed;
+            this.position.vec[1] -= this.cross.vec[1]*speed;
+            this.position.vec[2] += this.cross.vec[2]*speed;
         }
         if (this.leftward && this.forward && this.backward && !this.rightward)
         {
             // Move leftward
-            this.position.vec[0] += this.cross.vec[1]*speed;
-            this.position.vec[1] -= this.cross.vec[2]*speed;
-            this.position.vec[2] += this.cross.vec[0]*speed;
+            this.position.vec[0] += this.cross.vec[0]*speed;
+            this.position.vec[1] -= this.cross.vec[1]*speed;
+            this.position.vec[2] += this.cross.vec[2]*speed;
         }
         if (this.rightward && !this.leftward && !this.forward && !this.backward)
         {
             // Move rightward
-            this.position.vec[0] -= this.cross.vec[1]*speed;
-            this.position.vec[1] += this.cross.vec[2]*speed;
-            this.position.vec[2] -= this.cross.vec[0]*speed;
+            this.position.vec[0] -= this.cross.vec[0]*speed;
+            this.position.vec[1] += this.cross.vec[1]*speed;
+            this.position.vec[2] -= this.cross.vec[2]*speed;
         }
         if (this.rightward && this.forward && this.backward && !this.leftward)
         {
             // Move rightward
-            this.position.vec[0] -= this.cross.vec[1]*speed;
-            this.position.vec[1] += this.cross.vec[2]*speed;
-            this.position.vec[2] -= this.cross.vec[0]*speed;
+            this.position.vec[0] -= this.cross.vec[0]*speed;
+            this.position.vec[1] += this.cross.vec[1]*speed;
+            this.position.vec[2] -= this.cross.vec[2]*speed;
         }
         if (this.forward && this.leftward && !this.backward && !this.rightward)
         {
             // Move forward leftward
-            this.position.vec[0] += this.target.vec[1]*crossSpeed;
-            this.position.vec[1] -= this.target.vec[2]*crossSpeed;
-            this.position.vec[2] += this.target.vec[0]*crossSpeed;
-            this.position.vec[0] += this.cross.vec[1]*crossSpeed;
-            this.position.vec[1] -= this.cross.vec[2]*crossSpeed;
-            this.position.vec[2] += this.cross.vec[0]*crossSpeed;
+            this.position.vec[0] += this.target.vec[0]*crossSpeed;
+            this.position.vec[1] -= this.target.vec[1]*crossSpeed;
+            this.position.vec[2] += this.target.vec[2]*crossSpeed;
+            this.position.vec[0] += this.cross.vec[0]*crossSpeed;
+            this.position.vec[1] -= this.cross.vec[1]*crossSpeed;
+            this.position.vec[2] += this.cross.vec[2]*crossSpeed;
         }
         if (this.forward && this.rightward && !this.backward && !this.leftward)
         {
             // Move forward rightward
-            this.position.vec[0] += this.target.vec[1]*crossSpeed;
-            this.position.vec[1] -= this.target.vec[2]*crossSpeed;
-            this.position.vec[2] += this.target.vec[0]*crossSpeed;
-            this.position.vec[0] -= this.cross.vec[1]*crossSpeed;
-            this.position.vec[1] += this.cross.vec[2]*crossSpeed;
-            this.position.vec[2] -= this.cross.vec[0]*crossSpeed;
+            this.position.vec[0] += this.target.vec[0]*crossSpeed;
+            this.position.vec[1] -= this.target.vec[1]*crossSpeed;
+            this.position.vec[2] += this.target.vec[2]*crossSpeed;
+            this.position.vec[0] -= this.cross.vec[0]*crossSpeed;
+            this.position.vec[1] += this.cross.vec[1]*crossSpeed;
+            this.position.vec[2] -= this.cross.vec[2]*crossSpeed;
         }
         if (this.backward && this.leftward && !this.forward && !this.rightward)
         {
             // Move backward leftward
-            this.position.vec[0] -= this.target.vec[1]*crossSpeed;
-            this.position.vec[1] += this.target.vec[2]*crossSpeed;
-            this.position.vec[2] -= this.target.vec[0]*crossSpeed;
-            this.position.vec[0] += this.cross.vec[1]*crossSpeed;
-            this.position.vec[1] -= this.cross.vec[2]*crossSpeed;
-            this.position.vec[2] += this.cross.vec[0]*crossSpeed;
+            this.position.vec[0] -= this.target.vec[0]*crossSpeed;
+            this.position.vec[1] += this.target.vec[1]*crossSpeed;
+            this.position.vec[2] -= this.target.vec[2]*crossSpeed;
+            this.position.vec[0] += this.cross.vec[0]*crossSpeed;
+            this.position.vec[1] -= this.cross.vec[1]*crossSpeed;
+            this.position.vec[2] += this.cross.vec[2]*crossSpeed;
         }
         if (this.backward && this.rightward && !this.leftward && !this.forward)
         {
             // Move backward rightward
-            this.position.vec[0] -= this.target.vec[1]*crossSpeed;
-            this.position.vec[1] += this.target.vec[2]*crossSpeed;
-            this.position.vec[2] -= this.target.vec[0]*crossSpeed;
-            this.position.vec[0] -= this.cross.vec[1]*crossSpeed;
-            this.position.vec[1] += this.cross.vec[2]*crossSpeed;
-            this.position.vec[2] -= this.cross.vec[0]*crossSpeed;
+            this.position.vec[0] -= this.target.vec[0]*crossSpeed;
+            this.position.vec[1] += this.target.vec[1]*crossSpeed;
+            this.position.vec[2] -= this.target.vec[2]*crossSpeed;
+            this.position.vec[0] -= this.cross.vec[0]*crossSpeed;
+            this.position.vec[1] += this.cross.vec[1]*crossSpeed;
+            this.position.vec[2] -= this.cross.vec[2]*crossSpeed;
         }
 
         // Compute projection matrix
@@ -290,6 +290,57 @@ FreeflyCam.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setPosition : Set the freefly camera's position                       //
+    //  param x : X position of the freefly camera                            //
+    //  param y : Y position of the freefly camera                            //
+    //  param z : Z position of the freefly camera                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosition: function(x, y, z)
+    {
+        this.position.vec[0] = -x;
+        this.position.vec[1] = -y;
+        this.position.vec[2] = -z;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPositionVec3 : Set freefly camera's position from a vector         //
+    //  param vector : 3 components vector to set freefly camera position     //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec3: function(vector)
+    {
+        this.position.vec[0] = -vector.vec[0];
+        this.position.vec[1] = -vector.vec[1];
+        this.position.vec[2] = -vector.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setX : Set the freefly camera's X position                            //
+    //  param x : X position of the freefly camera                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setX: function(x)
+    {
+        this.position.vec[0] = -x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setY : Set the freefly camera's Y position                            //
+    //  param y : Y position of the freefly camera                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setY: function(y)
+    {
+        this.position.vec[1] = -y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setZ : Set the freefly camera's Z position                            //
+    //  param z : Z position of the freefly camera                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setZ: function(z)
+    {
+        this.position.vec[2] = -z;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  move : Move the freefly camera                                        //
     //  param x : Value of the translation on the X axis                      //
     //  param y : Value of the translation on the Y axis                      //
@@ -297,9 +348,9 @@ FreeflyCam.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     move: function(x, y, z)
     {
-        this.position.vec[0] += x;
-        this.position.vec[1] += y;
-        this.position.vec[2] += z;
+        this.position.vec[0] -= x;
+        this.position.vec[1] -= y;
+        this.position.vec[2] -= z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -308,9 +359,9 @@ FreeflyCam.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveVec3: function(vector)
     {
-        this.position.vec[0] += vector.vec[0];
-        this.position.vec[1] += vector.vec[1];
-        this.position.vec[2] += vector.vec[2];
+        this.position.vec[0] -= vector.vec[0];
+        this.position.vec[1] -= vector.vec[1];
+        this.position.vec[2] -= vector.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -319,7 +370,7 @@ FreeflyCam.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
-        this.position.vec[0] += x;
+        this.position.vec[0] -= x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -328,7 +379,7 @@ FreeflyCam.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
-        this.position.vec[1] += y;
+        this.position.vec[1] -= y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -337,7 +388,58 @@ FreeflyCam.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveZ: function(z)
     {
-        this.position.vec[2] += z;
+        this.position.vec[2] -= z;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngles : Set freefly camera rotation angles                        //
+    //  param angleX : Freefly camera X rotation angle to set in degrees      //
+    //  param angleY : Freefly camera Y rotation angle to set in degrees      //
+    //  param angleZ : Freefly camera Z rotation angle to set in degrees      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngles: function(angleX, angleY, angleZ)
+    {
+        this.angles.vec[0] = -angleX;
+        this.angles.vec[1] = -angleY;
+        this.angles.vec[2] = -angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAnglesVec3 : Set freefly camera rotation angles from a vector      //
+    //  param vector : 3 components vector to set rotation angles from        //
+    ////////////////////////////////////////////////////////////////////////////
+    setAnglesVec3: function(vector)
+    {
+        this.angles.vec[0] = -vector.vec[0];
+        this.angles.vec[1] = -vector.vec[1];
+        this.angles.vec[2] = -vector.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleX : Set freefly camera X rotation angle                       //
+    //  param angleX : Freefly camera X rotation angle to set in degrees      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleX: function(angleX)
+    {
+        this.angles.vec[0] = -angleX;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleY : Set freefly camera Y rotation angle                       //
+    //  param angleY : Freefly camera Y rotation angle to set in degrees      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleY: function(angleY)
+    {
+        this.angles.vec[1] = -angleY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleZ : Set freefly camera Z rotation angle                       //
+    //  param angleZ : Freefly camera Z rotation angle to set in degrees      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleZ: function(angleZ)
+    {
+        this.angles.vec[2] = -angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -346,7 +448,7 @@ FreeflyCam.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
-        this.angles.vec[0] += angleX;
+        this.angles.vec[0] -= angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -355,7 +457,7 @@ FreeflyCam.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleX)
     {
-        this.angles.vec[1] += angleY;
+        this.angles.vec[1] -= angleY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -364,7 +466,7 @@ FreeflyCam.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
-        this.angles.vec[2] += angleZ;
+        this.angles.vec[2] -= angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////

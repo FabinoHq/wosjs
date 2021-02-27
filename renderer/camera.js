@@ -101,6 +101,57 @@ Camera.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setPosition : Set the camera's position                               //
+    //  param x : X position of the camera                                    //
+    //  param y : Y position of the camera                                    //
+    //  param z : Z position of the camera                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosition: function(x, y, z)
+    {
+        this.position.vec[0] = -x;
+        this.position.vec[1] = -y;
+        this.position.vec[2] = -z;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPositionVec3 : Set camera's position from a vector                 //
+    //  param vector : 3 components vector to set camera position             //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec3: function(vector)
+    {
+        this.position.vec[0] = -vector.vec[0];
+        this.position.vec[1] = -vector.vec[1];
+        this.position.vec[2] = -vector.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setX : Set the camera's X position                                    //
+    //  param x : X position of the camera                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setX: function(x)
+    {
+        this.position.vec[0] = -x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setY : Set the camera's Y position                                    //
+    //  param y : Y position of the camera                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setY: function(y)
+    {
+        this.position.vec[1] = -y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setZ : Set the camera's Z position                                    //
+    //  param z : Z position of the camera                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setZ: function(z)
+    {
+        this.position.vec[2] = -z;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  move : Move the camera                                                //
     //  param x : Value of the translation on the X axis                      //
     //  param y : Value of the translation on the Y axis                      //
@@ -108,9 +159,9 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     move: function(x, y, z)
     {
-        this.position.vec[0] += x;
-        this.position.vec[1] += y;
-        this.position.vec[2] += z;
+        this.position.vec[0] -= x;
+        this.position.vec[1] -= y;
+        this.position.vec[2] -= z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -119,9 +170,9 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveVec3: function(vector)
     {
-        this.position.vec[0] += vector.vec[0];
-        this.position.vec[1] += vector.vec[1];
-        this.position.vec[2] += vector.vec[2];
+        this.position.vec[0] -= vector.vec[0];
+        this.position.vec[1] -= vector.vec[1];
+        this.position.vec[2] -= vector.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -130,7 +181,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
-        this.position.vec[0] += x;
+        this.position.vec[0] -= x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -139,7 +190,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
-        this.position.vec[1] += y;
+        this.position.vec[1] -= y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -148,7 +199,58 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveZ: function(z)
     {
-        this.position.vec[2] += z;
+        this.position.vec[2] -= z;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngles : Set camera rotation angles                                //
+    //  param angleX : Camera X rotation angle to set in degrees              //
+    //  param angleY : Camera Y rotation angle to set in degrees              //
+    //  param angleZ : Camera Z rotation angle to set in degrees              //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngles: function(angleX, angleY, angleZ)
+    {
+        this.angles.vec[0] = -angleX;
+        this.angles.vec[1] = -angleY;
+        this.angles.vec[2] = -angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAnglesVec3 : Set camera rotation angles from a vector              //
+    //  param vector : 3 components vector to set rotation angles from        //
+    ////////////////////////////////////////////////////////////////////////////
+    setAnglesVec3: function(vector)
+    {
+        this.angles.vec[0] = -vector.vec[0];
+        this.angles.vec[1] = -vector.vec[1];
+        this.angles.vec[2] = -vector.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleX : Set camera X rotation angle                               //
+    //  param angleX : Camera X rotation angle to set in degrees              //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleX: function(angleX)
+    {
+        this.angles.vec[0] = -angleX;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleY : Set camera Y rotation angle                               //
+    //  param angleY : Camera Y rotation angle to set in degrees              //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleY: function(angleY)
+    {
+        this.angles.vec[1] = -angleY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleZ : Set camera Z rotation angle                               //
+    //  param angleZ : Camera Z rotation angle to set in degrees              //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleZ: function(angleZ)
+    {
+        this.angles.vec[2] = -angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -157,7 +259,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
-        this.angles.vec[0] += angleX;
+        this.angles.vec[0] -= angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -166,7 +268,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleX)
     {
-        this.angles.vec[1] += angleY;
+        this.angles.vec[1] -= angleY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -175,7 +277,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
-        this.angles.vec[2] += angleZ;
+        this.angles.vec[2] -= angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////

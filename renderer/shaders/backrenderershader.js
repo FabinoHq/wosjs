@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/backrenderershader.js : Backrenderer shader management       //
+//      renderer/backrenderershader.js : Backrenderer shader                  //
 ////////////////////////////////////////////////////////////////////////////////
 
 

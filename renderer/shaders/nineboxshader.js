@@ -37,7 +37,7 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/nineboxshader.js : Ninebox shader management                 //
+//      renderer/nineboxshader.js : Ninebox shader                            //
 ////////////////////////////////////////////////////////////////////////////////
 
 
