@@ -795,13 +795,16 @@ Wos.prototype = {
         //this.testtextbox.render();
 
         // Render shadows
-        //this.shadows.clear();
+        /*if (this.renderer.maxQuality >= 1)
+        {
+            this.shadows.clear();
 
-        // Render test static mesh shadows
-        //this.staticmesh.render(0);
+            // Render test static mesh shadows
+            this.staticmesh.render(0);
 
-        // Render test skeletal mesh shadows
-        //this.skeletalmesh.render(0);
+            // Render test skeletal mesh shadows
+            this.skeletalmesh.render(0);
+        }*/
 
         // Set renderer as active
         //this.renderer.setActive();

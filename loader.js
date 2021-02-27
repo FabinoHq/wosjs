@@ -205,11 +205,14 @@ Loader.prototype = {
         }
 
         // Init static mesh shader
-        this.staticMeshShader = new Shader(this.renderer.gl);
-        if (!this.staticMeshShader.init(
-            staticMeshVertexShaderSrc, staticMeshFragmentShaderSrc))
+        if (this.renderer.maxQuality >= 1)
         {
-            return false;
+            this.staticMeshShader = new Shader(this.renderer.gl);
+            if (!this.staticMeshShader.init(
+                staticMeshVertexShaderSrc, staticMeshFragmentShaderSrc))
+            {
+                return false;
+            }
         }
 
         // Init low static mesh shader
@@ -221,11 +224,14 @@ Loader.prototype = {
         }
 
         // Init skeletal mesh shader
-        this.skeletalMeshShader = new Shader(this.renderer.gl);
-        if (!this.skeletalMeshShader.init(
-            skeletalMeshVertexShaderSrc, skeletalMeshFragmentShaderSrc))
+        if (this.renderer.maxQuality >= 1)
         {
-            return false;
+            this.skeletalMeshShader = new Shader(this.renderer.gl);
+            if (!this.skeletalMeshShader.init(
+                skeletalMeshVertexShaderSrc, skeletalMeshFragmentShaderSrc))
+            {
+                return false;
+            }
         }
 
         // Init low skeletal mesh shader

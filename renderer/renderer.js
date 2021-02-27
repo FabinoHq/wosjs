@@ -69,6 +69,13 @@ function Renderer()
     this.offCanvas = null;
     this.offContext = null;
 
+    // Max renderer quality
+    this.maxQuality = 0;
+
+    // Renderer extensions
+    this.depthTextureExt = null;
+    this.mouseLockExt = false;
+
     // Size of the renderer
     this.width = 0;
     this.height = 0;
@@ -105,8 +112,6 @@ Renderer.prototype = {
     init: function(canvas)
     {
         var i = 0;
-        var texFloatExt = 0;
-        var depthTextureExt = 0;
         
         // Reset renderer
         this.loaded = false;
@@ -115,6 +120,7 @@ Renderer.prototype = {
         this.ctx = null;
         this.offCanvas = null;
         this.offContext = null;
+        this.maxQuality = 0;
         this.width = 0;
         this.height = 0;
         this.ratio = 1.0;
@@ -165,12 +171,19 @@ Renderer.prototype = {
         if (!this.gl) return false;
 
         // Check texture float extension
-        texFloatExt = this.gl.getExtension("OES_texture_float");
-        if (!texFloatExt) return false;
+        this.texFloatExt = this.gl.getExtension("OES_texture_float");
+        if (!this.texFloatExt) return false;
 
         // Check depth texture extension
-        depthTextureExt = this.gl.getExtension("WEBGL_depth_texture");
-        if (!depthTextureExt) return false;
+        this.depthTextureExt = this.gl.getExtension("WEBGL_depth_texture");
+        if (this.depthTextureExt)
+        {
+            this.maxQuality = 1;
+        }
+        else
+        {
+            this.maxQuality = 0;
+        }
 
         // Get canvas context
         this.ctx = this.context.getContext("2d");
@@ -501,13 +514,19 @@ Renderer.prototype = {
     {
         if (lock)
         {
-            // Request pointer lock
-            this.context.requestPointerLock();
+            if (this.context.requestPointerLock)
+            {
+                // Request pointer lock
+                this.context.requestPointerLock();
+            }
         }
         else
         {
-            // Exit pointer lock
-            document.exitPointerLock();
+            if (document.exitPointerLock)
+            {
+                // Exit pointer lock
+                document.exitPointerLock();
+            }
         }
     },
 
@@ -579,6 +598,15 @@ Renderer.prototype = {
         this.offContext.font = fontsize.toString() + "px wosfont";
         textWidth = this.offContext.measureText(text).width;
         return textWidth;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getMaxQuality : Get renderer's max quality                            //
+    //  return : Maximum quality of the renderer                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getMaxQuality: function()
+    {
+        return this.maxQuality;
     },
 
     ////////////////////////////////////////////////////////////////////////////

@@ -115,6 +115,9 @@ Shadows.prototype = {
         // Check gl pointer
         if (!this.renderer.gl) return false;
 
+        // Check renderer max quality
+        if (this.renderer.maxQuality < 1) return false;
+
         // Init shadows framebuffer
         this.framebuffer = this.renderer.gl.createFramebuffer();
         if (!this.framebuffer)
@@ -252,6 +255,9 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     clear: function()
     {
+        // Check renderer max quality
+        if (this.renderer.maxQuality < 1) return;
+
         // Bind shadows framebuffer
         this.renderer.gl.bindFramebuffer(
             this.renderer.gl.FRAMEBUFFER, this.framebuffer
@@ -297,6 +303,9 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setActive: function()
     {
+        // Check renderer max quality
+        if (this.renderer.maxQuality < 1) return;
+
         // Enable depth test
         this.renderer.gl.enable(this.renderer.gl.DEPTH_TEST);
 
