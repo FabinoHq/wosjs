@@ -113,7 +113,7 @@ Shadows.prototype = {
         if (!this.renderer.gl) return false;
 
         // Check renderer max quality
-        if (this.renderer.maxQuality < 1) return false;
+        if (this.renderer.maxQuality < WOSRendererQualityHigh) return false;
 
         // Set shadows caster renderer size
         if (width !== undefined) this.width = Math.round(width);
@@ -268,7 +268,7 @@ Shadows.prototype = {
     clear: function()
     {
         // Check renderer max quality
-        if (this.renderer.maxQuality < 1) return;
+        if (this.renderer.maxQuality < WOSRendererQualityHigh) return;
 
         // Bind shadows framebuffer
         this.renderer.gl.bindFramebuffer(
@@ -316,7 +316,7 @@ Shadows.prototype = {
     setActive: function()
     {
         // Check renderer max quality
-        if (this.renderer.maxQuality < 1) return;
+        if (this.renderer.maxQuality < WOSRendererQualityHigh) return;
 
         // Enable depth test
         this.renderer.gl.enable(this.renderer.gl.DEPTH_TEST);

@@ -205,7 +205,7 @@ Loader.prototype = {
         }
 
         // Init static mesh shader
-        if (this.renderer.maxQuality >= 1)
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
         {
             this.staticMeshShader = new Shader(this.renderer.gl);
             if (!this.staticMeshShader.init(
@@ -224,7 +224,7 @@ Loader.prototype = {
         }
 
         // Init skeletal mesh shader
-        if (this.renderer.maxQuality >= 1)
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
         {
             this.skeletalMeshShader = new Shader(this.renderer.gl);
             if (!this.skeletalMeshShader.init(

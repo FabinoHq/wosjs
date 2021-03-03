@@ -795,7 +795,7 @@ Wos.prototype = {
         //this.testtextbox.render();
 
         // Render shadows
-        /*if (this.renderer.maxQuality >= 1)
+        /*if (this.renderer.maxQuality >= WOSRendererQualityHigh)
         {
             this.shadows.clear();
 
@@ -816,9 +816,9 @@ Wos.prototype = {
         //this.renderer.setCamera(this.freeflycam, this.frametime);
 
         // Render test static mesh
-        //this.staticmesh.render(1, this.shadows);
+        //this.staticmesh.render(this.renderer.quality, this.shadows);
 
         // Render test skeletal mesh
-        //this.skeletalmesh.render(1, this.shadows);
+        //this.skeletalmesh.render(this.renderer.quality, this.shadows);
     }
 };

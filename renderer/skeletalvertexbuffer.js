@@ -345,7 +345,7 @@ SkeletalVertexBuffer.prototype = {
         );
 
         // High quality
-        if (quality >= 1)
+        if (quality >= WOSRendererQualityHigh)
         {
             // Enable normals array
             this.gl.enableVertexAttribArray(shader.normalsLocation);

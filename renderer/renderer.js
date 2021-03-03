@@ -56,6 +56,12 @@ const WOSGLContextNames = [
 ////////////////////////////////////////////////////////////////////////////////
 const WOSGLMaxTextureSize = 2048;
 
+////////////////////////////////////////////////////////////////////////////////
+//  WOS Renderer quality                                                      //
+////////////////////////////////////////////////////////////////////////////////
+const WOSRendererQualityLow = 0;
+const WOSRendererQualityHigh = 1;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Renderer class definition                                                 //
@@ -74,8 +80,9 @@ function Renderer()
     this.offCanvas = null;
     this.offContext = null;
 
-    // Max renderer quality
-    this.maxQuality = 0;
+    // Renderer quality
+    this.maxQuality = WOSRendererQualityLow;
+    this.quality = WOSRendererQualityLow;
 
     // Renderer extensions
     this.depthTextureExt = null;
@@ -107,7 +114,7 @@ function Renderer()
     this.vpoffx = 0.0;
     this.vpoffy = 0.0;
 
-    // Default graphics pipeline
+    // Graphic pipeline
     this.vertexBuffer = null;
     this.shader = null;
     this.worldMatrix = new Matrix4x4();
@@ -118,6 +125,8 @@ function Renderer()
     // Lighting
     this.worldLight = null;
     this.dynamicLights = null;
+    this.normalMap = null;
+    this.specularMap = null;
 }
 
 Renderer.prototype = {
@@ -136,7 +145,8 @@ Renderer.prototype = {
         this.ctx = null;
         this.offCanvas = null;
         this.offContext = null;
-        this.maxQuality = 0;
+        this.maxQuality = WOSRendererQualityLow;
+        this.quality = WOSRendererQualityLow;
         this.width = 0;
         this.height = 0;
         this.ratio = 1.0;
@@ -152,6 +162,8 @@ Renderer.prototype = {
         this.camera = null;
         this.worldLight = null;
         this.dynamicLights = null;
+        this.normalMap = null;
+        this.specularMap = null;
 
         // Get html canvas
         this.context = document.getElementById(canvas);
@@ -206,11 +218,11 @@ Renderer.prototype = {
         this.depthTextureExt = this.gl.getExtension("WEBGL_depth_texture");
         if (this.depthTextureExt)
         {
-            this.maxQuality = 1;
+            this.maxQuality = WOSRendererQualityHigh;
         }
         else
         {
-            this.maxQuality = 0;
+            this.maxQuality = WOSRendererQualityLow;
         }
 
         // Check max texture units
@@ -235,7 +247,7 @@ Renderer.prototype = {
             (this.maxCombTextureUnits < 7))
         {
             // Not enough texture units for maximum quality
-            this.maxQuality = 0;
+            this.maxQuality = WOSRendererQualityLow;
         }
 
         // Check max texture size
@@ -255,6 +267,9 @@ Renderer.prototype = {
             // Not enough vertex attribs
             return false;
         }
+
+        // Set default renderer quality
+        this.quality = this.maxQuality;
 
         // Get canvas context
         this.ctx = this.context.getContext("2d");
@@ -379,6 +394,14 @@ Renderer.prototype = {
         this.dynamicLights = new DynamicLights(this);
         this.dynamicLights.init();
 
+        // Init default normal map
+        this.normalMap = new Texture(this);
+        this.normalMap.init(1, 1, new Uint8Array([128, 128, 255, 255]));
+
+        // Init default specular map
+        this.specularMap = new Texture(this);
+        this.specularMap.init(1, 1, new Uint8Array([255, 255, 255, 255]));
+
         // Renderer is successfully loaded
         this.loaded = true;
         return true;
@@ -452,6 +475,15 @@ Renderer.prototype = {
 
         // Set default view
         this.setDefaultView();
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setQuality : Set renderer current quality                             //
+    //  param quality : Current renderer quality to set                       //
+    ////////////////////////////////////////////////////////////////////////////
+    setQuality: function(quality)
+    {
+        this.quality = quality;
     },
 
     ////////////////////////////////////////////////////////////////////////////

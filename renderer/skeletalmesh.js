@@ -116,8 +116,6 @@ function SkeletalMesh(renderer, skeletalShader, skeletalShaderLow)
     this.alpha = 1.0;
     // Static mesh specularity
     this.specularity = 0.0;
-
-    this.test = 0.0;
 }
 
 SkeletalMesh.prototype = {
@@ -178,7 +176,7 @@ SkeletalMesh.prototype = {
         if (!this.skeletalShaderLow) return false;
 
         // Get skeletal mesh shader uniforms locations
-        if (this.renderer.maxQuality >= 1)
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
         {
             // Check skeletal mesh shader pointer
             if (!this.skeletalShader) return false;
@@ -332,12 +330,10 @@ SkeletalMesh.prototype = {
         if (!this.texture) return false;
 
         // Set default normal map
-        this.normalMap = new Texture(this.renderer);
-        this.normalMap.init(1, 1, new Uint8Array([128, 128, 255, 255]));
+        this.normalMap = this.renderer.normalMap;
 
         // Set default specular map
-        this.specularMap = new Texture(this.renderer);
-        this.specularMap.init(1, 1, new Uint8Array([255, 255, 255, 255]));
+        this.specularMap = this.renderer.specularMap;
 
         // Skeletal mesh loaded
         return true;
@@ -643,7 +639,6 @@ SkeletalMesh.prototype = {
     {
         var i = 0;
         var tmpMat = new Matrix4x4();
-        this.test += frametime;
 
         for (i = 0; i < this.bonesCount; ++i)
         {
@@ -654,11 +649,6 @@ SkeletalMesh.prototype = {
             );
             this.bonesMatrices[i].translateVec3(this.bonesPositions[i]);
             this.bonesMatrices[i].rotateVec3(this.bonesAngles[i]);
-
-            if (i == 0)
-            {
-                this.bonesMatrices[i].rotateX(this.test*8.0);
-            }
 
             // Multiply bone matrix by inverse bind pose matrix
             tmpMat.setMatrix(this.bonesMatrices[i]);
@@ -724,11 +714,11 @@ SkeletalMesh.prototype = {
         }
         if (!shadows)
         {
-            quality = 0;
+            quality = WOSRendererQualityLow;
         }
 
         // Render skeletal mesh
-        if (quality == 0)
+        if (quality == WOSRendererQualityLow)
         {
             // Low quality
             this.skeletalShaderLow.bind();
