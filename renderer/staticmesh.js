@@ -58,6 +58,8 @@ function StaticMesh(renderer, meshShader, meshShaderLow)
 
     // Static mesh shader uniforms locations
     this.shadowsTextureLocation = -1;
+    this.normalMapLocation = -1;
+    this.specularMapLocation = -1;
     this.cameraPosLocation = -1;
     this.lightsCountLocation = -1;
     this.lightsTextureLocation = -1;
@@ -74,6 +76,10 @@ function StaticMesh(renderer, meshShader, meshShaderLow)
 
     // Static mesh texture
     this.texture = null;
+    // Static mesh normal map
+    this.normalMap = null;
+    // Static mesh specular map
+    this.specularMap = null;
     // Static mesh model matrix
     this.modelMatrix = new Matrix4x4();
     // Static mesh shadows matrix
@@ -100,7 +106,9 @@ StaticMesh.prototype = {
     init: function(model, texture)
     {
         // Reset static mesh
-        this.shadowsMatrixLocation = -1;
+        this.shadowsTextureLocation = -1;
+        this.normalMapLocation = -1;
+        this.specularMapLocation = -1;
         this.cameraPosLocation = -1;
         this.lightsCountLocation = -1;
         this.lightsTextureLocation = -1;
@@ -113,6 +121,8 @@ StaticMesh.prototype = {
         this.alphaUniformLow = -1;
         this.vertexBuffer = null;
         this.texture = null;
+        this.normalMap = null;
+        this.specularMap = null;
         this.modelMatrix.setIdentity();
         this.position.reset();
         this.angles.reset();
@@ -151,6 +161,12 @@ StaticMesh.prototype = {
                 "shadowsTexture"
             );
             this.meshShader.sendIntUniform(this.shadowsTextureLocation, 2);
+            this.normalMapLocation = this.meshShader.getUniform("normalMap");
+            this.meshShader.sendIntUniform(this.normalMapLocation, 3);
+            this.specularMapLocation = this.meshShader.getUniform(
+                "specularMap"
+            );
+            this.meshShader.sendIntUniform(this.specularMapLocation, 4);
             this.worldLightVecUniform =
                 this.meshShader.getUniform("worldLightVec");
             this.worldLightColorUniform =
@@ -195,8 +211,40 @@ StaticMesh.prototype = {
         this.texture = texture;
         if (!this.texture) return false;
 
+        // Set default normal map
+        this.normalMap = new Texture(this.renderer);
+        this.normalMap.init(1, 1, new Uint8Array([128, 128, 255, 255]));
+
+        // Set default specular map
+        this.specularMap = new Texture(this.renderer);
+        this.specularMap.init(1, 1, new Uint8Array([255, 255, 255, 255]));
+
         // Static mesh loaded
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setNormalMap : Set static mesh normal map                             //
+    //  param normalMap : Static mesh normal map                              //
+    ////////////////////////////////////////////////////////////////////////////
+    setNormalMap: function(normalMap)
+    {
+        if (normalMap)
+        {
+            this.normalMap = normalMap;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSpecularMap : Set static mesh specular map                         //
+    //  param specularMap : Static mesh specular map                          //
+    ////////////////////////////////////////////////////////////////////////////
+    setSpecularMap: function(specularMap)
+    {
+        if (specularMap)
+        {
+            this.specularMap = specularMap;
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -511,7 +559,7 @@ StaticMesh.prototype = {
 
             // Render VBO
             this.vertexBuffer.bind();
-            this.vertexBuffer.render(this.meshShaderLow);
+            this.vertexBuffer.render(this.meshShaderLow, quality);
             this.vertexBuffer.unbind();
 
             // Unbind texture
@@ -568,13 +616,27 @@ StaticMesh.prototype = {
                 this.renderer.gl.TEXTURE_2D,
                 shadows.depthTexture
             );
+            if (this.normalMap)
+            {
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
+                this.normalMap.bind();
+            }
+            if (this.specularMap)
+            {
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
+                this.specularMap.bind();
+            }
 
             // Render VBO
             this.vertexBuffer.bind();
-            this.vertexBuffer.render(this.meshShader);
+            this.vertexBuffer.render(this.meshShader, quality);
             this.vertexBuffer.unbind();
 
             // Unbind textures
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
             this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);

@@ -58,6 +58,8 @@ function SkeletalMesh(renderer, skeletalShader, skeletalShaderLow)
 
     // Skeletal mesh shader uniforms locations
     this.shadowsTextureLocation = -1;
+    this.normalMapLocation = -1;
+    this.specularMapLocation = -1;
     this.cameraPosLocation = -1;
     this.lightsCountLocation = -1;
     this.bonesMatricesLocation = -1;
@@ -78,6 +80,10 @@ function SkeletalMesh(renderer, skeletalShader, skeletalShaderLow)
 
     // Skeletal mesh texture
     this.texture = null;
+    // Skeletal mesh normal map
+    this.normalMap = null;
+    // Skeletal mesh specular map
+    this.specularMap = null;
     // Skeletal mesh model matrix
     this.modelMatrix = new Matrix4x4();
     // Skeletal mesh shadows matrix
@@ -110,6 +116,8 @@ function SkeletalMesh(renderer, skeletalShader, skeletalShaderLow)
     this.alpha = 1.0;
     // Static mesh specularity
     this.specularity = 0.0;
+
+    this.test = 0.0;
 }
 
 SkeletalMesh.prototype = {
@@ -124,6 +132,8 @@ SkeletalMesh.prototype = {
 
         // Reset skeletal mesh
         this.shadowsTextureLocation = -1;
+        this.normalMapLocation = -1;
+        this.specularMapLocation = -1;
         this.cameraPosLocation = -1;
         this.lightsCountLocation = -1;
         this.bonesMatricesLocation = -1;
@@ -140,6 +150,8 @@ SkeletalMesh.prototype = {
         this.alphaUniformLow = -1;
         this.vertexBuffer = null;
         this.texture = null;
+        this.normalMap = null;
+        this.specularMap = null;
         this.modelMatrix.setIdentity();
         this.shadowsMatrix.setIdentity();
         this.bonesCount = 0;
@@ -196,6 +208,14 @@ SkeletalMesh.prototype = {
                 "shadowsTexture"
             );
             this.skeletalShader.sendIntUniform(this.shadowsTextureLocation, 3);
+            this.normalMapLocation = this.skeletalShader.getUniform(
+                "normalMap"
+            );
+            this.skeletalShader.sendIntUniform(this.normalMapLocation, 4);
+            this.specularMapLocation = this.skeletalShader.getUniform(
+                "specularMap"
+            );
+            this.skeletalShader.sendIntUniform(this.specularMapLocation, 5);
             this.worldLightVecUniform =
                 this.skeletalShader.getUniform("worldLightVec");
             this.worldLightColorUniform =
@@ -311,8 +331,40 @@ SkeletalMesh.prototype = {
         this.texture = texture;
         if (!this.texture) return false;
 
+        // Set default normal map
+        this.normalMap = new Texture(this.renderer);
+        this.normalMap.init(1, 1, new Uint8Array([128, 128, 255, 255]));
+
+        // Set default specular map
+        this.specularMap = new Texture(this.renderer);
+        this.specularMap.init(1, 1, new Uint8Array([255, 255, 255, 255]));
+
         // Skeletal mesh loaded
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setNormalMap : Set skeletal mesh normal map                           //
+    //  param normalMap : Skeletal mesh normal map                            //
+    ////////////////////////////////////////////////////////////////////////////
+    setNormalMap: function(normalMap)
+    {
+        if (normalMap)
+        {
+            this.normalMap = normalMap;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSpecularMap : Set skeletal mesh specular map                       //
+    //  param specularMap : Skeletal mesh specular map                        //
+    ////////////////////////////////////////////////////////////////////////////
+    setSpecularMap: function(specularMap)
+    {
+        if (specularMap)
+        {
+            this.specularMap = specularMap;
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -591,6 +643,7 @@ SkeletalMesh.prototype = {
     {
         var i = 0;
         var tmpMat = new Matrix4x4();
+        this.test += frametime;
 
         for (i = 0; i < this.bonesCount; ++i)
         {
@@ -601,6 +654,11 @@ SkeletalMesh.prototype = {
             );
             this.bonesMatrices[i].translateVec3(this.bonesPositions[i]);
             this.bonesMatrices[i].rotateVec3(this.bonesAngles[i]);
+
+            if (i == 0)
+            {
+                this.bonesMatrices[i].rotateX(this.test*8.0);
+            }
 
             // Multiply bone matrix by inverse bind pose matrix
             tmpMat.setMatrix(this.bonesMatrices[i]);
@@ -694,7 +752,7 @@ SkeletalMesh.prototype = {
 
             // Render VBO
             this.vertexBuffer.bind();
-            this.vertexBuffer.render(this.skeletalShaderLow);
+            this.vertexBuffer.render(this.skeletalShaderLow, quality);
             this.vertexBuffer.unbind();
 
             // Unbind textures
@@ -761,13 +819,21 @@ SkeletalMesh.prototype = {
                 this.renderer.gl.TEXTURE_2D,
                 shadows.depthTexture
             );
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
+            this.normalMap.bind();
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE5);
+            this.specularMap.bind();
 
             // Render VBO
             this.vertexBuffer.bind();
-            this.vertexBuffer.render(this.skeletalShader);
+            this.vertexBuffer.render(this.skeletalShader, quality);
             this.vertexBuffer.unbind();
 
             // Unbind textures
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE5);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
             this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);

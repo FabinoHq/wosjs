@@ -95,10 +95,7 @@ BackRenderer.prototype = {
         // Reset background renderer
         this.width = 0;
         this.height = 0;
-        if (width !== undefined) this.width = Math.round(width);
-        if (height !== undefined) this.height = Math.round(height);
         this.ratio = 1.0;
-        if (this.height > 0.0) this.ratio = this.width/this.height;
         this.framebuffer = null;
         this.depthbuffer = null;
         this.texture = null;
@@ -116,6 +113,21 @@ BackRenderer.prototype = {
 
         // Check background renderer shader pointer
         if (!this.backrendererShader) return false;
+
+        // Set background renderer size
+        if (width !== undefined) this.width = Math.round(width);
+        if (height !== undefined) this.height = Math.round(height);
+        if (this.width <= 1) { this.width = 1; }
+        if (this.width >= WOSGLMaxTextureSize)
+        {
+            this.width = WOSGLMaxTextureSize;
+        }
+        if (this.height <= 1) { this.height = 1; }
+        if (this.height >= WOSGLMaxTextureSize)
+        {
+            this.height = WOSGLMaxTextureSize;
+        }
+        if (this.height > 0.0) this.ratio = this.width/this.height;
 
         // Get background renderer shader uniforms locations
         this.backrendererShader.bind();

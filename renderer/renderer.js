@@ -51,6 +51,11 @@ const WOSGLContextNames = [
     "moz-webgl"
 ];
 
+////////////////////////////////////////////////////////////////////////////////
+//  WOS WebGL maximum texture size                                            //
+////////////////////////////////////////////////////////////////////////////////
+const WOSGLMaxTextureSize = 2048;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Renderer class definition                                                 //
@@ -75,6 +80,17 @@ function Renderer()
     // Renderer extensions
     this.depthTextureExt = null;
     this.mouseLockExt = false;
+
+    // Max texture units
+    this.maxTextureUnits = 0;
+    this.maxVertTextureUnits = 0;
+    this.maxCombTextureUnits = 0;
+
+    // Max texture size
+    this.maxTextureSize = 0;
+
+    // Max vertex attribs
+    this.maxVertexAttribs = 0;
 
     // Size of the renderer
     this.width = 0;
@@ -112,7 +128,7 @@ Renderer.prototype = {
     init: function(canvas)
     {
         var i = 0;
-        
+
         // Reset renderer
         this.loaded = false;
         this.gl = null;
@@ -141,7 +157,11 @@ Renderer.prototype = {
         this.context = document.getElementById(canvas);
 
         // Check context
-        if (!this.context) return false;
+        if (!this.context)
+        {
+            // Invalid canvas context
+            return false;
+        }
 
         // Check rendering context
         if (!window.WebGLRenderingContext) return false;
@@ -167,12 +187,20 @@ Renderer.prototype = {
             }
         }
 
-        // No valid context found
-        if (!this.gl) return false;
+        // Check if context is valid
+        if (!this.gl)
+        {
+            // No valid context found
+            return false;
+        }
 
         // Check texture float extension
         this.texFloatExt = this.gl.getExtension("OES_texture_float");
-        if (!this.texFloatExt) return false;
+        if (!this.texFloatExt)
+        {
+            // Texture float extension is not supported
+            return false;
+        }
 
         // Check depth texture extension
         this.depthTextureExt = this.gl.getExtension("WEBGL_depth_texture");
@@ -183,6 +211,49 @@ Renderer.prototype = {
         else
         {
             this.maxQuality = 0;
+        }
+
+        // Check max texture units
+        this.maxTextureUnits = this.gl.getParameter(
+            this.gl.MAX_TEXTURE_IMAGE_UNITS
+        );
+        this.maxVertTextureUnits = this.gl.getParameter(
+            this.gl.MAX_VERTEX_TEXTURE_IMAGE_UNITS
+        );
+        this.maxCombTextureUnits = this.gl.getParameter(
+            this.gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS
+        );
+
+        if ((this.maxTextureUnits < 1) || (this.maxVertTextureUnits < 1) ||
+            (this.maxCombTextureUnits < 2))
+        {
+            // Not enough texture units
+            return false;
+        }
+
+        if ((this.maxTextureUnits < 2) || (this.maxVertTextureUnits < 5) ||
+            (this.maxCombTextureUnits < 7))
+        {
+            // Not enough texture units for maximum quality
+            this.maxQuality = 0;
+        }
+
+        // Check max texture size
+        this.maxTextureSize = this.gl.getParameter(this.gl.MAX_TEXTURE_SIZE);
+        if (this.maxTextureSize < WOSGLMaxTextureSize)
+        {
+            // Invalid maximum texture size
+            return false;
+        }
+
+        // Check max vertex attribs
+        this.maxVertexAttribs = this.gl.getParameter(
+            this.gl.MAX_VERTEX_ATTRIBS
+        );
+        if (this.maxVertexAttribs < 6)
+        {
+            // Not enough vertex attribs
+            return false;
         }
 
         // Get canvas context
@@ -262,6 +333,11 @@ Renderer.prototype = {
         this.gl.viewport(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
         this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
         this.gl.disable(this.gl.SCISSOR_TEST);
+
+        // Disable face culling
+        this.gl.disable(this.gl.CULL_FACE);
+        this.gl.frontFace(this.gl.CCW);
+        this.gl.cullFace(this.gl.BACK);
 
         // Disable dithering
         this.gl.disable(this.gl.DITHER);
@@ -478,6 +554,24 @@ Renderer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setDepthTesting : Set renderer depth testing state                    //
+    //  param depthTesting : Renderer depth testing state to set              //
+    ////////////////////////////////////////////////////////////////////////////
+    setDepthTesting: function(depthTesting)
+    {
+        if (depthTesting)
+        {
+            // Enable depth buffer
+            this.gl.enable(this.gl.DEPTH_TEST);
+        }
+        else
+        {
+            // Disable depth buffer
+            this.gl.disable(this.gl.DEPTH_TEST);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  handleOnResize : Handle render zone resize                            //
     ////////////////////////////////////////////////////////////////////////////
     handleOnResize: function()
@@ -547,6 +641,18 @@ Renderer.prototype = {
         this.offCanvas.width = Math.round(width);
         this.offCanvas.height = Math.round(height);
 
+        // Clamp canvas size
+        if (this.offCanvas.width <= 1) { this.offCanvas.width = 1; }
+        if (this.offCanvas.width >= WOSGLMaxTextureSize)
+        {
+            this.offCanvas.width = WOSGLMaxTextureSize;
+        }
+        if (this.offCanvas.height <= 1) { this.offCanvas.height = 1; }
+        if (this.offCanvas.height >= WOSGLMaxTextureSize)
+        {
+            this.offCanvas.height = WOSGLMaxTextureSize;
+        }
+
         // Draw text
         this.offContext.font = fontsize.toString() + "px wosfont";
         this.offContext.fillText(text, 0, (0.84*fontsize));
@@ -574,6 +680,18 @@ Renderer.prototype = {
         // Update offscreen canvas size
         this.offCanvas.width = Math.round(width);
         this.offCanvas.height = Math.round(height);
+
+        // Clamp canvas size
+        if (this.offCanvas.width <= 1) { this.offCanvas.width = 1; }
+        if (this.offCanvas.width >= WOSGLMaxTextureSize)
+        {
+            this.offCanvas.width = WOSGLMaxTextureSize;
+        }
+        if (this.offCanvas.height <= 1) { this.offCanvas.height = 1; }
+        if (this.offCanvas.height >= WOSGLMaxTextureSize)
+        {
+            this.offCanvas.height = WOSGLMaxTextureSize;
+        }
 
         // Create image context
         this.offContext.drawImage(image, 0, 0);

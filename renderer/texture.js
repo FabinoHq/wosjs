@@ -68,6 +68,86 @@ function Texture(renderer)
 
 Texture.prototype = {
     ////////////////////////////////////////////////////////////////////////////
+    //  init : Init default 1x1 texture                                       //
+    //  param width : Texture width                                           //
+    //  param height : Texture height                                         //
+    //  param data : Texture data                                             //
+    ////////////////////////////////////////////////////////////////////////////
+    init: function(width, height, data)
+    {
+        // Reset texture
+        this.loaded = false;
+        this.tex = null;
+        this.width = 0;
+        this.height = 0;
+        this.smooth = false;
+
+        // Check renderer pointer
+        if (!this.renderer) return false;
+
+        // Check gl pointer
+        if (!this.renderer.gl) return false;
+
+        // Check data pointer
+        if (!data) return false;
+
+        // Set texture size
+        if (width !== undefined) this.width = width;
+        if (height !== undefined) this.height = height;
+
+        // Check texture size
+        if (this.width <= 0) return false;
+        if (this.width > WOSGLMaxTextureSize) return false;
+        if (this.height <= 0) return false;
+        if (this.height > WOSGLMaxTextureSize) return false;
+
+        // Create texture
+        this.tex = this.renderer.gl.createTexture();
+        if (!this.tex)
+        {
+            // Could not create texture
+            return false;
+        }
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.tex);
+        this.renderer.gl.texImage2D(
+            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
+            this.width, this.height, 0, this.renderer.gl.RGBA,
+            this.renderer.gl.UNSIGNED_BYTE, data
+        );
+
+        // Set texture wrap mode
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_WRAP_S,
+            this.renderer.gl.CLAMP_TO_EDGE
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_WRAP_T,
+            this.renderer.gl.CLAMP_TO_EDGE
+        );
+
+        // Set texture min and mag filters
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_MIN_FILTER,
+            this.renderer.gl.NEAREST
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_MAG_FILTER,
+            this.renderer.gl.NEAREST
+        );
+
+        // Unbind texture
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+
+        // Texture successfully loaded
+        this.loaded = true;
+        return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  load : Load texture                                                   //
     //  param src : URL of the source image                                   //
     //  param smooth : Texture smooth attribute                               //
@@ -142,6 +222,12 @@ Texture.prototype = {
     handleImageLoaded: function()
     {
         var pixelsData = null;
+
+        // Check texture size
+        if (this.image.width <= 0) return;
+        if (this.image.width > WOSGLMaxTextureSize) return;
+        if (this.image.height <= 0) return;
+        if (this.image.height > WOSGLMaxTextureSize) return;
 
         // Bind texture
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.tex);
@@ -244,7 +330,17 @@ Texture.prototype = {
     //  param smooth : Texture smooth attribute                               //
     ////////////////////////////////////////////////////////////////////////////
     setSmooth: function(smooth)
-    {        
+    {
+        // Set texture smooth attribute
+        if (smooth)
+        {
+            this.smooth = true;
+        }
+        else
+        {
+            this.smooth = false;
+        }
+
         if (this.loaded)
         {
             // Bind texture

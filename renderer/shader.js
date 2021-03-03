@@ -63,6 +63,7 @@ function Shader(glPointer)
     this.vertexLocation = -1;
     this.texCoordsLocation = -1;
     this.normalsLocation = -1;
+    this.tangentsLocation = -1;
     this.bonesIndicesLocation = -1;
     this.bonesWeightsLocation = -1;
 
@@ -89,6 +90,7 @@ Shader.prototype = {
         this.vertexLocation = -1;
         this.texCoordsLocation = -1;
         this.normalsLocation = -1;
+        this.tangentsLocation = -1;
         this.textureLocation = -1;
         this.worldMatrixLocation = -1;
         this.modelMatrixLocation = -1;
@@ -206,6 +208,11 @@ Shader.prototype = {
         // Get normals attribute location
         this.normalsLocation = this.gl.getAttribLocation(
             this.shaderProgram, "vertexNorm"
+        );
+
+        // Get tangents attribute location
+        this.tangentsLocation = this.gl.getAttribLocation(
+            this.shaderProgram, "vertexTan"
         );
 
         // Get bones indices attribute location
