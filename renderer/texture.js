@@ -380,6 +380,51 @@ Texture.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  generateMipmap : Generate texture mipmap                              //
+    ////////////////////////////////////////////////////////////////////////////
+    generateMipmap: function()
+    {
+        if (this.loaded)
+        {
+            // Generate mipmap
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.tex);
+            this.renderer.gl.generateMipmap(this.renderer.gl.TEXTURE_2D);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAnisotropy : Set texture anisotropic filter                        //
+    //  param anisotropy : Texture anisotropic filter value                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setAnisotropy: function(anisotropy)
+    {
+        if (this.loaded)
+        {
+            if (this.renderer.maxTexAnisotropy > 0)
+            {
+                // Clamp texture anisotropy
+                if (anisotropy >= this.renderer.maxTexAnisotropy)
+                {
+                    anisotropy = this.renderer.maxTexAnisotropy;
+                }
+
+                // Set texture anisotropic filter
+                this.renderer.gl.bindTexture(
+                    this.renderer.gl.TEXTURE_2D, this.tex
+                );
+                this.renderer.gl.texParameterf(
+                    this.renderer.gl.TEXTURE_2D,
+                    this.renderer.texFilterAnisotropic.
+                    TEXTURE_MAX_ANISOTROPY_EXT,
+                    this.renderer.maxTexAnisotropy
+                );
+                this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+            }
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  getWidth : Get texture width                                          //
     //  return : Width of the texture                                         //
     ////////////////////////////////////////////////////////////////////////////

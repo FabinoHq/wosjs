@@ -85,8 +85,9 @@ function Renderer()
     this.quality = WOSRendererQualityLow;
 
     // Renderer extensions
+    this.texFloatExt = null;
     this.depthTextureExt = null;
-    this.mouseLockExt = false;
+    this.texFilterAnisotropic = null;
 
     // Max texture units
     this.maxTextureUnits = 0;
@@ -95,6 +96,10 @@ function Renderer()
 
     // Max texture size
     this.maxTextureSize = 0;
+
+    // Renderer texture anisotropic filter
+    this.maxTexAnisotropy = 0;
+    this.texAnisotropy = 0;
 
     // Max vertex attribs
     this.maxVertexAttribs = 0;
@@ -147,6 +152,16 @@ Renderer.prototype = {
         this.offContext = null;
         this.maxQuality = WOSRendererQualityLow;
         this.quality = WOSRendererQualityLow;
+        this.texFloatExt = null;
+        this.depthTextureExt = null;
+        this.texFilterAnisotropic = null;
+        this.maxTextureUnits = 0;
+        this.maxVertTextureUnits = 0;
+        this.maxCombTextureUnits = 0;
+        this.maxTextureSize = 0;
+        this.maxTexAnisotropy = 0;
+        this.texAnisotropy = 0;
+        this.maxVertexAttribs = 0;
         this.width = 0;
         this.height = 0;
         this.ratio = 1.0;
@@ -223,6 +238,19 @@ Renderer.prototype = {
         else
         {
             this.maxQuality = WOSRendererQualityLow;
+        }
+
+        // Check anisotropic texture filter extension
+        this.texFilterAnisotropic = (
+            this.gl.getExtension("EXT_texture_filter_anisotropic") ||
+            this.gl.getExtension("MOZ_EXT_texture_filter_anisotropic") ||
+            this.gl.getExtension("WEBKIT_EXT_texture_filter_anisotropic")
+        );
+        if (this.texFilterAnisotropic)
+        {
+            this.maxTexAnisotropy = this.gl.getParameter(
+                this.texFilterAnisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT
+            );
         }
 
         // Check max texture units
