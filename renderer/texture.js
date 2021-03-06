@@ -404,6 +404,10 @@ Texture.prototype = {
             if (this.renderer.maxTexAnisotropy > 0)
             {
                 // Clamp texture anisotropy
+                if (anisotropy <= 1)
+                {
+                    anisotropy = 1;
+                }
                 if (anisotropy >= this.renderer.maxTexAnisotropy)
                 {
                     anisotropy = this.renderer.maxTexAnisotropy;
@@ -417,7 +421,7 @@ Texture.prototype = {
                     this.renderer.gl.TEXTURE_2D,
                     this.renderer.texFilterAnisotropic.
                     TEXTURE_MAX_ANISOTROPY_EXT,
-                    this.renderer.maxTexAnisotropy
+                    anisotropy
                 );
                 this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
             }

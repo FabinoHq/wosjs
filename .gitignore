@@ -65,8 +65,10 @@
 !renderer/shaders/togglebuttonshader.js
 !renderer/shaders/textshader.js
 !renderer/shaders/staticmeshshader.js
+!renderer/shaders/staticmeshshadermedium.js
 !renderer/shaders/staticmeshshaderlow.js
 !renderer/shaders/skeletalmeshshader.js
+!renderer/shaders/skeletalmeshshadermedium.js
 !renderer/shaders/skeletalmeshshaderlow.js
 
 !interface/

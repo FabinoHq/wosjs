@@ -490,6 +490,7 @@ Wos.prototype = {
         this.staticmesh = new StaticMesh(
             this.renderer,
             this.loader.staticMeshShader,
+            this.loader.staticMeshShaderMedium,
             this.loader.staticMeshShaderLow
         );
         this.staticmesh.init(
@@ -501,6 +502,7 @@ Wos.prototype = {
         this.skeletalmesh = new SkeletalMesh(
             this.renderer,
             this.loader.skeletalMeshShader,
+            this.loader.skeletalMeshShaderMedium,
             this.loader.skeletalMeshShaderLow
         );
         this.skeletalmesh.init(

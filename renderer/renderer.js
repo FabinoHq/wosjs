@@ -60,7 +60,8 @@ const WOSGLMaxTextureSize = 2048;
 //  WOS Renderer quality                                                      //
 ////////////////////////////////////////////////////////////////////////////////
 const WOSRendererQualityLow = 0;
-const WOSRendererQualityHigh = 1;
+const WOSRendererQualityMedium = 1;
+const WOSRendererQualityHigh = 2;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -221,6 +222,12 @@ Renderer.prototype = {
             return false;
         }
 
+        // Set context pointer lock function
+        this.context.requestPointerLock =
+            this.context.requestPointerLock ||
+            this.context.mozRequestPointerLock ||
+            this.context.webkitRequestPointerLock;
+
         // Check texture float extension
         this.texFloatExt = this.gl.getExtension("OES_texture_float");
         if (!this.texFloatExt)
@@ -237,7 +244,7 @@ Renderer.prototype = {
         }
         else
         {
-            this.maxQuality = WOSRendererQualityLow;
+            this.maxQuality = WOSRendererQualityMedium;
         }
 
         // Check anisotropic texture filter extension
@@ -252,6 +259,7 @@ Renderer.prototype = {
                 this.texFilterAnisotropic.MAX_TEXTURE_MAX_ANISOTROPY_EXT
             );
         }
+        this.texAnisotropy = this.maxTexAnisotropy;
 
         // Check max texture units
         this.maxTextureUnits = this.gl.getParameter(
@@ -271,11 +279,21 @@ Renderer.prototype = {
             return false;
         }
 
+        if ((this.maxTextureUnits < 2) || (this.maxVertTextureUnits < 2) ||
+            (this.maxCombTextureUnits < 4))
+        {
+            // Not enough texture units for medium quality
+            this.maxQuality = WOSRendererQualityLow;
+        }
+
         if ((this.maxTextureUnits < 2) || (this.maxVertTextureUnits < 5) ||
             (this.maxCombTextureUnits < 7))
         {
-            // Not enough texture units for maximum quality
-            this.maxQuality = WOSRendererQualityLow;
+            // Not enough texture units for high quality
+            if (this.maxQuality >= WOSRendererQualityMedium)
+            {
+                this.maxQuality = WOSRendererQualityMedium;
+            }
         }
 
         // Check max texture size
@@ -290,10 +308,25 @@ Renderer.prototype = {
         this.maxVertexAttribs = this.gl.getParameter(
             this.gl.MAX_VERTEX_ATTRIBS
         );
-        if (this.maxVertexAttribs < 6)
+        if (this.maxVertexAttribs < 4)
         {
             // Not enough vertex attribs
             return false;
+        }
+
+        if (this.maxVertexAttribs < 5)
+        {
+            // Not enough vertex attribs for medium quality
+            this.maxQuality = WOSRendererQualityLow;
+        }
+
+        if (this.maxVertexAttribs < 6)
+        {
+            // Not enough vertex attribs for high quality
+            if (this.maxQuality >= WOSRendererQualityMedium)
+            {
+                this.maxQuality = WOSRendererQualityMedium;
+            }
         }
 
         // Set default renderer quality
@@ -301,12 +334,6 @@ Renderer.prototype = {
 
         // Get canvas context
         this.ctx = this.context.getContext("2d");
-
-        // Set context pointer lock function
-        this.context.requestPointerLock =
-            this.context.requestPointerLock ||
-            this.context.mozRequestPointerLock ||
-            this.context.webkitRequestPointerLock;
 
         // Init context handlers
         this.context.addEventListener(

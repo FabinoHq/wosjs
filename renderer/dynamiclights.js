@@ -44,7 +44,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  WOS Max dynamic lights                                                    //
 ////////////////////////////////////////////////////////////////////////////////
-const WOSMaxDynamicLights = 8;
+const WOSMaxPointLights = 4;
+const WOSMaxSpotLights = 4;
+const WOSMaxDynamicLights = WOSMaxPointLights+WOSMaxSpotLights;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -56,12 +58,12 @@ function DynamicLights(renderer)
     // Renderer pointer
     this.renderer = renderer;
 
-    // Dynamic lights count
-    this.lightsCount = 0;
     // Point lights
     this.pointLights = null;
+    this.pointLightsCount = 0;
     // Spot lights
     this.spotLights = null;
+    this.spotLightsCount = 0;
     // Dynamic lights texture
     this.lightsTexture = null;
     // Dynamic lights array
@@ -74,10 +76,13 @@ DynamicLights.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
+        var i = 0;
+
         // Reset dynamic lights
-        this.lightsCount = 0;
         this.pointLights = null;
+        this.pointLightsCount = 0;
         this.spotLights = null;
+        this.spotLightsCount = 0;
         this.lightsTexture = null;
         this.lightsArray = null;
 
@@ -88,10 +93,18 @@ DynamicLights.prototype = {
         if (!this.renderer.gl) return false;
 
         // Create point lights array
-        this.pointLights = new Array();
+        this.pointLights = new Array(WOSMaxPointLights);
+        for (i = 0; i < WOSMaxPointLights; ++i)
+        {
+            this.pointLights[i] = new PointLight();
+        }
 
         // Create spot lights array
-        this.spotLights = new Array();
+        this.spotLights = new Array(WOSMaxSpotLights);
+        for (i = 0; i < WOSMaxSpotLights; ++i)
+        {
+            this.spotLights[i] = new SpotLight();
+        }
 
         // Create dynamic lights texture
         this.lightsTexture = this.renderer.gl.createTexture();
@@ -121,7 +134,26 @@ DynamicLights.prototype = {
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
         // Create lights array
-        this.lightsArray = new GLArrayDataType();
+        this.lightsArray = new GLArrayDataType(WOSMaxDynamicLights*16);
+        for (i = 0; i < WOSMaxDynamicLights; ++i)
+        {
+            this.lightsArray[(i*16)] = 0.0;
+            this.lightsArray[(i*16)+1] = 0.0;
+            this.lightsArray[(i*16)+2] = 0.0;
+            this.lightsArray[(i*16)+3] = 0.0;
+            this.lightsArray[(i*16)+4] = 0.0;
+            this.lightsArray[(i*16)+5] = 0.0;
+            this.lightsArray[(i*16)+6] = 0.0;
+            this.lightsArray[(i*16)+7] = 0.0;
+            this.lightsArray[(i*16)+8] = 0.0;
+            this.lightsArray[(i*16)+9] = 0.0;
+            this.lightsArray[(i*16)+10] = 0.0;
+            this.lightsArray[(i*16)+11] = 0.0;
+            this.lightsArray[(i*16)+12] = 0.0;
+            this.lightsArray[(i*16)+13] = 0.0;
+            this.lightsArray[(i*16)+14] = 0.0;
+            this.lightsArray[(i*16)+15] = 0.0;
+        }
 
         // Dynamic light loaded
         return true;
@@ -133,10 +165,8 @@ DynamicLights.prototype = {
     clear: function()
     {
         // Clear dynamic lights
-        this.lightsCount = 0;
-        this.pointLights = [];
-        this.spotLights = [];
-        this.lightsArray = [];
+        this.pointLightsCount = 0;
+        this.spotLightsCount = 0;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -147,10 +177,13 @@ DynamicLights.prototype = {
     {
         if (pointLight)
         {
-            this.pointLights.push(new PointLight());
-            this.pointLights[this.pointLights.length-1].setPointLight(
-                pointLight
-            );
+            if (this.pointLightsCount < WOSMaxPointLights)
+            {
+                this.pointLights[this.pointLightsCount].setPointLight(
+                    pointLight
+                );
+                ++this.pointLightsCount;
+            }
         }
     },
 
@@ -162,8 +195,13 @@ DynamicLights.prototype = {
     {
         if (spotLight)
         {
-            this.spotLights.push(new SpotLight());
-            this.spotLights[this.spotLights.length-1].setSpotLight(spotLight);
+            if (this.spotLightsCount < WOSMaxSpotLights)
+            {
+                this.spotLights[this.spotLightsCount].setSpotLight(
+                    spotLight
+                );
+                ++this.spotLightsCount;
+            }
         }
     },
 
@@ -174,109 +212,135 @@ DynamicLights.prototype = {
     {
         var i = 0;
 
-        // Update lights array
-        this.lightsCount = 0;
-        this.lightsArray = new GLArrayDataType(128);
-
         // Add point lights
-        for (i = 0; i < this.pointLights.length; ++i)
+        for (i = 0; i < WOSMaxPointLights; ++i)
         {
-            if (this.lightsCount < WOSMaxDynamicLights)
+            if (i < this.pointLightsCount)
             {
-                // Point light type
-                this.lightsArray[(this.lightsCount*16)] = 0.0;
+                // Point light
+                this.lightsArray[(i*16)] = 1.0;
 
                 // Point light position
-                this.lightsArray[(this.lightsCount*16)+1] =
+                this.lightsArray[(i*16)+1] =
                     this.pointLights[i].position.vec[0];
-                this.lightsArray[(this.lightsCount*16)+2] =
+                this.lightsArray[(i*16)+2] =
                     this.pointLights[i].position.vec[1];
-                this.lightsArray[(this.lightsCount*16)+3] =
+                this.lightsArray[(i*16)+3] =
                     this.pointLights[i].position.vec[2];
 
                 // Point light color
-                this.lightsArray[(this.lightsCount*16)+4] =
-                    this.pointLights[i].color.vec[0];
-                this.lightsArray[(this.lightsCount*16)+5] =
-                    this.pointLights[i].color.vec[1];
-                this.lightsArray[(this.lightsCount*16)+6] =
-                    this.pointLights[i].color.vec[2];
-                this.lightsArray[(this.lightsCount*16)+7] =
-                    this.pointLights[i].color.vec[3];
+                this.lightsArray[(i*16)+4] = this.pointLights[i].color.vec[0];
+                this.lightsArray[(i*16)+5] = this.pointLights[i].color.vec[1];
+                this.lightsArray[(i*16)+6] = this.pointLights[i].color.vec[2];
+                this.lightsArray[(i*16)+7] = this.pointLights[i].color.vec[3];
 
-                this.lightsArray[(this.lightsCount*16)+8] = 0.0;
-                this.lightsArray[(this.lightsCount*16)+9] = 0.0;
-                this.lightsArray[(this.lightsCount*16)+10] = 0.0;
+                this.lightsArray[(i*16)+8] = 0.0;
+                this.lightsArray[(i*16)+9] = 0.0;
+                this.lightsArray[(i*16)+10] = 0.0;
 
                 // Point light radius
-                this.lightsArray[(this.lightsCount*16)+11] =
-                    this.pointLights[i].radius;
+                this.lightsArray[(i*16)+11] = this.pointLights[i].radius;
 
                 // Point light falloff radius
-                this.lightsArray[(this.lightsCount*16)+12] =
-                    this.pointLights[i].falloffRadius;
+                this.lightsArray[(i*16)+12] = this.pointLights[i].falloffRadius;
 
-                this.lightsArray[(this.lightsCount*16)+13] = 0.0;
-                this.lightsArray[(this.lightsCount*16)+14] = 0.0;
-                this.lightsArray[(this.lightsCount*16)+15] = 0.0;
-
-                ++this.lightsCount;
+                this.lightsArray[(i*16)+13] = 0.0;
+                this.lightsArray[(i*16)+14] = 0.0;
+                this.lightsArray[(i*16)+15] = 0.0;
+            }
+            else
+            {
+                // No light
+                this.lightsArray[(i*16)] = 0.0;
+                this.lightsArray[(i*16)+1] = 0.0;
+                this.lightsArray[(i*16)+2] = 0.0;
+                this.lightsArray[(i*16)+3] = 0.0;
+                this.lightsArray[(i*16)+4] = 0.0;
+                this.lightsArray[(i*16)+5] = 0.0;
+                this.lightsArray[(i*16)+6] = 0.0;
+                this.lightsArray[(i*16)+7] = 0.0;
+                this.lightsArray[(i*16)+8] = 0.0;
+                this.lightsArray[(i*16)+9] = 0.0;
+                this.lightsArray[(i*16)+10] = 0.0;
+                this.lightsArray[(i*16)+11] = 0.0;
+                this.lightsArray[(i*16)+12] = 0.0;
+                this.lightsArray[(i*16)+13] = 0.0;
+                this.lightsArray[(i*16)+14] = 0.0;
+                this.lightsArray[(i*16)+15] = 0.0;
             }
         }
 
         // Add spot lights
-        for (i = 0; i < this.spotLights.length; ++i)
+        for (i = 0; i < WOSMaxSpotLights; ++i)
         {
-            if (this.lightsCount < WOSMaxDynamicLights)
+            if (i < this.spotLightsCount)
             {
-                // Spot light type
-                this.lightsArray[(this.lightsCount*16)] = 1.0;
+                // Spot light
+                this.lightsArray[((i+WOSMaxPointLights)*16)] = 1.0;
 
                 // Spot light position
-                this.lightsArray[(this.lightsCount*16)+1] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+1] =
                     this.spotLights[i].position.vec[0];
-                this.lightsArray[(this.lightsCount*16)+2] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+2] =
                     this.spotLights[i].position.vec[1];
-                this.lightsArray[(this.lightsCount*16)+3] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+3] =
                     this.spotLights[i].position.vec[2];
 
                 // Spot light color
-                this.lightsArray[(this.lightsCount*16)+4] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+4] =
                     this.spotLights[i].color.vec[0];
-                this.lightsArray[(this.lightsCount*16)+5] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+5] =
                     this.spotLights[i].color.vec[1];
-                this.lightsArray[(this.lightsCount*16)+6] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+6] =
                     this.spotLights[i].color.vec[2];
-                this.lightsArray[(this.lightsCount*16)+7] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+7] =
                     this.spotLights[i].color.vec[3];
 
                 // Spot light direction
-                this.lightsArray[(this.lightsCount*16)+8] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+8] =
                     this.spotLights[i].direction.vec[0];
-                this.lightsArray[(this.lightsCount*16)+9] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+9] =
                     this.spotLights[i].direction.vec[1];
-                this.lightsArray[(this.lightsCount*16)+10] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+10] =
                     this.spotLights[i].direction.vec[2];
 
                 // Spot light radius
-                this.lightsArray[(this.lightsCount*16)+11] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+11] =
                     this.spotLights[i].radius;
 
                 // Spot light falloff radius
-                this.lightsArray[(this.lightsCount*16)+12] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+12] =
                     this.spotLights[i].falloffRadius;
 
                 // Spot light focal
-                this.lightsArray[(this.lightsCount*16)+13] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+13] =
                     this.spotLights[i].focal;
 
                 // Spot light falloff focal
-                this.lightsArray[(this.lightsCount*16)+14] =
+                this.lightsArray[((i+WOSMaxPointLights)*16)+14] =
                     this.spotLights[i].falloffFocal;
 
-                this.lightsArray[(this.lightsCount*16)+15] = 0.0;
-
-                ++this.lightsCount;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+15] = 0.0;
+            }
+            else
+            {
+                // No light
+                this.lightsArray[((i+WOSMaxPointLights)*16)] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+1] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+2] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+3] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+4] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+5] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+6] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+7] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+8] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+9] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+10] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+11] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+12] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+13] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+14] = 0.0;
+                this.lightsArray[((i+WOSMaxPointLights)*16)+15] = 0.0;
             }
         }
 
@@ -286,7 +350,7 @@ DynamicLights.prototype = {
         );
         this.renderer.gl.texImage2D(
             this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            4, this.lightsCount, 0, this.renderer.gl.RGBA,
+            4, WOSMaxDynamicLights, 0, this.renderer.gl.RGBA,
             this.renderer.gl.FLOAT, this.lightsArray
         );
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);

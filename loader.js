@@ -65,8 +65,10 @@ function Loader(renderer, audio)
     this.toggleButtonShader = null;
     this.textShader = null;
     this.staticMeshShader = null;
+    this.staticMeshShaderMedium = null;
     this.staticMeshShaderLow = null;
     this.skeletalMeshShader = null;
+    this.skeletalMeshShaderMedium = null;
     this.skeletalMeshShaderLow = null;
     this.allShadersLoaded = false;
 
@@ -105,8 +107,10 @@ Loader.prototype = {
         this.toggleButtonShader = null;
         this.textShader = null;
         this.staticMeshShader = null;
+        this.staticMeshShaderMedium = null;
         this.staticMeshShaderLow = null;
         this.skeletalMeshShader = null;
+        this.skeletalMeshShaderMedium = null;
         this.skeletalMeshShaderLow = null;
         this.allShadersLoaded = false;
 
@@ -215,6 +219,18 @@ Loader.prototype = {
             }
         }
 
+        // Init medium static mesh shader
+        if (this.renderer.maxQuality >= WOSRendererQualityMedium)
+        {
+            this.staticMeshShaderMedium = new Shader(this.renderer.gl);
+            if (!this.staticMeshShaderMedium.init(
+                staticMeshVertexShaderMediumSrc,
+                staticMeshFragmentShaderMediumSrc))
+            {
+                return false;
+            }
+        }
+
         // Init low static mesh shader
         this.staticMeshShaderLow = new Shader(this.renderer.gl);
         if (!this.staticMeshShaderLow.init(
@@ -229,6 +245,18 @@ Loader.prototype = {
             this.skeletalMeshShader = new Shader(this.renderer.gl);
             if (!this.skeletalMeshShader.init(
                 skeletalMeshVertexShaderSrc, skeletalMeshFragmentShaderSrc))
+            {
+                return false;
+            }
+        }
+
+        // Init medium skeletal mesh shader
+        if (this.renderer.maxQuality >= WOSRendererQualityMedium)
+        {
+            this.skeletalMeshShaderMedium = new Shader(this.renderer.gl);
+            if (!this.skeletalMeshShaderMedium.init(
+                skeletalMeshVertexShaderMediumSrc,
+                skeletalMeshFragmentShaderMediumSrc))
             {
                 return false;
             }

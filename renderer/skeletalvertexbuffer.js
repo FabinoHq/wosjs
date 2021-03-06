@@ -64,12 +64,12 @@ var defaultBonesWeights = new GLArrayDataType([
 
 ////////////////////////////////////////////////////////////////////////////////
 //  SkeletalVertexBuffer class definition                                     //
-//  param glPointer : WebGL functions pointer                                 //
+//  param renderer : Renderer pointer                                         //
 ////////////////////////////////////////////////////////////////////////////////
-function SkeletalVertexBuffer(glPointer)
+function SkeletalVertexBuffer(renderer)
 {
-    // WebGL functions pointer
-    this.gl = glPointer;
+    // Renderer pointer
+    this.renderer = renderer;
 
     // Vertex buffer object
     this.vertexBuffer = null;
@@ -112,11 +112,11 @@ SkeletalVertexBuffer.prototype = {
     init: function(vertCount, vertices, texcoords, normals, indices,
         bonesIndices, bonesWeights)
     {
+        // Check renderer pointer
+        if (!this.renderer) return false;
+
         // Check gl pointer
-        if (!this.gl)
-        {
-            return false;
-        }
+        if (!this.renderer.gl) return false;
 
         // Check vertex buffer data
         if ((vertCount > 0) && vertices && texcoords && normals && indices &&
@@ -144,7 +144,7 @@ SkeletalVertexBuffer.prototype = {
         }
 
         // Create VBO
-        this.vertexBuffer = this.gl.createBuffer();
+        this.vertexBuffer = this.renderer.gl.createBuffer();
         if (!this.vertexBuffer)
         {
             // Could not create VBO
@@ -152,7 +152,7 @@ SkeletalVertexBuffer.prototype = {
         }
 
         // Create EBO
-        this.elementBuffer = this.gl.createBuffer();
+        this.elementBuffer = this.renderer.gl.createBuffer();
         if (!this.elementBuffer)
         {
             // Could not create EBO
@@ -174,9 +174,11 @@ SkeletalVertexBuffer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     bind: function()
     {
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
-        this.gl.bindBuffer(
-            this.gl.ELEMENT_ARRAY_BUFFER,
+        this.renderer.gl.bindBuffer(
+            this.renderer.gl.ARRAY_BUFFER, this.vertexBuffer
+        );
+        this.renderer.gl.bindBuffer(
+            this.renderer.gl.ELEMENT_ARRAY_BUFFER,
             this.elementBuffer
         );
     },
@@ -186,8 +188,10 @@ SkeletalVertexBuffer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     unbind: function()
     {
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+        this.renderer.gl.bindBuffer(
+            this.renderer.gl.ELEMENT_ARRAY_BUFFER, null
+        );
+        this.renderer.gl.bindBuffer(this.renderer.gl.ARRAY_BUFFER, null);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -196,6 +200,7 @@ SkeletalVertexBuffer.prototype = {
     computeTangents: function()
     {
         var i = 0;
+        if (this.renderer.maxQuality < WOSRendererQualityHigh) return;
         this.tangentsData = new GLArrayDataType(this.verticesData.length);
         for (i = 0; i < this.indicesData.length; i += 3)
         {
@@ -240,69 +245,110 @@ SkeletalVertexBuffer.prototype = {
     updateBuffer: function()
     {
         // Send data to GPU
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.vertexBuffer);
+        this.renderer.gl.bindBuffer(
+            this.renderer.gl.ARRAY_BUFFER, this.vertexBuffer
+        );
         this.texCoordsOffset = this.verticesData.byteLength;
         this.bonesIndicesOffset =
             this.texCoordsOffset+this.texCoordsData.byteLength;
         this.bonesWeightsOffset =
             this.bonesIndicesOffset+this.bonesIndicesData.byteLength;
-        this.normalsOffset =
-            this.bonesWeightsOffset+this.bonesWeightsData.byteLength;
-        this.tangentsOffset = this.normalsOffset+this.normalsData.byteLength;
-        this.gl.bufferData(
-            this.gl.ARRAY_BUFFER,
-            this.tangentsOffset+this.tangentsData.byteLength,
-            this.gl.STATIC_DRAW
-        );
+        if (this.renderer.maxQuality == WOSRendererQualityHigh)
+        {
+            // High quality
+            this.normalsOffset =
+                this.bonesWeightsOffset+this.bonesWeightsData.byteLength;
+            this.tangentsOffset =
+                this.normalsOffset+this.normalsData.byteLength;
+            this.renderer.gl.bufferData(
+                this.renderer.gl.ARRAY_BUFFER,
+                this.tangentsOffset+this.tangentsData.byteLength,
+                this.renderer.gl.STATIC_DRAW
+            );
+        }
+        else if (this.renderer.maxQuality == WOSRendererQualityMedium)
+        {
+            // Medium quality
+            this.normalsOffset =
+                this.bonesWeightsOffset+this.bonesWeightsData.byteLength;
+            this.renderer.gl.bufferData(
+                this.renderer.gl.ARRAY_BUFFER,
+                this.normalsOffset+this.normalsData.byteLength,
+                this.renderer.gl.STATIC_DRAW
+            );
+        }
+        else
+        {
+            // Low quality
+            this.renderer.gl.bufferData(
+                this.renderer.gl.ARRAY_BUFFER,
+                this.bonesWeightsOffset+this.bonesWeightsData.byteLength,
+                this.renderer.gl.STATIC_DRAW
+            );
+        }
 
         // Send vertices data
-        this.gl.bufferSubData(this.gl.ARRAY_BUFFER, 0, this.verticesData);
+        this.renderer.gl.bufferSubData(
+            this.renderer.gl.ARRAY_BUFFER, 0, this.verticesData
+        );
 
         // Send texcoords data
-        this.gl.bufferSubData(
-            this.gl.ARRAY_BUFFER,
+        this.renderer.gl.bufferSubData(
+            this.renderer.gl.ARRAY_BUFFER,
             this.texCoordsOffset,
             this.texCoordsData
         );
 
-        // Send normals data
-        this.gl.bufferSubData(
-            this.gl.ARRAY_BUFFER,
-            this.normalsOffset,
-            this.normalsData
-        );
-
-        // Send tangents data
-        this.gl.bufferSubData(
-            this.gl.ARRAY_BUFFER,
-            this.tangentsOffset,
-            this.tangentsData
-        );
-
         // Send bones indices data
-        this.gl.bufferSubData(
-            this.gl.ARRAY_BUFFER,
+        this.renderer.gl.bufferSubData(
+            this.renderer.gl.ARRAY_BUFFER,
             this.bonesIndicesOffset,
             this.bonesIndicesData
         );
 
         // Send bones weights data
-        this.gl.bufferSubData(
-            this.gl.ARRAY_BUFFER,
+        this.renderer.gl.bufferSubData(
+            this.renderer.gl.ARRAY_BUFFER,
             this.bonesWeightsOffset,
             this.bonesWeightsData
         );
 
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, null);
+        // Medium quality
+        if (this.renderer.maxQuality >= WOSRendererQualityMedium)
+        {
+            // Send normals data
+            this.renderer.gl.bufferSubData(
+                this.renderer.gl.ARRAY_BUFFER,
+                this.normalsOffset,
+                this.normalsData
+            );
+        }
+
+        // High quality
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
+        {
+            // Send tangents data
+            this.renderer.gl.bufferSubData(
+                this.renderer.gl.ARRAY_BUFFER,
+                this.tangentsOffset,
+                this.tangentsData
+            );
+        }
+
+        this.renderer.gl.bindBuffer(this.renderer.gl.ARRAY_BUFFER, null);
 
         // Send indexes data
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.elementBuffer);
-        this.gl.bufferData(
-            this.gl.ELEMENT_ARRAY_BUFFER,
-            this.indicesData,
-            this.gl.STATIC_DRAW
+        this.renderer.gl.bindBuffer(
+            this.renderer.gl.ELEMENT_ARRAY_BUFFER, this.elementBuffer
         );
-        this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, null);
+        this.renderer.gl.bufferData(
+            this.renderer.gl.ELEMENT_ARRAY_BUFFER,
+            this.indicesData,
+            this.renderer.gl.STATIC_DRAW
+        );
+        this.renderer.gl.bindBuffer(
+            this.renderer.gl.ELEMENT_ARRAY_BUFFER, null
+        );
     },
     
     ////////////////////////////////////////////////////////////////////////////
@@ -313,62 +359,66 @@ SkeletalVertexBuffer.prototype = {
     render: function(shader, quality)
     {
         // Enable vertices array
-        this.gl.enableVertexAttribArray(shader.vertexLocation);
-        this.gl.vertexAttribPointer(
+        this.renderer.gl.enableVertexAttribArray(shader.vertexLocation);
+        this.renderer.gl.vertexAttribPointer(
             shader.vertexLocation, 3,
-            this.gl.FLOAT, this.gl.FALSE,
+            this.renderer.gl.FLOAT, this.renderer.gl.FALSE,
             0, 0
         );
 
         // Enable texcoords array
-        this.gl.enableVertexAttribArray(shader.texCoordsLocation);
-        this.gl.vertexAttribPointer(
+        this.renderer.gl.enableVertexAttribArray(shader.texCoordsLocation);
+        this.renderer.gl.vertexAttribPointer(
             shader.texCoordsLocation, 2,
-            this.gl.FLOAT, this.gl.FALSE,
+            this.renderer.gl.FLOAT, this.renderer.gl.FALSE,
             0, this.texCoordsOffset
         );
 
         // Enable bones indices array
-        this.gl.enableVertexAttribArray(shader.bonesIndicesLocation);
-        this.gl.vertexAttribPointer(
+        this.renderer.gl.enableVertexAttribArray(shader.bonesIndicesLocation);
+        this.renderer.gl.vertexAttribPointer(
             shader.bonesIndicesLocation, 4,
-            this.gl.UNSIGNED_SHORT, this.gl.FALSE,
+            this.renderer.gl.UNSIGNED_SHORT, this.renderer.gl.FALSE,
             0, this.bonesIndicesOffset
         );
 
         // Enable bones weights array
-        this.gl.enableVertexAttribArray(shader.bonesWeightsLocation);
-        this.gl.vertexAttribPointer(
+        this.renderer.gl.enableVertexAttribArray(shader.bonesWeightsLocation);
+        this.renderer.gl.vertexAttribPointer(
             shader.bonesWeightsLocation, 4,
-            this.gl.FLOAT, this.gl.FALSE,
+            this.renderer.gl.FLOAT, this.renderer.gl.FALSE,
             0, this.bonesWeightsOffset
         );
+
+        // Medium quality
+        if (quality >= WOSRendererQualityMedium)
+        {
+            // Enable normals array
+            this.renderer.gl.enableVertexAttribArray(shader.normalsLocation);
+            this.renderer.gl.vertexAttribPointer(
+                shader.normalsLocation, 3,
+                this.renderer.gl.FLOAT, this.renderer.gl.FALSE,
+                0, this.normalsOffset
+            );
+        }
 
         // High quality
         if (quality >= WOSRendererQualityHigh)
         {
-            // Enable normals array
-            this.gl.enableVertexAttribArray(shader.normalsLocation);
-            this.gl.vertexAttribPointer(
-                shader.normalsLocation, 3,
-                this.gl.FLOAT, this.gl.FALSE,
-                0, this.normalsOffset
-            );
-
             // Enable tangents array
-            this.gl.enableVertexAttribArray(shader.tangentsLocation);
-            this.gl.vertexAttribPointer(
+            this.renderer.gl.enableVertexAttribArray(shader.tangentsLocation);
+            this.renderer.gl.vertexAttribPointer(
                 shader.tangentsLocation, 3,
-                this.gl.FLOAT, this.gl.FALSE,
+                this.renderer.gl.FLOAT, this.renderer.gl.FALSE,
                 0, this.tangentsOffset
             );
         }
 
         // Draw triangles
-        this.gl.drawElements(
-            this.gl.TRIANGLES,
+        this.renderer.gl.drawElements(
+            this.renderer.gl.TRIANGLES,
             this.vertCount,
-            this.gl.UNSIGNED_SHORT, 0
+            this.renderer.gl.UNSIGNED_SHORT, 0
         );
     }
 };
