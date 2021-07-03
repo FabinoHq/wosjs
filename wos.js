@@ -317,6 +317,8 @@ function Wos()
     // Test shadows
     this.shadows = null;
 
+    // Test plane
+    this.testplane = null;
     // Test static mesh
     this.staticmesh = null;
     // Test skeletal mesh
@@ -485,6 +487,13 @@ Wos.prototype = {
         this.shadows.init(512, 512);
         this.shadows.setPosition(3.0, 3.0, -3.0);
         this.shadows.setAngles(75.0, 230.0, 0.0);
+
+        // Init test plane
+        this.testplane = new Plane(this.renderer, this.loader.planeShader);
+        this.testplane.init(
+            this.loader.getTexture("testsprite.png"), 1.0, 1.0
+        );
+        this.testplane.setBillboard(0);
 
         // Init test static mesh
         this.staticmesh = new StaticMesh(
@@ -821,6 +830,9 @@ Wos.prototype = {
 
         // Set freefly camera
         //this.renderer.setCamera(this.freeflycam, this.frametime);
+
+        // Render test plane
+        //this.testplane.render();
 
         // Render test static mesh
         //this.staticmesh.render(this.renderer.quality, this.shadows);

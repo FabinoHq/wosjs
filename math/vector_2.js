@@ -172,11 +172,19 @@ Vector2.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  dotProduct : Get the dot product of this vector and another           //
+    ////////////////////////////////////////////////////////////////////////////
+    dotProduct: function(v)
+    {
+        return (this.vec[0]*v.vec[0] + this.vec[1]*v.vec[1]);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  length : Get vector length                                            //
     ////////////////////////////////////////////////////////////////////////////
     length: function()
     {
-        var length = (this.vec[0]*this.vec[0])+(this.vec[1]*this.vec[1]);
+        var length = (this.vec[0]*this.vec[0]) + (this.vec[1]*this.vec[1]);
         return Math.sqrt(length);
     },
 

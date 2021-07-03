@@ -43,6 +43,7 @@
 !renderer/animsprite.js
 !renderer/procsprite.js
 !renderer/ninebox.js
+!renderer/plane.js
 !renderer/staticmesh.js
 !renderer/skeletalmesh.js
 !renderer/view.js
@@ -64,6 +65,7 @@
 !renderer/shaders/buttonshader.js
 !renderer/shaders/togglebuttonshader.js
 !renderer/shaders/textshader.js
+!renderer/shaders/planeshader.js
 !renderer/shaders/staticmeshshader.js
 !renderer/shaders/staticmeshshadermedium.js
 !renderer/shaders/staticmeshshaderlow.js
