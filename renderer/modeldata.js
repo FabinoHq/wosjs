@@ -77,6 +77,12 @@ function ModelData()
     this.bonesIndices = null;
     // Bones weights
     this.bonesWeights = null;
+    // Anim bones
+    this.animBones = null;
+    // Anim keyframes
+    this.animFrames = null;
+    // Animations
+    this.animations = null;
 }
 
 ModelData.prototype = {
@@ -121,6 +127,11 @@ ModelData.prototype = {
         var bonesAnglesCount = 0;
         var bonesIndicesCount = 0;
         var bonesWeightsCount = 0;
+        var animGroupsCount = 0;
+        var animGroupBones = 0;
+        var animCount = 0;
+        var keyFrames = 0;
+        var animValues = 0;
         var currentRead = 0;
         var currentIndex = 0;
         var modelData = this.model.responseText.split(' ');
@@ -153,7 +164,8 @@ ModelData.prototype = {
                     bonesMaxInfluence = parseInt(modelData[11]);
                     bonesIndicesCount = parseInt(modelData[12]);
                     bonesWeightsCount = parseInt(modelData[13]);
-                    currentRead = 14;
+                    animGroupsCount = parseInt(modelData[14]);
+                    currentRead = 15;
                 }
 
                 // Check model data count
@@ -180,6 +192,9 @@ ModelData.prototype = {
                         this.bonesWeights = new GLArrayDataType(
                             bonesWeightsCount
                         );
+                        this.animBones = new Array(animGroupsCount);
+                        this.animFrames = new Array(animGroupsCount);
+                        this.animations = new Array(animGroupsCount);
                     }
 
                     // Read vertices
@@ -297,6 +312,51 @@ ModelData.prototype = {
                             }
                         }
                         currentRead += bonesWeightsCount;
+
+                        // Read all animations
+                        for (var curAnim = 0;
+                            curAnim < animGroupsCount; ++curAnim)
+                        {
+                            // Read anim group
+                            animGroupBones = parseInt(modelData[currentRead++]);
+                            this.animBones[curAnim] = new Array(animGroupBones);
+                            currentIndex = 0;
+                            for (i = currentRead;
+                                i < (currentRead+animGroupBones); ++i)
+                            {
+                                if (i < modelDataLen)
+                                {
+                                    this.animBones[curAnim][currentIndex++] =
+                                        parseInt(modelData[i]);
+                                }
+                            }
+                            currentRead += animGroupBones;
+                            animCount = parseInt(modelData[currentRead++]);
+
+                            // Read current group animations
+                            this.animFrames[curAnim] = new Array(animCount);
+                            this.animations[curAnim] = new Array(animCount);
+                            for (var j = 0; j < animCount; ++j)
+                            {
+                                keyFrames = parseInt(modelData[currentRead++]);
+                                animValues = keyFrames*animGroupBones*6;
+                                this.animFrames[curAnim][j] = keyFrames;
+                                this.animations[curAnim][j] =
+                                    new GLArrayDataType(animValues);
+                                currentIndex = 0;
+                                for (i = currentRead;
+                                    i < (currentRead+animValues); ++i)
+                                {
+                                    if (i < modelDataLen)
+                                    {
+                                        this.animations
+                                            [curAnim][j][currentIndex++] =
+                                            parseFloat(modelData[i]);
+                                    }
+                                }
+                                currentRead += animValues;
+                            }
+                        }
                     }
 
                     // Mesh data successfully loaded

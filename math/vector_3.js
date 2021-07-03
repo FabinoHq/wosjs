@@ -200,6 +200,16 @@ Vector3.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  linearInterp : Linear interpolation                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    linearInterp: function(v1, v2, t)
+    {
+        this.vec[0] = (1.0-t)*v1.vec[0] + t*v2.vec[0];
+        this.vec[1] = (1.0-t)*v1.vec[1] + t*v2.vec[1];
+        this.vec[2] = (1.0-t)*v1.vec[2] + t*v2.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  crossProduct : Set this vector as a cross product from 2 vectors      //
     ////////////////////////////////////////////////////////////////////////////
     crossProduct: function(v1, v2)

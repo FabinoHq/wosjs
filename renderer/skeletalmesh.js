@@ -116,6 +116,25 @@ function SkeletalMesh(renderer,
     this.bonesTexture = null;
     // Bones array
     this.bonesArray = null;
+    // Anim bones array
+    this.animBones = null;
+    // Animations array
+    this.animations = null;
+
+    // Anim groups
+    this.animGroups = 0;
+    // Anim keyframes
+    this.keyFrames = null;
+    // Current animations
+    this.currentAnims = null;
+    // Current frames
+    this.currentFrames = null;
+    // Current frametimes
+    this.frametimes = null;
+    // Current times
+    this.currentTimes = null;
+    // Current bones
+    this.currentBones = null;
 
     // Skeletal mesh position
     this.position = new Vector3(0.0, 0.0, 0.0);
@@ -138,6 +157,9 @@ SkeletalMesh.prototype = {
     init: function(model, texture)
     {
         var i = 0;
+        var j = 0;
+        var k = 0;
+        var found = false;
 
         // Reset skeletal mesh
         this.shadowsTextureLocation = -1;
@@ -179,6 +201,15 @@ SkeletalMesh.prototype = {
         this.bonesInverses = null;
         this.bonesTexture = null;
         this.bonesArray = null;
+        this.animBones = null;
+        this.animations = null;
+        this.animGroups = 0;
+        this.keyFrames = null;
+        this.currentAnims = null;
+        this.currentFrames = null;
+        this.frametimes = null;
+        this.currentTimes = null;
+        this.currentBones = null;
         this.position.reset();
         this.angles.reset();
         this.scale = 1.0;
@@ -377,6 +408,74 @@ SkeletalMesh.prototype = {
 
         // Create bones array
         this.bonesArray = new GLArrayDataType(this.bonesCount*16);
+
+        // Set anim groups count
+        this.animGroups = model.animBones.length;
+
+        // Create anim bones array
+        this.animBones = new Array(this.bonesCount);
+        for (i = 0; i < this.bonesCount; ++i)
+        {
+            this.animBones[i] = -1;
+
+            // Look for matching bone
+            found = false;
+            for (j = 0; j < this.animGroups; ++j)
+            {
+                for (k = 0; k < model.animBones[j].length; ++k)
+                {
+                    if (model.animBones[j][k] == i)
+                    {
+                        // Get matching bone anim group
+                        this.animBones[i] = j;
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) break;
+            }
+        }
+
+        // Create animations array
+        this.animations = model.animations;
+
+        // Set keyframes count
+        this.keyFrames = model.animFrames;
+
+        // Create current animations array
+        this.currentAnims = new Array(this.animGroups);
+        for (i = 0; i < this.animGroups; ++i)
+        {
+            this.currentAnims[i] = 0;
+        }
+
+        // Create current frames array
+        this.currentFrames = new Array(this.animGroups);
+        for (i = 0; i < this.animGroups; ++i)
+        {
+            this.currentFrames[i] = 0;
+        }
+
+        // Create current frametimes array
+        this.frametimes = new Array(this.animGroups);
+        for (i = 0; i < this.animGroups; ++i)
+        {
+            this.frametimes[i] = 1.0;
+        }
+
+        // Create current times array
+        this.currentTimes = new Array(this.animGroups);
+        for (i = 0; i < this.animGroups; ++i)
+        {
+            this.currentTimes[i] = 0.0;
+        }
+
+        // Create current bones array
+        this.currentBones = new Array(this.animGroups);
+        for (i = 0; i < this.animGroups; ++i)
+        {
+            this.currentBones[i] = 0;
+        }
 
         // Set texture
         this.texture = texture;
@@ -586,6 +685,36 @@ SkeletalMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAnimation : Set skeletal mesh current animation                    //
+    //  param animGroup : Anim group to set animation                         //
+    //  param animation : Animation to set to the anim group                  //
+    ////////////////////////////////////////////////////////////////////////////
+    setAnimation: function(animGroup, animation)
+    {
+        if ((animGroup >= 0) && (animGroup <= this.animGroups))
+        {
+            if ((animation >= 0) &&
+                (animation <= this.animations[animGroup].length))
+            {
+                this.currentAnims[animGroup] = animation;
+            }
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setFrametime : Set skeletal mesh animation frametime                  //
+    //  param animGroup : Anim group to set frametime                         //
+    //  param frametime : Frametime to set to the anim group                  //
+    ////////////////////////////////////////////////////////////////////////////
+    setFrametime: function(animGroup, frametime)
+    {
+        if ((animGroup >= 0) && (animGroup <= this.animGroups))
+        {
+            this.frametimes[animGroup] = frametime;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setSpecularity : Set skeletal mesh specularity                        //
     //  param specularity : Skeletal mesh specularity to set                  //
     ////////////////////////////////////////////////////////////////////////////
@@ -692,6 +821,42 @@ SkeletalMesh.prototype = {
     {
         var i = 0;
         var tmpMat = new Matrix4x4();
+        var animGroup = -1;
+        var currentFrame = -1;
+        var nextFrame = -1;
+        var currentAnim = -1;
+        var currentBone = 0;
+        var currentFrametime = 0.0;
+        var currentTime = 0.0;
+        var keyFrames = 0;
+        var curI = 0;
+        var nextI = 0;
+        var animated = false;
+        var pos = new Vector3();
+        var nextPos = new Vector3();
+        var rot = new Vector3();
+        var nextRot = new Vector3();
+        for (i = 0; i < this.animGroups; ++i)
+        {
+            this.currentBones[i] = 0;
+        }
+
+        // Compute animations frames
+        for (i = 0; i < this.animGroups; ++i)
+        {
+            this.currentTimes[i] += frametime;
+            if (this.currentTimes[i] >= this.frametimes[i])
+            {
+                // Next frame
+                ++this.currentFrames[i];
+                if (this.currentFrames[i] >=
+                    this.keyFrames[i][this.currentAnims[i]])
+                {
+                    this.currentFrames[i] = 0;
+                }
+                this.currentTimes[i] = 0.0;
+            }
+        }
 
         for (i = 0; i < this.bonesCount; ++i)
         {
@@ -700,8 +865,67 @@ SkeletalMesh.prototype = {
             this.bonesMatrices[i].setMatrix(
                 this.bonesMatrices[this.bonesParents[i]]
             );
-            this.bonesMatrices[i].translateVec3(this.bonesPositions[i]);
-            this.bonesMatrices[i].rotateVec3(this.bonesAngles[i]);
+
+            // Animate bone
+            animated = false;
+            animGroup = this.animBones[i];
+            if (animGroup >= 0)
+            {
+                currentFrame = this.currentFrames[animGroup];
+                nextFrame = currentFrame+1;
+                currentTime = this.currentTimes[animGroup];
+                currentFrametime = this.frametimes[animGroup];
+                if (currentFrametime > 0.0)
+                {
+                    currentTime /= currentFrametime;
+                }
+                if (nextFrame >=
+                    this.keyFrames[animGroup][this.currentAnims[animGroup]])
+                {
+                    nextFrame = 0;
+                }
+                if (currentFrame >= 0)
+                {
+                    currentAnim = this.currentAnims[animGroup];
+                    currentBone = this.currentBones[animGroup];
+                    keyFrames = this.keyFrames[animGroup][currentAnim];
+                    curI = (currentBone*keyFrames*6)+(currentFrame*6);
+                    nextI = (currentBone*keyFrames*6)+(nextFrame*6);
+                    pos.setXYZ(
+                        this.animations[animGroup][currentAnim][curI],
+                        this.animations[animGroup][currentAnim][curI+1],
+                        this.animations[animGroup][currentAnim][curI+2]
+                    );
+                    rot.setXYZ(
+                        this.animations[animGroup][currentAnim][curI+3],
+                        this.animations[animGroup][currentAnim][curI+4],
+                        this.animations[animGroup][currentAnim][curI+5]
+                    );
+                    nextPos.setXYZ(
+                        this.animations[animGroup][currentAnim][nextI],
+                        this.animations[animGroup][currentAnim][nextI+1],
+                        this.animations[animGroup][currentAnim][nextI+2]
+                    );
+                    nextRot.setXYZ(
+                        this.animations[animGroup][currentAnim][nextI+3],
+                        this.animations[animGroup][currentAnim][nextI+4],
+                        this.animations[animGroup][currentAnim][nextI+5]
+                    );
+                    pos.linearInterp(pos, nextPos, currentTime);
+                    rot.linearInterp(rot, nextRot, currentTime);
+                    this.bonesMatrices[i].translateVec3(pos);
+                    this.bonesMatrices[i].rotateVec3(rot);
+                    animated = true;
+                }
+                ++this.currentBones[animGroup];
+            }
+
+            // Bone bind pose
+            if (!animated)
+            {
+                this.bonesMatrices[i].translateVec3(this.bonesPositions[i]);
+                this.bonesMatrices[i].rotateVec3(this.bonesAngles[i]);
+            }
 
             // Multiply bone matrix by inverse bind pose matrix
             tmpMat.setMatrix(this.bonesMatrices[i]);

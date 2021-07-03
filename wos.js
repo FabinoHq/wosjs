@@ -509,6 +509,10 @@ Wos.prototype = {
             this.loader.getModel("testskeletal.wmsh"),
             this.loader.getTexture("testsprite.png")
         );
+        this.skeletalmesh.setAnimation(0, 0);
+        this.skeletalmesh.setAnimation(1, 0);
+        this.skeletalmesh.setFrametime(0, 0.7);
+        this.skeletalmesh.setFrametime(1, 1.0);
 
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
@@ -645,6 +649,7 @@ Wos.prototype = {
     handleMouseDown: function(button, mouseX, mouseY)
     {
         this.updateMousePosition(mouseX, mouseY);
+        //this.renderer.setMouseLock(true);
         /*if (this.testbutton)
         {
             this.testbutton.mousePress(this.realMouseX, this.realMouseY);
