@@ -321,6 +321,8 @@ function Wos()
     this.testplane = null;
     // Test anim plane
     this.testanimplane = null;
+    // Test procedural plane
+    this.testprocplane = null;
     // Test static mesh
     this.staticmesh = null;
     // Test skeletal mesh
@@ -509,6 +511,11 @@ Wos.prototype = {
         this.testanimplane.setEnd(1, 1);
         this.testanimplane.resetAnim();
         this.testanimplane.setBillboard(0);
+
+        // Init test procedural plane
+        this.testprocplane = new ProcPlane(this.renderer);
+        this.testprocplane.init();
+        this.testprocplane.setBillboard(0);
 
         // Init test static mesh
         this.staticmesh = new StaticMesh(
@@ -851,6 +858,9 @@ Wos.prototype = {
 
         // Render test anim plane
         //this.testanimplane.render(this.frametime);
+
+        // Render test proc plane
+        //this.testprocplane.render(this.frametime);
 
         // Render test static mesh
         //this.staticmesh.render(this.renderer.quality, this.shadows);

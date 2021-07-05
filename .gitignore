@@ -45,6 +45,7 @@
 !renderer/ninebox.js
 !renderer/plane.js
 !renderer/animplane.js
+!renderer/procplane.js
 !renderer/staticmesh.js
 !renderer/skeletalmesh.js
 !renderer/view.js

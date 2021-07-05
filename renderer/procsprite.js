@@ -433,4 +433,3 @@ ProcSprite.prototype = {
         this.shader.unbind();
     }
 };
-
