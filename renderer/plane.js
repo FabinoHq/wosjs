@@ -539,6 +539,8 @@ Plane.prototype = {
             delta.normalize();
             rotVec.crossProduct(upVec, delta);
             dotProduct = upVec.dotProduct(delta);
+            if (dotProduct <= -1.0) { dotProduct = -1.0; }
+            if (dotProduct >= 1.0) { dotProduct = 1.0; }
             angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
             this.modelMatrix.rotate(
                 angle, rotVec.vec[0], rotVec.vec[1], rotVec.vec[2]
@@ -557,6 +559,8 @@ Plane.prototype = {
             delta.normalize();
             rotVec.crossProduct(upVec, delta);
             dotProduct = upVec.dotProduct(delta);
+            if (dotProduct <= -1.0) { dotProduct = -1.0; }
+            if (dotProduct >= 1.0) { dotProduct = 1.0; }
             angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
             this.modelMatrix.rotate(
                 angle, rotVec.vec[0], rotVec.vec[1], rotVec.vec[2]
@@ -575,6 +579,8 @@ Plane.prototype = {
             delta.normalize();
             rotVec.crossProduct(upVec, delta);
             dotProduct = upVec.dotProduct(delta);
+            if (dotProduct <= -1.0) { dotProduct = -1.0; }
+            if (dotProduct >= 1.0) { dotProduct = 1.0; }
             angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
             this.modelMatrix.rotate(
                 angle, rotVec.vec[0], rotVec.vec[1], rotVec.vec[2]
@@ -586,6 +592,8 @@ Plane.prototype = {
             );
             delta2.normalize();
             dotProduct = delta.dotProduct(delta2);
+            if (dotProduct <= -1.0) { dotProduct = -1.0; }
+            if (dotProduct >= 1.0) { dotProduct = 1.0; }
             angle = Math.acos(dotProduct)*180.0/Math.PI;
             if (delta2.vec[1] < 0.0) { this.modelMatrix.rotateX(angle); }
             else { this.modelMatrix.rotateX(-angle); }

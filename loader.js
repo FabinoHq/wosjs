@@ -64,7 +64,6 @@ function Loader(renderer, audio)
     this.buttonShader = null;
     this.toggleButtonShader = null;
     this.textShader = null;
-    this.planeShader = null;
     this.staticMeshShader = null;
     this.staticMeshShaderMedium = null;
     this.staticMeshShaderLow = null;
@@ -107,7 +106,6 @@ Loader.prototype = {
         this.buttonShader = null;
         this.toggleButtonShader = null;
         this.textShader = null;
-        this.planeShader = null;
         this.staticMeshShader = null;
         this.staticMeshShaderMedium = null;
         this.staticMeshShaderLow = null;
@@ -206,14 +204,6 @@ Loader.prototype = {
         this.textShader = new Shader(this.renderer.gl);
         if (!this.textShader.init(
             defaultVertexShaderSrc, textFragmentShaderSrc))
-        {
-            return false;
-        }
-
-        // Init plane shader
-        this.planeShader = new Shader(this.renderer.gl);
-        if (!this.planeShader.init(
-            defaultVertexShaderSrc, planeFragmentShaderSrc))
         {
             return false;
         }

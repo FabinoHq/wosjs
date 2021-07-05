@@ -489,7 +489,7 @@ Wos.prototype = {
         this.shadows.setAngles(75.0, 230.0, 0.0);
 
         // Init test plane
-        this.testplane = new Plane(this.renderer, this.loader.planeShader);
+        this.testplane = new Plane(this.renderer, this.loader.spriteShader);
         this.testplane.init(
             this.loader.getTexture("testsprite.png"), 1.0, 1.0
         );
