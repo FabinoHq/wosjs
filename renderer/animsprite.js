@@ -276,7 +276,7 @@ AnimSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate sprite                                                //
+    //  rotate : Rotate animated sprite                                       //
     //  param angle : Angle to rotate animated sprite by in degrees           //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
@@ -629,4 +629,3 @@ AnimSprite.prototype = {
         this.animShader.unbind();
     }
 };
-

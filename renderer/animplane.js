@@ -37,62 +37,78 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/plane.js : Plane management                                  //
+//      renderer/animplane.js : Animated plane management                     //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Plane class definition                                                    //
+//  AnimPlane class definition                                                //
 //  param renderer : Renderer pointer                                         //
-//  param planeShader : Plane shader pointer                                  //
+//  param animShader : Animated plane shader pointer                          //
 ////////////////////////////////////////////////////////////////////////////////
-function Plane(renderer, planeShader)
+function AnimPlane(renderer, animShader)
 {
     // Renderer pointer
     this.renderer = renderer;
 
-    // Plane shader pointer
-    this.planeShader = planeShader;
+    // Animated plane shader pointer
+    this.animShader = animShader;
 
-    // Plane shader uniforms locations
+    // Animated plane shader uniforms locations
     this.alphaUniform = -1;
-    this.uvSizeUniform = -1;
-    this.uvOffsetUniform = -1;
+    this.countUniform = -1;
+    this.currentUniform = -1;
+    this.nextUniform = -1;
+    this.interpUniform = -1;
 
-    // Plane texture
+    // Animated plane texture
     this.texture = null;
-    // Plane model matrix
+    // Animated plane model matrix
     this.modelMatrix = new Matrix4x4();
 
-    // Plane billboard mode
+    // Animated plane billboard mode
     this.billboard = 0;
-    // Plane position
+    // Animated plane position
     this.position = new Vector3(0.0, 0.0, 0.0);
-    // Plane size
+    // Animated plane size
     this.size = new Vector2(1.0, 1.0);
-    // Plane rotation angle
+    // Animated plane rotation angle
     this.angle = new Vector3(0.0, 0.0, 0.0);
-    // Plane texture UV size
-    this.uvSize = new Vector2(1.0, 1.0);
-    // Plane texture UV offset
-    this.uvOffset = new Vector2(0.0, 0.0);
-    // Plane alpha
+    // Animated plane frame count
+    this.count = new Vector2(1, 1);
+    // Animated plane start frame
+    this.start = new Vector2(0, 0);
+    // Animated plane end frame
+    this.end = new Vector2(0, 0);
+    // Animated plane frametime in seconds
+    this.frametime = 1.0;
+    // Animated plane alpha
     this.alpha = 1.0;
+
+    // Animated plane current states
+    this.current = new Vector2(0, 0);
+    this.next = new Vector2(0, 0);
+    this.currentTime = 0.0;
+    this.interpOffset = 0.0;
 }
 
-Plane.prototype = {
+AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init plane                                                     //
-    //  param texture : Texture pointer                                       //
-    //  param width : Plane width                                             //
-    //  param height : Plane height                                           //
+    //  init : Init animated plane                                            //
+    //  param tex : Texture pointer                                           //
+    //  param width : Animated plane width                                    //
+    //  param height : Animated plane height                                  //
+    //  param countX : Animated plane frames count in U texture axis          //
+    //  param countY : Animated plane frames count in V texture axis          //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(texture, width, height)
+    init: function(tex, width, height, countX, countY)
     {
-        // Reset Plane
+        // Reset animated plane
         this.alphaUniform = -1;
-        this.uvSizeUniform = -1;
-        this.uvOffsetUniform = -1;
+        this.countUniform = -1;
+        this.currentUniform = -1;
+        this.nextUniform = -1;
+        this.interpUniform = -1;
         this.texture = null;
         this.modelMatrix.setIdentity();
         this.billboard = 0;
@@ -101,34 +117,44 @@ Plane.prototype = {
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.angle.reset();
-        this.uvSize.setXY(1.0, 1.0);
-        this.uvOffset.reset();
+        this.count.setXY(1, 1);
+        if (countX !== undefined) this.count.vec[0] = countX;
+        if (countY !== undefined) this.count.vec[1] = countY;
+        this.start.setXY(0, 0);
+        this.end.setXY(0, 0);
+        this.frametime = 1.0;
         this.alpha = 1.0;
+        this.current.setXY(0, 0);
+        this.next.setXY(0, 0);
+        this.currentTime = 0.0;
+        this.interpOffset = 0.0;
 
         // Check renderer pointer
         if (!this.renderer) return false;
 
-        // Check plane shader pointer
-        if (!this.planeShader) return false;
+        // Check animated plane shader pointer
+        if (!this.animShader) return false;
 
-        // Get plane shader uniforms locations
-        this.planeShader.bind();
-        this.alphaUniform = this.planeShader.getUniform("alpha");
-        this.uvOffsetUniform = this.planeShader.getUniform("uvOffset");
-        this.uvSizeUniform = this.planeShader.getUniform("uvSize");
-        this.planeShader.unbind();
+        // Get animated plane shader uniforms locations
+        this.animShader.bind();
+        this.alphaUniform = this.animShader.getUniform("alpha");
+        this.countUniform = this.animShader.getUniform("count");
+        this.currentUniform = this.animShader.getUniform("current");
+        this.nextUniform = this.animShader.getUniform("next");
+        this.interpUniform = this.animShader.getUniform("interp");
+        this.animShader.unbind();
 
         // Set texture
-        this.texture = texture;
+        this.texture = tex;
         if (!this.texture) return false;
 
-        // Plane loaded
+        // Sprite loaded
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setBillboard : Set plane billboard mode                               //
-    //  param billboard : Plane billboard mode                                //
+    //  setBillboard : Set animated plane billboard mode                      //
+    //  param billboard : Animated plane billboard mode                       //
     ////////////////////////////////////////////////////////////////////////////
     setBillboard: function(billboard)
     {
@@ -138,10 +164,10 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosition : Set plane position                                      //
-    //  param x : Plane X position                                            //
-    //  param y : Plane Y position                                            //
-    //  param z : Plane Z position                                            //
+    //  setPosition : Set animated plane position                             //
+    //  param x : Animated plane X position                                   //
+    //  param y : Animated plane Y position                                   //
+    //  param z : Animated plane Z position                                   //
     ////////////////////////////////////////////////////////////////////////////
     setPosition: function(x, y, z)
     {
@@ -162,8 +188,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setX : Set plane X position                                           //
-    //  param x : Plane X position                                            //
+    //  setX : Set animated plane X position                                  //
+    //  param x : Animated animated plane X position                          //
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
     {
@@ -171,8 +197,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setY : Set plane Y position                                           //
-    //  param y : Plane Y position                                            //
+    //  setY : Set animated plane Y position                                  //
+    //  param y : Animated animated plane Y position                          //
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
     {
@@ -180,8 +206,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setZ : Set plane Z position                                           //
-    //  param z : Plane Z position                                            //
+    //  setZ : Set animated plane Z position                                  //
+    //  param z : Animated animated plane Z position                          //
     ////////////////////////////////////////////////////////////////////////////
     setZ: function(z)
     {
@@ -189,7 +215,7 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  move : Translate plane                                                //
+    //  move : Translate animated plane                                       //
     //  param x : X axis translate value                                      //
     //  param y : Y axis translate value                                      //
     //  param z : Z axis translate value                                      //
@@ -202,8 +228,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveVec3 : Translate plane by a 3 components vector                   //
-    //  param vector : 3 components vector to translate plane by              //
+    //  moveVec3 : Translate animated plane by a 3 components vector          //
+    //  param vector : 3 components vector to translate animated plane by     //
     ////////////////////////////////////////////////////////////////////////////
     moveVec3: function(vector)
     {
@@ -213,7 +239,7 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate plane on X axis                                     //
+    //  moveX : Translate animated plane on X axis                            //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
@@ -222,7 +248,7 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate plane on Y axis                                     //
+    //  moveY : Translate animated plane on Y axis                            //
     //  param y : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
@@ -231,7 +257,7 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveZ : Translate plane on Z axis                                     //
+    //  moveZ : Translate animated plane on Z axis                            //
     //  param z : Z axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveZ: function(z)
@@ -240,9 +266,9 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSize : Set plane size                                              //
-    //  param width : Plane width to set                                      //
-    //  param height : Plane height to set                                    //
+    //  setSize : Set animated plane size                                     //
+    //  param width : Animated plane width to set                             //
+    //  param height : Animated plane height to set                           //
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
@@ -251,8 +277,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSizeVec2 : Set plane size from a 2 components vector               //
-    //  param vector : 2 components vector to set plane size from             //
+    //  setSizeVec2 : Set animated plane size from a 2 components vector      //
+    //  param vector : 2 components vector to set animated plane size from    //
     ////////////////////////////////////////////////////////////////////////////
     setSizeVec2: function(vector)
     {
@@ -261,8 +287,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setWidth : Set plane width                                            //
-    //  param width : Plane width to set                                      //
+    //  setWidth : Set animated plane width                                   //
+    //  param width : Animated plane width to set                             //
     ////////////////////////////////////////////////////////////////////////////
     setWidth: function(width)
     {
@@ -270,8 +296,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setHeight : Set plane height                                          //
-    //  param height : Plane height to set                                    //
+    //  setHeight : Set animated plane height                                 //
+    //  param height : Animated plane height to set                           //
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
@@ -279,10 +305,10 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngle : Set plane rotation angle                                   //
-    //  param angleX : Plane rotation X angle to set in degrees               //
-    //  param angleY : Plane rotation Y angle to set in degrees               //
-    //  param angleZ : Plane rotation Z angle to set in degrees               //
+    //  setAngle : Set animated plane rotation angle                          //
+    //  param angleX : Animated plane rotation X angle to set in degrees      //
+    //  param angleY : Animated plane rotation Y angle to set in degrees      //
+    //  param angleZ : Animated plane rotation Z angle to set in degrees      //
     ////////////////////////////////////////////////////////////////////////////
     setAngle: function(angleX, angleY, angleZ)
     {
@@ -292,8 +318,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngleX : Set plane rotation X angle                                //
-    //  param angleX : Plane rotation X angle to set in degrees               //
+    //  setAngleX : Set animated plane rotation X angle                       //
+    //  param angleX : Animated plane rotation X angle to set in degrees      //
     ////////////////////////////////////////////////////////////////////////////
     setAngleX: function(angleX)
     {
@@ -301,8 +327,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngleY : Set plane rotation Y angle                                //
-    //  param angleY : Plane rotation Y angle to set in degrees               //
+    //  setAngleY : Set animated plane rotation Y angle                       //
+    //  param angleY : Animated plane rotation Y angle to set in degrees      //
     ////////////////////////////////////////////////////////////////////////////
     setAngleY: function(angleY)
     {
@@ -310,8 +336,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngleZ : Set plane rotation Z angle                                //
-    //  param angleZ : Plane rotation Z angle to set in degrees               //
+    //  setAngleZ : Set animated plane rotation Z angle                       //
+    //  param angleZ : Animated plane rotation Z angle to set in degrees      //
     ////////////////////////////////////////////////////////////////////////////
     setAngleZ: function(angleZ)
     {
@@ -319,10 +345,10 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate plane                                                 //
-    //  param angleX : X angle to rotate plane by in degrees                  //
-    //  param angleY : Y angle to rotate plane by in degrees                  //
-    //  param angleZ : Z angle to rotate plane by in degrees                  //
+    //  rotate : Rotate animated plane                                        //
+    //  param angleX : X angle to rotate animated plane by in degrees         //
+    //  param angleY : Y angle to rotate animated plane by in degrees         //
+    //  param angleZ : Z angle to rotate animated plane by in degrees         //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angleX, angleY, angleZ)
     {
@@ -332,8 +358,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateX : Rotate plane on X axis                                      //
-    //  param angleX : X angle to rotate plane by in degrees                  //
+    //  rotateX : Rotate animated plane on X axis                             //
+    //  param angleX : X angle to rotate animated plane by in degrees         //
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
@@ -341,8 +367,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateY : Rotate plane on Y axis                                      //
-    //  param angleY : Y angle to rotate plane by in degrees                  //
+    //  rotateY : Rotate animated plane on Y axis                             //
+    //  param angleY : Y angle to rotate animated plane by in degrees         //
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleY)
     {
@@ -350,8 +376,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateZ : Rotate plane on Z axis                                      //
-    //  param angleZ : Z angle to rotate plane by in degrees                  //
+    //  rotateZ : Rotate animated plane on Z axis                             //
+    //  param angleZ : Z angle to rotate animated plane by in degrees         //
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
@@ -359,45 +385,47 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setUVSize : Set plane render subrectangle size                        //
-    //  param usize : Plane texture U size                                    //
-    //  param vsize : Plane texture V size                                    //
+    //  setCount : Set animation frame count                                  //
+    //  param countX : Animation X frames total count                         //
+    //  param countY : Animation Y frames total count                         //
     ////////////////////////////////////////////////////////////////////////////
-    setUVSize: function(usize, vsize)
+    setCount: function(countX, countY)
     {
-        this.uvSize.vec[0] = usize;
-        this.uvSize.vec[1] = vsize;
+        this.count.setXY(countX, countY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSubrect : Set plane render subrectangle offset                     //
-    //  param uoffset : Plane texture U offset                                //
-    //  param voffset : Plane texture V offset                                //
+    //  setStart : Set animation start frame                                  //
+    //  param startX : Animation start frame X position to set                //
+    //  param startY : Animation start frame Y position to set                //
     ////////////////////////////////////////////////////////////////////////////
-    setUVOffset: function(uoffset, voffset)
+    setStart: function(startX, startY)
     {
-        this.uvOffset.vec[0] = uoffset;
-        this.uvOffset.vec[1] = voffset;
+        this.start.setXY(startX, startY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSubrect : Set plane render subrectangle                            //
-    //  param usize : Plane texture U size                                    //
-    //  param vsize : Plane texture V size                                    //
-    //  param uoffset : Plane texture U offset                                //
-    //  param voffset : Plane texture V offset                                //
+    //  setEnd : Set animation end frame                                      //
+    //  param endX : Animation end frame X position to set                    //
+    //  param endY : Animation end frame Y position to set                    //
     ////////////////////////////////////////////////////////////////////////////
-    setSubrect: function(usize, vsize, uoffset, voffset)
+    setEnd: function(endX, endY)
     {
-        this.uvSize.vec[0] = usize;
-        this.uvSize.vec[1] = vsize;
-        this.uvOffset.vec[0] = uoffset;
-        this.uvOffset.vec[1] = voffset;
+        this.end.setXY(endX, endY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set plane alpha                                            //
-    //  param alpha : Plane alpha to set                                      //
+    //  setFrametime : Set animated plane frametime                           //
+    //  param frametime : Animated plane frametime to set                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setFrametime: function(frametime)
+    {
+        this.frametime = frametime;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set animated plane alpha                                   //
+    //  param alpha : Animated plane alpha to set                             //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
     {
@@ -405,8 +433,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getX : Get plane X position                                           //
-    //  return : Plane X position                                             //
+    //  getX : Get animated plane X position                                  //
+    //  return : Animated plane X position                                    //
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
@@ -414,8 +442,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getY : Get plane Y position                                           //
-    //  return : Plane Y position                                             //
+    //  getY : Get animated plane Y position                                  //
+    //  return : Animated plane Y position                                    //
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
@@ -423,8 +451,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getZ : Get plane Z position                                           //
-    //  return : Plane Z position                                             //
+    //  getZ : Get animated plane Z position                                  //
+    //  return : Animated plane Z position                                    //
     ////////////////////////////////////////////////////////////////////////////
     getZ: function()
     {
@@ -432,8 +460,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get plane width                                            //
-    //  return : Plane width                                                  //
+    //  getWidth : Get animated plane width                                   //
+    //  return : Animated plane width                                         //
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
@@ -441,8 +469,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get plane height                                          //
-    //  return : Plane height                                                 //
+    //  getHeight : Get animated plane height                                 //
+    //  return : Animated plane height                                        //
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
@@ -450,8 +478,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAngleX : Get plane rotation X angle                                //
-    //  return : Plane rotation X angle in degrees                            //
+    //  getAngleX : Get animated plane rotation X angle                       //
+    //  return : Animated plane rotation X angle in degrees                   //
     ////////////////////////////////////////////////////////////////////////////
     getAngleX: function()
     {
@@ -459,8 +487,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAngleY : Get plane rotation Y angle                                //
-    //  return : Plane rotation Y angle in degrees                            //
+    //  getAngleY : Get animated plane rotation Y angle                       //
+    //  return : Animated plane rotation Y angle in degrees                   //
     ////////////////////////////////////////////////////////////////////////////
     getAngleY: function()
     {
@@ -468,8 +496,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAngleZ : Get plane rotation Z angle                                //
-    //  return : Plane rotation Z angle in degrees                            //
+    //  getAngleZ : Get animated plane rotation Z angle                       //
+    //  return : Animated plane rotation Z angle in degrees                   //
     ////////////////////////////////////////////////////////////////////////////
     getAngleZ: function()
     {
@@ -477,44 +505,71 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getUVWidth : Get plane render subrectangle width                      //
-    //  return : Plane render subrectangle width                              //
+    //  getCountX : Get animated plane X frames count                         //
+    //  return : Animated plane X frames count                                //
     ////////////////////////////////////////////////////////////////////////////
-    getUVWidth: function()
+    getCountX: function()
     {
-        return this.uvSize.vec[0];
+        return this.count.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getUVHeight : Get plane render subrectangle height                    //
-    //  return : Plane render subrectangle height                             //
+    //  getCountY : Get animated plane Y frames count                         //
+    //  return : Animated plane Y frames count                                //
     ////////////////////////////////////////////////////////////////////////////
-    getUVHeight: function()
+    getCountY: function()
     {
-        return this.uvSize.vec[1];
+        return this.count.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getUVWidth : Get plane render subrectangle X offset                   //
-    //  return : Plane render subrectangle X offset                           //
+    //  getStartX : Get animated plane X start frame                          //
+    //  return : Animated plane X start frame                                 //
     ////////////////////////////////////////////////////////////////////////////
-    getUVOffsetX: function()
+    getStartX: function()
     {
-        return this.uvOffset.vec[0];
+        return this.start.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getUVHeight : Get plane render subrectangle Y offset                  //
-    //  return : Plane render subrectangle Y offset                           //
+    //  getStartY : Get animated plane Y start frame                          //
+    //  return : Animated plane Y start frame                                 //
     ////////////////////////////////////////////////////////////////////////////
-    getUVOffsetY: function()
+    getStartY: function()
     {
-        return this.uvOffset.vec[1];
+        return this.start.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAlpha : Get plane alpha                                            //
-    //  return : Plane alpha                                                  //
+    //  getEndX : Get animated plane X end frame                              //
+    //  return : Animated plane X end frame                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    getEndX: function()
+    {
+        return this.end.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getEndY : Get animated plane Y end frame                              //
+    //  return : Animated plane Y end frame                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    getEndY: function()
+    {
+        return this.end.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getFrametime : Get animated plane frametime                           //
+    //  return : Animated plane frametime                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    getFrametime: function()
+    {
+        return this.frametime;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAlpha : Get animated plane alpha                                   //
+    //  return : Animated plane alpha                                         //
     ////////////////////////////////////////////////////////////////////////////
     getAlpha: function()
     {
@@ -522,9 +577,112 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  render : Render plane                                                 //
+    //  getCurrentX : Get animated plane X current frame                      //
+    //  return : Animated plane X current frame                               //
     ////////////////////////////////////////////////////////////////////////////
-    render: function()
+    getCurrentX: function()
+    {
+        return this.current.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getCurrentY : Get animated plane Y current frame                      //
+    //  return : Animated plane Y current frame                               //
+    ////////////////////////////////////////////////////////////////////////////
+    getCurrentY: function()
+    {
+        return this.current.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getNextX : Get animated plane X next frame                            //
+    //  return : Animated plane X next frame                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    getNextX: function()
+    {
+        return this.next.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getNextY : Get animated plane Y next frame                            //
+    //  return : Animated plane Y next frame                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    getNextY: function()
+    {
+        return this.next.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getCurrentTime : Get animated plane current time                      //
+    //  return : Animated plane current time                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    getCurrentTime: function()
+    {
+        return this.currentTime;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  resetAnim : Reset current animation                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    resetAnim: function()
+    {
+        this.currentTime = 0.0;
+        this.interpOffset = 0.0;
+        this.next.set(this.start);
+        this.computeFrame();
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  computeFrame : Compute current and next frame offsets                 //
+    ////////////////////////////////////////////////////////////////////////////
+    computeFrame: function()
+    {
+        // Compute next frame offset
+        this.current.set(this.next);
+        if (this.next.vec[0] < (this.count.vec[0]-1))
+        {
+            // Check end frame
+            if ((this.next.vec[0] >= this.end.vec[0]) &&
+                (this.next.vec[1] >= this.end.vec[1]))
+            {
+                // End frame reached
+                this.next.set(this.start);
+            }
+            else
+            {
+                ++this.next.vec[0];
+            }
+        }
+        else
+        {
+            if (this.next.vec[1] < (this.count.vec[1]-1))
+            {
+                // Check end frame
+                if ((this.next.vec[0] >= this.end.vec[0]) &&
+                    (this.next.vec[1] >= this.end.vec[1]))
+                {
+                    // End frame reached
+                    this.next.set(this.start);
+                }
+                else
+                {
+                    this.next.vec[0] = 0;
+                    ++this.next.vec[1];
+                }
+            }
+            else
+            {
+                // Last frame reached
+                this.next.set(this.start);
+            }
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  render : Render animated plane                                        //
+    //  param frametime : Frametime for animation update                      //
+    ////////////////////////////////////////////////////////////////////////////
+    render: function(frametime)
     {
         var upVec = new Vector3();
         var rotVec = new Vector3();
@@ -532,8 +690,36 @@ Plane.prototype = {
         var delta2 = new Vector3();
         var dotProduct = 0.0;
         var angle = 0.0;
+        var interp = 0.0;
 
-        // Set plane model matrix
+        // Update current animation time
+        this.currentTime += frametime;
+        if (this.frametime > 0.0)
+        {
+            this.interpOffset += frametime/this.frametime;
+        }
+        else
+        {
+            this.interpOffset += frametime;
+        }
+
+        if (this.currentTime >= this.frametime)
+        {
+            // Reset interpolation timer
+            this.interpOffset = 0.0;
+
+            // Compute frame offets
+            this.computeFrame();
+
+            // Reset timer
+            this.currentTime = 0.0;
+        }
+
+        // Compute cubic interpolation
+        interp = this.interpOffset + (this.interpOffset - 
+            this.interpOffset*this.interpOffset*(3.0-2.0*this.interpOffset));
+
+        // Set animated plane model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec3(this.position);
         if (this.billboard == 1)
@@ -618,32 +804,34 @@ Plane.prototype = {
         );
         this.modelMatrix.scaleVec2(this.size);
 
-        // Bind plane shader
-        this.planeShader.bind();
+        // Bind shader
+        this.animShader.bind();
 
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
-        // Send shader uniforms
-        this.planeShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.planeShader.sendUniform(this.alphaUniform, this.alpha);
-        this.planeShader.sendUniformVec2(this.uvOffsetUniform, this.uvOffset);
-        this.planeShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
+        // Send animated plane shader uniforms
+        this.animShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.animShader.sendUniform(this.alphaUniform, this.alpha);
+        this.animShader.sendUniformVec2(this.countUniform, this.count);
+        this.animShader.sendUniformVec2(this.currentUniform, this.current);
+        this.animShader.sendUniformVec2(this.nextUniform, this.next);
+        this.animShader.sendUniform(this.interpUniform, interp);
 
         // Bind texture
         this.texture.bind();
 
         // Render VBO
         this.renderer.vertexBuffer.bind();
-        this.renderer.vertexBuffer.render(this.planeShader);
+        this.renderer.vertexBuffer.render(this.animShader);
         this.renderer.vertexBuffer.unbind();
 
         // Unbind texture
         this.texture.unbind();
 
-        // Unbind plane shader
-        this.planeShader.unbind();
+        // Unbind shader
+        this.animShader.unbind();
     }
 };

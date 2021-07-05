@@ -319,6 +319,8 @@ function Wos()
 
     // Test plane
     this.testplane = null;
+    // Test anim plane
+    this.testanimplane = null;
     // Test static mesh
     this.staticmesh = null;
     // Test skeletal mesh
@@ -494,6 +496,19 @@ Wos.prototype = {
             this.loader.getTexture("testsprite.png"), 1.0, 1.0
         );
         this.testplane.setBillboard(0);
+
+        // Init test anim plane
+        this.testanimplane = new AnimPlane(
+            this.renderer, this.loader.animSpriteShader
+        );
+        this.testanimplane.init(
+            this.loader.getTexture("testsprite.png"), 1.0, 1.0, 2, 2
+        );
+        this.testanimplane.setFrametime(1.0);
+        this.testanimplane.setStart(0, 0);
+        this.testanimplane.setEnd(1, 1);
+        this.testanimplane.resetAnim();
+        this.testanimplane.setBillboard(0);
 
         // Init test static mesh
         this.staticmesh = new StaticMesh(
@@ -833,6 +848,9 @@ Wos.prototype = {
 
         // Render test plane
         //this.testplane.render();
+
+        // Render test anim plane
+        //this.testanimplane.render(this.frametime);
 
         // Render test static mesh
         //this.staticmesh.render(this.renderer.quality, this.shadows);
