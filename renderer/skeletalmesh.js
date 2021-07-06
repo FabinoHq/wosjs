@@ -136,6 +136,11 @@ function SkeletalMesh(renderer,
     // Current bones
     this.currentBones = null;
 
+    // Skeletal mesh attachment
+    this.attachedMesh = null;
+    // Skeletal mesh bones attachment
+    this.attachedBones = null;
+
     // Skeletal mesh position
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Skeletal mesh rotation angles
@@ -210,6 +215,8 @@ SkeletalMesh.prototype = {
         this.frametimes = null;
         this.currentTimes = null;
         this.currentBones = null;
+        this.attachedMesh = null;
+        this.attachedBones = null;
         this.position.reset();
         this.angles.reset();
         this.scale = 1.0;
@@ -477,6 +484,9 @@ SkeletalMesh.prototype = {
             this.currentBones[i] = 0;
         }
 
+        // Create bones attachement array
+        this.attachedBones = new Array(this.bonesCount);
+
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
@@ -512,6 +522,34 @@ SkeletalMesh.prototype = {
         if (specularMap)
         {
             this.specularMap = specularMap;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAttachment : Set skeletal mesh attachment mesh                     //
+    //  param skeletalMesh : Skeletal mesh to attach skeletal mesh to         //
+    ////////////////////////////////////////////////////////////////////////////
+    setAttachment: function(skeletalMesh)
+    {
+        if (skeletalMesh)
+        {
+            this.attachedMesh = skeletalMesh;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setBoneAttachment : Set skeletal mesh attachment bone                 //
+    //  param bone : Current bone to attach skeletal mesh bone to             //
+    //  param skeletalBone : Skeletal mesh bone to attach current bone to     //
+    ////////////////////////////////////////////////////////////////////////////
+    setBoneAttachment: function(bone, skeletalBone)
+    {
+        if (this.attachedMesh)
+        {
+            if ((bone >= 0 && bone) <= (this.attachedBones.length))
+            {
+                this.attachedBones[bone] = skeletalBone;
+            }
         }
     },
 
@@ -691,12 +729,15 @@ SkeletalMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setAnimation: function(animGroup, animation)
     {
-        if ((animGroup >= 0) && (animGroup <= this.animGroups))
+        if (this.animGroups)
         {
-            if ((animation >= 0) &&
-                (animation <= this.animations[animGroup].length))
+            if ((animGroup >= 0) && (animGroup <= this.animGroups))
             {
-                this.currentAnims[animGroup] = animation;
+                if ((animation >= 0) &&
+                    (animation <= this.animations[animGroup].length))
+                {
+                    this.currentAnims[animGroup] = animation;
+                }
             }
         }
     },
@@ -836,6 +877,7 @@ SkeletalMesh.prototype = {
         var nextPos = new Vector3();
         var rot = new Vector3();
         var nextRot = new Vector3();
+        var attachedBone = 0;
         for (i = 0; i < this.animGroups; ++i)
         {
             this.currentBones[i] = 0;
@@ -868,56 +910,73 @@ SkeletalMesh.prototype = {
 
             // Animate bone
             animated = false;
-            animGroup = this.animBones[i];
-            if (animGroup >= 0)
+            if (this.attachedMesh)
             {
-                currentFrame = this.currentFrames[animGroup];
-                nextFrame = currentFrame+1;
-                currentTime = this.currentTimes[animGroup];
-                currentFrametime = this.frametimes[animGroup];
-                if (currentFrametime > 0.0)
+                // Bone attachment
+                attachedBone = this.attachedBones[i];
+                if ((attachedBone >= 0) &&
+                    (attachedBone < this.attachedMesh.bonesCount))
                 {
-                    currentTime /= currentFrametime;
-                }
-                if (nextFrame >=
-                    this.keyFrames[animGroup][this.currentAnims[animGroup]])
-                {
-                    nextFrame = 0;
-                }
-                if (currentFrame >= 0)
-                {
-                    currentAnim = this.currentAnims[animGroup];
-                    currentBone = this.currentBones[animGroup];
-                    keyFrames = this.keyFrames[animGroup][currentAnim];
-                    curI = (currentBone*keyFrames*6)+(currentFrame*6);
-                    nextI = (currentBone*keyFrames*6)+(nextFrame*6);
-                    pos.setXYZ(
-                        this.animations[animGroup][currentAnim][curI],
-                        this.animations[animGroup][currentAnim][curI+1],
-                        this.animations[animGroup][currentAnim][curI+2]
+                    this.bonesMatrices[i].setMatrix(
+                        this.attachedMesh.bonesMatrices[attachedBone]
                     );
-                    rot.setXYZ(
-                        this.animations[animGroup][currentAnim][curI+3],
-                        this.animations[animGroup][currentAnim][curI+4],
-                        this.animations[animGroup][currentAnim][curI+5]
-                    );
-                    nextPos.setXYZ(
-                        this.animations[animGroup][currentAnim][nextI],
-                        this.animations[animGroup][currentAnim][nextI+1],
-                        this.animations[animGroup][currentAnim][nextI+2]
-                    );
-                    nextRot.setXYZ(
-                        this.animations[animGroup][currentAnim][nextI+3],
-                        this.animations[animGroup][currentAnim][nextI+4],
-                        this.animations[animGroup][currentAnim][nextI+5]
-                    );
-                    pos.linearInterp(pos, nextPos, currentTime);
-                    rot.linearInterp(rot, nextRot, currentTime);
-                    this.bonesMatrices[i].translateVec3(pos);
-                    this.bonesMatrices[i].rotateVec3(rot);
                     animated = true;
                 }
-                ++this.currentBones[animGroup];
+            }
+            else
+            {
+                // Bone animation
+                animGroup = this.animBones[i];
+                if (animGroup >= 0)
+                {
+                    currentFrame = this.currentFrames[animGroup];
+                    nextFrame = currentFrame+1;
+                    currentTime = this.currentTimes[animGroup];
+                    currentFrametime = this.frametimes[animGroup];
+                    if (currentFrametime > 0.0)
+                    {
+                        currentTime /= currentFrametime;
+                    }
+                    if (nextFrame >=
+                        this.keyFrames[animGroup][this.currentAnims[animGroup]])
+                    {
+                        nextFrame = 0;
+                    }
+                    if (currentFrame >= 0)
+                    {
+                        currentAnim = this.currentAnims[animGroup];
+                        currentBone = this.currentBones[animGroup];
+                        keyFrames = this.keyFrames[animGroup][currentAnim];
+                        curI = (currentBone*keyFrames*6)+(currentFrame*6);
+                        nextI = (currentBone*keyFrames*6)+(nextFrame*6);
+                        pos.setXYZ(
+                            this.animations[animGroup][currentAnim][curI],
+                            this.animations[animGroup][currentAnim][curI+1],
+                            this.animations[animGroup][currentAnim][curI+2]
+                        );
+                        rot.setXYZ(
+                            this.animations[animGroup][currentAnim][curI+3],
+                            this.animations[animGroup][currentAnim][curI+4],
+                            this.animations[animGroup][currentAnim][curI+5]
+                        );
+                        nextPos.setXYZ(
+                            this.animations[animGroup][currentAnim][nextI],
+                            this.animations[animGroup][currentAnim][nextI+1],
+                            this.animations[animGroup][currentAnim][nextI+2]
+                        );
+                        nextRot.setXYZ(
+                            this.animations[animGroup][currentAnim][nextI+3],
+                            this.animations[animGroup][currentAnim][nextI+4],
+                            this.animations[animGroup][currentAnim][nextI+5]
+                        );
+                        pos.linearInterp(pos, nextPos, currentTime);
+                        rot.linearInterp(rot, nextRot, currentTime);
+                        this.bonesMatrices[i].translateVec3(pos);
+                        this.bonesMatrices[i].rotateVec3(rot);
+                        animated = true;
+                    }
+                    ++this.currentBones[animGroup];
+                }
             }
 
             // Bone bind pose
@@ -975,6 +1034,10 @@ SkeletalMesh.prototype = {
     {
         // Set skeletal mesh model matrix
         this.modelMatrix.setIdentity();
+        if (this.attachedMesh)
+        {
+            this.modelMatrix.setMatrix(this.attachedMesh.modelMatrix);
+        }
         this.modelMatrix.translateVec3(this.position);
         this.modelMatrix.rotateVec3(this.angles);
         this.modelMatrix.scale(this.scale, this.scale, this.scale);
@@ -985,13 +1048,31 @@ SkeletalMesh.prototype = {
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Set maximum quality
+        if (!shadows)
+        {
+            if (this.renderer.maxQuality >= WOSRendererQualityMedium)
+            {
+                if (quality >= WOSRendererQualityMedium)
+                {
+                    quality = WOSRendererQualityMedium;
+                }
+                else
+                {
+                    quality = WOSRendererQualityLow;
+                }
+            }
+            else
+            {
+                quality = WOSRendererQualityLow;
+            }
+        }
+        if (quality >= this.renderer.quality)
+        {
+            quality = this.renderer.quality;
+        }
         if (quality >= this.renderer.maxQuality)
         {
             quality = this.renderer.maxQuality;
-        }
-        if (!shadows)
-        {
-            quality = WOSRendererQualityLow;
         }
 
         // Render skeletal mesh

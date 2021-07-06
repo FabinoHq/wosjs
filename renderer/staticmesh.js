@@ -93,6 +93,11 @@ function StaticMesh(renderer, meshShader, meshShaderMedium, meshShaderLow)
     // Static mesh shadows matrix
     this.shadowsMatrix = new Matrix4x4();
 
+    // Skeletal mesh attachment
+    this.attachedMesh = null;
+    // Skeletal bone attachment
+    this.attachedBone = 0;
+
     // Static mesh position
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Static mesh rotation angles
@@ -138,6 +143,8 @@ StaticMesh.prototype = {
         this.normalMap = null;
         this.specularMap = null;
         this.modelMatrix.setIdentity();
+        this.attachedMesh = null;
+        this.attachedBone = 0;
         this.position.reset();
         this.angles.reset();
         this.scale = 1.0;
@@ -282,6 +289,20 @@ StaticMesh.prototype = {
         if (specularMap)
         {
             this.specularMap = specularMap;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAttachment : Set skeletal mesh attachment bone                     //
+    //  param skeletalMesh : Skeletal mesh to attach static mesh to           //
+    //  param skeletalBone : Skeletal mesh bone to attach static mesh to      //
+    ////////////////////////////////////////////////////////////////////////////
+    setAttachment: function(skeletalMesh, skeletalBone)
+    {
+        if (skeletalMesh)
+        {
+            this.attachedMesh = skeletalMesh;
+            this.attachedBone = skeletalBone;
         }
     },
 
@@ -562,6 +583,12 @@ StaticMesh.prototype = {
     {
         // Set static mesh model matrix
         this.modelMatrix.setIdentity();
+        if (this.attachedMesh)
+        {
+            this.modelMatrix.setMatrix(
+                this.attachedMesh.bonesMatrices[this.attachedBone]
+            );
+        }
         this.modelMatrix.translateVec3(this.position);
         this.modelMatrix.rotateVec3(this.angles);
         this.modelMatrix.scale(this.scale, this.scale, this.scale);
@@ -572,20 +599,31 @@ StaticMesh.prototype = {
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Set maximum quality
-        if (quality >= this.renderer.maxQuality)
-        {
-            quality = this.renderer.maxQuality;
-        }
         if (!shadows)
         {
             if (this.renderer.maxQuality >= WOSRendererQualityMedium)
             {
-                quality = WOSRendererQualityMedium;
+                if (quality >= WOSRendererQualityMedium)
+                {
+                    quality = WOSRendererQualityMedium;
+                }
+                else
+                {
+                    quality = WOSRendererQualityLow;
+                }
             }
             else
             {
                 quality = WOSRendererQualityLow;
             }
+        }
+        if (quality >= this.renderer.quality)
+        {
+            quality = this.renderer.quality;
+        }
+        if (quality >= this.renderer.maxQuality)
+        {
+            quality = this.renderer.maxQuality;
         }
 
         // Render static mesh
