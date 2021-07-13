@@ -67,6 +67,7 @@
 !renderer/shaders/buttonshader.js
 !renderer/shaders/togglebuttonshader.js
 !renderer/shaders/textshader.js
+!renderer/shaders/pxtextshader.js
 !renderer/shaders/staticmeshshader.js
 !renderer/shaders/staticmeshshadermedium.js
 !renderer/shaders/staticmeshshaderlow.js
@@ -79,6 +80,7 @@
 !interface/guitogglebutton.js
 !interface/guitext.js
 !interface/guitextbox.js
+!interface/guipxtext.js
 
 !audio/audioengine.js
 !audio/sound.js
@@ -89,6 +91,7 @@
 # Textures files
 !textures/
 !textures/cursor.png
+!textures/wospxfont.png
 !textures/testsprite.png
 !textures/testninebox.png
 !textures/testbutton.png

@@ -37,27 +37,29 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      assets.js : WOS Assets management                                     //
+//      renderer/pxtextshader.js : Pixel text shader                          //
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// WOS textures assets
-var TexturesAssets = [
-    "cursor.png",
-    "wospxfont.png",
-    "testsprite.png",
-    "testninebox.png",
-    "testbutton.png",
-    "testtogglebutton.png"
-];
-
-// WOS models assets
-var ModelsAssets = [
-    "testmodel.wmsh",
-    "testskeletal.wmsh"
-];
-
-// WOS sounds assets
-var SoundsAssets = [
-    "test.wav"
-];
+////////////////////////////////////////////////////////////////////////////////
+//  Pixel text fragment shader                                                //
+////////////////////////////////////////////////////////////////////////////////
+const pxTextFragmentShaderSrc = [
+    "precision mediump float;",
+    "precision mediump int;",
+    "uniform sampler2D texture;",
+    "varying vec2 texCoord;",
+    "uniform vec3 color;",
+    "uniform float alpha;",
+    "uniform float smooth;",
+    "uniform vec2 uvOffset;",
+    "uniform vec2 uvSize;",
+    "",
+    "void main()",
+    "{",
+    "    float dist = texture2D(texture, (texCoord*uvSize)+uvOffset).a;",
+    "    float pxAlpha = smoothstep(0.5-smooth, 0.5+smooth, dist);",
+    "    gl_FragColor = vec4(color, pxAlpha*alpha);",
+    "}",
+    ""
+].join("\n");

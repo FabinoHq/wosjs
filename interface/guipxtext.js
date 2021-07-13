@@ -37,28 +37,26 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      interface/guitext.js : GUI Text management                            //
+//      interface/guipxtext.js : GUI Pixel text (distance field) management   //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Default text hidden pass character (unicode dot)                          //
+//  Default pixel text hidden pass character                                  //
 ////////////////////////////////////////////////////////////////////////////////
-const HiddenTextPassCharacter = '\u2022';
+const HiddenPxTextPassCharacter = '#';
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Default font settings                                                     //
+//  Default pixel font settings                                               //
 ////////////////////////////////////////////////////////////////////////////////
-const WOSDefaultFontCharsizeFactor = 0.00098;
-const WOSDefaultFontScaleXFactor = 1024.0;
-const WOSDefaultFontScaleYFactor = 1024.0;
-const WOSDefaultFontSizeFactor = 800.0;
-const WOSDefaultMinFontSize = 12.0;
-const WOSDefaultMaxFontSize = 400.0;
-const WOSDefaultMinTextWidth = 0.001;
-const WOSDefaultMaxTextWidth = 3.98;
-const WOSDefaultMinTextHeight = 0.03;
-const WOSDefaultMaxTextHeight = 0.5;
+const WOSDefaultMinPxTextWidth = 0.001;
+const WOSDefaultMaxPxTextWidth = 3.98;
+const WOSDefaultMinPxTextHeight = 0.025;
+const WOSDefaultMaxPxTextHeight = 0.2;
+const WOSDefaultPxTextUVWidth = 0.0625;
+const WOSDefaultPxTextUVHeight = 0.125;
+const WOSDefaultPxTextXOffset = 0.44;
+const WOSDefaultPxTextYOffset = 0.92;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +64,7 @@ const WOSDefaultMaxTextHeight = 0.5;
 //  param renderer : Renderer pointer                                         //
 //  param textShader : Text shader pointer                                    //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiText(renderer, textShader)
+function GuiPxText(renderer, textShader)
 {
     // Renderer pointer
     this.renderer = renderer;
@@ -77,44 +75,53 @@ function GuiText(renderer, textShader)
     // Text shader uniforms locations
     this.colorUniform = -1;
     this.alphaUniform = -1;
+    this.smoothUniform = -1;
+    this.uvSizeUniform = -1;
+    this.uvOffsetUniform = -1;
 
-    // GuiText generated texture
+    // GuiPxText generated texture
     this.texture = null;
-    // GuiText model matrix
+    // GuiPxText model matrix
     this.modelMatrix = new Matrix4x4();
 
-    // GuiText position
+    // GuiPxText position
     this.position = new Vector2(0.0, 0.0);
-    // GuiText size
+    // GuiPxText size
     this.size = new Vector2(0.05, 0.05);
-    // GuiText rotation angle
+    // GuiPxText rotation angle
     this.angle = 0.0;
-    // GuiText color
+    // GuiPxText color
     this.color = new Vector3(1.0, 1.0, 1.0);
-    // GuiText alpha
+    // GuiPxText alpha
     this.alpha = 1.0;
+    // GuiPxText smooth value
+    this.smooth = 0.05;
+    // GuiPxText UV size
+    this.uvSize = new Vector2(1.0, 1.0);
+    // GuiPxText UV offset
+    this.uvOffset = new Vector2(0.0, 0.0);
 
-    // GuiText internal string
+    // GuiPxText internal string
     this.text = "";
     this.textLength = 0;
-    this.fontsize = 40.0;
-
-    // Characters sizes array
-    this.charsizes = null;
+    
+    // Characters size
+    this.charsize = new Vector2(1.0, 1.0);
 
     // Hidden text mode
     this.hidden = false;
     this.hidetext = "";
 }
 
-GuiText.prototype = {
+GuiPxText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init GUI Text                                                  //
+    //  init : Init GUI PxText                                                //
+    //  param texture : Texture pointer                                       //
     //  param text : Text to set                                              //
     //  param height : Text field height                                      //
     //  param hide : Text hide mode                                           //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(text, height, hide)
+    init: function(texture, text, height, hide)
     {
         var i = 0;
         var pixelsData = null;
@@ -124,17 +131,22 @@ GuiText.prototype = {
         // Reset GuiText
         this.colorUniform = -1;
         this.alphaUniform = -1;
+        this.smoothUniform = -1;
+        this.uvSizeUniform = -1;
+        this.uvOffsetUniform = -1;
         this.texture = null;
         this.modelMatrix.setIdentity();
         this.position.reset();
         this.angle = 0.0;
-        this.size.setXY(0.05, 0.05);
+        this.size.setXY(1.0, 1.0);
         this.color.setXYZ(1.0, 1.0, 1.0);
+        this.uvSize.setXY(WOSDefaultPxTextUVWidth, WOSDefaultPxTextUVHeight);
+        this.uvOffset.reset();
         this.alpha = 1.0;
+        this.smooth = 0.05;
         this.text = "";
         this.textLength = 0;
-        this.fontsize = 40.0;
-        this.charsizes = null;
+        this.charsize.setXY(1.0, 1.0);
         this.hidden = false;
         this.hidetext = "";
 
@@ -142,39 +154,38 @@ GuiText.prototype = {
         if (hide !== undefined) this.hidden = hide;
 
         // Set text
-        this.text = "";
-        this.textLength = 0;
         if (text !== undefined)
         {
             this.textLength = text.length;
             if (this.hidden)
             {
-                this.hidetext = text;
                 for (i = 0; i < this.textLength; ++i)
                 {
-                    this.text += HiddenTextPassCharacter;
+                    this.hidetext += this.convertASCII(text[i]);
+                    this.text += HiddenPxTextPassCharacter;
                 }
             }
             else
             {
-                this.hidetext = "";
-                this.text = text;
+                for (i = 0; i < this.textLength; ++i)
+                {
+                    this.text += this.convertASCII(text[i]);
+                }
             }
         }
 
-        // Set text field height
-        if (height !== undefined) this.size.vec[1] = height;
-        if (this.size.vec[1] <= WOSDefaultMinTextHeight)
-            this.size.vec[1] = WOSDefaultMinTextHeight;
-        if (this.size.vec[1] >= WOSDefaultMaxTextHeight)
-            this.size.vec[1] = WOSDefaultMaxTextHeight;
+        // Set char size
+        if (height !== undefined) this.charsize.vec[1] = height;
+        if (this.charsize.vec[1] <= WOSDefaultMinPxTextHeight)
+            this.charsize.vec[1] = WOSDefaultMinPxTextHeight;
+        if (this.charsize.vec[1] >= WOSDefaultMaxPxTextHeight)
+            this.charsize.vec[1] = WOSDefaultMaxPxTextHeight;
+        this.charsize.vec[0] = this.charsize.vec[1];
 
-        // Set font size based on text field height
-        this.fontsize = this.size.vec[1]*WOSDefaultFontSizeFactor;
-        if (this.fontsize <= WOSDefaultMinFontSize)
-            this.fontsize = WOSDefaultMinFontSize;
-        if (this.fontsize >= WOSDefaultMaxFontSize)
-            this.fontsize = WOSDefaultMaxFontSize;
+        // Set text size
+        this.size.vec[0] =
+            this.charsize.vec[0]*WOSDefaultPxTextXOffset*(this.textLength+1);
+        this.size.vec[1] = this.charsize.vec[1];
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -189,76 +200,21 @@ GuiText.prototype = {
         this.textShader.bind();
         this.colorUniform = this.textShader.getUniform("color");
         this.alphaUniform = this.textShader.getUniform("alpha");
+        this.smoothUniform = this.textShader.getUniform("smooth");
+        this.uvOffsetUniform = this.textShader.getUniform("uvOffset");
+        this.uvSizeUniform = this.textShader.getUniform("uvSize");
         this.textShader.unbind();
 
-        // Set text width
-        this.size.vec[0] = this.renderer.getTextWidth(
-            this.text, this.fontsize
-        )*WOSDefaultFontCharsizeFactor;
+        // Set texture
+        this.texture = texture;
+        if (!this.texture) return false;
+        this.texture.setSmooth(true);
 
         // Clamp text width
-        if (this.size.vec[0] <= WOSDefaultMinTextWidth)
-            this.size.vec[0] = WOSDefaultMinTextWidth;
-        if (this.size.vec[0] >= WOSDefaultMaxTextWidth)
-            this.size.vec[0] = WOSDefaultMaxTextWidth;
-
-        // Get char sizes
-        this.charsizes = new Array();
-        for (i = 0; i <= this.textLength; ++i)
-        {
-            this.charsizes[i] = this.renderer.getTextWidth(
-                this.text.substring(0, i), this.fontsize
-            )*WOSDefaultFontCharsizeFactor;
-        }
-
-        // Update pixels data size
-        pixelsDataWidth = Math.round(
-            this.size.vec[0]*WOSDefaultFontScaleXFactor
-        );
-        pixelsDataHeight = Math.round(
-            this.size.vec[1]*WOSDefaultFontScaleYFactor
-        );
-
-        // Render text
-        pixelsData = this.renderer.renderText(
-            this.text, pixelsDataWidth, pixelsDataHeight, this.fontsize
-        );
-
-        // Create texture
-        this.texture = this.renderer.gl.createTexture();
-        if (!this.texture) return false;
-        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
-        this.renderer.gl.texImage2D(
-            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            pixelsDataWidth, pixelsDataHeight, 0,
-            this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
-        );
-
-        // Set texture wrap mode
-        this.renderer.gl.texParameteri(
-            this.renderer.gl.TEXTURE_2D,
-            this.renderer.gl.TEXTURE_WRAP_S,
-            this.renderer.gl.CLAMP_TO_EDGE
-        );
-        this.renderer.gl.texParameteri(
-            this.renderer.gl.TEXTURE_2D,
-            this.renderer.gl.TEXTURE_WRAP_T,
-            this.renderer.gl.CLAMP_TO_EDGE
-        );
-
-        // Set texture min and mag filters
-        this.renderer.gl.texParameteri(
-            this.renderer.gl.TEXTURE_2D,
-            this.renderer.gl.TEXTURE_MIN_FILTER,
-            this.renderer.gl.LINEAR
-        );
-        this.renderer.gl.texParameteri(
-            this.renderer.gl.TEXTURE_2D,
-            this.renderer.gl.TEXTURE_MAG_FILTER,
-            this.renderer.gl.LINEAR
-        );
-
-        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+        if (this.size.vec[0] <= WOSDefaultMinPxTextWidth)
+            this.size.vec[0] = WOSDefaultMinPxTextWidth;
+        if (this.size.vec[0] >= WOSDefaultMaxPxTextWidth)
+            this.size.vec[0] = WOSDefaultMaxPxTextWidth;
 
         // Text loaded
         return true;
@@ -348,22 +304,18 @@ GuiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
-        // Set text field height
+        // Set char size
+        if (height <= WOSDefaultMinPxTextHeight)
+            height = WOSDefaultMinPxTextHeight;
+        if (height >= WOSDefaultMaxPxTextHeight)
+            height = WOSDefaultMaxPxTextHeight;
+        this.charsize.vec[0] = height;
+        this.charsize.vec[1] = height;
+
+        // Set text size
+        this.size.vec[0] =
+            this.charsize.vec[0]*WOSDefaultPxTextXOffset*(this.textLength+1);
         this.size.vec[1] = height;
-        if (this.size.vec[1] <= WOSDefaultMinTextHeight)
-            this.size.vec[1] = WOSDefaultMinTextHeight;
-        if (this.size.vec[1] >= WOSDefaultMaxTextHeight)
-            this.size.vec[1] = WOSDefaultMaxTextHeight;
-
-        // Set font size based on text field height
-        this.fontsize = this.size.vec[1]*WOSDefaultFontSizeFactor;
-        if (this.fontsize <= WOSDefaultMinFontSize)
-            this.fontsize = WOSDefaultMinFontSize;
-        if (this.fontsize >= WOSDefaultMaxFontSize)
-            this.fontsize = WOSDefaultMaxFontSize;
-
-        // Update text
-        this.setText(this.getText());
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -407,6 +359,17 @@ GuiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setSmooth : Set text smooth value                                     //
+    //  param smooth : Text smooth value to set                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setSmooth: function(smooth)
+    {
+        if (smooth <= 0.0) smooth = 0.0;
+        if (smooth >= 1.0) smooth = 1.0;
+        this.smooth = smooth*0.4;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setText : Set GuiText internal text string                            //
     //  param text : Text to set                                              //
     ////////////////////////////////////////////////////////////////////////////
@@ -417,6 +380,7 @@ GuiText.prototype = {
         var pixelsDataHeight = 0;
 
         // Set text
+        this.hidetext = "";
         this.text = "";
         this.textLength = 0;
         if (text)
@@ -424,60 +388,31 @@ GuiText.prototype = {
             this.textLength = text.length;
             if (this.hidden)
             {
-                this.hidetext = text;
                 for (i = 0; i < this.textLength; ++i)
                 {
-                    this.text += HiddenTextPassCharacter;
+                    this.hidetext += this.convertASCII(text[i]);
+                    this.text += HiddenPxTextPassCharacter;
                 }
             }
             else
             {
-                this.hidetext = "";
-                this.text = text;
+                for (i = 0; i < this.textLength; ++i)
+                {
+                    this.text += this.convertASCII(text[i]);
+                }
             }
         }
 
         // Set text width
-        this.size.vec[0] = this.renderer.getTextWidth(
-            this.text, this.fontsize
-        )*WOSDefaultFontCharsizeFactor;
+        this.size.vec[0] =
+            this.charsize.vec[0]*WOSDefaultPxTextXOffset*(this.textLength+1);
 
         // Clamp text width
-        if (this.size.vec[0] <= WOSDefaultMinTextWidth)
-            this.size.vec[0] = WOSDefaultMinTextWidth;
-        if (this.size.vec[0] >= WOSDefaultMaxTextWidth)
-            this.size.vec[0] = WOSDefaultMaxTextWidth;
+        if (this.size.vec[0] <= WOSDefaultMinPxTextWidth)
+            this.size.vec[0] = WOSDefaultMinPxTextWidth;
+        if (this.size.vec[0] >= WOSDefaultMaxPxTextWidth)
+            this.size.vec[0] = WOSDefaultMaxPxTextWidth;
 
-        // Get char sizes
-        this.charsizes = new Array();
-        for (i = 0; i <= this.textLength; ++i)
-        {
-            this.charsizes[i] = this.renderer.getTextWidth(
-                this.text.substring(0, i), this.fontsize
-            )*WOSDefaultFontCharsizeFactor;
-        }
-
-        // Update pixels data size
-        pixelsDataWidth = Math.round(
-            this.size.vec[0]*WOSDefaultFontScaleXFactor
-        );
-        pixelsDataHeight = Math.round(
-            this.size.vec[1]*WOSDefaultFontScaleYFactor
-        );
-
-        // Render text
-        pixelsData = this.renderer.renderText(
-            this.text, pixelsDataWidth, pixelsDataHeight, this.fontsize
-        );
-
-        // Update texture data
-        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
-        this.renderer.gl.texImage2D(
-            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            pixelsDataWidth, pixelsDataHeight, 0,
-            this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
-        );
-        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
         return true;
     },
 
@@ -494,7 +429,7 @@ GuiText.prototype = {
 
         // Insert character
         this.setText(
-            this.text.substring(0, index) + character +
+            this.text.substring(0, index) + this.convertASCII(character) +
             this.text.substring(index, this.textLength)
         );
     },
@@ -559,6 +494,78 @@ GuiText.prototype = {
             this.text.substring(0, selStart) +
             this.text.substring(selEnd, this.textLength)
         );
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  convertASCII : Convert character to ASCII                             //
+    //  param character : Character to convert to ASCII                       //
+    //  return : ASCII converted character                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    convertASCII: function(character)
+    {
+        if (character == '\u00A1') return '!';
+        if (character == '\u00B5') return 'u';
+        if (character == '\u00BF') return '?';
+        if (character == '\u00C0') return 'A';
+        if (character == '\u00C1') return 'A';
+        if (character == '\u00C2') return 'A';
+        if (character == '\u00C3') return 'A';
+        if (character == '\u00C4') return 'A';
+        if (character == '\u00C5') return 'A';
+        if (character == '\u00C7') return 'C';
+        if (character == '\u00C8') return 'E';
+        if (character == '\u00C9') return 'E';
+        if (character == '\u00CA') return 'E';
+        if (character == '\u00CB') return 'E';
+        if (character == '\u00CC') return 'I';
+        if (character == '\u00CD') return 'I';
+        if (character == '\u00CE') return 'I';
+        if (character == '\u00CF') return 'I';
+        if (character == '\u00D1') return 'N';
+        if (character == '\u00D2') return 'O';
+        if (character == '\u00D3') return 'O';
+        if (character == '\u00D4') return 'O';
+        if (character == '\u00D5') return 'O';
+        if (character == '\u00D6') return 'O';
+        if (character == '\u00D7') return 'x';
+        if (character == '\u00D8') return 'O';
+        if (character == '\u00D9') return 'U';
+        if (character == '\u00DA') return 'U';
+        if (character == '\u00DB') return 'U';
+        if (character == '\u00DC') return 'U';
+        if (character == '\u00DD') return 'Y';
+        if (character == '\u00E0') return 'a';
+        if (character == '\u00E1') return 'a';
+        if (character == '\u00E2') return 'a';
+        if (character == '\u00E3') return 'a';
+        if (character == '\u00E4') return 'a';
+        if (character == '\u00E5') return 'a';
+        if (character == '\u00E7') return 'c';
+        if (character == '\u00E8') return 'e';
+        if (character == '\u00E9') return 'e';
+        if (character == '\u00EA') return 'e';
+        if (character == '\u00EB') return 'e';
+        if (character == '\u00EC') return 'i';
+        if (character == '\u00ED') return 'i';
+        if (character == '\u00EE') return 'i';
+        if (character == '\u00EF') return 'i';
+        if (character == '\u00F1') return 'n';
+        if (character == '\u00F2') return 'o';
+        if (character == '\u00F3') return 'o';
+        if (character == '\u00F4') return 'o';
+        if (character == '\u00F5') return 'o';
+        if (character == '\u00F6') return 'o';
+        if (character == '\u00F7') return '/';
+        if (character == '\u00F8') return 'o';
+        if (character == '\u00F9') return 'u';
+        if (character == '\u00FA') return 'u';
+        if (character == '\u00FB') return 'u';
+        if (character == '\u00FC') return 'u';
+        if (character == '\u00FD') return 'y';
+        if (character == '\u00FF') return 'y';
+        if (character.charCodeAt(0) < 32) return '';
+        if (character.charCodeAt(0) > 126) return '?';
+        return character;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -627,6 +634,15 @@ GuiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  getSmooth : Get smooth value                                          //
+    //  return : Text smooth value                                            //
+    ////////////////////////////////////////////////////////////////////////////
+    getSmooth: function()
+    {
+        return this.smooth;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  getText : Get text internal string                                    //
     //  return : Text internal string                                         //
     ////////////////////////////////////////////////////////////////////////////
@@ -647,27 +663,18 @@ GuiText.prototype = {
         if (index <= 0) index = 0;
         if (index >= this.textLength) index = this.textLength;
 
-        // Return character size at given index
-        return this.charsizes[index];
+        // Return character position at given index
+        return (this.charsize*index);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getNextWidth : Get text next width when a given character is inserted //
-    //  param character : Character willing to be inserted                    //
+    //  getNextWidth : Get text next width when a character is inserted       //
     //  return : Text width when new character is inserted                    //
     ////////////////////////////////////////////////////////////////////////////
-    getNextWidth: function(character)
+    getNextWidth: function()
     {
-        // Get current text width
-        var width = this.size.vec[0];
-
-        // Add new character width
-        if (this.hidden) character = HiddenTextPassCharacter;
-        width += this.renderer.getTextWidth(character, this.fontsize)/
-                    WOSDefaultFontScaleXFactor;
-
         // Return next text width
-        return width;
+        return (this.size.vec[0]+this.charsize.vec[0]*WOSDefaultPxTextXOffset);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -685,7 +692,7 @@ GuiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getFontsize: function()
     {
-        return this.fontsize;
+        return this.charsize.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -702,44 +709,80 @@ GuiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-        // Set text model matrix
-        this.modelMatrix.setIdentity();
-        this.modelMatrix.translateVec2(this.position);
-        this.modelMatrix.translate(
-            this.size.vec[0]*0.5, this.size.vec[1]*0.5, 0.0
-        );
-        this.modelMatrix.rotateZ(this.angle);
-        this.modelMatrix.translate(
-            -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
-        );
-        this.modelMatrix.scaleVec2(this.size);
+        var i = 0;
+        var charCode = 0;
+        var charX = 0;
+        var charY = 0;
 
         // Bind text shader
         this.textShader.bind();
-
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send shader uniforms
         this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.textShader.sendUniformVec3(this.colorUniform, this.color);
         this.textShader.sendUniform(this.alphaUniform, this.alpha);
+        this.textShader.sendUniform(this.smoothUniform, this.smooth);
+        this.textShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
 
         // Bind texture
-        this.renderer.gl.bindTexture(
-            this.renderer.gl.TEXTURE_2D,
-            this.texture
-        );
+        this.texture.bind();
 
-        // Render VBO
+        // Bind VBO
         this.renderer.vertexBuffer.bind();
-        this.renderer.vertexBuffer.render(this.textShader);
+
+        // Render text
+        for (i = 0; i < this.textLength; ++i)
+        {
+            // Get current character
+            charCode = this.text.charCodeAt(i)-32;
+            if (charCode < 0) { charCode = 31; }
+            if (charCode > 94) { charCode = 31; }
+            charX = Math.floor(charCode%16);
+            charY = Math.floor(charCode/16);
+            if (charX <= 0) { charX = 0; }
+            if (charX >= 15) { charX = 15; }
+            if (charY <= 0) { charY = 0; }
+            if (charY >= 5) { charY = 5; }
+
+            // Set text model matrix
+            this.modelMatrix.setIdentity();
+            this.modelMatrix.translateVec2(this.position);
+            this.modelMatrix.translateX(
+                (WOSDefaultPxTextXOffset*this.charsize.vec[0]*i)-
+                (WOSDefaultPxTextXOffset*this.charsize.vec[0]*0.18)
+            );
+            this.modelMatrix.translate(
+                this.charsize.vec[0]*0.5, this.charsize.vec[1]*0.5, 0.0
+            );
+            this.modelMatrix.rotateZ(this.angle);
+            this.modelMatrix.translate(
+                -this.charsize.vec[0]*0.5, -this.charsize.vec[1]*0.5, 0.0
+            );
+            this.modelMatrix.scaleVec2(this.charsize);
+
+            // Compute world matrix
+            this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
+            this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
+            this.renderer.worldMatrix.multiply(this.modelMatrix);
+
+            this.uvOffset.vec[0] = charX*WOSDefaultPxTextUVWidth;
+            this.uvOffset.vec[1] = charY*WOSDefaultPxTextUVHeight;
+
+            // Update shader uniforms
+            this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
+            this.textShader.sendUniformVec2(
+                this.uvOffsetUniform, this.uvOffset
+            );
+
+            // Render VBO
+            this.renderer.vertexBuffer.render(this.textShader);
+        }
+
+        // Unbind VBO
         this.renderer.vertexBuffer.unbind();
 
         // Unbind texture
-        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+        this.texture.unbind();
 
         // Unbind text shader
         this.textShader.unbind();

@@ -304,6 +304,8 @@ function Wos()
     this.testtext = null;
     // Test text box
     this.testtextbox = null;
+    // Test pixel text
+    this.testpxtext = null;
 
     // Test camera
     this.camera = null;
@@ -441,7 +443,7 @@ Wos.prototype = {
 
         // Init test text
         this.testtext = new GuiText(this.renderer, this.loader.textShader);
-        this.testtext.init("Test text", 0.07);
+        this.testtext.init("Test text", 0.1);
 
         // init test text box
         this.testtextbox = new GuiTextBox(
@@ -449,6 +451,14 @@ Wos.prototype = {
         );
         this.testtextbox.init(0.7, 0.2, "Test");
         this.testtextbox.setSelected(true);
+
+        // Init test pixel text
+        this.testpxtext = new GuiPxText(
+            this.renderer, this.loader.pxTextShader
+        );
+        this.testpxtext.init(
+            this.loader.getTexture("wospxfont.png"), "Test pixel text", 0.1
+        );
 
         // Init test camera
         this.camera = new Camera();
@@ -826,6 +836,11 @@ Wos.prototype = {
         //this.testtext.setX(-this.testtext.getWidth()*0.5);
         //this.testtext.setY(-this.testtext.getHeight()*0.5);
         //this.testtext.render();
+
+        // Render test pixel text
+        //this.testpxtext.setX(-this.testpxtext.getWidth()*0.5);
+        //this.testpxtext.setY(-this.testpxtext.getHeight()*0.5);
+        //this.testpxtext.render();
 
         // Render test text box
         //this.testtextbox.setX(-this.testtextbox.getWidth()*0.5);
