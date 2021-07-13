@@ -57,6 +57,8 @@ const WOSDefaultPxTextUVWidth = 0.0625;
 const WOSDefaultPxTextUVHeight = 0.125;
 const WOSDefaultPxTextXOffset = 0.44;
 const WOSDefaultPxTextYOffset = 0.92;
+const WOSDefaultPxTextScaleXFactor = 580.0;
+const WOSDefaultPxTextScaleYFactor = 580.0;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -64,13 +66,17 @@ const WOSDefaultPxTextYOffset = 0.92;
 //  param renderer : Renderer pointer                                         //
 //  param textShader : Text shader pointer                                    //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiPxText(renderer, textShader)
+function GuiPxText(renderer, textShader, lineShader)
 {
     // Renderer pointer
     this.renderer = renderer;
+    // Background renderer
+    this.backrenderer = null;
 
     // Text shader pointer
     this.textShader = textShader;
+    // Line shader pointer
+    this.lineShader = lineShader;
 
     // Text shader uniforms locations
     this.colorUniform = -1;
@@ -79,8 +85,10 @@ function GuiPxText(renderer, textShader)
     this.uvSizeUniform = -1;
     this.uvOffsetUniform = -1;
 
-    // GuiPxText generated texture
+    // GuiPxText glyphs texture
     this.texture = null;
+    // GuiPxText line need update
+    this.needUpdate = false;
     // GuiPxText model matrix
     this.modelMatrix = new Matrix4x4();
 
@@ -95,7 +103,7 @@ function GuiPxText(renderer, textShader)
     // GuiPxText alpha
     this.alpha = 1.0;
     // GuiPxText smooth value
-    this.smooth = 0.05;
+    this.smooth = 0.1;
     // GuiPxText UV size
     this.uvSize = new Vector2(1.0, 1.0);
     // GuiPxText UV offset
@@ -104,7 +112,7 @@ function GuiPxText(renderer, textShader)
     // GuiPxText internal string
     this.text = "";
     this.textLength = 0;
-    
+
     // Characters size
     this.charsize = new Vector2(1.0, 1.0);
 
@@ -124,17 +132,16 @@ GuiPxText.prototype = {
     init: function(texture, text, height, hide)
     {
         var i = 0;
-        var pixelsData = null;
-        var pixelsDataWidth = 0;
-        var pixelsDataHeight = 0;
 
         // Reset GuiText
+        this.backrenderer = null;
         this.colorUniform = -1;
         this.alphaUniform = -1;
         this.smoothUniform = -1;
         this.uvSizeUniform = -1;
         this.uvOffsetUniform = -1;
         this.texture = null;
+        this.needUpdate = false;
         this.modelMatrix.setIdentity();
         this.position.reset();
         this.angle = 0.0;
@@ -143,7 +150,7 @@ GuiPxText.prototype = {
         this.uvSize.setXY(WOSDefaultPxTextUVWidth, WOSDefaultPxTextUVHeight);
         this.uvOffset.reset();
         this.alpha = 1.0;
-        this.smooth = 0.05;
+        this.smooth = 0.1;
         this.text = "";
         this.textLength = 0;
         this.charsize.setXY(1.0, 1.0);
@@ -196,6 +203,14 @@ GuiPxText.prototype = {
         // Check text shader pointer
         if (!this.textShader) return false;
 
+        // Check line shader pointer
+        if (!this.lineShader) return false;
+
+        // Create background renderer
+        this.backrenderer = new BackRenderer(this.renderer, this.lineShader);
+        this.backrenderer.init(1, 1);
+        this.backrenderer.setAlpha(2.0);
+
         // Get text shader uniforms locations
         this.textShader.bind();
         this.colorUniform = this.textShader.getUniform("color");
@@ -215,6 +230,9 @@ GuiPxText.prototype = {
             this.size.vec[0] = WOSDefaultMinPxTextWidth;
         if (this.size.vec[0] >= WOSDefaultMaxPxTextWidth)
             this.size.vec[0] = WOSDefaultMaxPxTextWidth;
+
+        // Text line need update
+        this.needUpdate = true;
 
         // Text loaded
         return true;
@@ -316,6 +334,9 @@ GuiPxText.prototype = {
         this.size.vec[0] =
             this.charsize.vec[0]*WOSDefaultPxTextXOffset*(this.textLength+1);
         this.size.vec[1] = height;
+
+        // Text line need update
+        this.needUpdate = true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -347,6 +368,9 @@ GuiPxText.prototype = {
         this.color.vec[0] = r;
         this.color.vec[1] = g;
         this.color.vec[2] = b;
+
+        // Text line need update
+        this.needUpdate = true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -367,6 +391,9 @@ GuiPxText.prototype = {
         if (smooth <= 0.0) smooth = 0.0;
         if (smooth >= 1.0) smooth = 1.0;
         this.smooth = smooth*0.4;
+
+        // Text line need update
+        this.needUpdate = true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -375,10 +402,6 @@ GuiPxText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setText: function(text)
     {
-        var pixelsData = null;
-        var pixelsDataWidth = 0;
-        var pixelsDataHeight = 0;
-
         // Set text
         this.hidetext = "";
         this.text = "";
@@ -413,7 +436,8 @@ GuiPxText.prototype = {
         if (this.size.vec[0] >= WOSDefaultMaxPxTextWidth)
             this.size.vec[0] = WOSDefaultMaxPxTextWidth;
 
-        return true;
+        // Text line need update
+        this.needUpdate = true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -713,78 +737,113 @@ GuiPxText.prototype = {
         var charCode = 0;
         var charX = 0;
         var charY = 0;
+        var lineWidth = 0;
+        var lineHeight = 0;
+        var invCharX = 0.0;
+        var invCharY = 0.0;
 
-        // Bind text shader
-        this.textShader.bind();
-
-        // Send shader uniforms
-        this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.textShader.sendUniformVec3(this.colorUniform, this.color);
-        this.textShader.sendUniform(this.alphaUniform, this.alpha);
-        this.textShader.sendUniform(this.smoothUniform, this.smooth);
-        this.textShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
-
-        // Bind texture
-        this.texture.bind();
-
-        // Bind VBO
-        this.renderer.vertexBuffer.bind();
-
-        // Render text
-        for (i = 0; i < this.textLength; ++i)
+        if (this.needUpdate)
         {
-            // Get current character
-            charCode = this.text.charCodeAt(i)-32;
-            if (charCode < 0) { charCode = 31; }
-            if (charCode > 94) { charCode = 31; }
-            charX = Math.floor(charCode%16);
-            charY = Math.floor(charCode/16);
-            if (charX <= 0) { charX = 0; }
-            if (charX >= 15) { charX = 15; }
-            if (charY <= 0) { charY = 0; }
-            if (charY >= 5) { charY = 5; }
-
-            // Set text model matrix
-            this.modelMatrix.setIdentity();
-            this.modelMatrix.translateVec2(this.position);
-            this.modelMatrix.translateX(
-                (WOSDefaultPxTextXOffset*this.charsize.vec[0]*i)-
-                (WOSDefaultPxTextXOffset*this.charsize.vec[0]*0.18)
+            // Update line size
+            lineWidth = Math.round(
+                this.size.vec[0]*WOSDefaultPxTextScaleXFactor
             );
-            this.modelMatrix.translate(
-                this.charsize.vec[0]*0.5, this.charsize.vec[1]*0.5, 0.0
+            lineHeight = Math.round(
+                this.size.vec[1]*WOSDefaultPxTextScaleYFactor
             );
-            this.modelMatrix.rotateZ(this.angle);
-            this.modelMatrix.translate(
-                -this.charsize.vec[0]*0.5, -this.charsize.vec[1]*0.5, 0.0
-            );
-            this.modelMatrix.scaleVec2(this.charsize);
 
-            // Compute world matrix
-            this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-            this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-            this.renderer.worldMatrix.multiply(this.modelMatrix);
+            // Update inverse char size
+            if (this.charsize.vec[0] > 0.0) invCharX = 2.0/this.charsize.vec[0];
+            if (this.charsize.vec[1] > 0.0) invCharY = 2.0/this.charsize.vec[1];
 
-            this.uvOffset.vec[0] = charX*WOSDefaultPxTextUVWidth;
-            this.uvOffset.vec[1] = charY*WOSDefaultPxTextUVHeight;
+            // Set background renderer size
+            this.backrenderer.setRenderSize(lineWidth, lineHeight);
 
-            // Update shader uniforms
+            // Render into background renderer
+            this.backrenderer.clear();
+            this.backrenderer.setActive();
+
+            // Bind text shader
+            this.textShader.bind();
+
+            // Send shader uniforms
             this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
-            this.textShader.sendUniformVec2(
-                this.uvOffsetUniform, this.uvOffset
-            );
+            this.textShader.sendUniformVec3(this.colorUniform, this.color);
+            this.textShader.sendUniform(this.alphaUniform, 1.5);
+            this.textShader.sendUniform(this.smoothUniform, this.smooth);
+            this.textShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
 
-            // Render VBO
-            this.renderer.vertexBuffer.render(this.textShader);
+            // Bind texture
+            this.texture.bind();
+
+            // Bind VBO
+            this.renderer.vertexBuffer.bind();
+
+            // Render text
+            for (i = 0; i < this.textLength; ++i)
+            {
+                // Get current character
+                charCode = this.text.charCodeAt(i)-32;
+                if (charCode < 0) { charCode = 31; }
+                if (charCode > 94) { charCode = 31; }
+                charX = Math.floor(charCode%16);
+                charY = Math.floor(charCode/16);
+                if (charX <= 0) { charX = 0; }
+                if (charX >= 15) { charX = 15; }
+                if (charY <= 0) { charY = 0; }
+                if (charY >= 5) { charY = 5; }
+
+                // Set text model matrix
+                this.modelMatrix.setIdentity();
+                this.modelMatrix.translate(-this.backrenderer.ratio, -1.0, 0.0);
+                this.modelMatrix.scale(invCharX, invCharY, 1.0);
+                this.modelMatrix.translateX(
+                    (WOSDefaultPxTextXOffset*this.charsize.vec[0]*i)-
+                    (WOSDefaultPxTextXOffset*this.charsize.vec[0]*0.18)
+                );
+                this.modelMatrix.scaleVec2(this.charsize);
+
+                // Compute world matrix
+                this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
+                this.renderer.worldMatrix.multiply(
+                    this.renderer.view.viewMatrix
+                );
+                this.renderer.worldMatrix.multiply(this.modelMatrix);
+
+                this.uvOffset.vec[0] = charX*WOSDefaultPxTextUVWidth;
+                this.uvOffset.vec[1] = charY*WOSDefaultPxTextUVHeight;
+
+                // Update shader uniforms
+                this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
+                this.textShader.sendUniformVec2(
+                    this.uvOffsetUniform, this.uvOffset
+                );
+
+                // Render VBO
+                this.renderer.vertexBuffer.render(this.textShader);
+            }
+
+            // Unbind VBO
+            this.renderer.vertexBuffer.unbind();
+
+            // Unbind texture
+            this.texture.unbind();
+
+            // Unbind text shader
+            this.textShader.unbind();
+
+            // Set renderer as active
+            this.renderer.setActive();
+
+            // Text line updated
+            this.needUpdate = false;
         }
 
-        // Unbind VBO
-        this.renderer.vertexBuffer.unbind();
-
-        // Unbind texture
-        this.texture.unbind();
-
-        // Unbind text shader
-        this.textShader.unbind();
+        // Render text line
+        this.backrenderer.setAlpha(this.alpha);
+        this.backrenderer.setSizeVec2(this.size);
+        this.backrenderer.setPositionVec2(this.position);
+        this.backrenderer.setAngle(this.angle);
+        this.backrenderer.render();
     }
 };

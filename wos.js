@@ -454,7 +454,8 @@ Wos.prototype = {
 
         // Init test pixel text
         this.testpxtext = new GuiPxText(
-            this.renderer, this.loader.pxTextShader
+            this.renderer, this.loader.pxTextShader,
+            this.loader.backrendererShader
         );
         this.testpxtext.init(
             this.loader.getTexture("wospxfont.png"), "Test pixel text", 0.1

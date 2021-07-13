@@ -230,6 +230,67 @@ BackRenderer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setRenderSize : Set background renderer rendering size                //
+    //  param width : Width of the background renderer in pixels              //
+    //  param height : Height of the background renderer in pixels            //
+    ////////////////////////////////////////////////////////////////////////////
+    setRenderSize: function(width, height)
+    {
+        // Set background renderer size
+        if (width !== undefined) this.width = Math.round(width);
+        if (height !== undefined) this.height = Math.round(height);
+        if (this.width <= 1) { this.width = 1; }
+        if (this.width >= WOSGLMaxTextureSize)
+        {
+            this.width = WOSGLMaxTextureSize;
+        }
+        if (this.height <= 1) { this.height = 1; }
+        if (this.height >= WOSGLMaxTextureSize)
+        {
+            this.height = WOSGLMaxTextureSize;
+        }
+        if (this.height > 0.0) this.ratio = this.width/this.height;
+
+        // Bind framebuffer
+        this.renderer.gl.bindFramebuffer(
+            this.renderer.gl.FRAMEBUFFER, this.framebuffer
+        );
+
+        // Bind renderbuffer
+        this.renderer.gl.bindRenderbuffer(
+            this.renderer.gl.RENDERBUFFER, this.depthbuffer
+        );
+
+        // Attach depth buffer to framebuffer
+        this.renderer.gl.renderbufferStorage(
+            this.renderer.gl.RENDERBUFFER, this.renderer.gl.DEPTH_COMPONENT16,
+            this.width, this.height
+        );
+        this.renderer.gl.framebufferRenderbuffer(
+            this.renderer.gl.FRAMEBUFFER, this.renderer.gl.DEPTH_ATTACHMENT,
+            this.renderer.gl.RENDERBUFFER, this.depthbuffer
+        );
+
+        // Attach texture to framebuffer
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
+        this.renderer.gl.texImage2D(
+            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
+            this.width, this.height, 0, this.renderer.gl.RGBA,
+            this.renderer.gl.UNSIGNED_BYTE, null
+        );
+        this.renderer.gl.framebufferTexture2D(
+            this.renderer.gl.FRAMEBUFFER, this.renderer.gl.COLOR_ATTACHMENT0,
+            this.renderer.gl.TEXTURE_2D, this.texture, 0
+        );
+
+        // Unbind texture
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+
+        // Unbind framebuffer
+        this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  clear : Clear background renderer                                     //
     ////////////////////////////////////////////////////////////////////////////
     clear: function()
@@ -483,6 +544,15 @@ BackRenderer.prototype = {
     rotate: function(angle)
     {
         this.angle += angle;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set backrenderer alpha                                     //
+    //  param alpha : Backrenderer alpha to set                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setAlpha: function(alpha)
+    {
+        this.alpha = alpha;
     },
 
     ////////////////////////////////////////////////////////////////////////////
