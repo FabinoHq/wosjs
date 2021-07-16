@@ -222,6 +222,10 @@ window.onmousedown = function(event)
 {
     if (wos) wos.handleMouseDown(event.button, event.clientX, event.clientY);
 }
+window.addEventListener('click', function(event)
+{
+    //if (wos) wos.handleMouseDown(event.button, event.clientX, event.clientY);
+}, false);
 window.addEventListener('touchstart', function(event)
 {
     if (wos && event.targetTouches.length >= 1)
@@ -306,6 +310,8 @@ function Wos()
     this.testtextbox = null;
     // Test pixel text
     this.testpxtext = null;
+    // Test pixel text box
+    this.testpxtextbox = null;
 
     // Test camera
     this.camera = null;
@@ -445,11 +451,11 @@ Wos.prototype = {
         this.testtext = new GuiText(this.renderer, this.loader.textShader);
         this.testtext.init("Test text", 0.1);
 
-        // init test text box
+        // Init test text box
         this.testtextbox = new GuiTextBox(
             this.renderer, this.loader.textShader
         );
-        this.testtextbox.init(0.7, 0.2, "Test");
+        this.testtextbox.init(1.0, 0.1, "Test");
         this.testtextbox.setSelected(true);
 
         // Init test pixel text
@@ -457,8 +463,18 @@ Wos.prototype = {
             this.renderer, this.loader.pxTextShader,
             this.loader.backrendererShader
         );
-        this.testpxtext.init(
-            this.loader.getTexture("wospxfont.png"), "Test pixel text", 0.1
+        this.testpxtext.init(true,
+            this.loader.getTexture("wospxfont.png"), "Test pixel text", 0.08
+        );
+        this.testpxtext.setSmooth(0.4);
+
+        // Init test pixel text box
+        this.testpxtextbox = new GuiPxTextBox(
+            this.renderer, this.loader.pxTextShader,
+            this.loader.backrendererShader
+        );
+        this.testpxtextbox.init(
+            this.loader.getTexture("wospxfont.png"), 1.0, 0.08, "Test",
         );
 
         // Init test camera
@@ -593,6 +609,7 @@ Wos.prototype = {
     handleKeyDown: function(key)
     {
         //if (this.testtextbox) this.testtextbox.keyPress(key);
+        //if (this.testpxtextbox) this.testpxtextbox.keyPress(key);
         /*if (this.freeflycam)
         {
             switch (key)
@@ -622,6 +639,7 @@ Wos.prototype = {
     handleKeyUp: function(key)
     {
         //if (this.testtextbox) this.testtextbox.keyRelease(key);
+        //if (this.testpxtextbox) this.testpxtextbox.keyRelease(key);
         /*if (this.freeflycam)
         {
             switch (key)
@@ -664,6 +682,10 @@ Wos.prototype = {
         {
             this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testpxtextbox)
+        {
+            this.testpxtextbox.mouseMove(this.realMouseX, this.realMouseY);
+        }*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -704,6 +726,10 @@ Wos.prototype = {
         {
             this.testtextbox.mousePress(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testpxtextbox)
+        {
+            this.testpxtextbox.mousePress(this.realMouseX, this.realMouseY);
+        }*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -728,6 +754,10 @@ Wos.prototype = {
         /*if (this.testtextbox)
         {
             this.testtextbox.mouseRelease(this.realMouseX, this.realMouseY);
+        }*/
+        /*if (this.testpxtextbox)
+        {
+            this.testpxtextbox.mouseRelease(this.realMouseX, this.realMouseY);
         }*/
     },
 
@@ -847,6 +877,11 @@ Wos.prototype = {
         //this.testtextbox.setX(-this.testtextbox.getWidth()*0.5);
         //this.testtextbox.setY(-this.testtextbox.getHeight()*0.5);
         //this.testtextbox.render();
+
+        // Render test pixel text box
+        //this.testpxtextbox.setX(-this.testpxtextbox.getWidth()*0.5);
+        //this.testpxtextbox.setY(-this.testpxtextbox.getHeight()*0.5);
+        //this.testpxtextbox.render();
 
         // Render shadows
         /*if (this.renderer.maxQuality >= WOSRendererQualityHigh)

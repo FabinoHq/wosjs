@@ -37,14 +37,14 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      interface/guitextbox.js : GUI TextBox management                      //
+//      interface/guipxtextbox.js : GUI Pixel TextBox management              //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GUI Textbox default fragment shader                                       //
+//  GUI Pixel Textbox default fragment shader                                 //
 ////////////////////////////////////////////////////////////////////////////////
-const textboxFragmentShaderSrc = [
+const pxtextboxFragmentShaderSrc = [
     "precision mediump float;",
     "varying vec2 texCoord;",
     "uniform float alpha;",
@@ -54,9 +54,9 @@ const textboxFragmentShaderSrc = [
     "}" ].join("\n");
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GUI Textbox selection default fragment shader                             //
+//  GUI Pixel Textbox selection default fragment shader                       //
 ////////////////////////////////////////////////////////////////////////////////
-const textselectionFragmentShaderSrc = [
+const pxtextselectionFragmentShaderSrc = [
     "precision mediump float;",
     "varying vec2 texCoord;",
     "uniform float alpha;",
@@ -66,9 +66,9 @@ const textselectionFragmentShaderSrc = [
     "}" ].join("\n");
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GUI Textbox cursor default fragment shader                                //
+//  GUI Pixel Textbox cursor default fragment shader                          //
 ////////////////////////////////////////////////////////////////////////////////
-const textcursorFragmentShaderSrc = [
+const pxtextcursorFragmentShaderSrc = [
     "precision mediump float;",
     "varying vec2 texCoord;",
     "uniform float alpha;",
@@ -78,26 +78,26 @@ const textcursorFragmentShaderSrc = [
     "}" ].join("\n");
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Default textbox settings                                                  //
+//  Default pixel textbox settings                                            //
 ////////////////////////////////////////////////////////////////////////////////
-const WOSDefaultTextBoxMinWidth = 0.001;
-const WOSDefaultTextBoxMaxWidth = 1.95;
-const WOSDefaultTextBoxMinHeight = 0.015;
-const WOSDefaultTextBoxMaxHeight = 0.55;
-const WOSDefaultTextBoxCursorWidthFactor = 0.04;
-const WOSDefaultTextBoxCursorHeightFactor = 0.96;
-const WOSDefaultTextBoxCursorOffsetFactor = -0.02;
-const WOSDefaultTextBoxTextOffsetFactor = 0.025;
-const WOSDefaultTextBoxCheckWidthFactor = 0.02;
-const WOSDefaultTextBoxCheckWidthOffset = 0.005;
+const WOSDefaultPxTextBoxMinWidth = 0.1;
+const WOSDefaultPxTextBoxMaxWidth = 1.95;
+const WOSDefaultPxTextBoxMinHeight = 0.03;
+const WOSDefaultPxTextBoxMaxHeight = 0.2;
+const WOSDefaultPxTextBoxCursorWidthFactor = 0.04;
+const WOSDefaultPxTextBoxCursorHeightFactor = 0.96;
+const WOSDefaultPxTextBoxCursorOffsetFactor = -0.02;
+const WOSDefaultPxTextBoxTextOffsetFactor = -0.08;
+const WOSDefaultPxTextBoxCheckWidthFactor = 0.005;
+const WOSDefaultPxTextBoxCheckWidthOffset = 0.002;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GuiTextBox class definition                                               //
+//  GuiPxTextBox class definition                                             //
 //  param renderer : Renderer pointer                                         //
 //  param textShader : Text shader pointer                                    //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiTextBox(renderer, textShader)
+function GuiPxTextBox(renderer, textShader,)
 {
     // Renderer pointer
     this.renderer = renderer;
@@ -105,19 +105,19 @@ function GuiTextBox(renderer, textShader)
     // Text shader pointer
     this.textShader = textShader;
 
-    // GuiText
-    this.guitext = null;
+    // GuiPxText
+    this.guipxtext = null;
 
     // Procedural sprites
     this.textbox = null;
     this.textsel = null;
     this.textcursor = null;
 
-    // Textbox position
+    // Pxtextbox position
     this.position = new Vector2(0.0, 0.0);
-    // Textbox size
+    // Pxtextbox size
     this.size = new Vector2(1.0, 1.0);
-    // Textbox alpha
+    // Pxtextbox alpha
     this.alpha = 1.0;
 
     // Cursor position
@@ -125,7 +125,7 @@ function GuiTextBox(renderer, textShader)
     // Cursor offset
     this.cursorOffset = 0.0;
 
-    // Textbox states
+    // Pxtextbox states
     this.selected = false;
     this.pressed = false;
     this.selection = false;
@@ -136,18 +136,19 @@ function GuiTextBox(renderer, textShader)
     this.selEndOffset = 0.0;
 }
 
-GuiTextBox.prototype = {
+GuiPxTextBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init GUI TextBox                                               //
-    //  param width : TextBox field width                                     //
-    //  param height : TextBox field height                                   //
+    //  init : Init GUI PxTextBox                                             //
+    //  param texture : Texture pointer                                       //
+    //  param width : PxTextBox field width                                   //
+    //  param height : PxTextBox field height                                 //
     //  param text : Text to set                                              //
     //  param hide : Text hide mode                                           //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(width, height, text, hide)
+    init: function(texture, width, height, text, hide)
     {
-        // Reset textbox
-        this.guitext = null;
+        // Reset Pxtextbox
+        this.guipxtext = null;
         this.textbox = null;
         this.textsel = null;
         this.textcursor = null;
@@ -167,59 +168,61 @@ GuiTextBox.prototype = {
         this.selEnd = 0;
         this.selEndOffset = 0.0;
 
-        // Clamp textbox size
-        if (this.size.vec[0] <= WOSDefaultTextBoxMinWidth)
-            this.size.vec[0] = WOSDefaultTextBoxMinWidth;
-        if (this.size.vec[0] >= WOSDefaultTextBoxMaxWidth)
-            this.size.vec[0] = WOSDefaultTextBoxMaxWidth;
-        if (this.size.vec[1] <= WOSDefaultTextBoxMinHeight)
-            this.size.vec[1] = WOSDefaultTextBoxMinHeight;
-        if (this.size.vec[1] >= WOSDefaultTextBoxMaxHeight)
-            this.size.vec[1] = WOSDefaultTextBoxMaxHeight;
+        // Clamp pxtextbox size
+        if (this.size.vec[0] <= WOSDefaultPxTextBoxMinWidth)
+            this.size.vec[0] = WOSDefaultPxTextBoxMinWidth;
+        if (this.size.vec[0] >= WOSDefaultPxTextBoxMaxWidth)
+            this.size.vec[0] = WOSDefaultPxTextBoxMaxWidth;
+        if (this.size.vec[1] <= WOSDefaultPxTextBoxMinHeight)
+            this.size.vec[1] = WOSDefaultPxTextBoxMinHeight;
+        if (this.size.vec[1] >= WOSDefaultPxTextBoxMaxHeight)
+            this.size.vec[1] = WOSDefaultPxTextBoxMaxHeight;
 
         // Check renderer pointer
         if (!this.renderer) return false;
 
         // Init text
-        this.guitext = new GuiText(this.renderer, this.textShader);
-        this.guitext.init(text, this.size.vec[1]*0.9, hide);
+        this.guipxtext = new GuiPxText(this.renderer, this.textShader);
+        this.guipxtext.init(false, texture, text, this.size.vec[1]*0.9, hide);
 
         // Check text size
-        if (this.guitext.getWidth() >
-            this.size.vec[0]-(WOSDefaultTextBoxCheckWidthOffset+
-            this.size.vec[1]*WOSDefaultTextBoxCheckWidthFactor))
+        if (this.guipxtext.getWidth() >
+            this.size.vec[0]-(WOSDefaultPxTextBoxCheckWidthOffset+
+            this.size.vec[1]*WOSDefaultPxTextBoxCheckWidthFactor))
         {
-            this.guitext.setText("");
+            this.guipxtext.setText("");
         }
 
-        // Init textbox
+        // Init pxtextbox
         this.textbox = new ProcSprite(this.renderer);
         this.textbox.init(
-            textboxFragmentShaderSrc, this.size.vec[0], this.size.vec[1]
+            pxtextboxFragmentShaderSrc, this.size.vec[0], this.size.vec[1]
         );
 
         // Init text selection
         this.textsel = new ProcSprite(this.renderer);
-        this.textsel.init(textselectionFragmentShaderSrc, 0, this.size.vec[1]);
+        this.textsel.init(
+            pxtextselectionFragmentShaderSrc, 0, this.size.vec[1]
+        );
 
         // Init cursor
         this.textcursor = new ProcSprite(this.renderer);
         this.textcursor.init(
-            textcursorFragmentShaderSrc,
-            (this.size.vec[1]*WOSDefaultTextBoxCursorWidthFactor),
-            (this.size.vec[1]*WOSDefaultTextBoxCursorHeightFactor)
+            pxtextcursorFragmentShaderSrc,
+            (this.size.vec[1]*WOSDefaultPxTextBoxCursorWidthFactor),
+            (this.size.vec[1]*WOSDefaultPxTextBoxCursorHeightFactor)
         );
 
         // Get initial cursor position
-        this.cursorPos = this.guitext.getLength();
-        this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
+        this.cursorPos = this.guipxtext.getLength();
+        this.cursorOffset = this.guipxtext.getCharPos(this.cursorPos);
 
         // Textbox loaded
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosition : Set textbox position                                    //
+    //  setPosition : Set pxtextbox position                                  //
     //  param x : X position to set                                           //
     //  param y : Y position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
@@ -230,8 +233,8 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPositionVec2 : Set textbox position from a 2 components vector     //
-    //  param vector : 2 components vector to set textbox position from       //
+    //  setPositionVec2 : Set pxtextbox position from a 2 components vector   //
+    //  param vector : 2 components vector to set pxtextbox position from     //
     ////////////////////////////////////////////////////////////////////////////
     setPositionVec2: function(vector)
     {
@@ -240,7 +243,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setX : Set textbox X position                                         //
+    //  setX : Set pxtextbox X position                                       //
     //  param x : X position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
@@ -249,7 +252,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setY : Set textbox Y position                                         //
+    //  setY : Set pxtextbox Y position                                       //
     //  param y : Y position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
@@ -258,7 +261,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  move : Translate textbox                                              //
+    //  move : Translate pxtextbox                                            //
     //  param x : X axis translate value                                      //
     //  param y : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -269,8 +272,8 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveVec2 : Translate textbox by a 2 components vector                 //
-    //  param vector : 2 components vector to translate textbox by            //
+    //  moveVec2 : Translate pxtextbox by a 2 components vector               //
+    //  param vector : 2 components vector to translate pxtextbox by          //
     ////////////////////////////////////////////////////////////////////////////
     moveVec2: function(vector)
     {
@@ -279,7 +282,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate textbox on X axis                                   //
+    //  moveX : Translate pxtextbox on X axis                                 //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
@@ -288,7 +291,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate textbox on Y axis                                   //
+    //  moveY : Translate pxtextbox on Y axis                                 //
     //  param x : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
@@ -297,7 +300,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set textbox alpha                                          //
+    //  setAlpha : Set pxtextbox alpha                                        //
     //  param alpha : Textbox alpha to set                                    //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
@@ -306,28 +309,28 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setText : Set textbox internal text string                            //
+    //  setText : Set pxtextbox internal text string                          //
     //  param text : Text to set                                              //
     ////////////////////////////////////////////////////////////////////////////
     setText: function(text)
     {
-        this.guitext.setText(text);
+        this.guipxtext.setText(text);
 
         // Check text size
-        if (this.guitext.getWidth() >
-            this.size.vec[0]-(WOSDefaultTextBoxCheckWidthOffset+
-            this.size.vec[1]*WOSDefaultTextBoxCheckWidthFactor))
+        if (this.guipxtext.getWidth() >
+            this.size.vec[0]-(WOSDefaultPxTextBoxCheckWidthOffset+
+            this.size.vec[1]*WOSDefaultPxTextBoxCheckWidthFactor))
         {
-            this.guitext.setText("");
+            this.guipxtext.setText("");
         }
 
         // Update cursor
-        this.cursorPos = this.guitext.getLength();
-        this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
+        this.cursorPos = this.guipxtext.getLength();
+        this.cursorOffset = this.guipxtext.getCharPos(this.cursorPos);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSelected : Set textbox selected state                              //
+    //  setSelected : Set pxtextbox selected state                            //
     //  param selected : Textbox active selected state                        //
     ////////////////////////////////////////////////////////////////////////////
     setSelected: function(selected)
@@ -343,7 +346,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveCursorLeft : Move textbox cursor to the left                      //
+    //  moveCursorLeft : Move pxtextbox cursor to the left                    //
     ////////////////////////////////////////////////////////////////////////////
     moveCursorLeft: function()
     {
@@ -357,11 +360,11 @@ GuiTextBox.prototype = {
                     {
                         // Extend selection to the left
                         --this.cursorPos;
-                        this.cursorOffset = this.guitext.getCharPos(
+                        this.cursorOffset = this.guipxtext.getCharPos(
                             this.cursorPos
                         );
                         this.selEnd = this.cursorPos;
-                        this.selEndOffset = this.guitext.getCharPos(
+                        this.selEndOffset = this.guipxtext.getCharPos(
                             this.selEnd
                         );
                         selSize = Math.abs(
@@ -380,7 +383,9 @@ GuiTextBox.prototype = {
                 {
                     // Set cursor position to the left of the selection
                     this.cursorPos = Math.min(this.selStart, this.selEnd);
-                    this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
+                    this.cursorOffset = this.guipxtext.getCharPos(
+                        this.cursorPos
+                    );
                     this.selection = false;
                 }
             }
@@ -392,15 +397,15 @@ GuiTextBox.prototype = {
                     {
                         // Select character to the left
                         --this.cursorPos;
-                        this.cursorOffset = this.guitext.getCharPos(
+                        this.cursorOffset = this.guipxtext.getCharPos(
                             this.cursorPos
                         );
                         this.selStart = this.cursorPos+1;
-                        this.selStartOffset = this.guitext.getCharPos(
+                        this.selStartOffset = this.guipxtext.getCharPos(
                             this.selStart
                         );
                         this.selEnd = this.cursorPos;
-                        this.selEndOffset = this.guitext.getCharPos(
+                        this.selEndOffset = this.guipxtext.getCharPos(
                             this.selEnd
                         );
                         selSize = Math.abs(
@@ -413,7 +418,7 @@ GuiTextBox.prototype = {
                     {
                         // Move cursor to the left
                         --this.cursorPos;
-                        this.cursorOffset = this.guitext.getCharPos(
+                        this.cursorOffset = this.guipxtext.getCharPos(
                             this.cursorPos
                         );
                     }
@@ -423,7 +428,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveCursorRight : Move textbox cursor to the right                    //
+    //  moveCursorRight : Move pxtextbox cursor to the right                  //
     ////////////////////////////////////////////////////////////////////////////
     moveCursorRight: function()
     {
@@ -433,15 +438,15 @@ GuiTextBox.prototype = {
             {
                 if (this.holdShift)
                 {
-                    if (this.cursorPos < this.guitext.getLength())
+                    if (this.cursorPos < this.guipxtext.getLength())
                     {
                         // Extend selection to the right
                         ++this.cursorPos;
-                        this.cursorOffset = this.guitext.getCharPos(
+                        this.cursorOffset = this.guipxtext.getCharPos(
                             this.cursorPos
                         );
                         this.selEnd = this.cursorPos;
-                        this.selEndOffset = this.guitext.getCharPos(
+                        this.selEndOffset = this.guipxtext.getCharPos(
                             this.selEnd
                         );
                         selSize = Math.abs(
@@ -460,27 +465,29 @@ GuiTextBox.prototype = {
                 {
                     // Set cursor position to the right of the selection
                     this.cursorPos = Math.max(this.selStart, this.selEnd);
-                    this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
+                    this.cursorOffset = this.guipxtext.getCharPos(
+                        this.cursorPos
+                    );
                     this.selection = false;
                 }
             }
             else
             {
-                if (this.cursorPos < this.guitext.getLength())
+                if (this.cursorPos < this.guipxtext.getLength())
                 {
                     if (this.holdShift)
                     {
                         // Select character to the right
                         ++this.cursorPos;
-                        this.cursorOffset = this.guitext.getCharPos(
+                        this.cursorOffset = this.guipxtext.getCharPos(
                             this.cursorPos
                         );
                         this.selStart = this.cursorPos-1;
-                        this.selStartOffset = this.guitext.getCharPos(
+                        this.selStartOffset = this.guipxtext.getCharPos(
                             this.selStart
                         );
                         this.selEnd = this.cursorPos;
-                        this.selEndOffset = this.guitext.getCharPos(
+                        this.selEndOffset = this.guipxtext.getCharPos(
                             this.selEnd
                         );
                         selSize = Math.abs(
@@ -493,7 +500,7 @@ GuiTextBox.prototype = {
                     {
                         // Move cursor to the right
                         ++this.cursorPos;
-                        this.cursorOffset = this.guitext.getCharPos(
+                        this.cursorOffset = this.guipxtext.getCharPos(
                             this.cursorPos
                         );
                     }
@@ -503,7 +510,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  addCharacter : Add character to textbox                               //
+    //  addCharacter : Add character to pxtextbox                             //
     //  param character : Character to add                                    //
     ////////////////////////////////////////////////////////////////////////////
     addCharacter: function(character)
@@ -512,20 +519,20 @@ GuiTextBox.prototype = {
         {
             if (this.selection)
             {
-                this.guitext.eraseSelection(this.selStart, this.selEnd);
+                this.guipxtext.eraseSelection(this.selStart, this.selEnd);
                 this.cursorPos = Math.min(this.selStart, this.selEnd);
-                this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
+                this.cursorOffset = this.guipxtext.getCharPos(this.cursorPos);
                 this.textsel.setSize(0, this.size.vec[1]);
                 this.selection = false;
             }
 
-            if ((this.guitext.getNextWidth(character)) <=
-                this.size.vec[0]-(WOSDefaultTextBoxCheckWidthOffset+
-                this.size.vec[1]*WOSDefaultTextBoxCheckWidthFactor))
+            if ((this.guipxtext.getNextWidth()) <=
+                this.size.vec[0]+(WOSDefaultPxTextBoxCheckWidthOffset+
+                this.size.vec[1]*WOSDefaultPxTextBoxCheckWidthFactor))
             {
-                this.guitext.addCharacter(this.cursorPos, character);
+                this.guipxtext.addCharacter(this.cursorPos, character);
                 ++this.cursorPos;
-                this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
+                this.cursorOffset = this.guipxtext.getCharPos(this.cursorPos);
             }
             this.pressed = false;
         }
@@ -540,9 +547,9 @@ GuiTextBox.prototype = {
         {
             if (this.selection)
             {
-                this.guitext.eraseSelection(this.selStart, this.selEnd);
+                this.guipxtext.eraseSelection(this.selStart, this.selEnd);
                 this.cursorPos = Math.min(this.selStart, this.selEnd);
-                this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
+                this.cursorOffset = this.guipxtext.getCharPos(this.cursorPos);
                 this.textsel.setSize(0, this.size.vec[1]);
                 this.selection = false;
             }
@@ -550,9 +557,11 @@ GuiTextBox.prototype = {
             {
                 if (this.cursorPos > 0)
                 {
-                    this.guitext.eraseCharacter(this.cursorPos);
+                    this.guipxtext.eraseCharacter(this.cursorPos);
                     --this.cursorPos;
-                    this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
+                    this.cursorOffset = this.guipxtext.getCharPos(
+                        this.cursorPos
+                    );
                 }
             }
             this.pressed = false;
@@ -568,18 +577,20 @@ GuiTextBox.prototype = {
         {
             if (this.selection)
             {
-                this.guitext.eraseSelection(this.selStart, this.selEnd);
+                this.guipxtext.eraseSelection(this.selStart, this.selEnd);
                 this.cursorPos = Math.min(this.selStart, this.selEnd);
-                this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
+                this.cursorOffset = this.guipxtext.getCharPos(this.cursorPos);
                 this.textsel.setSize(0, this.size.vec[1]);
                 this.selection = false;
             }
             else
             {
-                if (this.cursorPos < this.guitext.getLength())
+                if (this.cursorPos < this.guipxtext.getLength())
                 {
-                    this.guitext.eraseCharacter(this.cursorPos+1);
-                    this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
+                    this.guipxtext.eraseCharacter(this.cursorPos+1);
+                    this.cursorOffset = this.guipxtext.getCharPos(
+                        this.cursorPos
+                    );
                 }
             }
         }
@@ -654,9 +665,9 @@ GuiTextBox.prototype = {
             if (mouseOffX >= this.size.vec[0]) mouseOffX = this.size.vec[0];
 
             // Get current character position
-            for (i = 0; i <= this.guitext.getLength(); ++i)
+            for (i = 0; i <= this.guipxtext.getLength(); ++i)
             {
-                curOffset = this.guitext.getCharPos(i);
+                curOffset = this.guipxtext.getCharPos(i);
                 if (mouseOffX >= curOffset)
                 {
                     this.cursorPos = i;
@@ -704,9 +715,9 @@ GuiTextBox.prototype = {
                 if (mouseOffX >= this.size.vec[0]) mouseOffX = this.size.vec[0];
 
                 // Get current character position
-                for (i = 0; i <= this.guitext.getLength(); ++i)
+                for (i = 0; i <= this.guipxtext.getLength(); ++i)
                 {
-                    curOffset = this.guitext.getCharPos(i);
+                    curOffset = this.guipxtext.getCharPos(i);
                     if (mouseOffX >= curOffset)
                     {
                         this.cursorPos = i;
@@ -749,9 +760,9 @@ GuiTextBox.prototype = {
             if (mouseOffX >= this.size.vec[0]) mouseOffX = this.size.vec[0];
 
             // Get current character position
-            for (i = 0; i <= this.guitext.getLength(); ++i)
+            for (i = 0; i <= this.guipxtext.getLength(); ++i)
             {
-                curOffset = this.guitext.getCharPos(i);
+                curOffset = this.guipxtext.getCharPos(i);
                 if (mouseOffX >= curOffset)
                 {
                     this.cursorPos = i;
@@ -781,7 +792,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getX : Get textbox X position                                         //
+    //  getX : Get pxtextbox X position                                       //
     //  return : Textbox X position                                           //
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
@@ -790,7 +801,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getY : Get textbox Y position                                         //
+    //  getY : Get pxtextbox Y position                                       //
     //  return : Textbox Y position                                           //
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
@@ -799,7 +810,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get textbox width                                          //
+    //  getWidth : Get pxtextbox width                                        //
     //  return : Textbox width                                                //
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
@@ -808,7 +819,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get textbox height                                        //
+    //  getHeight : Get pxtextbox height                                      //
     //  return : Textbox height                                               //
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
@@ -817,7 +828,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAlpha : Get textbox alpha                                          //
+    //  getAlpha : Get pxtextbox alpha                                        //
     //  return : Textbox alpha                                                //
     ////////////////////////////////////////////////////////////////////////////
     getAlpha: function()
@@ -826,25 +837,25 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getText : Get textbox internal text string                            //
+    //  getText : Get pxtextbox internal text string                          //
     //  return : Textbox internal text string                                 //
     ////////////////////////////////////////////////////////////////////////////
     getText: function()
     {
-        return this.guitext.getText();
+        return this.guipxtext.getText();
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getLength : Get textbox internal text characters length               //
+    //  getLength : Get pxtextbox internal text characters length             //
     //  return : Textbox internal text length                                 //
     ////////////////////////////////////////////////////////////////////////////
     getLength: function()
     {
-        return this.guitext.getLength();
+        return this.guipxtext.getLength();
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  isSelected : Get textbox selected state                               //
+    //  isSelected : Get pxtextbox selected state                             //
     //  return : True if the text box is selected, false otherwise            //
     ////////////////////////////////////////////////////////////////////////////
     isSelected: function()
@@ -853,7 +864,7 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  render : Render textbox                                               //
+    //  render : Render pxtextbox                                             //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
@@ -863,13 +874,13 @@ GuiTextBox.prototype = {
         this.textbox.render();
 
         // Render text
-        this.guitext.setPosition(
+        this.guipxtext.setPosition(
             this.position.vec[0]+
-            (this.size.vec[1]*WOSDefaultTextBoxTextOffsetFactor),
+            (this.size.vec[1]*WOSDefaultPxTextBoxTextOffsetFactor),
             this.position.vec[1]
         );
-        this.guitext.setAlpha(this.alpha);
-        this.guitext.render();
+        this.guipxtext.setAlpha(this.alpha);
+        this.guipxtext.render();
 
         if (this.selected)
         {
@@ -878,7 +889,7 @@ GuiTextBox.prototype = {
                 // Render selection
                 this.textsel.setPosition(
                     this.position.vec[0]+
-                    (this.size.vec[1]*WOSDefaultTextBoxTextOffsetFactor)+
+                    (this.size.vec[1]*WOSDefaultPxTextBoxTextOffsetFactor)+
                     Math.min(this.selStartOffset, this.selEndOffset),
                     this.position.vec[1]
                 );
@@ -890,11 +901,11 @@ GuiTextBox.prototype = {
                 // Render cursor
                 this.textcursor.setPosition(
                     this.position.vec[0]+
-                    (this.size.vec[1]*WOSDefaultTextBoxTextOffsetFactor)+
+                    (this.size.vec[1]*WOSDefaultPxTextBoxTextOffsetFactor)+
                     this.cursorOffset+
-                    (this.size.vec[1]*WOSDefaultTextBoxCursorOffsetFactor),
+                    (this.size.vec[1]*WOSDefaultPxTextBoxCursorOffsetFactor),
                     this.position.vec[1]+(this.size.vec[1]*
-                    (1.0-WOSDefaultTextBoxCursorHeightFactor)*0.5)
+                    (1.0-WOSDefaultPxTextBoxCursorHeightFactor)*0.5)
                 );
                 this.textcursor.setAlpha(this.alpha);
                 this.textcursor.render();

@@ -56,7 +56,7 @@ const WOSDefaultFontSizeFactor = 800.0;
 const WOSDefaultMinFontSize = 12.0;
 const WOSDefaultMaxFontSize = 400.0;
 const WOSDefaultMinTextWidth = 0.001;
-const WOSDefaultMaxTextWidth = 3.98;
+const WOSDefaultMaxTextWidth = 1.98;
 const WOSDefaultMinTextHeight = 0.03;
 const WOSDefaultMaxTextHeight = 0.5;
 
@@ -218,6 +218,8 @@ GuiText.prototype = {
         pixelsDataHeight = Math.round(
             this.size.vec[1]*WOSDefaultFontScaleYFactor
         );
+        this.size.vec[0] = pixelsDataWidth/WOSDefaultFontScaleXFactor;
+        this.size.vec[1] = pixelsDataHeight/WOSDefaultFontScaleYFactor;
 
         // Render text
         pixelsData = this.renderer.renderText(
@@ -464,6 +466,8 @@ GuiText.prototype = {
         pixelsDataHeight = Math.round(
             this.size.vec[1]*WOSDefaultFontScaleYFactor
         );
+        this.size.vec[0] = pixelsDataWidth/WOSDefaultFontScaleXFactor;
+        this.size.vec[1] = pixelsDataHeight/WOSDefaultFontScaleYFactor;
 
         // Render text
         pixelsData = this.renderer.renderText(

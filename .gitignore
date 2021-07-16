@@ -81,6 +81,7 @@
 !interface/guitext.js
 !interface/guitextbox.js
 !interface/guipxtext.js
+!interface/guipxtextbox.js
 
 !audio/audioengine.js
 !audio/sound.js
