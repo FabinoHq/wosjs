@@ -97,7 +97,7 @@ const WOSDefaultPxTextBoxCheckWidthOffset = 0.002;
 //  param renderer : Renderer pointer                                         //
 //  param textShader : Text shader pointer                                    //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiPxTextBox(renderer, textShader,)
+function GuiPxTextBox(renderer, textShader)
 {
     // Renderer pointer
     this.renderer = renderer;

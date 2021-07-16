@@ -82,7 +82,7 @@ const textcursorFragmentShaderSrc = [
 ////////////////////////////////////////////////////////////////////////////////
 const WOSDefaultTextBoxMinWidth = 0.001;
 const WOSDefaultTextBoxMaxWidth = 1.95;
-const WOSDefaultTextBoxMinHeight = 0.015;
+const WOSDefaultTextBoxMinHeight = 0.03;
 const WOSDefaultTextBoxMaxHeight = 0.55;
 const WOSDefaultTextBoxCursorWidthFactor = 0.04;
 const WOSDefaultTextBoxCursorHeightFactor = 0.96;
@@ -139,12 +139,13 @@ function GuiTextBox(renderer, textShader)
 GuiTextBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init GUI TextBox                                               //
+    //  param asciiMode : TextBox ASCII mode                                  //
     //  param width : TextBox field width                                     //
     //  param height : TextBox field height                                   //
     //  param text : Text to set                                              //
     //  param hide : Text hide mode                                           //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(width, height, text, hide)
+    init: function(asciiMode, width, height, text, hide)
     {
         // Reset textbox
         this.guitext = null;
@@ -183,6 +184,7 @@ GuiTextBox.prototype = {
         // Init text
         this.guitext = new GuiText(this.renderer, this.textShader);
         this.guitext.init(text, this.size.vec[1]*0.9, hide);
+        this.guitext.setASCIImode(asciiMode);
 
         // Check text size
         if (this.guitext.getWidth() >

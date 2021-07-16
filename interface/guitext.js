@@ -57,7 +57,7 @@ const WOSDefaultMinFontSize = 12.0;
 const WOSDefaultMaxFontSize = 400.0;
 const WOSDefaultMinTextWidth = 0.001;
 const WOSDefaultMaxTextWidth = 1.98;
-const WOSDefaultMinTextHeight = 0.03;
+const WOSDefaultMinTextHeight = 0.025;
 const WOSDefaultMaxTextHeight = 0.5;
 
 
@@ -105,6 +105,9 @@ function GuiText(renderer, textShader)
     // Hidden text mode
     this.hidden = false;
     this.hidetext = "";
+
+    // ASCII mode
+    this.asciiMode = false;
 }
 
 GuiText.prototype = {
@@ -137,6 +140,7 @@ GuiText.prototype = {
         this.charsizes = null;
         this.hidden = false;
         this.hidetext = "";
+        this.asciiMode = false;
 
         // Set hidden mode
         if (hide !== undefined) this.hidden = hide;
@@ -147,18 +151,39 @@ GuiText.prototype = {
         if (text !== undefined)
         {
             this.textLength = text.length;
-            if (this.hidden)
+            if (this.asciiMode)
             {
-                this.hidetext = text;
-                for (i = 0; i < this.textLength; ++i)
+                if (this.hidden)
                 {
-                    this.text += HiddenTextPassCharacter;
+                    for (i = 0; i < this.textLength; ++i)
+                    {
+                        this.hidetext += this.convertASCII(text[i]);
+                        this.text += HiddenPxTextPassCharacter;
+                    }
+                }
+                else
+                {
+                    for (i = 0; i < this.textLength; ++i)
+                    {
+                        this.text += this.convertASCII(text[i]);
+                    }
                 }
             }
             else
             {
-                this.hidetext = "";
-                this.text = text;
+                if (this.hidden)
+                {
+                    this.hidetext = text;
+                    for (i = 0; i < this.textLength; ++i)
+                    {
+                        this.text += HiddenTextPassCharacter;
+                    }
+                }
+                else
+                {
+                    this.hidetext = "";
+                    this.text = text;
+                }
             }
         }
 
@@ -208,7 +233,8 @@ GuiText.prototype = {
         {
             this.charsizes[i] = this.renderer.getTextWidth(
                 this.text.substring(0, i), this.fontsize
-            )*WOSDefaultFontCharsizeFactor;
+            )*WOSDefaultFontCharsizeFactor-
+            (i*0.00001)-(i*this.fontsize*0.000001);
         }
 
         // Update pixels data size
@@ -264,6 +290,19 @@ GuiText.prototype = {
 
         // Text loaded
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setASCIImode : Set text ASCII mode                                    //
+    //  param asciiMode : Text ASCII mode state                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setASCIImode: function(asciiMode)
+    {
+        // Set ASCII mode
+        this.asciiMode = asciiMode;
+
+        // Update text
+        this.setText(this.getText());
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -424,18 +463,39 @@ GuiText.prototype = {
         if (text)
         {
             this.textLength = text.length;
-            if (this.hidden)
+            if (this.asciiMode)
             {
-                this.hidetext = text;
-                for (i = 0; i < this.textLength; ++i)
+                if (this.hidden)
                 {
-                    this.text += HiddenTextPassCharacter;
+                    for (i = 0; i < this.textLength; ++i)
+                    {
+                        this.hidetext += this.convertASCII(text[i]);
+                        this.text += HiddenPxTextPassCharacter;
+                    }
+                }
+                else
+                {
+                    for (i = 0; i < this.textLength; ++i)
+                    {
+                        this.text += this.convertASCII(text[i]);
+                    }
                 }
             }
             else
             {
-                this.hidetext = "";
-                this.text = text;
+                if (this.hidden)
+                {
+                    this.hidetext = text;
+                    for (i = 0; i < this.textLength; ++i)
+                    {
+                        this.text += HiddenTextPassCharacter;
+                    }
+                }
+                else
+                {
+                    this.hidetext = "";
+                    this.text = text;
+                }
             }
         }
 
@@ -456,7 +516,8 @@ GuiText.prototype = {
         {
             this.charsizes[i] = this.renderer.getTextWidth(
                 this.text.substring(0, i), this.fontsize
-            )*WOSDefaultFontCharsizeFactor;
+            )*WOSDefaultFontCharsizeFactor-
+            (i*0.00001)-(i*this.fontsize*0.000001);
         }
 
         // Update pixels data size
@@ -563,6 +624,78 @@ GuiText.prototype = {
             this.text.substring(0, selStart) +
             this.text.substring(selEnd, this.textLength)
         );
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  convertASCII : Convert character to ASCII                             //
+    //  param character : Character to convert to ASCII                       //
+    //  return : ASCII converted character                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    convertASCII: function(character)
+    {
+        if (character == '\u00A1') return '!';
+        if (character == '\u00B5') return 'u';
+        if (character == '\u00BF') return '?';
+        if (character == '\u00C0') return 'A';
+        if (character == '\u00C1') return 'A';
+        if (character == '\u00C2') return 'A';
+        if (character == '\u00C3') return 'A';
+        if (character == '\u00C4') return 'A';
+        if (character == '\u00C5') return 'A';
+        if (character == '\u00C7') return 'C';
+        if (character == '\u00C8') return 'E';
+        if (character == '\u00C9') return 'E';
+        if (character == '\u00CA') return 'E';
+        if (character == '\u00CB') return 'E';
+        if (character == '\u00CC') return 'I';
+        if (character == '\u00CD') return 'I';
+        if (character == '\u00CE') return 'I';
+        if (character == '\u00CF') return 'I';
+        if (character == '\u00D1') return 'N';
+        if (character == '\u00D2') return 'O';
+        if (character == '\u00D3') return 'O';
+        if (character == '\u00D4') return 'O';
+        if (character == '\u00D5') return 'O';
+        if (character == '\u00D6') return 'O';
+        if (character == '\u00D7') return 'x';
+        if (character == '\u00D8') return 'O';
+        if (character == '\u00D9') return 'U';
+        if (character == '\u00DA') return 'U';
+        if (character == '\u00DB') return 'U';
+        if (character == '\u00DC') return 'U';
+        if (character == '\u00DD') return 'Y';
+        if (character == '\u00E0') return 'a';
+        if (character == '\u00E1') return 'a';
+        if (character == '\u00E2') return 'a';
+        if (character == '\u00E3') return 'a';
+        if (character == '\u00E4') return 'a';
+        if (character == '\u00E5') return 'a';
+        if (character == '\u00E7') return 'c';
+        if (character == '\u00E8') return 'e';
+        if (character == '\u00E9') return 'e';
+        if (character == '\u00EA') return 'e';
+        if (character == '\u00EB') return 'e';
+        if (character == '\u00EC') return 'i';
+        if (character == '\u00ED') return 'i';
+        if (character == '\u00EE') return 'i';
+        if (character == '\u00EF') return 'i';
+        if (character == '\u00F1') return 'n';
+        if (character == '\u00F2') return 'o';
+        if (character == '\u00F3') return 'o';
+        if (character == '\u00F4') return 'o';
+        if (character == '\u00F5') return 'o';
+        if (character == '\u00F6') return 'o';
+        if (character == '\u00F7') return '/';
+        if (character == '\u00F8') return 'o';
+        if (character == '\u00F9') return 'u';
+        if (character == '\u00FA') return 'u';
+        if (character == '\u00FB') return 'u';
+        if (character == '\u00FC') return 'u';
+        if (character == '\u00FD') return 'y';
+        if (character == '\u00FF') return 'y';
+        if (character.charCodeAt(0) < 32) return '';
+        if (character.charCodeAt(0) > 126) return '?';
+        return character;
     },
 
     ////////////////////////////////////////////////////////////////////////////

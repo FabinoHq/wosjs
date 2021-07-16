@@ -455,7 +455,7 @@ Wos.prototype = {
         this.testtextbox = new GuiTextBox(
             this.renderer, this.loader.textShader
         );
-        this.testtextbox.init(1.0, 0.1, "Test");
+        this.testtextbox.init(false, 1.0, 0.1, "Test");
         this.testtextbox.setSelected(true);
 
         // Init test pixel text
@@ -474,7 +474,7 @@ Wos.prototype = {
             this.loader.backrendererShader
         );
         this.testpxtextbox.init(
-            this.loader.getTexture("wospxfont.png"), 1.0, 0.08, "Test",
+            this.loader.getTexture("wospxfont.png"), 1.0, 0.1, "Test"
         );
 
         // Init test camera
