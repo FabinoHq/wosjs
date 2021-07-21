@@ -49,7 +49,7 @@ const WOSDefaultMultiLineMaxWidth = 1.95;
 const WOSDefaultMultiLineMinHeight = 0.01;
 const WOSDefaultMultiLineMaxHeight = 1.95;
 const WOSDefaultMultiLineRightOffset = 0.05;
-const WOSDefaultMultiLineScrollFactor = 0.2;
+const WOSDefaultMultiLineScrollFactor = 1.5;
 
 
 ////////////////////////////////////////////////////////////////////////////////

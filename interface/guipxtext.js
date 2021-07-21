@@ -823,8 +823,6 @@ GuiPxText.prototype = {
         var charY = 0;
         var lineWidth = 0;
         var lineHeight = 0;
-        var invCharX = 0.0;
-        var invCharY = 0.0;
 
         if (this.lineOptimize)
         {
@@ -839,16 +837,6 @@ GuiPxText.prototype = {
                 );
                 this.size.vec[0] = lineWidth/WOSDefaultPxTextScaleXFactor;
                 this.size.vec[1] = lineHeight/WOSDefaultPxTextScaleYFactor;
-
-                // Update inverse char size
-                if (this.charsize.vec[0] > 0.0)
-                {
-                    invCharX = 2.0/this.charsize.vec[0];
-                }
-                if (this.charsize.vec[1] > 0.0)
-                {
-                    invCharY = 2.0/this.charsize.vec[1];
-                }
 
                 // Set background renderer size
                 this.backrenderer.setRenderSize(lineWidth, lineHeight);
@@ -893,18 +881,18 @@ GuiPxText.prototype = {
 
                     // Set text model matrix
                     this.modelMatrix.setIdentity();
-                    this.modelMatrix.translate(
-                        -this.backrenderer.ratio, -1.0, 0.0
-                    );
-                    this.modelMatrix.scale(
-                        this.charsize.vec[0]*invCharX,
-                        this.charsize.vec[1]*invCharY,
-                        1.0
-                    );
+                    if (this.size.vec[1] > 0.0)
+                    {
+                        this.modelMatrix.scale(
+                            2.0/this.size.vec[1], 2.0/this.size.vec[1], 1.0
+                        );
+                    }
+                    this.modelMatrix.translateVec2(this.position);
                     this.modelMatrix.translateX(
-                        (WOSDefaultPxTextXOffset*i)-
-                        (WOSDefaultPxTextXOffset*0.15)
+                        (WOSDefaultPxTextXOffset*this.charsize.vec[0]*i)-
+                        (WOSDefaultPxTextXOffset*this.charsize.vec[0]*0.18)
                     );
+                    this.modelMatrix.scaleVec2(this.charsize);
 
                     // Compute world matrix
                     this.renderer.worldMatrix.setMatrix(
@@ -991,13 +979,6 @@ GuiPxText.prototype = {
                 this.modelMatrix.translateX(
                     (WOSDefaultPxTextXOffset*this.charsize.vec[0]*i)-
                     (WOSDefaultPxTextXOffset*this.charsize.vec[0]*0.18)
-                );
-                this.modelMatrix.translate(
-                    this.charsize.vec[0]*0.5, this.charsize.vec[1]*0.5, 0.0
-                );
-                this.modelMatrix.rotateZ(this.angle);
-                this.modelMatrix.translate(
-                    -this.charsize.vec[0]*0.5, -this.charsize.vec[1]*0.5, 0.0
                 );
                 this.modelMatrix.scaleVec2(this.charsize);
 
