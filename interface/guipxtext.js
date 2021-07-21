@@ -44,7 +44,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Default pixel text hidden pass character                                  //
 ////////////////////////////////////////////////////////////////////////////////
-const HiddenPxTextPassCharacter = '#';
+const HiddenPxTextPassCharacter = '*';
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Default pixel font settings                                               //
@@ -234,7 +234,6 @@ GuiPxText.prototype = {
                 this.renderer, this.lineShader
             );
             this.backrenderer.init(1, 1);
-            this.backrenderer.setAlpha(2.0);
         }
 
         // Get text shader uniforms locations
@@ -447,8 +446,8 @@ GuiPxText.prototype = {
     setText: function(text)
     {
         // Set text
-        this.hidetext = "";
         this.text = "";
+        this.hidetext = "";
         this.textLength = 0;
         if (text)
         {
@@ -740,6 +739,21 @@ GuiPxText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  getChar : Get text character at given index                           //
+    //  param index : Index to get text character at                          //
+    //  return : Text character at given index                                //
+    ////////////////////////////////////////////////////////////////////////////
+    getChar: function(index)
+    {
+        // Clamp index into text length range
+        if (index <= 0) index = 0;
+        if (index >= this.textLength) index = this.textLength;
+
+        if (this.hidden) return this.hidetext[index];
+        return this.text[index];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  getCharPos : Get character position offset at given index             //
     //  param index : Index to get character position at                      //
     //  return : character position offset                                    //
@@ -885,7 +899,7 @@ GuiPxText.prototype = {
                     this.modelMatrix.scale(
                         this.charsize.vec[0]*invCharX,
                         this.charsize.vec[1]*invCharY,
-                        0.0
+                        1.0
                     );
                     this.modelMatrix.translateX(
                         (WOSDefaultPxTextXOffset*i)-

@@ -79,6 +79,7 @@
 !interface/guibutton.js
 !interface/guitogglebutton.js
 !interface/guitext.js
+!interface/guimultitext.js
 !interface/guitextbox.js
 !interface/guipxtext.js
 !interface/guipxtextbox.js

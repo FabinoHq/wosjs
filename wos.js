@@ -250,6 +250,14 @@ window.addEventListener('touchend', function()
     if (wos) wos.handleMouseUp(0, 0, 0);
 }, false);
 
+////////////////////////////////////////////////////////////////////////////////
+//  window wheel event : Triggered by the mouse wheel                         //
+////////////////////////////////////////////////////////////////////////////////
+window.addEventListener('wheel', function(event)
+{
+    if (wos) wos.handleMouseWheel(event.deltaY, event.clientX, event.clientY);
+}, false);
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  WOS class definition                                                      //
@@ -306,6 +314,8 @@ function Wos()
     this.testtogglebutton = null;
     // Test text
     this.testtext = null;
+    // Test multitext
+    this.testmultitext = null;
     // Test text box
     this.testtextbox = null;
     // Test pixel text
@@ -450,6 +460,16 @@ Wos.prototype = {
         // Init test text
         this.testtext = new GuiText(this.renderer, this.loader.textShader);
         this.testtext.init("Test text", 0.1);
+
+        // Init test multiline text
+        this.testmultitext = new GuiMultiText(
+            this.renderer, this.loader.textShader,
+            this.loader.backrendererShader
+        );
+        this.testmultitext.init(
+            "Test multi line text\nTest line 2\nAnd line 3 of text.",
+            1.0, 1.0, 0.1
+        );
 
         // Init test text box
         this.testtextbox = new GuiTextBox(
@@ -665,7 +685,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  handleMouseMove : Handle mouse moved                                  //
     //  param mouseX : Mouse X position relative to web navigator's window    //
-    //  param mouseX : Mouse Y position relative to web navigator's window    //
+    //  param mouseY : Mouse Y position relative to web navigator's window    //
     ////////////////////////////////////////////////////////////////////////////
     handleMouseMove: function(mouseX, mouseY)
     {
@@ -691,7 +711,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  handleMouseTrack : Handle mouse tracking                              //
     //  param mouseX : Mouse X offset position                                //
-    //  param mouseX : Mouse Y offset position                                //
+    //  param mouseY : Mouse Y offset position                                //
     ////////////////////////////////////////////////////////////////////////////
     handleMouseTrack: function(mouseX, mouseY)
     {
@@ -708,7 +728,7 @@ Wos.prototype = {
     //  handleMouseMove : Handle mouse button pressed                         //
     //  param button : Mouse button pressed                                   //
     //  param mouseX : Mouse X position relative to web navigator's window    //
-    //  param mouseX : Mouse Y position relative to web navigator's window    //
+    //  param mouseY : Mouse Y position relative to web navigator's window    //
     ////////////////////////////////////////////////////////////////////////////
     handleMouseDown: function(button, mouseX, mouseY)
     {
@@ -736,7 +756,7 @@ Wos.prototype = {
     //  handleMouseUp : Handle mouse button released                          //
     //  param button : Mouse button released                                  //
     //  param mouseX : Mouse X position relative to web navigator's window    //
-    //  param mouseX : Mouse Y position relative to web navigator's window    //
+    //  param mouseY : Mouse Y position relative to web navigator's window    //
     ////////////////////////////////////////////////////////////////////////////
     handleMouseUp: function(button, mouseX, mouseY)
     {
@@ -762,6 +782,23 @@ Wos.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  handleMouseWheel : Handle mouse wheel event                           //
+    //  param mouseWheel : Mouse wheel delta                                  //
+    //  param mouseX : Mouse X position relative to web navigator's window    //
+    //  param mouseY : Mouse Y position relative to web navigator's window    //
+    ////////////////////////////////////////////////////////////////////////////
+    handleMouseWheel: function(mouseWheel, mouseX, mouseY)
+    {
+        this.updateMousePosition(mouseX, mouseY);
+        /*if (this.testmultitext)
+        {
+            this.testmultitext.mouseWheel(
+                mouseWheel, this.realMouseX, this.realMouseY
+            );
+        }*/
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  updateFrameTime : Compute current frame time                          //
     ////////////////////////////////////////////////////////////////////////////
     updateFrameTime: function()
@@ -777,7 +814,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  updateMousePosition : Compute current mouse position                  //
     //  param mouseX : Mouse X position relative to web navigator's window    //
-    //  param mouseX : Mouse Y position relative to web navigator's window    //
+    //  param mouseY : Mouse Y position relative to web navigator's window    //
     ////////////////////////////////////////////////////////////////////////////
     updateMousePosition: function(mouseX, mouseY)
     {
@@ -800,7 +837,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     compute: function()
     {
-        this.skeletalmesh.compute(this.frametime);
+        //this.skeletalmesh.compute(this.frametime);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -867,6 +904,11 @@ Wos.prototype = {
         //this.testtext.setX(-this.testtext.getWidth()*0.5);
         //this.testtext.setY(-this.testtext.getHeight()*0.5);
         //this.testtext.render();
+
+        // Render test multitext
+        //this.testmultitext.setX(-this.testmultitext.getWidth()*0.5);
+        //this.testmultitext.setY(-this.testmultitext.getHeight()*0.5);
+        //this.testmultitext.render();
 
         // Render test pixel text
         //this.testpxtext.setX(-this.testpxtext.getWidth()*0.5);

@@ -59,6 +59,7 @@ const WOSDefaultMinTextWidth = 0.001;
 const WOSDefaultMaxTextWidth = 1.98;
 const WOSDefaultMinTextHeight = 0.025;
 const WOSDefaultMaxTextHeight = 0.5;
+const WOSDefaultTextYOffset = 0.9;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -247,19 +248,12 @@ GuiText.prototype = {
         this.size.vec[0] = pixelsDataWidth/WOSDefaultFontScaleXFactor;
         this.size.vec[1] = pixelsDataHeight/WOSDefaultFontScaleYFactor;
 
-        // Render text
-        pixelsData = this.renderer.renderText(
-            this.text, pixelsDataWidth, pixelsDataHeight, this.fontsize
-        );
-
         // Create texture
         this.texture = this.renderer.gl.createTexture();
         if (!this.texture) return false;
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
-        this.renderer.gl.texImage2D(
-            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            pixelsDataWidth, pixelsDataHeight, 0,
-            this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
+        this.renderer.renderText(
+            this.text, pixelsDataWidth, pixelsDataHeight, this.fontsize
         );
 
         // Set texture wrap mode
@@ -459,6 +453,7 @@ GuiText.prototype = {
 
         // Set text
         this.text = "";
+        this.hidetext = "";
         this.textLength = 0;
         if (text)
         {
@@ -530,20 +525,12 @@ GuiText.prototype = {
         this.size.vec[0] = pixelsDataWidth/WOSDefaultFontScaleXFactor;
         this.size.vec[1] = pixelsDataHeight/WOSDefaultFontScaleYFactor;
 
-        // Render text
-        pixelsData = this.renderer.renderText(
-            this.text, pixelsDataWidth, pixelsDataHeight, this.fontsize
-        );
-
         // Update texture data
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
-        this.renderer.gl.texImage2D(
-            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            pixelsDataWidth, pixelsDataHeight, 0,
-            this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
+        this.renderer.renderText(
+            this.text, pixelsDataWidth, pixelsDataHeight, this.fontsize
         );
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-        return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -771,6 +758,21 @@ GuiText.prototype = {
     {
         if (this.hidden) return this.hidetext;
         return this.text;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getChar : Get text character at given index                           //
+    //  param index : Index to get text character at                          //
+    //  return : Text character at given index                                //
+    ////////////////////////////////////////////////////////////////////////////
+    getChar: function(index)
+    {
+        // Clamp index into text length range
+        if (index <= 0) index = 0;
+        if (index >= this.textLength) index = this.textLength;
+
+        if (this.hidden) return this.hidetext[index];
+        return this.text[index];
     },
 
     ////////////////////////////////////////////////////////////////////////////

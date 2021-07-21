@@ -712,12 +712,53 @@ Renderer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  renderText : Render text offscreen into texture with WOS default font //
+    //  renderTextData : Render text into pixels data with WOS default font   //
     //  param text : Text to render                                           //
     //  param width : Width of the text texture to render                     //
     //  param height : Height of the text texture to render                   //
     //  param fontsize : Font size of the text to render                      //
     //  return : Text texture pixels data                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    renderTextData: function(text, width, height, fontsize)
+    {
+        var textData = null;
+        var pixelsData = null;
+
+        // Update offscreen canvas size
+        this.offCanvas.width = Math.round(width);
+        this.offCanvas.height = Math.round(height);
+
+        // Clamp canvas size
+        if (this.offCanvas.width <= 1) { this.offCanvas.width = 1; }
+        if (this.offCanvas.width >= WOSGLMaxTextureSize)
+        {
+            this.offCanvas.width = WOSGLMaxTextureSize;
+        }
+        if (this.offCanvas.height <= 1) { this.offCanvas.height = 1; }
+        if (this.offCanvas.height >= WOSGLMaxTextureSize)
+        {
+            this.offCanvas.height = WOSGLMaxTextureSize;
+        }
+
+        // Render text
+        this.offContext.font = fontsize.toString() + "px wosfont";
+        this.offContext.strokeText(text, 0, (0.84*fontsize));
+        this.offContext.fillText(text, 0, (0.84*fontsize));
+
+        // Get pixels data
+        textData = this.offContext.getImageData(
+            0, 0, this.offCanvas.width, this.offCanvas.height
+        );
+        pixelsData = new Uint8Array(textData.data.buffer);
+        return pixelsData;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  renderText : Render text into texture with WOS default font           //
+    //  param text : Text to render                                           //
+    //  param width : Width of the text texture to render                     //
+    //  param height : Height of the text texture to render                   //
+    //  param fontsize : Font size of the text to render                      //
     ////////////////////////////////////////////////////////////////////////////
     renderText: function(text, width, height, fontsize)
     {
@@ -740,16 +781,54 @@ Renderer.prototype = {
             this.offCanvas.height = WOSGLMaxTextureSize;
         }
 
-        // Draw text
+        // Render text
         this.offContext.font = fontsize.toString() + "px wosfont";
         this.offContext.strokeText(text, 0, (0.84*fontsize));
         this.offContext.fillText(text, 0, (0.84*fontsize));
 
+        // Copy text to texture
+        this.gl.texImage2D(
+            this.gl.TEXTURE_2D, 0, this.gl.RGBA,
+            this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.offCanvas
+        );
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  renderImageData : Render image offscreen into data                    //
+    //  param image : Image to render                                         //
+    //  param width : Width of the image texture to render                    //
+    //  param height : Height of the image texture to render                  //
+    //  return : Image texture pixels data                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    renderImageData: function(image, width, height)
+    {
+        var imageData = null;
+        var pixelsData = null;
+
+        // Update offscreen canvas size
+        this.offCanvas.width = Math.round(width);
+        this.offCanvas.height = Math.round(height);
+
+        // Clamp canvas size
+        if (this.offCanvas.width <= 1) { this.offCanvas.width = 1; }
+        if (this.offCanvas.width >= WOSGLMaxTextureSize)
+        {
+            this.offCanvas.width = WOSGLMaxTextureSize;
+        }
+        if (this.offCanvas.height <= 1) { this.offCanvas.height = 1; }
+        if (this.offCanvas.height >= WOSGLMaxTextureSize)
+        {
+            this.offCanvas.height = WOSGLMaxTextureSize;
+        }
+
+        // Render image
+        this.offContext.drawImage(image, 0, 0);
+
         // Get pixels data
-        textData = this.offContext.getImageData(
+        imageData = this.offContext.getImageData(
             0, 0, this.offCanvas.width, this.offCanvas.height
         );
-        pixelsData = new Uint8Array(textData.data.buffer);
+        pixelsData = new Uint8Array(imageData.data.buffer);
         return pixelsData;
     },
 
@@ -758,7 +837,6 @@ Renderer.prototype = {
     //  param image : Image to render                                         //
     //  param width : Width of the image texture to render                    //
     //  param height : Height of the image texture to render                  //
-    //  return : Image texture pixels data                                    //
     ////////////////////////////////////////////////////////////////////////////
     renderImage: function(image, width, height)
     {
@@ -781,15 +859,14 @@ Renderer.prototype = {
             this.offCanvas.height = WOSGLMaxTextureSize;
         }
 
-        // Create image context
+        // Render image
         this.offContext.drawImage(image, 0, 0);
 
-        // Get pixels data
-        imageData = this.offContext.getImageData(
-            0, 0, this.offCanvas.width, this.offCanvas.height
+        // Copy image to texture
+        this.gl.texImage2D(
+            this.gl.TEXTURE_2D, 0, this.gl.RGBA,
+            this.gl.RGBA, this.gl.UNSIGNED_BYTE, this.offCanvas
         );
-        pixelsData = new Uint8Array(imageData.data.buffer);
-        return pixelsData;
     },
 
     ////////////////////////////////////////////////////////////////////////////

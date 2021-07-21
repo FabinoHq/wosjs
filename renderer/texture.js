@@ -237,16 +237,7 @@ Texture.prototype = {
         this.height = this.image.height;
 
         // Render image
-        pixelsData = this.renderer.renderImage(
-            this.image, this.width, this.height
-        );
-
-        // Set texture data
-        this.renderer.gl.texImage2D(
-            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            this.width, this.height, 0,
-            this.renderer.gl.RGBA, this.renderer.gl.UNSIGNED_BYTE, pixelsData
-        );
+        this.renderer.renderImage(this.image, this.width, this.height);
 
         // Set texture wrap mode
         this.renderer.gl.texParameteri(
