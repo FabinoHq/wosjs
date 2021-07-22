@@ -37,14 +37,14 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/nineboxshader.js : Ninebox shader                            //
+//      renderer/scrollbarshader.js : ScrollBar shader                        //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Ninebox fragment shader                                                   //
+//  ScrollBar fragment shader                                                 //
 ////////////////////////////////////////////////////////////////////////////////
-const nineboxFragmentShaderSrc = [
+const scrollBarFragmentShaderSrc = [
     "precision mediump float;",
     "precision mediump int;",
     "uniform sampler2D texture;",
@@ -52,35 +52,23 @@ const nineboxFragmentShaderSrc = [
     "uniform vec2 uvSize;",
     "uniform float uvFactor;",
     "uniform float alpha;",
-    "",
     "void main()",
+    "",
     "{",
-    "    vec2 nineSize = abs(uvSize*uvFactor);",
-    "    vec2 curCoord = texCoord*nineSize;",
-    "    if (curCoord.x >= 0.25)",
-    "    {",
-    "        if (curCoord.x >= (nineSize.x-0.25))",
-    "        {",
-    "            curCoord.x = curCoord.x-nineSize.x;",
-    "        }",
-    "        else",
-    "        {",
-    "            curCoord.x = 0.25+mod(curCoord.x, 0.5);",
-    "        }",
-    "    }",
+    "    float barSize = abs(uvSize.y*uvFactor);",
+    "    vec2 curCoord = vec2((texCoord.x*0.5)+uvSize.x, texCoord.y*barSize);",
     "    if (curCoord.y >= 0.25)",
     "    {",
-    "        if (curCoord.y >= (nineSize.y-0.25))",
+    "        if (curCoord.y >= (barSize-0.25))",
     "        {",
-    "            curCoord.y = curCoord.y-nineSize.y;",
+    "            curCoord.y = curCoord.y-barSize;",
     "        }",
     "        else",
     "        {",
     "            curCoord.y = 0.25+mod(curCoord.y, 0.5);",
     "        }",
     "    }",
-    "    if (nineSize.x <= 0.5) { curCoord.x = texCoord.x; }",
-    "    if (nineSize.y <= 0.5) { curCoord.y = texCoord.y; }",
+    "    if (barSize <= 0.5) { curCoord.y = texCoord.y; }",
     "    vec4 texColor = texture2D(texture, curCoord);",
     "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
     "}",

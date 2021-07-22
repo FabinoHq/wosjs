@@ -68,12 +68,8 @@ function Ninebox(renderer, nineboxShader)
     this.position = new Vector2(0.0, 0.0);
     // Ninebox size
     this.size = new Vector2(1.0, 1.0);
-    // Ninebox rotation angle
-    this.angle = 0.0;
-    // Ninebox texture UV size
-    this.uvSize = new Vector2(1.0, 1.0);
     // Ninebox texture UV factor
-    this.uvFactor = null;
+    this.uvFactor = 1.0;
     // Ninebox alpha
     this.alpha = 1.0;
 }
@@ -84,7 +80,7 @@ Ninebox.prototype = {
     //  param texture : Texture pointer                                       //
     //  param width : Ninebox width                                           //
     //  param height : Ninebox height                                         //
-    //  param factor : Ninebox factor                                         //
+    //  param factor : Ninebox UV factor                                      //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, factor)
     {
@@ -98,8 +94,6 @@ Ninebox.prototype = {
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
-        this.angle = 0.0;
-        this.uvSize.setXY(1.0, 1.0);
         this.uvFactor = 1.0;
         if (factor !== undefined) this.uvFactor = factor;
         this.alpha = 1.0;
@@ -112,9 +106,9 @@ Ninebox.prototype = {
 
         // Get ninebox shader uniforms locations
         this.nineboxShader.bind();
-        this.alphaUniform = this.nineboxShader.getUniform("alpha");
         this.uvSizeUniform = this.nineboxShader.getUniform("uvSize");
         this.uvFactorUniform = this.nineboxShader.getUniform("uvFactor");
+        this.alphaUniform = this.nineboxShader.getUniform("alpha");
         this.nineboxShader.unbind();
 
         // Set texture
@@ -243,24 +237,6 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngle : Set ninebox rotation angle                                 //
-    //  param angle : Ninebox rotation angle to set in degrees                //
-    ////////////////////////////////////////////////////////////////////////////
-    setAngle: function(angle)
-    {
-        this.angle = angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate ninebox                                               //
-    //  param angle : Angle to rotate ninebox by in degrees                   //
-    ////////////////////////////////////////////////////////////////////////////
-    rotate: function(angle)
-    {
-        this.angle += angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setAlpha : Set ninebox alpha                                          //
     //  param alpha : Ninebox alpha to set                                    //
     ////////////////////////////////////////////////////////////////////////////
@@ -315,15 +291,6 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAngle : Get ninebox rotation angle                                 //
-    //  return : Ninebox rotation angle in degrees                            //
-    ////////////////////////////////////////////////////////////////////////////
-    getAngle: function()
-    {
-        return this.angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  getAlpha : Get ninebox alpha                                          //
     //  return : Ninebox alpha                                                //
     ////////////////////////////////////////////////////////////////////////////
@@ -349,13 +316,6 @@ Ninebox.prototype = {
         // Set ninebox model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec2(this.position);
-        this.modelMatrix.translate(
-            this.size.vec[0]*0.5, this.size.vec[1]*0.5, 0.0
-        );
-        this.modelMatrix.rotateZ(this.angle);
-        this.modelMatrix.translate(
-            -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
-        );
         this.modelMatrix.scaleVec2(this.size);
 
         // Bind ninebox shader
@@ -368,9 +328,9 @@ Ninebox.prototype = {
 
         // Send ninebox shader uniforms
         this.nineboxShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.nineboxShader.sendUniform(this.alphaUniform, this.alpha);
         this.nineboxShader.sendUniformVec2(this.uvSizeUniform, this.size);
         this.nineboxShader.sendUniform(this.uvFactorUniform, this.uvFactor);
+        this.nineboxShader.sendUniform(this.alphaUniform, this.alpha);
 
         // Bind texture
         this.texture.bind();

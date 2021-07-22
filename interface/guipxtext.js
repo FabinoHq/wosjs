@@ -887,7 +887,10 @@ GuiPxText.prototype = {
                             2.0/this.size.vec[1], 2.0/this.size.vec[1], 1.0
                         );
                     }
-                    this.modelMatrix.translateVec2(this.position);
+                    this.modelMatrix.translate(
+                        -this.size.vec[0]*0.5,
+                        -this.size.vec[1]*0.5, 0.0
+                    );
                     this.modelMatrix.translateX(
                         (WOSDefaultPxTextXOffset*this.charsize.vec[0]*i)-
                         (WOSDefaultPxTextXOffset*this.charsize.vec[0]*0.18)

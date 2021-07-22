@@ -464,11 +464,11 @@ Wos.prototype = {
         // Init test multiline text
         this.testmultitext = new GuiMultiText(
             this.renderer, this.loader.textShader,
-            this.loader.backrendererShader
+            this.loader.backrendererShader, this.loader.scrollBarShader
         );
         this.testmultitext.init(
             "Test multi line text\nTest line 2\nAnd line 3 of text.",
-            1.0, 1.0, 0.1
+            1.0, 1.0, 0.1, true, this.loader.getTexture("scrollbar.png"), 0.03
         );
 
         // Init test text box
@@ -698,6 +698,10 @@ Wos.prototype = {
         {
             this.testtogglebutton.mouseMove(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testmultitext)
+        {
+            this.testmultitext.mouseMove(this.realMouseX, this.realMouseY);
+        }*/
         /*if (this.testtextbox)
         {
             this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);
@@ -742,6 +746,10 @@ Wos.prototype = {
         {
             this.testtogglebutton.mousePress(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testmultitext)
+        {
+            this.testmultitext.mousePress(this.realMouseX, this.realMouseY);
+        }*/
         /*if (this.testtextbox)
         {
             this.testtextbox.mousePress(this.realMouseX, this.realMouseY);
@@ -770,6 +778,10 @@ Wos.prototype = {
             this.testtogglebutton.mouseRelease(
                 this.realMouseX, this.realMouseY
             );
+        }*/
+        /*if (this.testmultitext)
+        {
+            this.testmultitext.mouseRelease(this.realMouseX, this.realMouseY);
         }*/
         /*if (this.testtextbox)
         {

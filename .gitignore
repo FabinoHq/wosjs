@@ -66,6 +66,7 @@
 !renderer/shaders/nineboxshader.js
 !renderer/shaders/buttonshader.js
 !renderer/shaders/togglebuttonshader.js
+!renderer/shaders/scrollbarshader.js
 !renderer/shaders/textshader.js
 !renderer/shaders/pxtextshader.js
 !renderer/shaders/staticmeshshader.js
@@ -78,6 +79,7 @@
 !interface/
 !interface/guibutton.js
 !interface/guitogglebutton.js
+!interface/guiscrollbar.js
 !interface/guitext.js
 !interface/guimultitext.js
 !interface/guitextbox.js
@@ -93,6 +95,7 @@
 # Textures files
 !textures/
 !textures/cursor.png
+!textures/scrollbar.png
 !textures/wospxfont.png
 !textures/testsprite.png
 !textures/testninebox.png

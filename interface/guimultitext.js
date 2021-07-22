@@ -48,7 +48,6 @@ const WOSDefaultMultiLineMinWidth = 0.01;
 const WOSDefaultMultiLineMaxWidth = 1.95;
 const WOSDefaultMultiLineMinHeight = 0.01;
 const WOSDefaultMultiLineMaxHeight = 1.95;
-const WOSDefaultMultiLineRightOffset = 0.05;
 const WOSDefaultMultiLineScrollFactor = 1.5;
 
 
@@ -57,8 +56,9 @@ const WOSDefaultMultiLineScrollFactor = 1.5;
 //  param renderer : Renderer pointer                                         //
 //  param textShader : Text shader pointer                                    //
 //  param fieldShader : Text field shader pointer                             //
+//  param scrollBarShader : Scrollbar shader pointer                          //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiMultiText(renderer, textShader, fieldShader)
+function GuiMultiText(renderer, textShader, fieldShader, scrollBarShader)
 {
     // Renderer pointer
     this.renderer = renderer;
@@ -69,6 +69,8 @@ function GuiMultiText(renderer, textShader, fieldShader)
     this.textShader = textShader;
     // Text field shader pointer
     this.fieldShader = fieldShader;
+    // Scollbar shader pointer
+    this.scrollBarShader = scrollBarShader;
 
     // GuiMultiText need update
     this.needUpdate = false;
@@ -79,18 +81,21 @@ function GuiMultiText(renderer, textShader, fieldShader)
     this.position = new Vector2(0.0, 0.0);
     // GuiMultiText size
     this.size = new Vector2(1.0, 1.0);
-    // GuiMultiText rotation angle
-    this.angle = 0.0;
     // GuiMultiText color
     this.color = new Vector3(1.0, 1.0, 1.0);
     // GuiMultiText alpha
     this.alpha = 1.0;
 
+    // GuiMultiText scrollable state
+    this.scrollable = false;
+    // GuiMultiText scroll bar
+    this.scrollBar = null;
     // GuiMultiText max offset
     this.maxOffset = 0.0;
     // GuiMultiText offset
     this.offset = 0.0;
-
+    // GuiMultiText scrollbar width
+    this.scrollBarWidth = 0.0;
 
     // GuiMultiText internal string
     this.text = "";
@@ -108,8 +113,11 @@ GuiMultiText.prototype = {
     //  param height : Text field width                                       //
     //  param height : Text field height                                      //
     //  param lineHeight : Text line height                                   //
+    //  param scrollable : Text line scrollable state                         //
+    //  param scrollBarTexture : ScrollBar texture                            //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(text, width, height, lineHeight)
+    init: function(text, width, height, lineHeight,
+        scrollable, scrollBarTexture, scrollBarWidth)
     {
         var i = 0;
         var j = 0;
@@ -123,14 +131,21 @@ GuiMultiText.prototype = {
         this.needUpdate = false;
         this.height = 0.0;
         this.position.reset();
-        this.angle = 0.0;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.color.setXYZ(1.0, 1.0, 1.0);
         this.alpha = 1.0;
+        this.scrollable = false;
+        if (scrollable !== undefined) this.scrollable = scrollable;
+        this.scrollBar = null;
         this.maxOffset = 0.0;
         this.offset = 0.0;
+        this.scrollBarWidth = 0.0;
+        if (this.scrollable && (scrollBarWidth !== undefined))
+        {
+            this.scrollBarWidth = scrollBarWidth;
+        }
         this.text = "";
         this.lines = null;
         this.textLength = 0;
@@ -154,6 +169,19 @@ GuiMultiText.prototype = {
 
         // Check field shader pointer
         if (!this.fieldShader) return false;
+
+        // Create scrollbar
+        if (this.scrollable)
+        {
+            this.scrollBar = new GuiScrollBar(
+                this.renderer, this.scrollBarShader
+            );
+            if (!this.scrollBar.init(
+                scrollBarTexture, scrollBarWidth, 1.0, 15.0))
+            {
+                return false;
+            }
+        }
 
         // Set text
         this.setText(text);
@@ -381,24 +409,6 @@ GuiMultiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngle : Set text rotation angle                                    //
-    //  param angle : Text rotation angle to set in degrees                   //
-    ////////////////////////////////////////////////////////////////////////////
-    setAngle: function(angle)
-    {
-        this.angle = angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  rotate : Rotate text                                                  //
-    //  param angle : Angle to rotate text by in degrees                      //
-    ////////////////////////////////////////////////////////////////////////////
-    rotate: function(angle)
-    {
-        this.angle += angle;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setColor : Set text color                                             //
     //  param r : Text red color channel to set                               //
     //  param g : Text blue color channel to set                              //
@@ -476,7 +486,7 @@ GuiMultiText.prototype = {
             {
                 // Check line width
                 if (this.lines[i].getWidth() >=
-                    (this.size.vec[0]-WOSDefaultMultiLineRightOffset))
+                    (this.size.vec[0]-this.scrollBarWidth-0.02))
                 {
                     lastSpace = 0;
                     for (j = 2; j < this.lines[i].getLength(); ++j)
@@ -488,7 +498,7 @@ GuiMultiText.prototype = {
 
                         // Check character positions
                         if (this.lines[i].getCharPos(j+1) >=
-                            (this.size.vec[0]-WOSDefaultMultiLineRightOffset))
+                            (this.size.vec[0]-this.scrollBarWidth-0.02))
                         {
                             // Insert new line
                             currentText = this.lines[i].getText();
@@ -535,6 +545,12 @@ GuiMultiText.prototype = {
             // Clamp current scroll offset
             if (this.offset <= 0.0) this.offset = 0.0;
             if (this.offset >= this.maxOffset) this.offset = this.maxOffset;
+
+            // Update scrollbar
+            if (this.scrollable)
+            {
+                this.scrollBar.setScrollHeight(1.0/(this.maxOffset+1.0));
+            }
         }
 
         // Multitext need update
@@ -746,6 +762,53 @@ GuiMultiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  mousePress : Handle mouse press event                                 //
+    //  param mouseX : Cursor X position                                      //
+    //  param mouseY : Cursor Y position                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    mousePress: function(mouseX, mouseY)
+    {
+        if (this.scrollable)
+        {
+            if (this.scrollBar.mousePress(mouseX, mouseY))
+            {
+                this.offset = this.scrollBar.getScrollOffset()*this.maxOffset;
+                this.needUpdate = true;
+            }
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  mouseRelease : Handle mouse release event                             //
+    //  param mouseX : Cursor X position                                      //
+    //  param mouseY : Cursor Y position                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    mouseRelease: function(mouseX, mouseY)
+    {
+        if (this.scrollable)
+        {
+            this.scrollBar.mouseRelease(mouseX, mouseY);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  mouseMove : Handle mouse move event                                   //
+    //  param mouseX : Cursor X position                                      //
+    //  param mouseY : Cursor Y position                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    mouseMove: function(mouseX, mouseY)
+    {
+        if (this.scrollable)
+        {
+            if (this.scrollBar.mouseMove(mouseX, mouseY))
+            {
+                this.offset = this.scrollBar.getScrollOffset()*this.maxOffset;
+                this.needUpdate = true;
+            }
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  mouseWheel : Handle mouse wheel event                                 //
     //  param mouseWheel : Mouse wheel delta                                  //
     //  param mouseX : Cursor X position                                      //
@@ -753,26 +816,60 @@ GuiMultiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     mouseWheel: function(mouseWheel, mouseX, mouseY)
     {
-        if (mouseX >= this.position.vec[0] &&
-            mouseX <= (this.position.vec[0]+this.size.vec[0]) &&
-            mouseY >= this.position.vec[1] &&
-            mouseY <= (this.position.vec[1]+this.size.vec[1]))
+        if (this.scrollable)
         {
-            if (mouseWheel < 0.0)
+            if (this.isPicking(mouseX, mouseY))
             {
-                // Mouse wheel up
-                this.offset -= this.height*WOSDefaultMultiLineScrollFactor;
-                if (this.offset <= 0.0) this.offset = 0.0;
-                this.needUpdate = true;
-            }
-            else if (mouseWheel > 0.0)
-            {
-                // Mouse wheel down
-                this.offset += this.height*WOSDefaultMultiLineScrollFactor;
-                if (this.offset >= this.maxOffset) this.offset = this.maxOffset;
-                this.needUpdate = true;
+                if (mouseWheel < 0.0)
+                {
+                    // Mouse wheel up
+                    this.offset -= this.height*WOSDefaultMultiLineScrollFactor;
+                    if (this.offset <= 0.0) this.offset = 0.0;
+                    if (this.maxOffset > 0.0)
+                    {
+                        this.scrollBar.setScrollOffset(
+                            this.offset/this.maxOffset
+                        );
+                    }
+                    this.needUpdate = true;
+                }
+                else if (mouseWheel > 0.0)
+                {
+                    // Mouse wheel down
+                    this.offset += this.height*WOSDefaultMultiLineScrollFactor;
+                    if (this.offset >= this.maxOffset)
+                    {
+                        this.offset = this.maxOffset;
+                    }
+                    if (this.maxOffset > 0.0)
+                    {
+                        this.scrollBar.setScrollOffset(
+                            this.offset/this.maxOffset
+                        );
+                    }
+                    this.needUpdate = true;
+                }
             }
         }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  isPicking : Get multitext picking state                               //
+    //  return : True if the multitext is picking                             //
+    ////////////////////////////////////////////////////////////////////////////
+    isPicking: function(mouseX, mouseY)
+    {
+        if ((mouseX >= this.position.vec[0]) &&
+            (mouseX <= (this.position.vec[0] + this.size.vec[0])) &&
+            (mouseY >= this.position.vec[1]) &&
+            (mouseY <= (this.position.vec[1] + this.size.vec[1])))
+        {
+            // Multitext is picking
+            return true;
+        }
+
+        // Multitext is not picking
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -809,15 +906,6 @@ GuiMultiText.prototype = {
     getHeight: function()
     {
         return this.size.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getAngle : Get text rotation angle                                    //
-    //  return : Text rotation angle in degrees                               //
-    ////////////////////////////////////////////////////////////////////////////
-    getAngle: function()
-    {
-        return this.angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -916,8 +1004,8 @@ GuiMultiText.prototype = {
             {
                 // Set line position
                 this.lines[i].setPosition(
-                    this.position.vec[0] + (0.1*this.height),
-                    (this.position.vec[1]+this.size.vec[1])-
+                    (0.1*this.height)-(this.size.vec[0]*0.5),
+                    (this.size.vec[1])-(this.size.vec[1]*0.5)-
                     (i*this.height*WOSDefaultTextYOffset)-(1.05*this.height)+
                     this.offset
                 );
@@ -981,7 +1069,18 @@ GuiMultiText.prototype = {
         this.backrenderer.setAlpha(this.alpha);
         this.backrenderer.setSizeVec2(this.size);
         this.backrenderer.setPositionVec2(this.position);
-        this.backrenderer.setAngle(this.angle);
         this.backrenderer.render();
+
+        // Render scroll bar
+        if (this.scrollable)
+        {
+            this.scrollBar.setHeight(this.size.vec[1]-0.01);
+            this.scrollBar.setPosition(
+                this.position.vec[0]+this.size.vec[0]-
+                this.scrollBarWidth-0.005,
+                this.position.vec[1]+0.005
+            );
+            this.scrollBar.render();
+        }
     }
 };
