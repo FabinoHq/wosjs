@@ -44,11 +44,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Default multi text settings                                               //
 ////////////////////////////////////////////////////////////////////////////////
-const WOSDefaultMultiLineMinWidth = 0.01;
-const WOSDefaultMultiLineMaxWidth = 1.95;
-const WOSDefaultMultiLineMinHeight = 0.01;
-const WOSDefaultMultiLineMaxHeight = 1.95;
-const WOSDefaultMultiLineScrollFactor = 1.5;
+const WOSDefaultMultiTextMinWidth = 0.2;
+const WOSDefaultMultiTextMaxWidth = 1.95;
+const WOSDefaultMultiTextMinHeight = 0.05;
+const WOSDefaultMultiTextMaxHeight = 1.95;
+const WOSDefaultMultiTextScrollFactor = 1.5;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -108,7 +108,7 @@ function GuiMultiText(renderer, textShader, fieldShader, scrollBarShader)
 
 GuiMultiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init GUI MultiLine Text                                        //
+    //  init : Init GUI MultiText                                             //
     //  param text : Text to set                                              //
     //  param height : Text field width                                       //
     //  param height : Text field height                                      //
@@ -150,6 +150,33 @@ GuiMultiText.prototype = {
         this.lines = null;
         this.textLength = 0;
         this.asciiMode = false;
+
+        // Clamp multiline field size
+        if (this.size.vec[0] <= WOSDefaultMultiTextMinWidth)
+        {
+            this.size.vec[0] = WOSDefaultMultiTextMinWidth;
+        }
+        if (this.size.vec[0] >= WOSDefaultMultiTextMaxWidth)
+        {
+            this.size.vec[0] = WOSDefaultMultiTextMaxWidth;
+        }
+        if (this.scrollable)
+        {
+            if (this.size.vec[0] <=
+                (WOSDefaultMultiTextMinWidth+this.scrollBarWidth))
+            {
+                this.size.vec[0] =
+                    (WOSDefaultMultiTextMinWidth+this.scrollBarWidth);
+            }
+        }
+        if (this.size.vec[1] <= WOSDefaultMultiTextMinHeight)
+        {
+            this.size.vec[1] = WOSDefaultMultiTextMinHeight;
+        }
+        if (this.size.vec[1] >= WOSDefaultMultiTextMaxHeight)
+        {
+            this.size.vec[1] = WOSDefaultMultiTextMaxHeight;
+        }
 
         // Set text line height
         if (lineHeight !== undefined) this.height = lineHeight;
@@ -319,21 +346,28 @@ GuiMultiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
-        if (width <= WOSDefaultMultiLineMinWidth)
+        if (width <= WOSDefaultMultiTextMinWidth)
         {
-            width = WOSDefaultMultiLineMinWidth;
+            width = WOSDefaultMultiTextMinWidth;
         }
-        if (width >= WOSDefaultMultiLineMaxWidth)
+        if (width >= WOSDefaultMultiTextMaxWidth)
         {
-            width = WOSDefaultMultiLineMaxWidth;
+            width = WOSDefaultMultiTextMaxWidth;
         }
-        if (height <= WOSDefaultMultiLineMinHeight)
+        if (this.scrollable)
         {
-            height = WOSDefaultMultiLineMinHeight;
+            if (width <= (WOSDefaultMultiTextMinWidth+this.scrollBarWidth))
+            {
+                width = (WOSDefaultMultiTextMinWidth+this.scrollBarWidth);
+            }
         }
-        if (height >= WOSDefaultMultiLineMaxHeight)
+        if (height <= WOSDefaultMultiTextMinHeight)
         {
-            height = WOSDefaultMultiLineMaxHeight;
+            height = WOSDefaultMultiTextMinHeight;
+        }
+        if (height >= WOSDefaultMultiTextMaxHeight)
+        {
+            height = WOSDefaultMultiTextMaxHeight;
         }
         this.size.vec[0] = width;
         this.size.vec[1] = height;
@@ -350,21 +384,30 @@ GuiMultiText.prototype = {
     {
         this.size.vec[0] = vector.vec[0];
         this.size.vec[1] = vector.vec[1];
-        if (this.size.vec[0] <= WOSDefaultMultiLineMinWidth)
+        if (this.size.vec[0] <= WOSDefaultMultiTextMinWidth)
         {
-            this.size.vec[0] = WOSDefaultMultiLineMinWidth;
+            this.size.vec[0] = WOSDefaultMultiTextMinWidth;
         }
-        if (this.size.vec[0] >= WOSDefaultMultiLineMaxWidth)
+        if (this.size.vec[0] >= WOSDefaultMultiTextMaxWidth)
         {
-            this.size.vec[0] = WOSDefaultMultiLineMaxWidth;
+            this.size.vec[0] = WOSDefaultMultiTextMaxWidth;
         }
-        if (this.size.vec[1] <= WOSDefaultMultiLineMinHeight)
+        if (this.scrollable)
         {
-            this.size.vec[1] = WOSDefaultMultiLineMinHeight;
+            if (this.size.vec[0] <=
+                (WOSDefaultMultiTextMinWidth+this.scrollBarWidth))
+            {
+                this.size.vec[0] =
+                    (WOSDefaultMultiTextMinWidth+this.scrollBarWidth);
+            }
         }
-        if (this.size.vec[1] >= WOSDefaultMultiLineMaxHeight)
+        if (this.size.vec[1] <= WOSDefaultMultiTextMinHeight)
         {
-            this.size.vec[1] = WOSDefaultMultiLineMaxHeight;
+            this.size.vec[1] = WOSDefaultMultiTextMinHeight;
+        }
+        if (this.size.vec[1] >= WOSDefaultMultiTextMaxHeight)
+        {
+            this.size.vec[1] = WOSDefaultMultiTextMaxHeight;
         }
 
         // Update text
@@ -377,13 +420,20 @@ GuiMultiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setWidth: function(width)
     {
-        if (width <= WOSDefaultMultiLineMinWidth)
+        if (width <= WOSDefaultMultiTextMinWidth)
         {
-            width = WOSDefaultMultiLineMinWidth;
+            width = WOSDefaultMultiTextMinWidth;
         }
-        if (width >= WOSDefaultMultiLineMaxWidth)
+        if (width >= WOSDefaultMultiTextMaxWidth)
         {
-            width = WOSDefaultMultiLineMaxWidth;
+            width = WOSDefaultMultiTextMaxWidth;
+        }
+        if (this.scrollable)
+        {
+            if (width <= (WOSDefaultMultiTextMinWidth+this.scrollBarWidth))
+            {
+                width = (WOSDefaultMultiTextMinWidth+this.scrollBarWidth);
+            }
         }
         this.size.vec[0] = width;
 
@@ -397,15 +447,35 @@ GuiMultiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
-        if (height <= WOSDefaultMultiLineMinHeight)
+        if (height <= WOSDefaultMultiTextMinHeight)
         {
-            height = WOSDefaultMultiLineMinHeight;
+            height = WOSDefaultMultiTextMinHeight;
         }
-        if (height >= WOSDefaultMultiLineMaxHeight)
+        if (height >= WOSDefaultMultiTextMaxHeight)
         {
-            height = WOSDefaultMultiLineMaxHeight;
+            height = WOSDefaultMultiTextMaxHeight;
         }
         this.size.vec[1] = height;
+
+        // Compute max scroll offset
+        this.maxOffset =
+            (this.lines.length*this.height*WOSDefaultTextYOffset)-
+            this.size.vec[1]+(this.height*0.05);
+        if (this.maxOffset <= 0.0) this.maxOffset = 0.0;
+
+        // Clamp current scroll offset
+        if (this.offset <= 0.0) this.offset = 0.0;
+        if (this.offset >= this.maxOffset) this.offset = this.maxOffset;
+
+        // Update scrollbar
+        if (this.scrollable)
+        {
+            this.scrollBar.setScrollOffset(this.offset);
+            this.scrollBar.setScrollHeight(1.0/(this.maxOffset+1.0));
+        }
+
+        // Text need update
+        this.needUpdate = true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -549,6 +619,7 @@ GuiMultiText.prototype = {
             // Update scrollbar
             if (this.scrollable)
             {
+                this.scrollBar.setScrollOffset(this.offset);
                 this.scrollBar.setScrollHeight(1.0/(this.maxOffset+1.0));
             }
         }
@@ -584,6 +655,9 @@ GuiMultiText.prototype = {
         var isMaxOffset = (this.offset >= this.maxOffset);
         var currentLine = this.lines.length;
         var currentText = "";
+        var lastSpace = 0;
+        var i = 0;
+        var j = 0;
 
         if (text)
         {
@@ -593,13 +667,16 @@ GuiMultiText.prototype = {
             );
             for (i = 0; i < text.length; ++i)
             {
-                if (this.asciiMode)
+                if (text[i] != '\n')
                 {
-                    currentText += this.convertASCII(text[i]);
-                }
-                else
-                {
-                    currentText += text[i];
+                    if (this.asciiMode)
+                    {
+                        currentText += this.convertASCII(text[i]);
+                    }
+                    else
+                    {
+                        currentText += text[i];
+                    }
                 }
             }
             this.text += currentText;
@@ -607,6 +684,60 @@ GuiMultiText.prototype = {
             this.lines[currentLine].init(
                 currentText, this.height, false
             );
+
+            for (i = currentLine; i < this.lines.length; ++i)
+            {
+                // Check line width
+                if (this.lines[i].getWidth() >=
+                    (this.size.vec[0]-this.scrollBarWidth-0.02))
+                {
+                    lastSpace = 0;
+                    for (j = 2; j < this.lines[i].getLength(); ++j)
+                    {
+                        if (this.lines[i].getChar(j) == ' ')
+                        {
+                            lastSpace = j;
+                        }
+
+                        // Check character positions
+                        if (this.lines[i].getCharPos(j+1) >=
+                            (this.size.vec[0]-this.scrollBarWidth-0.02))
+                        {
+                            // Insert new line
+                            currentText = this.lines[i].getText();
+                            currentLen = this.lines[i].getLength();
+                            if (lastSpace == 0)
+                            {
+                                // No previous space, cut through letters
+                                this.lines[i].setText(
+                                    currentText.substring(0, j-1)
+                                );
+                                currentText = currentText.substring(
+                                    j-1, currentLen
+                                );
+                            }
+                            else
+                            {
+                                // Cut according to previous space
+                                this.lines[i].setText(
+                                    currentText.substring(0, lastSpace)
+                                );
+                                currentText = currentText.substring(
+                                    lastSpace+1, currentLen
+                                );
+                            }
+                            this.lines.splice(
+                                i+1, 0,
+                                new GuiText(this.renderer, this.textShader)
+                            );
+                            this.lines[i+1].init(
+                                currentText, this.height, false
+                            );
+                            break;
+                        }
+                    }
+                }
+            }
 
             // Compute max scroll offset
             this.maxOffset =
@@ -620,6 +751,13 @@ GuiMultiText.prototype = {
 
             // Auto text scroll
             if (isMaxOffset) this.offset = this.maxOffset;
+
+            // Update scrollbar
+            if (this.scrollable)
+            {
+                this.scrollBar.setScrollOffset(this.offset);
+                this.scrollBar.setScrollHeight(1.0/(this.maxOffset+1.0));
+            }
 
             // Text need update
             this.needUpdate = true;
@@ -683,6 +821,13 @@ GuiMultiText.prototype = {
             // Clamp current scroll offset
             if (this.offset <= 0.0) this.offset = 0.0;
             if (this.offset >= this.maxOffset) this.offset = this.maxOffset;
+
+            // Update scrollbar
+            if (this.scrollable)
+            {
+                this.scrollBar.setScrollOffset(this.offset);
+                this.scrollBar.setScrollHeight(1.0/(this.maxOffset+1.0));
+            }
 
             // Multitext need update
             this.needUpdate = true;
@@ -823,7 +968,7 @@ GuiMultiText.prototype = {
                 if (mouseWheel < 0.0)
                 {
                     // Mouse wheel up
-                    this.offset -= this.height*WOSDefaultMultiLineScrollFactor;
+                    this.offset -= this.height*WOSDefaultMultiTextScrollFactor;
                     if (this.offset <= 0.0) this.offset = 0.0;
                     if (this.maxOffset > 0.0)
                     {
@@ -836,7 +981,7 @@ GuiMultiText.prototype = {
                 else if (mouseWheel > 0.0)
                 {
                     // Mouse wheel down
-                    this.offset += this.height*WOSDefaultMultiLineScrollFactor;
+                    this.offset += this.height*WOSDefaultMultiTextScrollFactor;
                     if (this.offset >= this.maxOffset)
                     {
                         this.offset = this.maxOffset;
