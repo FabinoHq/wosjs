@@ -320,6 +320,8 @@ function Wos()
     this.testtextbox = null;
     // Test pixel text
     this.testpxtext = null;
+    // Test pixel multi text
+    this.testpxmultitext = null;
     // Test pixel text box
     this.testpxtextbox = null;
 
@@ -487,6 +489,17 @@ Wos.prototype = {
             this.loader.getTexture("wospxfont.png"), "Test pixel text", 0.08
         );
         this.testpxtext.setSmooth(0.4);
+
+        // Init test pixel multiline text
+        this.testpxmultitext = new GuiPxMultiText(
+            this.renderer, this.loader.pxTextShader,
+            this.loader.backrendererShader, this.loader.scrollBarShader
+        );
+        this.testpxmultitext.init(
+            this.loader.getTexture("wospxfont.png"),
+            "Test multi line pixel text\nTest line 2\nAnd line 3 of text.",
+            1.0, 1.0, 0.1, true, this.loader.getTexture("scrollbar.png"), 0.03
+        );
 
         // Init test pixel text box
         this.testpxtextbox = new GuiPxTextBox(
@@ -706,6 +719,10 @@ Wos.prototype = {
         {
             this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testpxmultitext)
+        {
+            this.testpxmultitext.mouseMove(this.realMouseX, this.realMouseY);
+        }*/
         /*if (this.testpxtextbox)
         {
             this.testpxtextbox.mouseMove(this.realMouseX, this.realMouseY);
@@ -754,6 +771,10 @@ Wos.prototype = {
         {
             this.testtextbox.mousePress(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testpxmultitext)
+        {
+            this.testpxmultitext.mousePress(this.realMouseX, this.realMouseY);
+        }*/
         /*if (this.testpxtextbox)
         {
             this.testpxtextbox.mousePress(this.realMouseX, this.realMouseY);
@@ -787,6 +808,10 @@ Wos.prototype = {
         {
             this.testtextbox.mouseRelease(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testpxmultitext)
+        {
+            this.testpxmultitext.mouseRelease(this.realMouseX, this.realMouseY);
+        }*/
         /*if (this.testpxtextbox)
         {
             this.testpxtextbox.mouseRelease(this.realMouseX, this.realMouseY);
@@ -805,6 +830,12 @@ Wos.prototype = {
         /*if (this.testmultitext)
         {
             this.testmultitext.mouseWheel(
+                mouseWheel, this.realMouseX, this.realMouseY
+            );
+        }*/
+        /*if (this.testpxmultitext)
+        {
+            this.testpxmultitext.mouseWheel(
                 mouseWheel, this.realMouseX, this.realMouseY
             );
         }*/
@@ -926,6 +957,11 @@ Wos.prototype = {
         //this.testpxtext.setX(-this.testpxtext.getWidth()*0.5);
         //this.testpxtext.setY(-this.testpxtext.getHeight()*0.5);
         //this.testpxtext.render();
+
+        // Render test pixel multitext
+        //this.testpxmultitext.setX(-this.testpxmultitext.getWidth()*0.5);
+        //this.testpxmultitext.setY(-this.testpxmultitext.getHeight()*0.5);
+        //this.testpxmultitext.render();
 
         // Render test text box
         //this.testtextbox.setX(-this.testtextbox.getWidth()*0.5);

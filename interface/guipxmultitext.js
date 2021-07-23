@@ -37,28 +37,28 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      interface/guimultitext.js : GUI MultiLine Text management             //
+//      interface/guipxmultitext.js : GUI MultiLine Pixel Text management     //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Default multi text settings                                               //
+//  Default pixel multi text settings                                         //
 ////////////////////////////////////////////////////////////////////////////////
-const WOSDefaultMultiTextMinWidth = 0.2;
-const WOSDefaultMultiTextMaxWidth = 1.95;
-const WOSDefaultMultiTextMinHeight = 0.05;
-const WOSDefaultMultiTextMaxHeight = 1.95;
-const WOSDefaultMultiTextScrollFactor = 1.5;
+const WOSDefaultPxMultiTextMinWidth = 0.2;
+const WOSDefaultPxMultiTextMaxWidth = 1.95;
+const WOSDefaultPxMultiTextMinHeight = 0.05;
+const WOSDefaultPxMultiTextMaxHeight = 1.95;
+const WOSDefaultPxMultiTextScrollFactor = 1.5;
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GuiMultiText class definition                                             //
+//  GuiPxMultiText class definition                                           //
 //  param renderer : Renderer pointer                                         //
 //  param textShader : Text shader pointer                                    //
 //  param fieldShader : Text field shader pointer                             //
 //  param scrollBarShader : Scrollbar shader pointer                          //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiMultiText(renderer, textShader, fieldShader, scrollBarShader)
+function GuiPxMultiText(renderer, textShader, fieldShader, scrollBarShader)
 {
     // Renderer pointer
     this.renderer = renderer;
@@ -72,43 +72,44 @@ function GuiMultiText(renderer, textShader, fieldShader, scrollBarShader)
     // Scollbar shader pointer
     this.scrollBarShader = scrollBarShader;
 
-    // GuiMultiText need update
+    // GuiPxText glyphs texture
+    this.texture = null;
+
+    // GuiPxMultiText need update
     this.needUpdate = false;
 
-    // GuiMultiText text height
+    // GuiPxMultiText text height
     this.height = 0.0;
-    // GuiMultiText position
+    // GuiPxMultiText position
     this.position = new Vector2(0.0, 0.0);
-    // GuiMultiText size
+    // GuiPxMultiText size
     this.size = new Vector2(1.0, 1.0);
-    // GuiMultiText color
+    // GuiPxMultiText color
     this.color = new Vector3(1.0, 1.0, 1.0);
-    // GuiMultiText alpha
+    // GuiPxMultiText alpha
     this.alpha = 1.0;
 
-    // GuiMultiText scrollable state
+    // GuiPxMultiText scrollable state
     this.scrollable = false;
-    // GuiMultiText scroll bar
+    // GuiPxMultiText scroll bar
     this.scrollBar = null;
-    // GuiMultiText max offset
+    // GuiPxMultiText max offset
     this.maxOffset = 0.0;
-    // GuiMultiText offset
+    // GuiPxMultiText offset
     this.offset = 0.0;
-    // GuiMultiText scrollbar width
+    // GuiPxMultiText scrollbar width
     this.scrollBarWidth = 0.0;
 
-    // GuiMultiText internal string
+    // GuiPxMultiText internal string
     this.text = "";
     this.lines = null;
     this.textLength = 0;
-
-    // ASCII mode
-    this.asciiMode = false;
 }
 
-GuiMultiText.prototype = {
+GuiPxMultiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init GUI MultiText                                             //
+    //  init : Init GUI PxMultiText                                           //
+    //  param texture : Texture pointer                                       //
     //  param text : Text to set                                              //
     //  param width : Text field width                                        //
     //  param height : Text field height                                      //
@@ -116,7 +117,7 @@ GuiMultiText.prototype = {
     //  param scrollable : Text line scrollable state                         //
     //  param scrollBarTexture : ScrollBar texture                            //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(text, width, height, lineHeight,
+    init: function(texture, text, width, height, lineHeight,
         scrollable, scrollBarTexture, scrollBarWidth)
     {
         var i = 0;
@@ -126,8 +127,9 @@ GuiMultiText.prototype = {
         var currentLen = 0;
         var lastSpace = 0;
 
-        // Reset GuiMultiText
+        // Reset GuiPxMultiText
         this.backrenderer = null;
+        this.texture = null;
         this.needUpdate = false;
         this.height = 0.0;
         this.position.reset();
@@ -149,41 +151,40 @@ GuiMultiText.prototype = {
         this.text = "";
         this.lines = null;
         this.textLength = 0;
-        this.asciiMode = false;
 
         // Clamp multitext field size
-        if (this.size.vec[0] <= WOSDefaultMultiTextMinWidth)
+        if (this.size.vec[0] <= WOSDefaultPxMultiTextMinWidth)
         {
-            this.size.vec[0] = WOSDefaultMultiTextMinWidth;
+            this.size.vec[0] = WOSDefaultPxMultiTextMinWidth;
         }
-        if (this.size.vec[0] >= WOSDefaultMultiTextMaxWidth)
+        if (this.size.vec[0] >= WOSDefaultPxMultiTextMaxWidth)
         {
-            this.size.vec[0] = WOSDefaultMultiTextMaxWidth;
+            this.size.vec[0] = WOSDefaultPxMultiTextMaxWidth;
         }
         if (this.scrollable)
         {
             if (this.size.vec[0] <=
-                (WOSDefaultMultiTextMinWidth+this.scrollBarWidth))
+                (WOSDefaultPxMultiTextMinWidth+this.scrollBarWidth))
             {
                 this.size.vec[0] =
-                    (WOSDefaultMultiTextMinWidth+this.scrollBarWidth);
+                    (WOSDefaultPxMultiTextMinWidth+this.scrollBarWidth);
             }
         }
-        if (this.size.vec[1] <= WOSDefaultMultiTextMinHeight)
+        if (this.size.vec[1] <= WOSDefaultPxMultiTextMinHeight)
         {
-            this.size.vec[1] = WOSDefaultMultiTextMinHeight;
+            this.size.vec[1] = WOSDefaultPxMultiTextMinHeight;
         }
-        if (this.size.vec[1] >= WOSDefaultMultiTextMaxHeight)
+        if (this.size.vec[1] >= WOSDefaultPxMultiTextMaxHeight)
         {
-            this.size.vec[1] = WOSDefaultMultiTextMaxHeight;
+            this.size.vec[1] = WOSDefaultPxMultiTextMaxHeight;
         }
 
         // Set text line height
         if (lineHeight !== undefined) this.height = lineHeight;
-        if (this.height <= WOSDefaultMinTextHeight)
-            this.height = WOSDefaultMinTextHeight;
-        if (this.height >= WOSDefaultMaxTextHeight)
-            this.height = WOSDefaultMaxTextHeight;
+        if (this.height <= WOSDefaultMinPxTextHeight)
+            this.height = WOSDefaultMinPxTextHeight;
+        if (this.height >= WOSDefaultMaxPxTextHeight)
+            this.height = WOSDefaultMaxPxTextHeight;
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -210,6 +211,11 @@ GuiMultiText.prototype = {
             }
         }
 
+        // Set texture
+        this.texture = texture;
+        if (!this.texture) return false;
+        this.texture.setSmooth(true);
+
         // Set text
         this.setText(text);
 
@@ -217,24 +223,11 @@ GuiMultiText.prototype = {
         this.backrenderer = new BackRenderer(this.renderer, this.fieldShader);
         this.backrenderer.init(1, 1);
 
-        // Multitext need update
+        // PxMultitext need update
         this.needUpdate = true;
 
-        // Multitext loaded
+        // PxMultitext text loaded
         return true;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setASCIImode : Set text ASCII mode                                    //
-    //  param asciiMode : Text ASCII mode state                               //
-    ////////////////////////////////////////////////////////////////////////////
-    setASCIImode: function(asciiMode)
-    {
-        // Set ASCII mode
-        this.asciiMode = asciiMode;
-
-        // Update text
-        this.setText(this.getText());
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -323,10 +316,10 @@ GuiMultiText.prototype = {
     {
         // Set text line height
         this.height = lineHeight;
-        if (this.height <= WOSDefaultMinTextHeight)
-            this.height = WOSDefaultMinTextHeight;
-        if (this.height >= WOSDefaultMaxTextHeight)
-            this.height = WOSDefaultMaxTextHeight;
+        if (this.height <= WOSDefaultMinPxTextHeight)
+            this.height = WOSDefaultMinPxTextHeight;
+        if (this.height >= WOSDefaultMaxPxTextHeight)
+            this.height = WOSDefaultMaxPxTextHeight;
 
         // Update text
         this.setText(this.getText());
@@ -339,28 +332,28 @@ GuiMultiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
-        if (width <= WOSDefaultMultiTextMinWidth)
+        if (width <= WOSDefaultPxMultiTextMinWidth)
         {
-            width = WOSDefaultMultiTextMinWidth;
+            width = WOSDefaultPxMultiTextMinWidth;
         }
-        if (width >= WOSDefaultMultiTextMaxWidth)
+        if (width >= WOSDefaultPxMultiTextMaxWidth)
         {
-            width = WOSDefaultMultiTextMaxWidth;
+            width = WOSDefaultPxMultiTextMaxWidth;
         }
         if (this.scrollable)
         {
-            if (width <= (WOSDefaultMultiTextMinWidth+this.scrollBarWidth))
+            if (width <= (WOSDefaultPxMultiTextMinWidth+this.scrollBarWidth))
             {
-                width = (WOSDefaultMultiTextMinWidth+this.scrollBarWidth);
+                width = (WOSDefaultPxMultiTextMinWidth+this.scrollBarWidth);
             }
         }
-        if (height <= WOSDefaultMultiTextMinHeight)
+        if (height <= WOSDefaultPxMultiTextMinHeight)
         {
-            height = WOSDefaultMultiTextMinHeight;
+            height = WOSDefaultPxMultiTextMinHeight;
         }
-        if (height >= WOSDefaultMultiTextMaxHeight)
+        if (height >= WOSDefaultPxMultiTextMaxHeight)
         {
-            height = WOSDefaultMultiTextMaxHeight;
+            height = WOSDefaultPxMultiTextMaxHeight;
         }
         this.size.vec[0] = width;
         this.size.vec[1] = height;
@@ -377,30 +370,30 @@ GuiMultiText.prototype = {
     {
         this.size.vec[0] = vector.vec[0];
         this.size.vec[1] = vector.vec[1];
-        if (this.size.vec[0] <= WOSDefaultMultiTextMinWidth)
+        if (this.size.vec[0] <= WOSDefaultPxMultiTextMinWidth)
         {
-            this.size.vec[0] = WOSDefaultMultiTextMinWidth;
+            this.size.vec[0] = WOSDefaultPxMultiTextMinWidth;
         }
-        if (this.size.vec[0] >= WOSDefaultMultiTextMaxWidth)
+        if (this.size.vec[0] >= WOSDefaultPxMultiTextMaxWidth)
         {
-            this.size.vec[0] = WOSDefaultMultiTextMaxWidth;
+            this.size.vec[0] = WOSDefaultPxMultiTextMaxWidth;
         }
         if (this.scrollable)
         {
             if (this.size.vec[0] <=
-                (WOSDefaultMultiTextMinWidth+this.scrollBarWidth))
+                (WOSDefaultPxMultiTextMinWidth+this.scrollBarWidth))
             {
                 this.size.vec[0] =
-                    (WOSDefaultMultiTextMinWidth+this.scrollBarWidth);
+                    (WOSDefaultPxMultiTextMinWidth+this.scrollBarWidth);
             }
         }
-        if (this.size.vec[1] <= WOSDefaultMultiTextMinHeight)
+        if (this.size.vec[1] <= WOSDefaultPxMultiTextMinHeight)
         {
-            this.size.vec[1] = WOSDefaultMultiTextMinHeight;
+            this.size.vec[1] = WOSDefaultPxMultiTextMinHeight;
         }
-        if (this.size.vec[1] >= WOSDefaultMultiTextMaxHeight)
+        if (this.size.vec[1] >= WOSDefaultPxMultiTextMaxHeight)
         {
-            this.size.vec[1] = WOSDefaultMultiTextMaxHeight;
+            this.size.vec[1] = WOSDefaultPxMultiTextMaxHeight;
         }
 
         // Update text
@@ -413,19 +406,19 @@ GuiMultiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setWidth: function(width)
     {
-        if (width <= WOSDefaultMultiTextMinWidth)
+        if (width <= WOSDefaultPxMultiTextMinWidth)
         {
-            width = WOSDefaultMultiTextMinWidth;
+            width = WOSDefaultPxMultiTextMinWidth;
         }
-        if (width >= WOSDefaultMultiTextMaxWidth)
+        if (width >= WOSDefaultPxMultiTextMaxWidth)
         {
-            width = WOSDefaultMultiTextMaxWidth;
+            width = WOSDefaultPxMultiTextMaxWidth;
         }
         if (this.scrollable)
         {
-            if (width <= (WOSDefaultMultiTextMinWidth+this.scrollBarWidth))
+            if (width <= (WOSDefaultPxMultiTextMinWidth+this.scrollBarWidth))
             {
-                width = (WOSDefaultMultiTextMinWidth+this.scrollBarWidth);
+                width = (WOSDefaultPxMultiTextMinWidth+this.scrollBarWidth);
             }
         }
         this.size.vec[0] = width;
@@ -440,19 +433,19 @@ GuiMultiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
-        if (height <= WOSDefaultMultiTextMinHeight)
+        if (height <= WOSDefaultPxMultiTextMinHeight)
         {
-            height = WOSDefaultMultiTextMinHeight;
+            height = WOSDefaultPxMultiTextMinHeight;
         }
-        if (height >= WOSDefaultMultiTextMaxHeight)
+        if (height >= WOSDefaultPxMultiTextMaxHeight)
         {
-            height = WOSDefaultMultiTextMaxHeight;
+            height = WOSDefaultPxMultiTextMaxHeight;
         }
         this.size.vec[1] = height;
 
         // Compute max scroll offset
         this.maxOffset =
-            (this.lines.length*this.height*WOSDefaultTextYOffset)-
+            (this.lines.length*this.height*WOSDefaultPxTextYOffset)-
             this.size.vec[1]+(this.height*0.05);
         if (this.maxOffset <= 0.0) this.maxOffset = 0.0;
 
@@ -501,7 +494,7 @@ GuiMultiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setText : Set GuiMultiText internal text string                       //
+    //  setText : Set GuiPxMultiText internal text string                     //
     //  param text : Text to set                                              //
     ////////////////////////////////////////////////////////////////////////////
     setText: function(text)
@@ -520,7 +513,7 @@ GuiMultiText.prototype = {
         this.textLength = 0;
         if (text)
         {
-            this.lines[0] = new GuiText(this.renderer, this.textShader);
+            this.lines[0] = new GuiPxText(this.renderer, this.textShader);
             this.textLength = text.length;
             this.text = text;
             for (i = 0; i < this.textLength; ++i)
@@ -528,28 +521,21 @@ GuiMultiText.prototype = {
                 if (text[i] == '\n')
                 {
                     this.lines[currentLine].init(
-                        currentText, this.height, false
+                        false, this.texture, currentText, this.height, false
                     );
                     ++currentLine;
                     currentText = "";
-                    this.lines[currentLine] = new GuiText(
+                    this.lines[currentLine] = new GuiPxText(
                         this.renderer, this.textShader
                     );
                 }
                 else
                 {
-                    if (this.asciiMode)
-                    {
-                        currentText += this.convertASCII(text[i]);
-                    }
-                    else
-                    {
-                        currentText += text[i];
-                    }
+                    currentText += this.convertASCII(text[i]);
                 }
             }
             this.lines[currentLine].init(
-                currentText, this.height, false
+                false, this.texture, currentText, this.height, false
             );
 
             for (i = 0; i < this.lines.length; ++i)
@@ -595,9 +581,10 @@ GuiMultiText.prototype = {
                             }
                             this.lines.splice(
                                 i+1, 0,
-                                new GuiText(this.renderer, this.textShader)
+                                new GuiPxText(this.renderer, this.textShader)
                             );
                             this.lines[i+1].init(
+                                false, this.texture,
                                 currentText, this.height, false
                             );
                             break;
@@ -608,7 +595,7 @@ GuiMultiText.prototype = {
 
             // Compute max scroll offset
             this.maxOffset =
-                (this.lines.length*this.height*WOSDefaultTextYOffset)-
+                (this.lines.length*this.height*WOSDefaultPxTextYOffset)-
                 this.size.vec[1]+(this.height*0.05);
             if (this.maxOffset <= 0.0) this.maxOffset = 0.0;
 
@@ -631,12 +618,12 @@ GuiMultiText.prototype = {
             }
         }
 
-        // Multitext need update
+        // PxMultitext need update
         this.needUpdate = true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  addText : Add GuiMultiText internal text                              //
+    //  addText : Add GuiPxMultiText internal text                            //
     //  param text : Text to add                                              //
     ////////////////////////////////////////////////////////////////////////////
     addText: function(text)
@@ -654,7 +641,7 @@ GuiMultiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  addLine : Add GuiMultiText new line                                   //
+    //  addLine : Add GuiPxMultiText new line                                 //
     //  param text : Text line to add                                         //
     ////////////////////////////////////////////////////////////////////////////
     addLine: function(text)
@@ -669,27 +656,20 @@ GuiMultiText.prototype = {
         if (text)
         {
             this.text += '\n';
-            this.lines[currentLine] = new GuiText(
+            this.lines[currentLine] = new GuiPxText(
                 this.renderer, this.textShader
             );
             for (i = 0; i < text.length; ++i)
             {
                 if (text[i] != '\n')
                 {
-                    if (this.asciiMode)
-                    {
-                        currentText += this.convertASCII(text[i]);
-                    }
-                    else
-                    {
-                        currentText += text[i];
-                    }
+                    currentText += this.convertASCII(text[i]);
                 }
             }
             this.text += currentText;
             this.textLength = this.text.length;
             this.lines[currentLine].init(
-                currentText, this.height, false
+                false, this.texture, currentText, this.height, false
             );
 
             for (i = currentLine; i < this.lines.length; ++i)
@@ -735,9 +715,10 @@ GuiMultiText.prototype = {
                             }
                             this.lines.splice(
                                 i+1, 0,
-                                new GuiText(this.renderer, this.textShader)
+                                new GuiPxText(this.renderer, this.textShader)
                             );
                             this.lines[i+1].init(
+                                false, this.texture,
                                 currentText, this.height, false
                             );
                             break;
@@ -748,7 +729,7 @@ GuiMultiText.prototype = {
 
             // Compute max scroll offset
             this.maxOffset =
-                (this.lines.length*this.height*WOSDefaultTextYOffset)-
+                (this.lines.length*this.height*WOSDefaultPxTextYOffset)-
                 this.size.vec[1]+(this.height*0.05);
             if (this.maxOffset <= 0.0) this.maxOffset = 0.0;
 
@@ -779,8 +760,8 @@ GuiMultiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  removeLine : Remove GuiMultiText line at given index                  //
-    //  param index : Index to remove GuiMultiText line at                    //
+    //  removeLine : Remove GuiPxMultiText line at given index                //
+    //  param index : Index to remove GuiPxMultiText line at                  //
     ////////////////////////////////////////////////////////////////////////////
     removeLine: function(index)
     {
@@ -828,7 +809,7 @@ GuiMultiText.prototype = {
 
             // Compute max scroll offset
             this.maxOffset =
-                (this.lines.length*this.height*WOSDefaultTextYOffset)-
+                (this.lines.length*this.height*WOSDefaultPxTextYOffset)-
                 this.size.vec[1]+(this.height*0.05);
             if (this.maxOffset <= 0.0) this.maxOffset = 0.0;
 
@@ -850,7 +831,7 @@ GuiMultiText.prototype = {
                 this.scrollBar.setScrollHeight(1.0/(this.maxOffset+1.0));
             }
 
-            // Multitext need update
+            // PxMultitext need update
             this.needUpdate = true;
         }
     },
@@ -989,7 +970,8 @@ GuiMultiText.prototype = {
                 if (mouseWheel < 0.0)
                 {
                     // Mouse wheel up
-                    this.offset -= this.height*WOSDefaultMultiTextScrollFactor;
+                    this.offset -=
+                        this.height*WOSDefaultPxMultiTextScrollFactor;
                     if (this.offset <= 0.0) this.offset = 0.0;
                     if (this.maxOffset > 0.0)
                     {
@@ -1006,7 +988,8 @@ GuiMultiText.prototype = {
                 else if (mouseWheel > 0.0)
                 {
                     // Mouse wheel down
-                    this.offset += this.height*WOSDefaultMultiTextScrollFactor;
+                    this.offset +=
+                        this.height*WOSDefaultPxMultiTextScrollFactor;
                     if (this.offset >= this.maxOffset)
                     {
                         this.offset = this.maxOffset;
@@ -1028,8 +1011,8 @@ GuiMultiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  isPicking : Get multitext picking state                               //
-    //  return : True if the multitext is picking                             //
+    //  isPicking : Get pxmultitext picking state                             //
+    //  return : True if the pxmultitext is picking                           //
     ////////////////////////////////////////////////////////////////////////////
     isPicking: function(mouseX, mouseY)
     {
@@ -1038,11 +1021,11 @@ GuiMultiText.prototype = {
             (mouseY >= this.position.vec[1]) &&
             (mouseY <= (this.position.vec[1] + this.size.vec[1])))
         {
-            // Multitext is picking
+            // PxMultitext is picking
             return true;
         }
 
-        // Multitext is not picking
+        // PxMultitext is not picking
         return false;
     },
 
@@ -1132,11 +1115,12 @@ GuiMultiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  render : Render multiline text                                        //
+    //  render : Render multiline pixel text                                  //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
         var i = 0;
+        var j = 0;
         var fieldWidth = 0;
         var fieldHeight = 0;
         var start = 0;
@@ -1159,14 +1143,14 @@ GuiMultiText.prototype = {
             this.backrenderer.clear();
             this.backrenderer.setActive();
 
-            if ((this.height*WOSDefaultTextYOffset) > 0.0)
+            if ((this.height*WOSDefaultPxTextYOffset) > 0.0)
             {
                 start = Math.round(
-                    (this.offset/(this.height*WOSDefaultTextYOffset))-1.0
+                    (this.offset/(this.height*WOSDefaultPxTextYOffset))-1.0
                 );
                 end = Math.round(
                     ((this.offset+this.size.vec[1])/
-                    (this.height*WOSDefaultTextYOffset))+1.0
+                    (this.height*WOSDefaultPxTextYOffset))+1.0
                 );
             }
             if (start <= 0) start = 0;
@@ -1178,32 +1162,14 @@ GuiMultiText.prototype = {
             {
                 // Set line position
                 this.lines[i].setPosition(
-                    (0.1*this.height)-(this.size.vec[0]*0.5),
+                    (-this.height*0.05)-this.size.vec[0]*0.5,
                     this.size.vec[1]-(this.size.vec[1]*0.5)-
-                    (i*this.height*WOSDefaultTextYOffset)-(1.05*this.height)+
+                    (i*this.height*WOSDefaultPxTextYOffset)-(0.98*this.height)+
                     this.offset
                 );
 
-                // Set text model matrix
-                this.lines[i].modelMatrix.setIdentity();
-                if (this.size.vec[1] > 0.0)
-                {
-                    this.lines[i].modelMatrix.scale(
-                        2.0/this.size.vec[1], 2.0/this.size.vec[1], 1.0
-                    );
-                }
-                this.lines[i].modelMatrix.translateVec2(this.lines[i].position);
-                this.lines[i].modelMatrix.scaleVec2(this.lines[i].size);
-
                 // Bind text shader
                 this.textShader.bind();
-
-                // Compute world matrix
-                this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-                this.renderer.worldMatrix.multiply(
-                    this.renderer.view.viewMatrix
-                );
-                this.renderer.worldMatrix.multiply(this.lines[i].modelMatrix);
 
                 // Send shader uniforms
                 this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
@@ -1211,22 +1177,85 @@ GuiMultiText.prototype = {
                     this.lines[i].colorUniform, this.lines[i].color
                 );
                 this.textShader.sendUniform(
-                    this.lines[i].alphaUniform, this.lines[i].alpha*1.5
+                    this.lines[i].alphaUniform, this.lines[i].charAlpha*1.5
+                );
+                this.textShader.sendUniform(
+                    this.lines[i].smoothUniform, this.lines[i].smooth
+                );
+                this.textShader.sendUniformVec2(
+                    this.lines[i].uvSizeUniform, this.lines[i].uvSize
                 );
 
                 // Bind texture
-                this.renderer.gl.bindTexture(
-                    this.renderer.gl.TEXTURE_2D,
-                    this.lines[i].texture
-                );
+                this.texture.bind();
 
-                // Render VBO
+                // Bind VBO
                 this.renderer.vertexBuffer.bind();
-                this.renderer.vertexBuffer.render(this.textShader);
+
+                // Render text
+                for (j = 0; j < this.lines[i].textLength; ++j)
+                {
+                    // Get current character
+                    charCode = this.lines[i].text.charCodeAt(j)-32;
+                    if (charCode < 0) { charCode = 31; }
+                    if (charCode > 94) { charCode = 31; }
+                    charX = Math.floor(charCode%16);
+                    charY = Math.floor(charCode/16);
+                    if (charX <= 0) { charX = 0; }
+                    if (charX >= 15) { charX = 15; }
+                    if (charY <= 0) { charY = 0; }
+                    if (charY >= 5) { charY = 5; }
+
+                    // Set text model matrix
+                    this.lines[i].modelMatrix.setIdentity();
+                    if (this.size.vec[1] > 0.0)
+                    {
+                        this.lines[i].modelMatrix.scale(
+                            2.0/this.size.vec[1], 2.0/this.size.vec[1], 1.0
+                        );
+                    }
+                    this.lines[i].modelMatrix.translateVec2(
+                        this.lines[i].position
+                    );
+                    this.lines[i].modelMatrix.translateX(
+                        (WOSDefaultPxTextXOffset*
+                        this.lines[i].charsize.vec[0]*j)-
+                        (WOSDefaultPxTextXOffset*
+                        this.lines[i].charsize.vec[0]*0.18)
+                    );
+                    this.lines[i].modelMatrix.scaleVec2(this.lines[i].charsize);
+
+                    // Compute world matrix
+                    this.renderer.worldMatrix.setMatrix(
+                        this.renderer.projMatrix
+                    );
+                    this.renderer.worldMatrix.multiply(
+                        this.renderer.view.viewMatrix
+                    );
+                    this.renderer.worldMatrix.multiply(
+                        this.lines[i].modelMatrix
+                    );
+
+                    this.lines[i].uvOffset.vec[0] =
+                        charX*WOSDefaultPxTextUVWidth;
+                    this.lines[i].uvOffset.vec[1] =
+                        charY*WOSDefaultPxTextUVHeight;
+
+                    // Update shader uniforms
+                    this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
+                    this.textShader.sendUniformVec2(
+                        this.lines[i].uvOffsetUniform, this.lines[i].uvOffset
+                    );
+
+                    // Render VBO
+                    this.renderer.vertexBuffer.render(this.textShader);
+                }
+
+                // Unbind VBO
                 this.renderer.vertexBuffer.unbind();
 
                 // Unbind texture
-                this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+                this.texture.unbind();
 
                 // Unbind text shader
                 this.textShader.unbind();
@@ -1235,7 +1264,7 @@ GuiMultiText.prototype = {
             // Set renderer as active
             this.renderer.setActive();
 
-            // Multitext updated
+            // PxMultitext updated
             this.needUpdate = false;
         }
 
