@@ -1213,7 +1213,7 @@ GuiPxMultiText.prototype = {
                     this.lines[i].colorUniform, this.color
                 );
                 this.textShader.sendUniform(
-                    this.lines[i].alphaUniform, this.linesAlpha*1.5
+                    this.lines[i].alphaUniform, this.linesAlpha
                 );
                 this.textShader.sendUniform(
                     this.lines[i].smoothUniform, this.smooth

@@ -357,6 +357,13 @@ BackRenderer.prototype = {
             // Disable depth buffer
             this.renderer.gl.disable(this.renderer.gl.DEPTH_TEST);
 
+            // Enable blending
+            this.renderer.gl.enable(this.renderer.gl.BLEND);
+            this.renderer.gl.blendFunc(
+                this.renderer.gl.ONE, this.renderer.gl.ONE_MINUS_SRC_ALPHA
+            );
+            this.renderer.gl.blendEquation(this.renderer.gl.FUNC_ADD);
+
             // Update view matrix
             this.renderer.view.compute();
         }
@@ -382,6 +389,13 @@ BackRenderer.prototype = {
             // Disable depth buffer
             this.renderer.gl.disable(this.renderer.gl.DEPTH_TEST);
 
+            // Enable blending
+            this.renderer.gl.enable(this.renderer.gl.BLEND);
+            this.renderer.gl.blendFunc(
+                this.renderer.gl.ONE, this.renderer.gl.ONE_MINUS_SRC_ALPHA
+            );
+            this.renderer.gl.blendEquation(this.renderer.gl.FUNC_ADD);
+
             // Update view matrix
             this.renderer.view.compute();
         }
@@ -401,6 +415,13 @@ BackRenderer.prototype = {
 
             // Enable depth buffer
             this.renderer.gl.enable(this.renderer.gl.DEPTH_TEST);
+
+            // Enable blending
+            this.renderer.gl.enable(this.renderer.gl.BLEND);
+            this.renderer.gl.blendFunc(
+                this.renderer.gl.ONE, this.renderer.gl.ONE_MINUS_SRC_ALPHA
+            );
+            this.renderer.gl.blendEquation(this.renderer.gl.FUNC_ADD);
 
             // Clear depth buffer
             this.renderer.gl.clear(this.renderer.gl.DEPTH_BUFFER_BIT);

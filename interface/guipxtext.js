@@ -851,9 +851,7 @@ GuiPxText.prototype = {
                 // Send shader uniforms
                 this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
                 this.textShader.sendUniformVec3(this.colorUniform, this.color);
-                this.textShader.sendUniform(
-                    this.alphaUniform, this.charAlpha*1.5
-                );
+                this.textShader.sendUniform(this.alphaUniform, this.charAlpha);
                 this.textShader.sendUniform(this.smoothUniform, this.smooth);
                 this.textShader.sendUniformVec2(
                     this.uvSizeUniform, this.uvSize
