@@ -654,10 +654,7 @@ GuiPxTextBox.prototype = {
         var mouseOffX = 0.0;
         var curOffset = 0.0;
 
-        if (mouseX >= this.position.vec[0] &&
-            mouseX <= (this.position.vec[0]+this.size.vec[0]) &&
-            mouseY >= this.position.vec[1] &&
-            mouseY <= (this.position.vec[1]+this.size.vec[1]))
+        if (this.isPicking(mouseX, mouseY))
         {
             // Compute mouse x offset
             mouseOffX = mouseX-this.position.vec[0];
@@ -704,10 +701,7 @@ GuiPxTextBox.prototype = {
 
         if (this.pressed)
         {
-            if (mouseX >= this.position.vec[0] &&
-                mouseX <= (this.position.vec[0]+this.size.vec[0]) &&
-                mouseY >= this.position.vec[1] &&
-                mouseY <= (this.position.vec[1]+this.size.vec[1]))
+            if (this.isPicking(mouseX, mouseY))
             {
                 // Compute mouse x offset
                 mouseOffX = mouseX-this.position.vec[0];
@@ -792,8 +786,27 @@ GuiPxTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  isPicking : Get pxtextbox picking state                               //
+    //  return : True if the pxtextbox is picking                             //
+    ////////////////////////////////////////////////////////////////////////////
+    isPicking: function(mouseX, mouseY)
+    {
+        if ((mouseX >= this.position.vec[0]) &&
+            (mouseX <= (this.position.vec[0] + this.size.vec[0])) &&
+            (mouseY >= this.position.vec[1]) &&
+            (mouseY <= (this.position.vec[1] + this.size.vec[1])))
+        {
+            // PxTextbox is picking
+            return true;
+        }
+
+        // PxTextbox is not picking
+        return false;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  getX : Get pxtextbox X position                                       //
-    //  return : Textbox X position                                           //
+    //  return : PxTextbox X position                                         //
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
@@ -802,7 +815,7 @@ GuiPxTextBox.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getY : Get pxtextbox Y position                                       //
-    //  return : Textbox Y position                                           //
+    //  return : PxTextbox Y position                                         //
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
@@ -811,7 +824,7 @@ GuiPxTextBox.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getWidth : Get pxtextbox width                                        //
-    //  return : Textbox width                                                //
+    //  return : PxTextbox width                                              //
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
@@ -820,7 +833,7 @@ GuiPxTextBox.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getHeight : Get pxtextbox height                                      //
-    //  return : Textbox height                                               //
+    //  return : PxTextbox height                                             //
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
@@ -829,7 +842,7 @@ GuiPxTextBox.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAlpha : Get pxtextbox alpha                                        //
-    //  return : Textbox alpha                                                //
+    //  return : PxTextbox alpha                                              //
     ////////////////////////////////////////////////////////////////////////////
     getAlpha: function()
     {
@@ -838,7 +851,7 @@ GuiPxTextBox.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getText : Get pxtextbox internal text string                          //
-    //  return : Textbox internal text string                                 //
+    //  return : PxTextbox internal text string                               //
     ////////////////////////////////////////////////////////////////////////////
     getText: function()
     {
@@ -847,7 +860,7 @@ GuiPxTextBox.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getLength : Get pxtextbox internal text characters length             //
-    //  return : Textbox internal text length                                 //
+    //  return : PxTextbox internal text length                               //
     ////////////////////////////////////////////////////////////////////////////
     getLength: function()
     {

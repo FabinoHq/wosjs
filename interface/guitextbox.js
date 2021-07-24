@@ -645,10 +645,7 @@ GuiTextBox.prototype = {
         var mouseOffX = 0.0;
         var curOffset = 0.0;
 
-        if (mouseX >= this.position.vec[0] &&
-            mouseX <= (this.position.vec[0]+this.size.vec[0]) &&
-            mouseY >= this.position.vec[1] &&
-            mouseY <= (this.position.vec[1]+this.size.vec[1]))
+        if (this.isPicking(mouseX, mouseY))
         {
             // Compute mouse x offset
             mouseOffX = mouseX-this.position.vec[0];
@@ -695,10 +692,7 @@ GuiTextBox.prototype = {
 
         if (this.pressed)
         {
-            if (mouseX >= this.position.vec[0] &&
-                mouseX <= (this.position.vec[0]+this.size.vec[0]) &&
-                mouseY >= this.position.vec[1] &&
-                mouseY <= (this.position.vec[1]+this.size.vec[1]))
+            if (this.isPicking(mouseX, mouseY))
             {
                 // Compute mouse x offset
                 mouseOffX = mouseX-this.position.vec[0];
@@ -780,6 +774,25 @@ GuiTextBox.prototype = {
                 this.selection = true;
             }
         }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  isPicking : Get textbox picking state                                 //
+    //  return : True if the textbox is picking                               //
+    ////////////////////////////////////////////////////////////////////////////
+    isPicking: function(mouseX, mouseY)
+    {
+        if ((mouseX >= this.position.vec[0]) &&
+            (mouseX <= (this.position.vec[0] + this.size.vec[0])) &&
+            (mouseY >= this.position.vec[1]) &&
+            (mouseY <= (this.position.vec[1] + this.size.vec[1])))
+        {
+            // Textbox is picking
+            return true;
+        }
+
+        // Textbox is not picking
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////

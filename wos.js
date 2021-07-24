@@ -953,6 +953,11 @@ Wos.prototype = {
         //this.testmultitext.setY(-this.testmultitext.getHeight()*0.5);
         //this.testmultitext.render();
 
+        // Render test text box
+        //this.testtextbox.setX(-this.testtextbox.getWidth()*0.5);
+        //this.testtextbox.setY(-this.testtextbox.getHeight()*0.5);
+        //this.testtextbox.render();
+
         // Render test pixel text
         //this.testpxtext.setX(-this.testpxtext.getWidth()*0.5);
         //this.testpxtext.setY(-this.testpxtext.getHeight()*0.5);
@@ -962,11 +967,6 @@ Wos.prototype = {
         //this.testpxmultitext.setX(-this.testpxmultitext.getWidth()*0.5);
         //this.testpxmultitext.setY(-this.testpxmultitext.getHeight()*0.5);
         //this.testpxmultitext.render();
-
-        // Render test text box
-        //this.testtextbox.setX(-this.testtextbox.getWidth()*0.5);
-        //this.testtextbox.setY(-this.testtextbox.getHeight()*0.5);
-        //this.testtextbox.render();
 
         // Render test pixel text box
         //this.testpxtextbox.setX(-this.testpxtextbox.getWidth()*0.5);
