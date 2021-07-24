@@ -83,6 +83,8 @@ function GuiMultiText(renderer, textShader, fieldShader, scrollBarShader)
     this.size = new Vector2(1.0, 1.0);
     // GuiMultiText color
     this.color = new Vector3(1.0, 1.0, 1.0);
+    // GuiMultiText lines alpha
+    this.linesAlpha = 1.0;
     // GuiMultiText alpha
     this.alpha = 1.0;
 
@@ -135,6 +137,7 @@ GuiMultiText.prototype = {
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.color.setXYZ(1.0, 1.0, 1.0);
+        this.linesAlpha = 1.0;
         this.alpha = 1.0;
         this.scrollable = false;
         if (scrollable !== undefined) this.scrollable = scrollable;
@@ -489,11 +492,26 @@ GuiMultiText.prototype = {
         this.color.vec[0] = r;
         this.color.vec[1] = g;
         this.color.vec[2] = b;
+
+        // Multitext need update
+        this.needUpdate = true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set text alpha                                             //
-    //  param alpha : Text alpha to set                                       //
+    //  setLinesAlpha : Set lines alpha                                       //
+    //  param alpha : Text lines alpha to set                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    setLinesAlpha: function(alpha)
+    {
+        this.linesAlpha = alpha;
+
+        // Multitext need update
+        this.needUpdate = true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set multitext alpha                                        //
+    //  param alpha : Multitext alpha to set                                  //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
     {
@@ -1208,10 +1226,10 @@ GuiMultiText.prototype = {
                 // Send shader uniforms
                 this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
                 this.textShader.sendUniformVec3(
-                    this.lines[i].colorUniform, this.lines[i].color
+                    this.lines[i].colorUniform, this.color
                 );
                 this.textShader.sendUniform(
-                    this.lines[i].alphaUniform, this.lines[i].alpha*1.5
+                    this.lines[i].alphaUniform, this.linesAlpha*1.5
                 );
 
                 // Bind texture

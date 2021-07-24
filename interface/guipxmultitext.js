@@ -86,8 +86,12 @@ function GuiPxMultiText(renderer, textShader, fieldShader, scrollBarShader)
     this.size = new Vector2(1.0, 1.0);
     // GuiPxMultiText color
     this.color = new Vector3(1.0, 1.0, 1.0);
+    // GuiPxMultiText lines alpha
+    this.linesAlpha = 1.0;
     // GuiPxMultiText alpha
     this.alpha = 1.0;
+    // GuiPxMultiText smooth value
+    this.smooth = 0.1;
 
     // GuiPxMultiText scrollable state
     this.scrollable = false;
@@ -137,7 +141,9 @@ GuiPxMultiText.prototype = {
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.color.setXYZ(1.0, 1.0, 1.0);
+        this.linesAlpha = 1.0;
         this.alpha = 1.0;
+        this.smooth = 0.1;
         this.scrollable = false;
         if (scrollable !== undefined) this.scrollable = scrollable;
         this.scrollBar = null;
@@ -479,18 +485,48 @@ GuiPxMultiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setColor: function(r, g, b)
     {
+        // Set text color
         this.color.vec[0] = r;
         this.color.vec[1] = g;
         this.color.vec[2] = b;
+
+        // Multitext need update
+        this.needUpdate = true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set text alpha                                             //
-    //  param alpha : Text alpha to set                                       //
+    //  setLinesAlpha : Set lines alpha                                       //
+    //  param alpha : Text lines alpha to set                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    setLinesAlpha: function(alpha)
+    {
+        this.linesAlpha = alpha;
+
+        // Multitext need update
+        this.needUpdate = true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAlpha : Set multitext alpha                                        //
+    //  param alpha : Multitext alpha to set                                  //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
     {
         this.alpha = alpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSmooth : Set multitext smooth value                                //
+    //  param smooth : Text smooth value to set                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setSmooth: function(smooth)
+    {
+        if (smooth <= 0.0) smooth = 0.0;
+        if (smooth >= 1.0) smooth = 1.0;
+        this.smooth = smooth*0.4;
+
+        // Multitext need update
+        this.needUpdate = true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1174,13 +1210,13 @@ GuiPxMultiText.prototype = {
                 // Send shader uniforms
                 this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
                 this.textShader.sendUniformVec3(
-                    this.lines[i].colorUniform, this.lines[i].color
+                    this.lines[i].colorUniform, this.color
                 );
                 this.textShader.sendUniform(
-                    this.lines[i].alphaUniform, this.lines[i].charAlpha*1.5
+                    this.lines[i].alphaUniform, this.linesAlpha*1.5
                 );
                 this.textShader.sendUniform(
-                    this.lines[i].smoothUniform, this.lines[i].smooth
+                    this.lines[i].smoothUniform, this.smooth
                 );
                 this.textShader.sendUniformVec2(
                     this.lines[i].uvSizeUniform, this.lines[i].uvSize
