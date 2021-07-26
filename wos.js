@@ -495,7 +495,7 @@ Wos.prototype = {
             this.renderer, this.loader.pxTextShader,
             this.loader.backrendererShader, this.loader.scrollBarShader
         );
-        this.testpxmultitext.init(
+        this.testpxmultitext.init(true,
             this.loader.getTexture("wospxfont.png"),
             "Test multi line pixel text\nTest line 2\nAnd line 3 of text.",
             1.0, 1.0, 0.1, true, this.loader.getTexture("scrollbar.png"), 0.03

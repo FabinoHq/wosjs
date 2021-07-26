@@ -108,11 +108,15 @@ function GuiPxMultiText(renderer, textShader, fieldShader, scrollBarShader)
     this.text = "";
     this.lines = null;
     this.textLength = 0;
+
+    // Line optimize mode
+    this.lineOptimize = true;
 }
 
 GuiPxMultiText.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init GUI PxMultiText                                           //
+    //  param lineOptimize : Text line texture optimization                   //
     //  param texture : Texture pointer                                       //
     //  param text : Text to set                                              //
     //  param width : Text field width                                        //
@@ -121,7 +125,7 @@ GuiPxMultiText.prototype = {
     //  param scrollable : Text line scrollable state                         //
     //  param scrollBarTexture : ScrollBar texture                            //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(texture, text, width, height, lineHeight,
+    init: function(lineOptimize, texture, text, width, height, lineHeight,
         scrollable, scrollBarTexture, scrollBarWidth)
     {
         var i = 0;
@@ -157,6 +161,9 @@ GuiPxMultiText.prototype = {
         this.text = "";
         this.lines = null;
         this.textLength = 0;
+
+        // Set line optimize mode
+        if (lineOptimize !== undefined) this.lineOptimize = lineOptimize;
 
         // Clamp multitext field size
         if (this.size.vec[0] <= WOSDefaultPxMultiTextMinWidth)
@@ -549,7 +556,9 @@ GuiPxMultiText.prototype = {
         this.textLength = 0;
         if (text)
         {
-            this.lines[0] = new GuiPxText(this.renderer, this.textShader);
+            this.lines[0] = new GuiPxText(
+                this.renderer, this.textShader, this.fieldShader
+            );
             this.textLength = text.length;
             this.text = text;
             for (i = 0; i < this.textLength; ++i)
@@ -557,12 +566,13 @@ GuiPxMultiText.prototype = {
                 if (text[i] == '\n')
                 {
                     this.lines[currentLine].init(
-                        false, this.texture, currentText, this.height, false
+                        this.lineOptimize, this.texture,
+                        currentText, this.height, false
                     );
                     ++currentLine;
                     currentText = "";
                     this.lines[currentLine] = new GuiPxText(
-                        this.renderer, this.textShader
+                        this.renderer, this.textShader, this.fieldShader
                     );
                 }
                 else
@@ -571,7 +581,7 @@ GuiPxMultiText.prototype = {
                 }
             }
             this.lines[currentLine].init(
-                false, this.texture, currentText, this.height, false
+                this.lineOptimize, this.texture, currentText, this.height, false
             );
 
             for (i = 0; i < this.lines.length; ++i)
@@ -617,10 +627,13 @@ GuiPxMultiText.prototype = {
                             }
                             this.lines.splice(
                                 i+1, 0,
-                                new GuiPxText(this.renderer, this.textShader)
+                                new GuiPxText(
+                                    this.renderer, this.textShader,
+                                    this.fieldShader
+                                )
                             );
                             this.lines[i+1].init(
-                                false, this.texture,
+                                this.lineOptimize, this.texture,
                                 currentText, this.height, false
                             );
                             break;
@@ -693,7 +706,7 @@ GuiPxMultiText.prototype = {
         {
             this.text += '\n';
             this.lines[currentLine] = new GuiPxText(
-                this.renderer, this.textShader
+                this.renderer, this.textShader, this.fieldShader
             );
             for (i = 0; i < text.length; ++i)
             {
@@ -705,7 +718,7 @@ GuiPxMultiText.prototype = {
             this.text += currentText;
             this.textLength = this.text.length;
             this.lines[currentLine].init(
-                false, this.texture, currentText, this.height, false
+                this.lineOptimize, this.texture, currentText, this.height, false
             );
 
             for (i = currentLine; i < this.lines.length; ++i)
@@ -751,10 +764,13 @@ GuiPxMultiText.prototype = {
                             }
                             this.lines.splice(
                                 i+1, 0,
-                                new GuiPxText(this.renderer, this.textShader)
+                                new GuiPxText(
+                                    this.renderer, this.textShader,
+                                    this.fieldShader
+                                )
                             );
                             this.lines[i+1].init(
-                                false, this.texture,
+                                this.lineOptimize, this.texture,
                                 currentText, this.height, false
                             );
                             break;
@@ -1157,6 +1173,11 @@ GuiPxMultiText.prototype = {
     {
         var i = 0;
         var j = 0;
+        var charCode = 0;
+        var charX = 0;
+        var charY = 0;
+        var lineWidth = 0;
+        var lineHeight = 0;
         var fieldWidth = 0;
         var fieldHeight = 0;
         var start = 0;
@@ -1204,97 +1225,258 @@ GuiPxMultiText.prototype = {
                     this.offset
                 );
 
-                // Bind text shader
-                this.textShader.bind();
-
-                // Send shader uniforms
-                this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
-                this.textShader.sendUniformVec3(
-                    this.lines[i].colorUniform, this.color
-                );
-                this.textShader.sendUniform(
-                    this.lines[i].alphaUniform, this.linesAlpha
-                );
-                this.textShader.sendUniform(
-                    this.lines[i].smoothUniform, this.smooth
-                );
-                this.textShader.sendUniformVec2(
-                    this.lines[i].uvSizeUniform, this.lines[i].uvSize
-                );
-
-                // Bind texture
-                this.texture.bind();
-
-                // Bind VBO
-                this.renderer.vertexBuffer.bind();
-
-                // Render text
-                for (j = 0; j < this.lines[i].textLength; ++j)
+                if (this.lineOptimize)
                 {
-                    // Get current character
-                    charCode = this.lines[i].text.charCodeAt(j)-32;
-                    if (charCode < 0) { charCode = 31; }
-                    if (charCode > 94) { charCode = 31; }
-                    charX = Math.floor(charCode%16);
-                    charY = Math.floor(charCode/16);
-                    if (charX <= 0) { charX = 0; }
-                    if (charX >= 15) { charX = 15; }
-                    if (charY <= 0) { charY = 0; }
-                    if (charY >= 5) { charY = 5; }
-
-                    // Set text model matrix
-                    this.lines[i].modelMatrix.setIdentity();
-                    if (this.size.vec[1] > 0.0)
+                    if (this.lines[i].needUpdate)
                     {
-                        this.lines[i].modelMatrix.scale(
-                            2.0/this.size.vec[1], 2.0/this.size.vec[1], 1.0
+                        // Update line size
+                        lineWidth = Math.round(
+                            this.lines[i].size.vec[0]*
+                            WOSDefaultPxTextScaleXFactor
+                        );
+                        lineHeight = Math.round(
+                            this.lines[i].size.vec[1]*
+                            WOSDefaultPxTextScaleYFactor
+                        );
+                        this.lines[i].size.vec[0] =
+                            lineWidth/WOSDefaultPxTextScaleXFactor;
+                        this.lines[i].size.vec[1] =
+                            lineHeight/WOSDefaultPxTextScaleYFactor;
+
+                        // Set background renderer size
+                        this.lines[i].backrenderer.setRenderSize(
+                            lineWidth, lineHeight
+                        );
+
+                        // Render into background renderer
+                        this.lines[i].backrenderer.clear();
+                        this.lines[i].backrenderer.setActive();
+
+                        // Bind text shader
+                        this.lines[i].textShader.bind();
+
+                        // Send shader uniforms
+                        this.lines[i].textShader.sendWorldMatrix(
+                            this.renderer.worldMatrix
+                        );
+                        this.lines[i].textShader.sendUniformVec3(
+                            this.lines[i].colorUniform, this.color
+                        );
+                        this.lines[i].textShader.sendUniform(
+                            this.lines[i].alphaUniform, this.linesAlpha
+                        );
+                        this.lines[i].textShader.sendUniform(
+                            this.lines[i].smoothUniform, this.smooth
+                        );
+                        this.lines[i].textShader.sendUniformVec2(
+                            this.lines[i].uvSizeUniform, this.lines[i].uvSize
+                        );
+
+                        // Bind texture
+                        this.lines[i].texture.bind();
+
+                        // Bind VBO
+                        this.renderer.vertexBuffer.bind();
+
+                        // Render text
+                        for (j = 0; j < this.lines[i].textLength; ++j)
+                        {
+                            // Get current character
+                            charCode = this.lines[i].text.charCodeAt(j)-32;
+                            if (charCode < 0) { charCode = 31; }
+                            if (charCode > 94) { charCode = 31; }
+                            charX = Math.floor(charCode%16);
+                            charY = Math.floor(charCode/16);
+                            if (charX <= 0) { charX = 0; }
+                            if (charX >= 15) { charX = 15; }
+                            if (charY <= 0) { charY = 0; }
+                            if (charY >= 5) { charY = 5; }
+
+                            // Set text model matrix
+                            this.lines[i].modelMatrix.setIdentity();
+                            if (this.lines[i].size.vec[1] > 0.0)
+                            {
+                                this.lines[i].modelMatrix.scale(
+                                    2.0/this.lines[i].size.vec[1],
+                                    2.0/this.lines[i].size.vec[1], 1.0
+                                );
+                            }
+                            this.lines[i].modelMatrix.translate(
+                                -this.lines[i].size.vec[0]*0.5,
+                                -this.lines[i].size.vec[1]*0.5, 0.0
+                            );
+                            this.lines[i].modelMatrix.translateX(
+                                (WOSDefaultPxTextXOffset*
+                                    this.lines[i].charsize.vec[0]*j)-
+                                (WOSDefaultPxTextXOffset*
+                                    this.lines[i].charsize.vec[0]*0.18)
+                            );
+                            this.lines[i].modelMatrix.scaleVec2(
+                                this.lines[i].charsize
+                            );
+
+                            // Compute world matrix
+                            this.renderer.worldMatrix.setMatrix(
+                                this.renderer.projMatrix
+                            );
+                            this.renderer.worldMatrix.multiply(
+                                this.renderer.view.viewMatrix
+                            );
+                            this.renderer.worldMatrix.multiply(
+                                this.lines[i].modelMatrix
+                            );
+
+                            this.lines[i].uvOffset.vec[0] =
+                                charX*WOSDefaultPxTextUVWidth;
+                            this.lines[i].uvOffset.vec[1] =
+                                charY*WOSDefaultPxTextUVHeight;
+
+                            // Update shader uniforms
+                            this.lines[i].textShader.sendWorldMatrix(
+                                this.renderer.worldMatrix
+                            );
+                            this.lines[i].textShader.sendUniformVec2(
+                                this.lines[i].uvOffsetUniform,
+                                this.lines[i].uvOffset
+                            );
+
+                            // Render VBO
+                            this.renderer.vertexBuffer.render(
+                                this.lines[i].textShader
+                            );
+                        }
+
+                        // Unbind VBO
+                        this.renderer.vertexBuffer.unbind();
+
+                        // Unbind texture
+                        this.lines[i].texture.unbind();
+
+                        // Unbind text shader
+                        this.lines[i].textShader.unbind();
+
+                        // Set text field backrenderer as active
+                        this.backrenderer.setActive();
+
+                        // Text line updated
+                        this.lines[i].needUpdate = false;
+                    }
+
+                    // Render text line
+                    this.lines[i].backrenderer.setAlpha(this.linesAlpha);
+                    this.lines[i].backrenderer.setSize(
+                        this.lines[i].size.vec[0]*2.0,
+                        this.lines[i].size.vec[1]*2.0
+                    );
+                    this.lines[i].backrenderer.setPosition(
+                        this.lines[i].position.vec[0]*2.0,
+                        this.lines[i].position.vec[1]*2.0
+                    );
+                    this.lines[i].backrenderer.render();
+                }
+                else
+                {
+                    // Bind text shader
+                    this.lines[i].textShader.bind();
+
+                    // Send shader uniforms
+                    this.lines[i].textShader.sendWorldMatrix(
+                        this.renderer.worldMatrix
+                    );
+                    this.lines[i].textShader.sendUniformVec3(
+                        this.lines[i].colorUniform, this.color
+                    );
+                    this.textShader.sendUniform(
+                        this.lines[i].alphaUniform, this.linesAlpha
+                    );
+                    this.textShader.sendUniform(
+                        this.lines[i].smoothUniform, this.smooth
+                    );
+                    this.textShader.sendUniformVec2(
+                        this.lines[i].uvSizeUniform, this.lines[i].uvSize
+                    );
+
+                    // Bind texture
+                    this.lines[i].texture.bind();
+
+                    // Bind VBO
+                    this.renderer.vertexBuffer.bind();
+
+                    // Render text
+                    for (j = 0; j < this.lines[i].textLength; ++j)
+                    {
+                        // Get current character
+                        charCode = this.lines[i].text.charCodeAt(j)-32;
+                        if (charCode < 0) { charCode = 31; }
+                        if (charCode > 94) { charCode = 31; }
+                        charX = Math.floor(charCode%16);
+                        charY = Math.floor(charCode/16);
+                        if (charX <= 0) { charX = 0; }
+                        if (charX >= 15) { charX = 15; }
+                        if (charY <= 0) { charY = 0; }
+                        if (charY >= 5) { charY = 5; }
+
+                        // Set text model matrix
+                        this.lines[i].modelMatrix.setIdentity();
+                        if (this.size.vec[1] > 0.0)
+                        {
+                            this.lines[i].modelMatrix.scale(
+                                2.0/this.size.vec[1], 2.0/this.size.vec[1], 1.0
+                            );
+                        }
+                        this.lines[i].modelMatrix.translateVec2(
+                            this.lines[i].position
+                        );
+                        this.lines[i].modelMatrix.translateX(
+                            (WOSDefaultPxTextXOffset*
+                            this.lines[i].charsize.vec[0]*j)-
+                            (WOSDefaultPxTextXOffset*
+                            this.lines[i].charsize.vec[0]*0.18)
+                        );
+                        this.lines[i].modelMatrix.scaleVec2(
+                            this.lines[i].charsize
+                        );
+
+                        // Compute world matrix
+                        this.renderer.worldMatrix.setMatrix(
+                            this.renderer.projMatrix
+                        );
+                        this.renderer.worldMatrix.multiply(
+                            this.renderer.view.viewMatrix
+                        );
+                        this.renderer.worldMatrix.multiply(
+                            this.lines[i].modelMatrix
+                        );
+
+                        this.lines[i].uvOffset.vec[0] =
+                            charX*WOSDefaultPxTextUVWidth;
+                        this.lines[i].uvOffset.vec[1] =
+                            charY*WOSDefaultPxTextUVHeight;
+
+                        // Update shader uniforms
+                        this.lines[i].textShader.sendWorldMatrix(
+                            this.renderer.worldMatrix
+                        );
+                        this.lines[i].textShader.sendUniformVec2(
+                            this.lines[i].uvOffsetUniform,
+                            this.lines[i].uvOffset
+                        );
+
+                        // Render VBO
+                        this.renderer.vertexBuffer.render(
+                            this.lines[i].textShader
                         );
                     }
-                    this.lines[i].modelMatrix.translateVec2(
-                        this.lines[i].position
-                    );
-                    this.lines[i].modelMatrix.translateX(
-                        (WOSDefaultPxTextXOffset*
-                        this.lines[i].charsize.vec[0]*j)-
-                        (WOSDefaultPxTextXOffset*
-                        this.lines[i].charsize.vec[0]*0.18)
-                    );
-                    this.lines[i].modelMatrix.scaleVec2(this.lines[i].charsize);
 
-                    // Compute world matrix
-                    this.renderer.worldMatrix.setMatrix(
-                        this.renderer.projMatrix
-                    );
-                    this.renderer.worldMatrix.multiply(
-                        this.renderer.view.viewMatrix
-                    );
-                    this.renderer.worldMatrix.multiply(
-                        this.lines[i].modelMatrix
-                    );
+                    // Unbind VBO
+                    this.renderer.vertexBuffer.unbind();
 
-                    this.lines[i].uvOffset.vec[0] =
-                        charX*WOSDefaultPxTextUVWidth;
-                    this.lines[i].uvOffset.vec[1] =
-                        charY*WOSDefaultPxTextUVHeight;
+                    // Unbind texture
+                    this.lines[i].texture.unbind();
 
-                    // Update shader uniforms
-                    this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
-                    this.textShader.sendUniformVec2(
-                        this.lines[i].uvOffsetUniform, this.lines[i].uvOffset
-                    );
-
-                    // Render VBO
-                    this.renderer.vertexBuffer.render(this.textShader);
+                    // Unbind text shader
+                    this.lines[i].textShader.unbind();
                 }
-
-                // Unbind VBO
-                this.renderer.vertexBuffer.unbind();
-
-                // Unbind texture
-                this.texture.unbind();
-
-                // Unbind text shader
-                this.textShader.unbind();
             }
 
             // Set renderer as active

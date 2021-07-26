@@ -1214,7 +1214,7 @@ GuiMultiText.prototype = {
                 this.lines[i].modelMatrix.scaleVec2(this.lines[i].size);
 
                 // Bind text shader
-                this.textShader.bind();
+                this.lines[i].textShader.bind();
 
                 // Compute world matrix
                 this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
@@ -1224,11 +1224,13 @@ GuiMultiText.prototype = {
                 this.renderer.worldMatrix.multiply(this.lines[i].modelMatrix);
 
                 // Send shader uniforms
-                this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
-                this.textShader.sendUniformVec3(
+                this.lines[i].textShader.sendWorldMatrix(
+                    this.renderer.worldMatrix
+                );
+                this.lines[i].textShader.sendUniformVec3(
                     this.lines[i].colorUniform, this.color
                 );
-                this.textShader.sendUniform(
+                this.lines[i].textShader.sendUniform(
                     this.lines[i].alphaUniform, this.linesAlpha
                 );
 
@@ -1240,14 +1242,14 @@ GuiMultiText.prototype = {
 
                 // Render VBO
                 this.renderer.vertexBuffer.bind();
-                this.renderer.vertexBuffer.render(this.textShader);
+                this.renderer.vertexBuffer.render(this.lines[i].textShader);
                 this.renderer.vertexBuffer.unbind();
 
                 // Unbind texture
                 this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
                 // Unbind text shader
-                this.textShader.unbind();
+                this.lines[i].textShader.unbind();
             }
 
             // Set renderer as active

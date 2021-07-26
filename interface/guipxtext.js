@@ -166,7 +166,7 @@ GuiPxText.prototype = {
         this.hidetext = "";
 
         // Set line optimize mode
-        this.lineOptimize = lineOptimize;
+        if (lineOptimize !== undefined) this.lineOptimize = lineOptimize;
 
         // Set hidden mode
         if (hide !== undefined) this.hidden = hide;
