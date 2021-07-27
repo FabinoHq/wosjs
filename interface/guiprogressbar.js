@@ -37,64 +37,62 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      interface/guiscrollbar.js : GUI ScrollBar management                  //
+//      interface/guiprogressbar.js : GUI ProgressBar management              //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GuiScrollBar class definition                                             //
+//  GuiProgressBar class definition                                           //
 //  param renderer : Renderer pointer                                         //
-//  param scrollBarShader : ScrollBar shader pointer                          //
+//  param progressBarShader : ProgressBar shader pointer                      //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiScrollBar(renderer, scrollBarShader)
+function GuiProgressBar(renderer, progressBarShader)
 {
     // Renderer pointer
     this.renderer = renderer;
 
-    // ScrollBar shader pointer
-    this.scrollBarShader = scrollBarShader;
+    // ProgressBar shader pointer
+    this.progressBarShader = progressBarShader;
 
-    // ScrollBar shader uniforms locations
+    // ProgressBar shader uniforms locations
     this.alphaUniform = -1;
     this.uvSizeUniform = -1;
     this.uvFactorUniform = -1;
 
-    // ScrollBar texture
+    // ProgressBar texture
     this.texture = null;
-    // ScrollBar model matrix
+    // ProgressBar model matrix
     this.modelMatrix = new Matrix4x4();
 
-    // ScrollBar position
+    // ProgressBar position
     this.position = new Vector2(0.0, 0.0);
-    // ScrollBar size
+    // ProgressBar size
     this.size = new Vector2(1.0, 1.0);
     // ScrollBar texture UV size
     this.uvSize = new Vector2(1.0, 1.0);
     // ScrollBar texture UV factor
     this.uvFactor = 1.0;
-    // ScrollBar alpha
+    // ProgressBar alpha
     this.alpha = 1.0;
 
-    // ScrollBar pressed state
-    this.scrollBarPressed = false;
-    // ScrollBar offset
-    this.offset = 0.0;
-    // ScrollBar height
-    this.height = 1.0;
+    // ProgressBar percentage value
+    this.value = 0.0;
 }
 
-GuiScrollBar.prototype = {
+GuiProgressBar.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init GUI ScrollBar                                             //
+    //  init : Init GUI ProgressBar                                           //
     //  param texture : Texture pointer                                       //
-    //  param width : ScrollBar width                                         //
-    //  param height : ScrollBar height                                       //
+    //  param width : ProgressBar width                                       //
+    //  param height : ProgressBar height                                     //
     //  param factor : ScrollBar UV factor                                    //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, factor)
     {
-        // Reset scrollbar
+        // Reset progress bar
         this.alphaUniform = -1;
+        this.uvSizeUniform = -1;
+        this.uvFactorUniform = -1;
         this.texture = null;
         this.modelMatrix.setIdentity();
         this.position.reset();
@@ -105,33 +103,31 @@ GuiScrollBar.prototype = {
         this.uvFactor = 1.0;
         if (factor !== undefined) this.uvFactor = factor;
         this.alpha = 1.0;
-        this.scrollBarPressed = false;
-        this.offset = 0.0;
-        this.height = 1.0;
+        this.value = 0.0;
 
         // Check renderer pointer
         if (!this.renderer) return false;
 
-        // Check scrollbar shader pointer
-        if (!this.scrollBarShader) return false;
+        // Check progress bar shader pointer
+        if (!this.progressBarShader) return false;
 
-        // Get scrollbar shader uniforms locations
-        this.scrollBarShader.bind();
-        this.alphaUniform = this.scrollBarShader.getUniform("alpha");
-        this.uvSizeUniform = this.scrollBarShader.getUniform("uvSize");
-        this.uvFactorUniform = this.scrollBarShader.getUniform("uvFactor");
-        this.scrollBarShader.unbind();
+        // Get progress bar shader uniforms locations
+        this.progressBarShader.bind();
+        this.alphaUniform = this.progressBarShader.getUniform("alpha");
+        this.uvSizeUniform = this.progressBarShader.getUniform("uvSize");
+        this.uvFactorUniform = this.progressBarShader.getUniform("uvFactor");
+        this.progressBarShader.unbind();
 
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
 
-        // ScrollBar loaded
+        // ProgressBar loaded
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosition : Set scrollbar position                                  //
+    //  setPosition : Set progress bar position                               //
     //  param x : X position to set                                           //
     //  param y : Y position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
@@ -142,8 +138,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPositionVec2 : Set scrollbar position from a 2 components vector   //
-    //  param vector : 2 components vector to set scrollbar position from     //
+    //  setPositionVec2 : Set bar position from a 2 components vector         //
+    //  param vector : 2 components vector to set progress bar position from  //
     ////////////////////////////////////////////////////////////////////////////
     setPositionVec2: function(vector)
     {
@@ -152,7 +148,7 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setX : Set scrollbar X position                                       //
+    //  setX : Set progress bar X position                                    //
     //  param x : X position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
@@ -161,7 +157,7 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setY : Set scrollbar Y position                                       //
+    //  setY : Set progress bar Y position                                    //
     //  param y : Y position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
@@ -170,7 +166,7 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  move : Translate scrollbar                                            //
+    //  move : Translate progress bar                                         //
     //  param x : X axis translate value                                      //
     //  param y : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -181,8 +177,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveVec2 : Translate scrollbar by a 2 components vector               //
-    //  param vector : 2 components vector to translate scrollbar by          //
+    //  moveVec2 : Translate progress bar by a 2 components vector            //
+    //  param vector : 2 components vector to translate progress bar by       //
     ////////////////////////////////////////////////////////////////////////////
     moveVec2: function(vector)
     {
@@ -191,7 +187,7 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate scrollbar on X axis                                 //
+    //  moveX : Translate progress bar on X axis                              //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
@@ -200,7 +196,7 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate scrollbar on Y axis                                 //
+    //  moveY : Translate progress bar on Y axis                              //
     //  param x : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
@@ -209,9 +205,9 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSize : Set scrollbar size                                          //
-    //  param width : ScrollBar width to set                                  //
-    //  param height : ScrollBar height to set                                //
+    //  setSize : Set progress bar size                                       //
+    //  param width : ProgressBar width to set                                //
+    //  param height : ProgressBar height to set                              //
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
@@ -220,8 +216,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSizeVec2 : Set scrollbar size from a 2 components vector           //
-    //  param vector : 2 components vector to set scrollbar size from         //
+    //  setSizeVec2 : Set progress bar size from a 2 components vector        //
+    //  param vector : 2 components vector to set progress bar size from      //
     ////////////////////////////////////////////////////////////////////////////
     setSizeVec2: function(vector)
     {
@@ -230,8 +226,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setWidth : Set scrollbar width                                        //
-    //  param width : ScrollBar width to set                                  //
+    //  setWidth : Set progress bar width                                     //
+    //  param width : ProgressBar width to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setWidth: function(width)
     {
@@ -239,8 +235,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setHeight : Set scrollbar height                                      //
-    //  param height : ScrollBar height to set                                //
+    //  setHeight : Set progress bar height                                   //
+    //  param height : ProgressBar height to set                              //
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
@@ -248,8 +244,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set scrollbar alpha                                        //
-    //  param alpha : ScrollBar alpha to set                                  //
+    //  setAlpha : Set progress bar alpha                                     //
+    //  param alpha : ProgressBar alpha to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
     {
@@ -257,8 +253,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setFactor : Set scrollbar factor                                      //
-    //  param factor : Scrollbar factor to set                                //
+    //  setFactor : Set progress bar factor                                   //
+    //  param factor : ProgressBar factor to set                              //
     ////////////////////////////////////////////////////////////////////////////
     setFactor: function(factor)
     {
@@ -266,106 +262,19 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setScrollHeight : Set scrollbar scrollable height percentage          //
-    //  param height : ScrollBar scrollable height percentage                 //
+    //  setValue : Set progress bar normalized percentage value               //
+    //  param value : Normalized percentage value to set                      //
     ////////////////////////////////////////////////////////////////////////////
-    setScrollHeight: function(height)
+    setValue: function(value)
     {
-        if (height <= 0.0) height = 0.0;
-        if (height >= 1.0) height = 1.0;
-        this.height = height;
+        if (value <= 0.0) value = 0.0;
+        if (value >= 1.0) value = 1.0;
+        this.value = value;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setScrollOffset : Set scrollbar scrollable offset percentage          //
-    //  param offset : ScrollBar scrollable offset percentage                 //
-    ////////////////////////////////////////////////////////////////////////////
-    setScrollOffset: function(offset)
-    {
-        if (offset <= 0.0) offset = 0.0;
-        if (offset >= 1.0) offset = 1.0;
-        this.offset = offset;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  mousePress : Handle mouse press event                                 //
-    //  param mouseX : Cursor X position                                      //
-    //  param mouseY : Cursor Y position                                      //
-    //  return : True if the scrollbar offset has been updated                //
-    ////////////////////////////////////////////////////////////////////////////
-    mousePress: function(mouseX, mouseY)
-    {
-        if (this.isPicking(mouseX, mouseY))
-        {
-            if ((this.size.vec[1]*(1.0-this.height)) > 0.0)
-            {
-                this.offset = ((this.position.vec[1]+
-                    (this.size.vec[1]*(1.0-(this.height*0.5))))-mouseY)/
-                    (this.size.vec[1]*(1.0-this.height));
-            }
-            if (this.offset <= 0.0) this.offset = 0.0;
-            if (this.offset >= 1.0) this.offset = 1.0;
-            this.scrollBarPressed = true;
-            return true;
-        }
-        return false;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  mouseRelease : Handle mouse release event                             //
-    //  param mouseX : Cursor X position                                      //
-    //  param mouseY : Cursor Y position                                      //
-    ////////////////////////////////////////////////////////////////////////////
-    mouseRelease: function(mouseX, mouseY)
-    {
-        this.scrollBarPressed = false;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  mouseMove : Handle mouse move event                                   //
-    //  param mouseX : Cursor X position                                      //
-    //  param mouseY : Cursor Y position                                      //
-    //  return : True if the scrollbar offset has been updated                //
-    ////////////////////////////////////////////////////////////////////////////
-    mouseMove: function(mouseX, mouseY)
-    {
-        if (this.scrollBarPressed)
-        {
-            if ((this.size.vec[1]*(1.0-this.height)) > 0.0)
-            {
-                this.offset = ((this.position.vec[1]+
-                    (this.size.vec[1]*(1.0-(this.height*0.5))))-mouseY)/
-                    (this.size.vec[1]*(1.0-this.height));
-            }
-            if (this.offset <= 0.0) this.offset = 0.0;
-            if (this.offset >= 1.0) this.offset = 1.0;
-            return true;
-        }
-        return false;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  isPicking : Get scrollbar picking state                               //
-    //  return : True if the scrollbar is picking                             //
-    ////////////////////////////////////////////////////////////////////////////
-    isPicking: function(mouseX, mouseY)
-    {
-        if ((mouseX >= this.position.vec[0]) &&
-            (mouseX <= (this.position.vec[0] + this.size.vec[0])) &&
-            (mouseY >= this.position.vec[1]) &&
-            (mouseY <= (this.position.vec[1] + this.size.vec[1])))
-        {
-            // ScrollBar is picking
-            return true;
-        }
-
-        // ScrollBar is not picking
-        return false;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getX : Get scrollbar X position                                       //
-    //  return : ScrollBar X position                                         //
+    //  getX : Get progress bar X position                                    //
+    //  return : ProgressBar X position                                       //
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
@@ -373,8 +282,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getY : Get scrollbar Y position                                       //
-    //  return : ScrollBar Y position                                         //
+    //  getY : Get progress bar Y position                                    //
+    //  return : ProgressBar Y position                                       //
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
@@ -382,8 +291,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get scrollbar width                                        //
-    //  return : ScrollBar width                                              //
+    //  getWidth : Get progress bar width                                     //
+    //  return : ProgressBar width                                            //
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
@@ -391,8 +300,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get scrollbar height                                      //
-    //  return : ScrollBar height                                             //
+    //  getHeight : Get progress bar height                                   //
+    //  return : ProgressBar height                                           //
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
@@ -400,8 +309,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAlpha : Get scrollbar alpha                                        //
-    //  return : ScrollBar alpha                                              //
+    //  getAlpha : Get progress bar alpha                                     //
+    //  return : ProgressBar alpha                                            //
     ////////////////////////////////////////////////////////////////////////////
     getAlpha: function()
     {
@@ -409,8 +318,8 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getFactor : Get scrollbar factor                                      //
-    //  return : Scrollbar factor                                             //
+    //  getFactor : Get progress bar factor                                   //
+    //  return : ProgressBar factor                                           //
     ////////////////////////////////////////////////////////////////////////////
     getFactor: function()
     {
@@ -418,35 +327,26 @@ GuiScrollBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getScrollHeight : Get scrollbar scrollable height percentage          //
-    //  return : ScrollBar scrollable height percentage                       //
+    //  getValue : Get progress bar value                                     //
+    //  return : ProgressBar value                                            //
     ////////////////////////////////////////////////////////////////////////////
-    getScrollHeight: function(height)
+    getValue: function()
     {
-        return this.height;
+        return this.value;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getScrollOffset : Get scrollbar scrollable offset percentage          //
-    //  return : ScrollBar scrollable offset percentage                       //
-    ////////////////////////////////////////////////////////////////////////////
-    getScrollOffset: function(offset)
-    {
-        return this.offset;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  render : Render scrollbar                                             //
+    //  render : Render progress bar                                          //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-        // Set scrollbar model matrix
+        // Set progress bar model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec2(this.position);
         this.modelMatrix.scaleVec2(this.size);
 
-        // Bind scrollbar shader
-        this.scrollBarShader.bind();
+        // Bind progress bar shader
+        this.progressBarShader.bind();
 
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
@@ -454,12 +354,12 @@ GuiScrollBar.prototype = {
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send shader uniforms
-        this.scrollBarShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.uvSize.vec[0] = 0.0;
-        this.uvSize.vec[1] = this.size.vec[1];
-        this.scrollBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
-        this.scrollBarShader.sendUniform(this.uvFactorUniform, this.uvFactor);
-        this.scrollBarShader.sendUniform(this.alphaUniform, this.alpha);
+        this.progressBarShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.uvSize.vec[0] = this.size.vec[0];
+        this.uvSize.vec[1] = 0.0;
+        this.progressBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
+        this.progressBarShader.sendUniform(this.uvFactorUniform, this.uvFactor);
+        this.progressBarShader.sendUniform(this.alphaUniform, this.alpha);
 
         // Bind texture
         this.texture.bind();
@@ -467,29 +367,25 @@ GuiScrollBar.prototype = {
         // Bind VBO
         this.renderer.vertexBuffer.bind();
 
-        // Render scrollbar background
-        this.renderer.vertexBuffer.render(this.scrollBarShader);
+        // Render progress bar background
+        this.renderer.vertexBuffer.render(this.progressBarShader);
 
         // Recompute matrix
         this.modelMatrix.setIdentity();
-        this.modelMatrix.translate(
-            this.position.vec[0],
-            this.position.vec[1]+((1.0-this.offset)*
-            this.size.vec[1]*(1.0-this.height)), 0.0
-        );
+        this.modelMatrix.translateVec2(this.position);
         this.modelMatrix.scale(
-            this.size.vec[0], this.size.vec[1]*this.height, 1.0
+            this.size.vec[0]*this.value, this.size.vec[1], 1.0
         );
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
-        // Render scrollbar
-        this.uvSize.vec[0] = 0.5;
-        this.uvSize.vec[1] = this.size.vec[1]*this.height;
-        this.scrollBarShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.scrollBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
-        this.renderer.vertexBuffer.render(this.scrollBarShader);
+        // Render progress bar
+        this.progressBarShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.uvSize.vec[0] = this.size.vec[0]*this.value;
+        this.uvSize.vec[1] = 0.5;
+        this.progressBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
+        this.renderer.vertexBuffer.render(this.progressBarShader);
 
         // Unbind VBO
         this.renderer.vertexBuffer.unbind();
@@ -497,7 +393,7 @@ GuiScrollBar.prototype = {
         // Unbind texture
         this.texture.unbind();
 
-        // Unbind scrollbar shader
-        this.scrollBarShader.unbind();
+        // Unbind progress bar shader
+        this.progressBarShader.unbind();
     }
 };

@@ -312,6 +312,8 @@ function Wos()
     this.testbutton = null;
     // Test toggle button
     this.testtogglebutton = null;
+    // Test progress bar
+    this.testprogressbar = null;
     // Test text
     this.testtext = null;
     // Test multitext
@@ -457,6 +459,14 @@ Wos.prototype = {
         );
         this.testtogglebutton.init(
             this.loader.getTexture("testtogglebutton.png"), 0.12, 0.12
+        );
+
+        // Init test progress bar
+        this.testprogressbar = new GuiProgressBar(
+            this.renderer, this.loader.progressBarShader
+        );
+        this.testprogressbar.init(
+            this.loader.getTexture("testprogressbar.png"), 0.8, 0.06, 15.0
         );
 
         // Init test text
@@ -942,6 +952,12 @@ Wos.prototype = {
         //this.testtogglebutton.setX(-this.testtogglebutton.getWidth()*0.5);
         //this.testtogglebutton.setY(-this.testtogglebutton.getHeight()*0.5);
         //this.testtogglebutton.render();
+
+        // Render test progress bar
+        //this.testprogressbar.setValue(this.realMouseX*2.0);
+        //this.testprogressbar.setX(-this.testprogressbar.getWidth()*0.5);
+        //this.testprogressbar.setY(-this.testprogressbar.getHeight()*0.5);
+        //this.testprogressbar.render();
 
         // Render test text
         //this.testtext.setX(-this.testtext.getWidth()*0.5);

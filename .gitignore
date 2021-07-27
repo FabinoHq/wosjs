@@ -67,6 +67,7 @@
 !renderer/shaders/buttonshader.js
 !renderer/shaders/togglebuttonshader.js
 !renderer/shaders/scrollbarshader.js
+!renderer/shaders/progressbarshader.js
 !renderer/shaders/textshader.js
 !renderer/shaders/pxtextshader.js
 !renderer/shaders/staticmeshshader.js
@@ -80,6 +81,7 @@
 !interface/guibutton.js
 !interface/guitogglebutton.js
 !interface/guiscrollbar.js
+!interface/guiprogressbar.js
 !interface/guitext.js
 !interface/guimultitext.js
 !interface/guitextbox.js
@@ -102,6 +104,7 @@
 !textures/testninebox.png
 !textures/testbutton.png
 !textures/testtogglebutton.png
+!textures/testprogressbar.png
 
 # Models files
 !models/
