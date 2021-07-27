@@ -62,8 +62,6 @@ function GuiMultiText(renderer, textShader, fieldShader, scrollBarShader)
 {
     // Renderer pointer
     this.renderer = renderer;
-    // Background renderer
-    this.backrenderer = null;
 
     // Text shader pointer
     this.textShader = textShader;
@@ -72,6 +70,8 @@ function GuiMultiText(renderer, textShader, fieldShader, scrollBarShader)
     // Scollbar shader pointer
     this.scrollBarShader = scrollBarShader;
 
+    // GuiMultiText field texture
+    this.fieldTexture = null;
     // GuiMultiText need update
     this.needUpdate = false;
 
@@ -129,7 +129,7 @@ GuiMultiText.prototype = {
         var lastSpace = 0;
 
         // Reset GuiMultiText
-        this.backrenderer = null;
+        this.fieldTexture = null;
         this.needUpdate = false;
         this.height = 0.0;
         this.position.reset();
@@ -213,12 +213,49 @@ GuiMultiText.prototype = {
             }
         }
 
+        // Create field texture
+        this.fieldTexture = this.renderer.gl.createTexture();
+        if (!this.fieldTexture)
+        {
+            // Could not create field texture
+            return false;
+        }
+
+        this.renderer.gl.bindTexture(
+            this.renderer.gl.TEXTURE_2D, this.fieldTexture
+        );
+        this.renderer.gl.texImage2D(
+            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
+            this.width, this.height, 0, this.renderer.gl.RGBA,
+            this.renderer.gl.UNSIGNED_BYTE, null
+        );
+
+        // Set line texture wrap mode
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_WRAP_S,
+            this.renderer.gl.CLAMP_TO_EDGE
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_WRAP_T,
+            this.renderer.gl.CLAMP_TO_EDGE
+        );
+
+        // Set line texture min and mag filters
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_MIN_FILTER,
+            this.renderer.gl.LINEAR
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_MAG_FILTER,
+            this.renderer.gl.LINEAR
+        );
+
         // Set text
         this.setText(text);
-
-        // Create background renderer
-        this.backrenderer = new BackRenderer(this.renderer, this.fieldShader);
-        this.backrenderer.init(1, 1);
 
         // Multitext need update
         this.needUpdate = true;
@@ -1171,11 +1208,15 @@ GuiMultiText.prototype = {
             );
             this.size.vec[0] = fieldWidth/WOSDefaultPxTextScaleXFactor;
             this.size.vec[1] = fieldHeight/WOSDefaultPxTextScaleYFactor;
-            this.backrenderer.setRenderSize(fieldWidth, fieldHeight);
+            this.renderer.textFieldRenderer.setShader(this.fieldShader);
+            this.renderer.textFieldRenderer.setTexture(this.fieldTexture);
+            this.renderer.textFieldRenderer.setRenderSize(
+                fieldWidth, fieldHeight
+            );
 
             // Render into background renderer
-            this.backrenderer.clear();
-            this.backrenderer.setActive();
+            this.renderer.textFieldRenderer.clear();
+            this.renderer.textFieldRenderer.setActive();
 
             if ((this.height*WOSDefaultTextYOffset) > 0.0)
             {
@@ -1260,10 +1301,12 @@ GuiMultiText.prototype = {
         }
 
         // Render text field
-        this.backrenderer.setAlpha(this.alpha);
-        this.backrenderer.setSizeVec2(this.size);
-        this.backrenderer.setPositionVec2(this.position);
-        this.backrenderer.render();
+        this.renderer.textFieldRenderer.setShader(this.fieldShader);
+        this.renderer.textFieldRenderer.setTexture(this.fieldTexture);
+        this.renderer.textFieldRenderer.setAlpha(this.alpha);
+        this.renderer.textFieldRenderer.setSizeVec2(this.size);
+        this.renderer.textFieldRenderer.setPositionVec2(this.position);
+        this.renderer.textFieldRenderer.render();
 
         // Render scroll bar
         if (this.scrollable)

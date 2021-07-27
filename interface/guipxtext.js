@@ -71,8 +71,6 @@ function GuiPxText(renderer, textShader, lineShader)
 {
     // Renderer pointer
     this.renderer = renderer;
-    // Background renderer
-    this.backrenderer = null;
 
     // Text shader pointer
     this.textShader = textShader;
@@ -88,6 +86,8 @@ function GuiPxText(renderer, textShader, lineShader)
 
     // GuiPxText glyphs texture
     this.texture = null;
+    // GuiPxText line texture
+    this.lineTexture = null;
     // GuiPxText line need update
     this.needUpdate = false;
     // GuiPxText model matrix
@@ -141,13 +141,13 @@ GuiPxText.prototype = {
         var i = 0;
 
         // Reset GuiText
-        this.backrenderer = null;
         this.colorUniform = -1;
         this.alphaUniform = -1;
         this.smoothUniform = -1;
         this.uvSizeUniform = -1;
         this.uvOffsetUniform = -1;
         this.texture = null;
+        this.lineTexture = null;
         this.needUpdate = false;
         this.modelMatrix.setIdentity();
         this.position.reset();
@@ -228,12 +228,6 @@ GuiPxText.prototype = {
         {
             // Check line shader pointer
             if (!this.lineShader) return false;
-
-            // Create background renderer
-            this.backrenderer = new BackRenderer(
-                this.renderer, this.lineShader
-            );
-            this.backrenderer.init(1, 1);
         }
 
         // Get text shader uniforms locations
@@ -255,6 +249,47 @@ GuiPxText.prototype = {
             this.size.vec[0] = WOSDefaultMinPxTextWidth;
         if (this.size.vec[0] >= WOSDefaultMaxPxTextWidth)
             this.size.vec[0] = WOSDefaultMaxPxTextWidth;
+
+        // Create line texture
+        this.lineTexture = this.renderer.gl.createTexture();
+        if (!this.lineTexture)
+        {
+            // Could not create line texture
+            return false;
+        }
+
+        this.renderer.gl.bindTexture(
+            this.renderer.gl.TEXTURE_2D, this.lineTexture
+        );
+        this.renderer.gl.texImage2D(
+            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
+            this.width, this.height, 0, this.renderer.gl.RGBA,
+            this.renderer.gl.UNSIGNED_BYTE, null
+        );
+
+        // Set line texture wrap mode
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_WRAP_S,
+            this.renderer.gl.CLAMP_TO_EDGE
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_WRAP_T,
+            this.renderer.gl.CLAMP_TO_EDGE
+        );
+
+        // Set line texture min and mag filters
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_MIN_FILTER,
+            this.renderer.gl.LINEAR
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_MAG_FILTER,
+            this.renderer.gl.LINEAR
+        );
 
         // Text line need update
         this.needUpdate = true;
@@ -838,12 +873,16 @@ GuiPxText.prototype = {
                 this.size.vec[0] = lineWidth/WOSDefaultPxTextScaleXFactor;
                 this.size.vec[1] = lineHeight/WOSDefaultPxTextScaleYFactor;
 
-                // Set background renderer size
-                this.backrenderer.setRenderSize(lineWidth, lineHeight);
+                // Set text line renderer size
+                this.renderer.textLineRenderer.setShader(this.lineShader);
+                this.renderer.textLineRenderer.setTexture(this.lineTexture);
+                this.renderer.textLineRenderer.setRenderSize(
+                    lineWidth, lineHeight
+                );
 
-                // Render into background renderer
-                this.backrenderer.clear();
-                this.backrenderer.setActive();
+                // Render into text line renderer
+                this.renderer.textLineRenderer.clear();
+                this.renderer.textLineRenderer.setActive();
 
                 // Bind text shader
                 this.textShader.bind();
@@ -934,11 +973,13 @@ GuiPxText.prototype = {
             }
 
             // Render text line
-            this.backrenderer.setAlpha(this.alpha);
-            this.backrenderer.setSizeVec2(this.size);
-            this.backrenderer.setPositionVec2(this.position);
-            this.backrenderer.setAngle(this.angle);
-            this.backrenderer.render();
+            this.renderer.textLineRenderer.setShader(this.lineShader);
+            this.renderer.textLineRenderer.setTexture(this.lineTexture);
+            this.renderer.textLineRenderer.setAlpha(this.alpha);
+            this.renderer.textLineRenderer.setSizeVec2(this.size);
+            this.renderer.textLineRenderer.setPositionVec2(this.position);
+            this.renderer.textLineRenderer.setAngle(this.angle);
+            this.renderer.textLineRenderer.render();
         }
         else
         {

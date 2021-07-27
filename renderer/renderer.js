@@ -133,6 +133,10 @@ function Renderer()
     this.dynamicLights = null;
     this.normalMap = null;
     this.specularMap = null;
+
+    // Back renderers
+    this.textLineRenderer = null;
+    this.textFieldRenderer = null;
 }
 
 Renderer.prototype = {
@@ -180,6 +184,8 @@ Renderer.prototype = {
         this.dynamicLights = null;
         this.normalMap = null;
         this.specularMap = null;
+        this.textLineRenderer = null;
+        this.textFieldRenderer = null;
 
         // Get html canvas
         this.context = document.getElementById(canvas);
@@ -456,6 +462,14 @@ Renderer.prototype = {
         // Init default specular map
         this.specularMap = new Texture(this);
         this.specularMap.init(1, 1, new Uint8Array([255, 255, 255, 255]));
+
+        // Init text line renderer
+        this.textLineRenderer = new BackRenderer(this, this.shader);
+        this.textLineRenderer.init(1, 1, true);
+
+        // Init text field renderer
+        this.textFieldRenderer = new BackRenderer(this, this.shader);
+        this.textFieldRenderer.init(1, 1, true);
 
         // Renderer is successfully loaded
         this.loaded = true;

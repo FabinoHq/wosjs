@@ -82,6 +82,9 @@ function BackRenderer(renderer, backrendererShader)
     this.angle = 0.0;
     // Background renderer alpha
     this.alpha = 1.0;
+
+    // Background renderer is using external texture
+    this.useExternalTexture = false;
 }
 
 BackRenderer.prototype = {
@@ -89,8 +92,9 @@ BackRenderer.prototype = {
     //  init : Init background renderer                                       //
     //  param width : Width of the background renderer                        //
     //  param height : Height of the background renderer                      //
+    //  param useExternalTexture : Use external texture for rendering         //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(width, height)
+    init: function(width, height, useExternalTexture)
     {
         // Reset background renderer
         this.width = 0;
@@ -104,6 +108,11 @@ BackRenderer.prototype = {
         this.size.setXY(1.0, 1.0);
         this.angle = 0.0;
         this.alpha = 1.0;
+        this.useExternalTexture = false;
+        if (useExternalTexture !== undefined)
+        {
+            this.useExternalTexture = useExternalTexture;
+        }
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -166,49 +175,55 @@ BackRenderer.prototype = {
             this.renderer.gl.RENDERBUFFER, this.depthbuffer
         );
 
-        // Init background renderer texture
-        this.texture = this.renderer.gl.createTexture();
-        if (!this.texture)
+        if (!this.useExternalTexture)
         {
-            // Could not create texture
-            return false;
+            // Init background renderer texture
+            this.texture = this.renderer.gl.createTexture();
+            if (!this.texture)
+            {
+                // Could not create texture
+                return false;
+            }
+            this.renderer.gl.bindTexture(
+                this.renderer.gl.TEXTURE_2D, this.texture
+            );
+            this.renderer.gl.texImage2D(
+                this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
+                this.width, this.height, 0, this.renderer.gl.RGBA,
+                this.renderer.gl.UNSIGNED_BYTE, null
+            );
+
+            // Set texture wrap mode
+            this.renderer.gl.texParameteri(
+                this.renderer.gl.TEXTURE_2D,
+                this.renderer.gl.TEXTURE_WRAP_S,
+                this.renderer.gl.CLAMP_TO_EDGE
+            );
+            this.renderer.gl.texParameteri(
+                this.renderer.gl.TEXTURE_2D,
+                this.renderer.gl.TEXTURE_WRAP_T,
+                this.renderer.gl.CLAMP_TO_EDGE
+            );
+
+            // Set texture min and mag filters
+            this.renderer.gl.texParameteri(
+                this.renderer.gl.TEXTURE_2D,
+                this.renderer.gl.TEXTURE_MIN_FILTER,
+                this.renderer.gl.LINEAR
+            );
+            this.renderer.gl.texParameteri(
+                this.renderer.gl.TEXTURE_2D,
+                this.renderer.gl.TEXTURE_MAG_FILTER,
+                this.renderer.gl.LINEAR
+            );
+
+            // Attach texture to framebuffer
+            this.renderer.gl.framebufferTexture2D(
+                this.renderer.gl.FRAMEBUFFER,
+                this.renderer.gl.COLOR_ATTACHMENT0,
+                this.renderer.gl.TEXTURE_2D, this.texture, 0
+            );
         }
-        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
-        this.renderer.gl.texImage2D(
-            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            this.width, this.height, 0, this.renderer.gl.RGBA,
-            this.renderer.gl.UNSIGNED_BYTE, null
-        );
-
-        // Set texture wrap mode
-        this.renderer.gl.texParameteri(
-            this.renderer.gl.TEXTURE_2D,
-            this.renderer.gl.TEXTURE_WRAP_S,
-            this.renderer.gl.CLAMP_TO_EDGE
-        );
-        this.renderer.gl.texParameteri(
-            this.renderer.gl.TEXTURE_2D,
-            this.renderer.gl.TEXTURE_WRAP_T,
-            this.renderer.gl.CLAMP_TO_EDGE
-        );
-
-        // Set texture min and mag filters
-        this.renderer.gl.texParameteri(
-            this.renderer.gl.TEXTURE_2D,
-            this.renderer.gl.TEXTURE_MIN_FILTER,
-            this.renderer.gl.LINEAR
-        );
-        this.renderer.gl.texParameteri(
-            this.renderer.gl.TEXTURE_2D,
-            this.renderer.gl.TEXTURE_MAG_FILTER,
-            this.renderer.gl.LINEAR
-        );
-
-        // Attach texture to framebuffer
-        this.renderer.gl.framebufferTexture2D(
-            this.renderer.gl.FRAMEBUFFER, this.renderer.gl.COLOR_ATTACHMENT0,
-            this.renderer.gl.TEXTURE_2D, this.texture, 0
-        );
 
         // Check framebuffer status
         if (this.renderer.gl.checkFramebufferStatus(
@@ -227,6 +242,35 @@ BackRenderer.prototype = {
 
         // Background renderer successfully loaded
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setTexture : Set background renderer target texture                   //
+    //  param texture : Target texture to render to                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setTexture: function(texture)
+    {
+        if (this.useExternalTexture && texture)
+        {
+            this.texture = texture;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setShader : Set background renderer shader                            //
+    //  param shader : Shader to render with                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    setShader: function(shader)
+    {
+        if (shader)
+        {
+            this.backrendererShader = shader;
+
+            // Get background renderer shader uniforms locations
+            this.backrendererShader.bind();
+            this.alphaUniform = this.backrendererShader.getUniform("alpha");
+            this.backrendererShader.unbind();
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////

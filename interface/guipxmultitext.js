@@ -62,8 +62,6 @@ function GuiPxMultiText(renderer, textShader, fieldShader, scrollBarShader)
 {
     // Renderer pointer
     this.renderer = renderer;
-    // Background renderer
-    this.backrenderer = null;
 
     // Text shader pointer
     this.textShader = textShader;
@@ -74,7 +72,8 @@ function GuiPxMultiText(renderer, textShader, fieldShader, scrollBarShader)
 
     // GuiPxText glyphs texture
     this.texture = null;
-
+    // GuiPxText field texture
+    this.fieldTexture = null;
     // GuiPxMultiText need update
     this.needUpdate = false;
 
@@ -136,8 +135,8 @@ GuiPxMultiText.prototype = {
         var lastSpace = 0;
 
         // Reset GuiPxMultiText
-        this.backrenderer = null;
         this.texture = null;
+        this.fieldTexture = null;
         this.needUpdate = false;
         this.height = 0.0;
         this.position.reset();
@@ -229,12 +228,49 @@ GuiPxMultiText.prototype = {
         if (!this.texture) return false;
         this.texture.setSmooth(true);
 
+        // Create field texture
+        this.fieldTexture = this.renderer.gl.createTexture();
+        if (!this.fieldTexture)
+        {
+            // Could not create field texture
+            return false;
+        }
+
+        this.renderer.gl.bindTexture(
+            this.renderer.gl.TEXTURE_2D, this.fieldTexture
+        );
+        this.renderer.gl.texImage2D(
+            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
+            this.width, this.height, 0, this.renderer.gl.RGBA,
+            this.renderer.gl.UNSIGNED_BYTE, null
+        );
+
+        // Set line texture wrap mode
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_WRAP_S,
+            this.renderer.gl.CLAMP_TO_EDGE
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_WRAP_T,
+            this.renderer.gl.CLAMP_TO_EDGE
+        );
+
+        // Set line texture min and mag filters
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_MIN_FILTER,
+            this.renderer.gl.LINEAR
+        );
+        this.renderer.gl.texParameteri(
+            this.renderer.gl.TEXTURE_2D,
+            this.renderer.gl.TEXTURE_MAG_FILTER,
+            this.renderer.gl.LINEAR
+        );
+
         // Set text
         this.setText(text);
-
-        // Create background renderer
-        this.backrenderer = new BackRenderer(this.renderer, this.fieldShader);
-        this.backrenderer.init(1, 1);
 
         // PxMultitext need update
         this.needUpdate = true;
@@ -1194,11 +1230,15 @@ GuiPxMultiText.prototype = {
             );
             this.size.vec[0] = fieldWidth/WOSDefaultPxTextScaleXFactor;
             this.size.vec[1] = fieldHeight/WOSDefaultPxTextScaleYFactor;
-            this.backrenderer.setRenderSize(fieldWidth, fieldHeight);
+            this.renderer.textFieldRenderer.setShader(this.fieldShader);
+            this.renderer.textFieldRenderer.setTexture(this.fieldTexture);
+            this.renderer.textFieldRenderer.setRenderSize(
+                fieldWidth, fieldHeight
+            );
 
             // Render into background renderer
-            this.backrenderer.clear();
-            this.backrenderer.setActive();
+            this.renderer.textFieldRenderer.clear();
+            this.renderer.textFieldRenderer.setActive();
 
             if ((this.height*WOSDefaultPxTextYOffset) > 0.0)
             {
@@ -1244,13 +1284,19 @@ GuiPxMultiText.prototype = {
                             lineHeight/WOSDefaultPxTextScaleYFactor;
 
                         // Set background renderer size
-                        this.lines[i].backrenderer.setRenderSize(
+                        this.renderer.textLineRenderer.setShader(
+                            this.fieldShader
+                        );
+                        this.renderer.textLineRenderer.setTexture(
+                            this.lines[i].lineTexture
+                        );
+                        this.renderer.textLineRenderer.setRenderSize(
                             lineWidth, lineHeight
                         );
 
                         // Render into background renderer
-                        this.lines[i].backrenderer.clear();
-                        this.lines[i].backrenderer.setActive();
+                        this.renderer.textLineRenderer.clear();
+                        this.renderer.textLineRenderer.setActive();
 
                         // Bind text shader
                         this.lines[i].textShader.bind();
@@ -1356,23 +1402,32 @@ GuiPxMultiText.prototype = {
                         this.lines[i].textShader.unbind();
 
                         // Set text field backrenderer as active
-                        this.backrenderer.setActive();
+                        this.renderer.textFieldRenderer.setActive();
 
                         // Text line updated
                         this.lines[i].needUpdate = false;
                     }
 
                     // Render text line
-                    this.lines[i].backrenderer.setAlpha(this.linesAlpha);
-                    this.lines[i].backrenderer.setSize(
-                        this.lines[i].size.vec[0]*2.0,
-                        this.lines[i].size.vec[1]*2.0
+                    this.renderer.textLineRenderer.setShader(this.fieldShader);
+                    this.renderer.textLineRenderer.setTexture(
+                        this.lines[i].lineTexture
                     );
-                    this.lines[i].backrenderer.setPosition(
-                        this.lines[i].position.vec[0]*2.0,
-                        this.lines[i].position.vec[1]*2.0
-                    );
-                    this.lines[i].backrenderer.render();
+                    this.renderer.textLineRenderer.setAlpha(this.linesAlpha);
+                    if (this.size.vec[1] > 0.0)
+                    {
+                        this.renderer.textLineRenderer.setSize(
+                            this.lines[i].size.vec[0]*(2.0/this.size.vec[1]),
+                            this.lines[i].size.vec[1]*(2.0/this.size.vec[1])
+                        );
+                        this.renderer.textLineRenderer.setPosition(
+                            this.lines[i].position.vec[0]*
+                                (2.0/this.size.vec[1]),
+                            this.lines[i].position.vec[1]*
+                                (2.0/this.size.vec[1])
+                        );
+                    }
+                    this.renderer.textLineRenderer.render();
                 }
                 else
                 {
@@ -1487,10 +1542,12 @@ GuiPxMultiText.prototype = {
         }
 
         // Render text field
-        this.backrenderer.setAlpha(this.alpha);
-        this.backrenderer.setSizeVec2(this.size);
-        this.backrenderer.setPositionVec2(this.position);
-        this.backrenderer.render();
+        this.renderer.textFieldRenderer.setShader(this.fieldShader);
+        this.renderer.textFieldRenderer.setTexture(this.fieldTexture);
+        this.renderer.textFieldRenderer.setAlpha(this.alpha);
+        this.renderer.textFieldRenderer.setSizeVec2(this.size);
+        this.renderer.textFieldRenderer.setPositionVec2(this.position);
+        this.renderer.textFieldRenderer.render();
 
         // Render scroll bar
         if (this.scrollable)
