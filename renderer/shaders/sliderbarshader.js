@@ -37,30 +37,51 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      assets.js : WOS Assets management                                     //
+//      renderer/sliderbarshader.js : SliderBar shader                        //
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// WOS textures assets
-var TexturesAssets = [
-    "cursor.png",
-    "scrollbar.png",
-    "wospxfont.png",
-    "testsprite.png",
-    "testninebox.png",
-    "testbutton.png",
-    "testtogglebutton.png",
-    "testprogressbar.png",
-    "testsliderbar.png"
-];
-
-// WOS models assets
-var ModelsAssets = [
-    "testmodel.wmsh",
-    "testskeletal.wmsh"
-];
-
-// WOS sounds assets
-var SoundsAssets = [
-    "test.wav"
-];
+////////////////////////////////////////////////////////////////////////////////
+//  SliderBar fragment shader                                                 //
+////////////////////////////////////////////////////////////////////////////////
+const sliderBarFragmentShaderSrc = [
+    "precision mediump float;",
+    "precision mediump int;",
+    "uniform sampler2D texture;",
+    "varying vec2 texCoord;",
+    "uniform vec2 uvSize;",
+    "uniform float uvFactor;",
+    "uniform float sliderValue;",
+    "uniform float drawCursor;",
+    "uniform float alpha;",
+    "void main()",
+    "",
+    "{",
+    "    float barSize = abs(uvSize.x*0.5*uvFactor);",
+    "    vec2 curCoord = vec2(texCoord.x*barSize, (texCoord.y*0.5)+uvSize.y);",
+    "    if (curCoord.x >= 0.25)",
+    "    {",
+    "        if (curCoord.x >= (barSize-0.25))",
+    "        {",
+    "            curCoord.x = (curCoord.x-0.5)-barSize;",
+    "        }",
+    "        else",
+    "        {",
+    "            curCoord.x = 0.125+mod(curCoord.x, 0.25);",
+    "        }",
+    "    }",
+    "    if (barSize <= 0.25) { curCoord.x = texCoord.x*0.5; }",
+    "    if (uvSize.y >= 0.25)",
+    "    {",
+    "        if (texCoord.x >= sliderValue) { curCoord.x = curCoord.x+0.5; }",
+    "    }",
+    "    if (drawCursor >= 0.5)",
+    "    {",
+    "        curCoord = texCoord*0.5;",
+    "        curCoord.x += 0.5;",
+    "    }",
+    "    vec4 texColor = texture2D(texture, curCoord);",
+    "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
+    "}",
+    ""
+].join("\n");

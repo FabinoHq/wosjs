@@ -65,6 +65,7 @@ function Loader(renderer, audio)
     this.toggleButtonShader = null;
     this.scrollBarShader = null;
     this.progressBarShader = null;
+    this.sliderBarShader = null;
     this.textShader = null;
     this.pxTextShader = null;
     this.staticMeshShader = null;
@@ -110,6 +111,7 @@ Loader.prototype = {
         this.toggleButtonShader = null;
         this.scrollBarShader = null;
         this.progressBarShader = null;
+        this.sliderBarShader = null;
         this.textShader = null;
         this.pxTextShader = null;
         this.staticMeshShader = null;
@@ -218,6 +220,14 @@ Loader.prototype = {
         this.progressBarShader = new Shader(this.renderer.gl);
         if (!this.progressBarShader.init(
             defaultVertexShaderSrc, progressBarFragmentShaderSrc))
+        {
+            return false;
+        }
+
+        // Init slidersbar shader
+        this.sliderBarShader = new Shader(this.renderer.gl);
+        if (!this.sliderBarShader.init(
+            defaultVertexShaderSrc, sliderBarFragmentShaderSrc))
         {
             return false;
         }

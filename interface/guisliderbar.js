@@ -37,59 +37,65 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      interface/guiprogressbar.js : GUI ProgressBar management              //
+//      interface/guisliderbar.js : GUI SliderBar management                  //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GuiProgressBar class definition                                           //
+//  GuiSliderBar class definition                                             //
 //  param renderer : Renderer pointer                                         //
-//  param progressBarShader : ProgressBar shader pointer                      //
+//  param sliderBarShader : SliderBar shader pointer                          //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiProgressBar(renderer, progressBarShader)
+function GuiSliderBar(renderer, sliderBarShader)
 {
     // Renderer pointer
     this.renderer = renderer;
 
-    // ProgressBar shader pointer
-    this.progressBarShader = progressBarShader;
+    // SliderBar shader pointer
+    this.sliderBarShader = sliderBarShader;
 
-    // ProgressBar shader uniforms locations
+    // SliderBar shader uniforms locations
     this.alphaUniform = -1;
     this.uvSizeUniform = -1;
     this.uvFactorUniform = -1;
+    this.sliderValueUniform = -1;
+    this.drawCursorUniform = -1;
 
-    // ProgressBar texture
+    // SliderBar texture
     this.texture = null;
-    // ProgressBar model matrix
+    // SliderBar model matrix
     this.modelMatrix = new Matrix4x4();
 
-    // ProgressBar position
+    // SliderBar position
     this.position = new Vector2(0.0, 0.0);
-    // ProgressBar size
+    // SliderBar size
     this.size = new Vector2(1.0, 1.0);
-    // ProgressBar texture UV size
+    // SliderBar texture UV size
     this.uvSize = new Vector2(1.0, 1.0);
-    // ProgressBar texture UV factor
+    // SliderBar texture UV factor
     this.uvFactor = 1.0;
-    // ProgressBar alpha
+    // SliderBar alpha
     this.alpha = 1.0;
 
-    // ProgressBar percentage value
+    // SliderBar pressed state
+    this.sliderBarPressed = false;
+    // SliderBar cursor offset
+    this.cursorOffset = 0.0;
+    // SliderBar percentage value
     this.value = 0.0;
 }
 
-GuiProgressBar.prototype = {
+GuiSliderBar.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init GUI ProgressBar                                           //
+    //  init : Init GUI SliderBar                                             //
     //  param texture : Texture pointer                                       //
     //  param width : ProgressBar width                                       //
     //  param height : ProgressBar height                                     //
-    //  param factor : ProgressBar UV factor                                  //
+    //  param factor : ScrollBar UV factor                                    //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, factor)
     {
-        // Reset progress bar
+        // Reset slider bar
         this.alphaUniform = -1;
         this.uvSizeUniform = -1;
         this.uvFactorUniform = -1;
@@ -99,24 +105,32 @@ GuiProgressBar.prototype = {
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
+        if (this.size.vec[0] <= 0.0) { this.size.vec[0] = 0.0; }
+        if (this.size.vec[1] <= 0.0) { this.size.vec[1] = 0.0; }
         this.uvSize.setXY(1.0, 1.0);
         this.uvFactor = 1.0;
         if (factor !== undefined) this.uvFactor = factor;
         this.alpha = 1.0;
+        this.sliderBarPressed = false;
+        this.cursorOffset = 0.0;
         this.value = 0.0;
 
         // Check renderer pointer
         if (!this.renderer) return false;
 
-        // Check progress bar shader pointer
-        if (!this.progressBarShader) return false;
+        // Check slider bar shader pointer
+        if (!this.sliderBarShader) return false;
 
-        // Get progress bar shader uniforms locations
-        this.progressBarShader.bind();
-        this.alphaUniform = this.progressBarShader.getUniform("alpha");
-        this.uvSizeUniform = this.progressBarShader.getUniform("uvSize");
-        this.uvFactorUniform = this.progressBarShader.getUniform("uvFactor");
-        this.progressBarShader.unbind();
+        // Get slider bar shader uniforms locations
+        this.sliderBarShader.bind();
+        this.alphaUniform = this.sliderBarShader.getUniform("alpha");
+        this.uvSizeUniform = this.sliderBarShader.getUniform("uvSize");
+        this.uvFactorUniform = this.sliderBarShader.getUniform("uvFactor");
+        this.sliderValueUniform = this.sliderBarShader.getUniform(
+            "sliderValue"
+        );
+        this.drawCursorUniform = this.sliderBarShader.getUniform("drawCursor");
+        this.sliderBarShader.unbind();
 
         // Set texture
         this.texture = texture;
@@ -127,7 +141,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosition : Set progress bar position                               //
+    //  setPosition : Set slider bar position                                 //
     //  param x : X position to set                                           //
     //  param y : Y position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
@@ -139,7 +153,7 @@ GuiProgressBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setPositionVec2 : Set bar position from a 2 components vector         //
-    //  param vector : 2 components vector to set progress bar position from  //
+    //  param vector : 2 components vector to set slider bar position from    //
     ////////////////////////////////////////////////////////////////////////////
     setPositionVec2: function(vector)
     {
@@ -148,7 +162,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setX : Set progress bar X position                                    //
+    //  setX : Set slider bar X position                                      //
     //  param x : X position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
@@ -157,7 +171,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setY : Set progress bar Y position                                    //
+    //  setY : Set slider bar Y position                                      //
     //  param y : Y position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
@@ -166,7 +180,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  move : Translate progress bar                                         //
+    //  move : Translate slider bar                                           //
     //  param x : X axis translate value                                      //
     //  param y : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -177,8 +191,8 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveVec2 : Translate progress bar by a 2 components vector            //
-    //  param vector : 2 components vector to translate progress bar by       //
+    //  moveVec2 : Translate slider bar by a 2 components vector              //
+    //  param vector : 2 components vector to translate slider bar by         //
     ////////////////////////////////////////////////////////////////////////////
     moveVec2: function(vector)
     {
@@ -187,7 +201,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate progress bar on X axis                              //
+    //  moveX : Translate slider bar on X axis                                //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
@@ -196,7 +210,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate progress bar on Y axis                              //
+    //  moveY : Translate slider bar on Y axis                                //
     //  param x : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
@@ -205,46 +219,52 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSize : Set progress bar size                                       //
+    //  setSize : Set slider bar size                                         //
     //  param width : ProgressBar width to set                                //
     //  param height : ProgressBar height to set                              //
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
+        if (width <= 0.0) { width = 0.0; }
+        if (height <= 0.0) { height = 0.0; }
         this.size.vec[0] = width;
         this.size.vec[1] = height;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSizeVec2 : Set progress bar size from a 2 components vector        //
-    //  param vector : 2 components vector to set progress bar size from      //
+    //  setSizeVec2 : Set slider bar size from a 2 components vector          //
+    //  param vector : 2 components vector to set slider bar size from        //
     ////////////////////////////////////////////////////////////////////////////
     setSizeVec2: function(vector)
     {
         this.size.vec[0] = vector.vec[0];
         this.size.vec[1] = vector.vec[1];
+        if (this.size.vec[0] <= 0.0) { this.size.vec[0] = 0.0; }
+        if (this.size.vec[1] <= 0.0) { this.size.vec[1] = 0.0; }
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setWidth : Set progress bar width                                     //
+    //  setWidth : Set slider bar width                                       //
     //  param width : ProgressBar width to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setWidth: function(width)
     {
+        if (width <= 0.0) { width = 0.0; }
         this.size.vec[0] = width;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setHeight : Set progress bar height                                   //
+    //  setHeight : Set slider bar height                                     //
     //  param height : ProgressBar height to set                              //
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
+        if (height <= 0.0) { height = 0.0; }
         this.size.vec[1] = height;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set progress bar alpha                                     //
+    //  setAlpha : Set slider bar alpha                                       //
     //  param alpha : ProgressBar alpha to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
@@ -253,7 +273,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setFactor : Set progress bar factor                                   //
+    //  setFactor : Set slider bar factor                                     //
     //  param factor : ProgressBar factor to set                              //
     ////////////////////////////////////////////////////////////////////////////
     setFactor: function(factor)
@@ -262,7 +282,16 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setValue : Set progress bar normalized percentage value               //
+    //  setCursorOffset : Set slider bar cursor offset                        //
+    //  param cursorOffset : Slider bar cursor offset to set                  //
+    ////////////////////////////////////////////////////////////////////////////
+    setCursorOffset: function(cursorOffset)
+    {
+        this.cursorOffset = cursorOffset;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setValue : Set slider bar normalized percentage value                 //
     //  param value : Normalized percentage value to set                      //
     ////////////////////////////////////////////////////////////////////////////
     setValue: function(value)
@@ -273,7 +302,75 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getX : Get progress bar X position                                    //
+    //  mousePress : Handle mouse press event                                 //
+    //  param mouseX : Cursor X position                                      //
+    //  param mouseY : Cursor Y position                                      //
+    //  return : True if the sliderbar value has been updated                 //
+    ////////////////////////////////////////////////////////////////////////////
+    mousePress: function(mouseX, mouseY)
+    {
+        if (this.isPicking(mouseX, mouseY))
+        {
+            this.sliderBarPressed = true;
+            this.value = ((mouseX-this.position.vec[0]-(this.cursorOffset*0.5))/
+                (this.size.vec[0]-this.cursorOffset));
+            if (this.value <= 0.0) this.value = 0.0;
+            if (this.value >= 1.0) this.value = 1.0;
+            return true;
+        }
+        return false;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  mouseRelease : Handle mouse release event                             //
+    //  param mouseX : Cursor X position                                      //
+    //  param mouseY : Cursor Y position                                      //
+    ////////////////////////////////////////////////////////////////////////////
+    mouseRelease: function(mouseX, mouseY)
+    {
+        this.sliderBarPressed = false;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  mouseMove : Handle mouse move event                                   //
+    //  param mouseX : Cursor X position                                      //
+    //  param mouseY : Cursor Y position                                      //
+    //  return : True if the sliderbar value has been updated                 //
+    ////////////////////////////////////////////////////////////////////////////
+    mouseMove: function(mouseX, mouseY)
+    {
+        if (this.sliderBarPressed)
+        {
+            this.value = ((mouseX-this.position.vec[0]-(this.cursorOffset*0.5))/
+                (this.size.vec[0]-this.cursorOffset));
+            if (this.value <= 0.0) this.value = 0.0;
+            if (this.value >= 1.0) this.value = 1.0;
+            return true;
+        }
+        return false;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  isPicking : Get slider bar picking state                              //
+    //  return : True if the slider bar is picking                            //
+    ////////////////////////////////////////////////////////////////////////////
+    isPicking: function(mouseX, mouseY)
+    {
+        if ((mouseX >= this.position.vec[0]) &&
+            (mouseX <= (this.position.vec[0] + this.size.vec[0])) &&
+            (mouseY >= this.position.vec[1]) &&
+            (mouseY <= (this.position.vec[1] + this.size.vec[1])))
+        {
+            // SliderBar is picking
+            return true;
+        }
+
+        // SliderBar is not picking
+        return false;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getX : Get slider bar X position                                      //
     //  return : ProgressBar X position                                       //
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
@@ -282,7 +379,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getY : Get progress bar Y position                                    //
+    //  getY : Get slider bar Y position                                      //
     //  return : ProgressBar Y position                                       //
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
@@ -291,7 +388,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get progress bar width                                     //
+    //  getWidth : Get slider bar width                                       //
     //  return : ProgressBar width                                            //
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
@@ -300,7 +397,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get progress bar height                                   //
+    //  getHeight : Get slider bar height                                     //
     //  return : ProgressBar height                                           //
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
@@ -309,7 +406,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAlpha : Get progress bar alpha                                     //
+    //  getAlpha : Get slider bar alpha                                       //
     //  return : ProgressBar alpha                                            //
     ////////////////////////////////////////////////////////////////////////////
     getAlpha: function()
@@ -318,7 +415,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getFactor : Get progress bar factor                                   //
+    //  getFactor : Get slider bar factor                                     //
     //  return : ProgressBar factor                                           //
     ////////////////////////////////////////////////////////////////////////////
     getFactor: function()
@@ -327,7 +424,7 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getValue : Get progress bar value                                     //
+    //  getValue : Get slider bar value                                       //
     //  return : ProgressBar value                                            //
     ////////////////////////////////////////////////////////////////////////////
     getValue: function()
@@ -336,17 +433,17 @@ GuiProgressBar.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  render : Render progress bar                                          //
+    //  render : Render slider bar                                            //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-        // Set progress bar model matrix
+        // Set slider bar model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec2(this.position);
         this.modelMatrix.scaleVec2(this.size);
 
-        // Bind progress bar shader
-        this.progressBarShader.bind();
+        // Bind slider bar shader
+        this.sliderBarShader.bind();
 
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
@@ -354,12 +451,14 @@ GuiProgressBar.prototype = {
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send shader uniforms
-        this.progressBarShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.sliderBarShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.uvSize.vec[0] = this.size.vec[0];
         this.uvSize.vec[1] = 0.0;
-        this.progressBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
-        this.progressBarShader.sendUniform(this.uvFactorUniform, this.uvFactor);
-        this.progressBarShader.sendUniform(this.alphaUniform, this.alpha);
+        this.sliderBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
+        this.sliderBarShader.sendUniform(this.uvFactorUniform, this.uvFactor);
+        this.sliderBarShader.sendUniform(this.sliderValueUniform, this.value);
+        this.sliderBarShader.sendUniform(this.drawCursorUniform, 0.0);
+        this.sliderBarShader.sendUniform(this.alphaUniform, this.alpha);
 
         // Bind texture
         this.texture.bind();
@@ -367,25 +466,34 @@ GuiProgressBar.prototype = {
         // Bind VBO
         this.renderer.vertexBuffer.bind();
 
-        // Render progress bar background
-        this.renderer.vertexBuffer.render(this.progressBarShader);
+        // Render slider bar background
+        this.renderer.vertexBuffer.render(this.sliderBarShader);
+
+        // Render slider bar
+        this.sliderBarShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.uvSize.vec[1] = 0.5;
+        this.sliderBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
+        this.renderer.vertexBuffer.render(this.sliderBarShader);
 
         // Recompute matrix
         this.modelMatrix.setIdentity();
-        this.modelMatrix.translateVec2(this.position);
+        this.modelMatrix.translate(this.position.vec[0]+
+            (this.value*(this.size.vec[0]-this.cursorOffset))-
+            (this.size.vec[1]*0.5)+(this.cursorOffset*0.5),
+            this.position.vec[1], 0.0
+        );
         this.modelMatrix.scale(
-            this.size.vec[0]*this.value, this.size.vec[1], 1.0
+            this.size.vec[1], this.size.vec[1], 1.0
         );
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
-        // Render progress bar
-        this.progressBarShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.uvSize.vec[0] = this.size.vec[0]*this.value;
-        this.uvSize.vec[1] = 0.5;
-        this.progressBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
-        this.renderer.vertexBuffer.render(this.progressBarShader);
+        // Render cursor
+        this.sliderBarShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.sliderBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
+        this.sliderBarShader.sendUniform(this.drawCursorUniform, 1.0);
+        this.renderer.vertexBuffer.render(this.sliderBarShader);
 
         // Unbind VBO
         this.renderer.vertexBuffer.unbind();
@@ -393,7 +501,7 @@ GuiProgressBar.prototype = {
         // Unbind texture
         this.texture.unbind();
 
-        // Unbind progress bar shader
-        this.progressBarShader.unbind();
+        // Unbind slider bar shader
+        this.sliderBarShader.unbind();
     }
 };

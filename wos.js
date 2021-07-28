@@ -314,6 +314,8 @@ function Wos()
     this.testtogglebutton = null;
     // Test progress bar
     this.testprogressbar = null;
+    // Test slider bar
+    this.testsliderbar = null;
     // Test text
     this.testtext = null;
     // Test multitext
@@ -468,6 +470,15 @@ Wos.prototype = {
         this.testprogressbar.init(
             this.loader.getTexture("testprogressbar.png"), 0.8, 0.06, 15.0
         );
+
+        // Init test slider bar
+        this.testsliderbar = new GuiSliderBar(
+            this.renderer, this.loader.sliderBarShader
+        );
+        this.testsliderbar.init(
+            this.loader.getTexture("testsliderbar.png"), 0.8, 0.06, 15.0
+        );
+        this.testsliderbar.setCursorOffset(0.013);
 
         // Init test text
         this.testtext = new GuiText(this.renderer, this.loader.textShader);
@@ -721,6 +732,10 @@ Wos.prototype = {
         {
             this.testtogglebutton.mouseMove(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testsliderbar)
+        {
+            this.testsliderbar.mouseMove(this.realMouseX, this.realMouseY);
+        }*/
         /*if (this.testmultitext)
         {
             this.testmultitext.mouseMove(this.realMouseX, this.realMouseY);
@@ -773,6 +788,10 @@ Wos.prototype = {
         {
             this.testtogglebutton.mousePress(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testsliderbar)
+        {
+            this.testsliderbar.mousePress(this.realMouseX, this.realMouseY);
+        }*/
         /*if (this.testmultitext)
         {
             this.testmultitext.mousePress(this.realMouseX, this.realMouseY);
@@ -809,6 +828,10 @@ Wos.prototype = {
             this.testtogglebutton.mouseRelease(
                 this.realMouseX, this.realMouseY
             );
+        }*/
+        /*if (this.testsliderbar)
+        {
+            this.testsliderbar.mouseRelease(this.realMouseX, this.realMouseY);
         }*/
         /*if (this.testmultitext)
         {
@@ -958,6 +981,11 @@ Wos.prototype = {
         //this.testprogressbar.setX(-this.testprogressbar.getWidth()*0.5);
         //this.testprogressbar.setY(-this.testprogressbar.getHeight()*0.5);
         //this.testprogressbar.render();
+
+        // Render test slider bar
+        //this.testsliderbar.setX(-this.testsliderbar.getWidth()*0.5);
+        //this.testsliderbar.setY(-this.testsliderbar.getHeight()*0.5);
+        //this.testsliderbar.render();
 
         // Render test text
         //this.testtext.setX(-this.testtext.getWidth()*0.5);
