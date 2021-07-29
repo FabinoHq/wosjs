@@ -85,8 +85,8 @@ function GuiPxMultiText(renderer, textShader, fieldShader, scrollBarShader)
     this.size = new Vector2(1.0, 1.0);
     // GuiPxMultiText color
     this.color = new Vector3(1.0, 1.0, 1.0);
-    // GuiPxMultiText lines alpha
-    this.linesAlpha = 1.0;
+    // GuiPxMultiText character alpha
+    this.charAlpha = 1.0;
     // GuiPxMultiText alpha
     this.alpha = 1.0;
     // GuiPxMultiText smooth value
@@ -144,7 +144,7 @@ GuiPxMultiText.prototype = {
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.color.setXYZ(1.0, 1.0, 1.0);
-        this.linesAlpha = 1.0;
+        this.charAlpha = 1.0;
         this.alpha = 1.0;
         this.smooth = 0.1;
         this.scrollable = false;
@@ -538,12 +538,26 @@ GuiPxMultiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setLinesAlpha : Set lines alpha                                       //
-    //  param alpha : Text lines alpha to set                                 //
+    //  setColorVec3 : Set text color from a 3 component vector               //
+    //  param color : 3 component vector to set text color from               //
     ////////////////////////////////////////////////////////////////////////////
-    setLinesAlpha: function(alpha)
+    setColorVec3: function(color)
     {
-        this.linesAlpha = alpha;
+        this.color.vec[0] = color.vec[0];
+        this.color.vec[1] = color.vec[1];
+        this.color.vec[2] = color.vec[2];
+
+        // Multitext need update
+        this.needUpdate = true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setCharAlpha : Set character alpha                                    //
+    //  param alpha : Text character alpha to set                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setCharAlpha: function(alpha)
+    {
+        this.charAlpha = alpha;
 
         // Multitext need update
         this.needUpdate = true;
@@ -1309,7 +1323,7 @@ GuiPxMultiText.prototype = {
                             this.lines[i].colorUniform, this.color
                         );
                         this.lines[i].textShader.sendUniform(
-                            this.lines[i].alphaUniform, this.linesAlpha
+                            this.lines[i].alphaUniform, this.charAlpha
                         );
                         this.lines[i].textShader.sendUniform(
                             this.lines[i].smoothUniform, this.smooth
@@ -1413,7 +1427,7 @@ GuiPxMultiText.prototype = {
                     this.renderer.textLineRenderer.setTexture(
                         this.lines[i].lineTexture
                     );
-                    this.renderer.textLineRenderer.setAlpha(this.linesAlpha);
+                    this.renderer.textLineRenderer.setAlpha(1.0);
                     if (this.size.vec[1] > 0.0)
                     {
                         this.renderer.textLineRenderer.setSize(
@@ -1442,7 +1456,7 @@ GuiPxMultiText.prototype = {
                         this.lines[i].colorUniform, this.color
                     );
                     this.textShader.sendUniform(
-                        this.lines[i].alphaUniform, this.linesAlpha
+                        this.lines[i].alphaUniform, this.charAlpha
                     );
                     this.textShader.sendUniform(
                         this.lines[i].smoothUniform, this.smooth

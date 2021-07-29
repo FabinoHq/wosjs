@@ -65,6 +65,7 @@
 !renderer/shaders/animspriteshader.js
 !renderer/shaders/nineboxshader.js
 !renderer/shaders/buttonshader.js
+!renderer/shaders/textbuttonshader.js
 !renderer/shaders/togglebuttonshader.js
 !renderer/shaders/scrollbarshader.js
 !renderer/shaders/progressbarshader.js
@@ -85,6 +86,7 @@
 !interface/guiprogressbar.js
 !interface/guisliderbar.js
 !interface/guitext.js
+!interface/guitextbutton.js
 !interface/guimultitext.js
 !interface/guitextbox.js
 !interface/guipxtext.js
@@ -104,6 +106,7 @@
 !textures/testsprite.png
 !textures/testninebox.png
 !textures/testbutton.png
+!textures/testtextbutton.png
 !textures/testtogglebutton.png
 !textures/testprogressbar.png
 !textures/testsliderbar.png

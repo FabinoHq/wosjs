@@ -310,6 +310,8 @@ function Wos()
     this.testanim = null;
     // Test button
     this.testbutton = null;
+    // Test text button
+    this.testtextbutton = null;
     // Test toggle button
     this.testtogglebutton = null;
     // Test progress bar
@@ -500,6 +502,17 @@ Wos.prototype = {
         );
         this.testtextbox.init(false, 1.0, 0.1, "Test");
         this.testtextbox.setSelected(true);
+
+        // Init test text button
+        this.testtextbutton = new GuiTextButton(
+            this.renderer, this.loader.textButtonShader, this.loader.textShader
+        );
+        this.testtextbutton.init(
+            this.loader.getTexture("testtextbutton.png"), "Test", 0.1, 15.0
+        );
+        this.testtextbutton.setTextOffset(-0.004, -0.005);
+        this.testtextbutton.setColor(0.1, 0.1, 0.1);
+        this.testtextbutton.setHoverColor(0.22, 0.22, 0.22);
 
         // Init test pixel text
         this.testpxtext = new GuiPxText(
@@ -744,6 +757,10 @@ Wos.prototype = {
         {
             this.testtextbox.mouseMove(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testtextbutton)
+        {
+            this.testtextbutton.mouseMove(this.realMouseX, this.realMouseY);
+        }*/
         /*if (this.testpxmultitext)
         {
             this.testpxmultitext.mouseMove(this.realMouseX, this.realMouseY);
@@ -800,6 +817,10 @@ Wos.prototype = {
         {
             this.testtextbox.mousePress(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testtextbutton)
+        {
+            this.testtextbutton.mousePress(this.realMouseX, this.realMouseY);
+        }*/
         /*if (this.testpxmultitext)
         {
             this.testpxmultitext.mousePress(this.realMouseX, this.realMouseY);
@@ -840,6 +861,10 @@ Wos.prototype = {
         /*if (this.testtextbox)
         {
             this.testtextbox.mouseRelease(this.realMouseX, this.realMouseY);
+        }*/
+        /*if (this.testtextbutton)
+        {
+            this.testtextbutton.mouseRelease(this.realMouseX, this.realMouseY);
         }*/
         /*if (this.testpxmultitext)
         {
@@ -1001,6 +1026,11 @@ Wos.prototype = {
         //this.testtextbox.setX(-this.testtextbox.getWidth()*0.5);
         //this.testtextbox.setY(-this.testtextbox.getHeight()*0.5);
         //this.testtextbox.render();
+
+        // Render test text button
+        //this.testtextbutton.setX(-this.testtextbutton.getWidth()*0.5);
+        //this.testtextbutton.setY(-this.testtextbutton.getHeight()*0.5);
+        //this.testtextbutton.render();
 
         // Render test pixel text
         //this.testpxtext.setX(-this.testpxtext.getWidth()*0.5);

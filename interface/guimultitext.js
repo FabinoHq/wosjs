@@ -83,8 +83,6 @@ function GuiMultiText(renderer, textShader, fieldShader, scrollBarShader)
     this.size = new Vector2(1.0, 1.0);
     // GuiMultiText color
     this.color = new Vector3(1.0, 1.0, 1.0);
-    // GuiMultiText lines alpha
-    this.linesAlpha = 1.0;
     // GuiMultiText alpha
     this.alpha = 1.0;
 
@@ -137,7 +135,6 @@ GuiMultiText.prototype = {
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.color.setXYZ(1.0, 1.0, 1.0);
-        this.linesAlpha = 1.0;
         this.alpha = 1.0;
         this.scrollable = false;
         if (scrollable !== undefined) this.scrollable = scrollable;
@@ -535,12 +532,14 @@ GuiMultiText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setLinesAlpha : Set lines alpha                                       //
-    //  param alpha : Text lines alpha to set                                 //
+    //  setColorVec3 : Set text color from a 3 component vector               //
+    //  param color : 3 component vector to set text color from               //
     ////////////////////////////////////////////////////////////////////////////
-    setLinesAlpha: function(alpha)
+    setColorVec3: function(color)
     {
-        this.linesAlpha = alpha;
+        this.color.vec[0] = color.vec[0];
+        this.color.vec[1] = color.vec[1];
+        this.color.vec[2] = color.vec[2];
 
         // Multitext need update
         this.needUpdate = true;
@@ -1272,7 +1271,7 @@ GuiMultiText.prototype = {
                     this.lines[i].colorUniform, this.color
                 );
                 this.lines[i].textShader.sendUniform(
-                    this.lines[i].alphaUniform, this.linesAlpha
+                    this.lines[i].alphaUniform, 1.0
                 );
 
                 // Bind texture

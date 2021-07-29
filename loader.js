@@ -62,6 +62,7 @@ function Loader(renderer, audio)
     this.nineboxShader = null;
     this.animSpriteShader = null;
     this.buttonShader = null;
+    this.textButtonShader = null;
     this.toggleButtonShader = null;
     this.scrollBarShader = null;
     this.progressBarShader = null;
@@ -108,6 +109,7 @@ Loader.prototype = {
         this.nineboxShader = null;
         this.animSpriteShader = null;
         this.buttonShader = null;
+        this.textButtonShader = null;
         this.toggleButtonShader = null;
         this.scrollBarShader = null;
         this.progressBarShader = null;
@@ -196,6 +198,14 @@ Loader.prototype = {
         this.buttonShader = new Shader(this.renderer.gl);
         if (!this.buttonShader.init(
             defaultVertexShaderSrc, buttonFragmentShaderSrc))
+        {
+            return false;
+        }
+
+        // Init text button shader
+        this.textButtonShader = new Shader(this.renderer.gl);
+        if (!this.textButtonShader.init(
+            defaultVertexShaderSrc, textButtonFragmentShaderSrc))
         {
             return false;
         }
@@ -355,7 +365,7 @@ Loader.prototype = {
             {
                 this.loader.handleTexturesLoaded();
             }
-            this.textures[i].load("textures/" + TexturesAssets[i], false);
+            this.textures[i].load("textures/" + TexturesAssets[i], true);
         }
         return true;
     },

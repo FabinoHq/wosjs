@@ -299,6 +299,26 @@ GuiTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setColor : Set text color                                             //
+    //  param r : Text red color channel to set                               //
+    //  param g : Text blue color channel to set                              //
+    //  param b : Text green color channel to set                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setColor: function(r, g, b)
+    {
+        this.guitext.setColor(r, g, b);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setColorVec3 : Set text color from a 3 component vector               //
+    //  param color : 3 component vector to set text color from               //
+    ////////////////////////////////////////////////////////////////////////////
+    setColorVec3: function(color)
+    {
+        this.guitext.setColorVec3(color);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setAlpha : Set textbox alpha                                          //
     //  param alpha : Textbox alpha to set                                    //
     ////////////////////////////////////////////////////////////////////////////

@@ -95,9 +95,10 @@ GuiButton.prototype = {
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
-        if (round !== undefined) { if (round) this.isRound = true; }
         this.alpha = 1.0;
         this.buttonState = 0;
+        this.isRound = false;
+        if (round !== undefined) { if (round) this.isRound = true; }
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -255,7 +256,7 @@ GuiButton.prototype = {
         if (this.isPicking(mouseX, mouseY))
         {
             this.buttonState = 3;
-            this.onButtonPressed();
+            return true;
         }
         else
         {
@@ -274,7 +275,8 @@ GuiButton.prototype = {
         {
             if (this.buttonState == 3)
             {
-                this.onButtonReleased();
+                this.buttonState = 1;
+                return true;
             }
             this.buttonState = 1;
         }
@@ -317,22 +319,6 @@ GuiButton.prototype = {
                     break;
             }
         }
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  onButtonPressed : Called when the button is pressed                   //
-    ////////////////////////////////////////////////////////////////////////////
-    onButtonPressed: function()
-    {
-
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  onButtonReleased : Called when the button is released                 //
-    ////////////////////////////////////////////////////////////////////////////
-    onButtonReleased: function()
-    {
-
     },
 
     ////////////////////////////////////////////////////////////////////////////

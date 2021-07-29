@@ -443,6 +443,20 @@ GuiPxText.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setColorVec3 : Set text color from a 3 component vector               //
+    //  param color : 3 component vector to set text color from               //
+    ////////////////////////////////////////////////////////////////////////////
+    setColorVec3: function(color)
+    {
+        this.color.vec[0] = color.vec[0];
+        this.color.vec[1] = color.vec[1];
+        this.color.vec[2] = color.vec[2];
+
+        // Text line need update
+        this.needUpdate = true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setCharAlpha : Set character alpha                                    //
     //  param alpha : Text character alpha to set                             //
     ////////////////////////////////////////////////////////////////////////////

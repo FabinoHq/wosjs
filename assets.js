@@ -49,6 +49,7 @@ var TexturesAssets = [
     "testsprite.png",
     "testninebox.png",
     "testbutton.png",
+    "testtextbutton.png",
     "testtogglebutton.png",
     "testprogressbar.png",
     "testsliderbar.png"

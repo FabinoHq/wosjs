@@ -80,7 +80,7 @@ Texture.prototype = {
         this.tex = null;
         this.width = 0;
         this.height = 0;
-        this.smooth = false;
+        this.smooth = true;
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -131,12 +131,12 @@ Texture.prototype = {
         this.renderer.gl.texParameteri(
             this.renderer.gl.TEXTURE_2D,
             this.renderer.gl.TEXTURE_MIN_FILTER,
-            this.renderer.gl.NEAREST
+            this.renderer.gl.LINEAR
         );
         this.renderer.gl.texParameteri(
             this.renderer.gl.TEXTURE_2D,
             this.renderer.gl.TEXTURE_MAG_FILTER,
-            this.renderer.gl.NEAREST
+            this.renderer.gl.LINEAR
         );
 
         // Unbind texture
