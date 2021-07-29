@@ -37,54 +37,54 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/ninebox.js : Ninebox management                              //
+//      renderer/ninepatch.js : Ninepatch management                          //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Ninebox class definition                                                  //
+//  Ninepatch class definition                                                //
 //  param renderer : Renderer pointer                                         //
-//  param nineboxShader : Ninebox shader pointer                              //
+//  param ninepatchShader : Ninepatch shader pointer                          //
 ////////////////////////////////////////////////////////////////////////////////
-function Ninebox(renderer, nineboxShader)
+function Ninepatch(renderer, ninepatchShader)
 {
     // Renderer pointer
     this.renderer = renderer;
 
-    // Ninebox shader pointer
-    this.nineboxShader = nineboxShader;
+    // Ninepatch shader pointer
+    this.ninepatchShader = ninepatchShader;
 
-    // Ninebox shader uniforms locations
+    // Ninepatch shader uniforms locations
     this.alphaUniform = -1;
     this.uvSizeUniform = -1;
     this.uvFactorUniform = -1;
 
-    // Ninebox texture
+    // Ninepatch texture
     this.texture = null;
-    // Ninebox model matrix
+    // Ninepatch model matrix
     this.modelMatrix = new Matrix4x4();
 
-    // Ninebox position
+    // Ninepatch position
     this.position = new Vector2(0.0, 0.0);
-    // Ninebox size
+    // Ninepatch size
     this.size = new Vector2(1.0, 1.0);
-    // Ninebox texture UV factor
+    // Ninepatch texture UV factor
     this.uvFactor = 1.0;
-    // Ninebox alpha
+    // Ninepatch alpha
     this.alpha = 1.0;
 }
 
-Ninebox.prototype = {
+Ninepatch.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init ninebox                                                   //
+    //  init : Init ninepatch                                                 //
     //  param texture : Texture pointer                                       //
-    //  param width : Ninebox width                                           //
-    //  param height : Ninebox height                                         //
-    //  param factor : Ninebox UV factor                                      //
+    //  param width : Ninepatch width                                         //
+    //  param height : Ninepatch height                                       //
+    //  param factor : Ninepatch UV factor                                    //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, factor)
     {
-        // Reset ninebox
+        // Reset ninepatch
         this.alphaUniform = -1;
         this.uvSizeUniform = -1;
         this.uvFactorUniform = -1;
@@ -101,28 +101,28 @@ Ninebox.prototype = {
         // Check renderer pointer
         if (!this.renderer) return false;
 
-        // Check ninebox shader pointer
-        if (!this.nineboxShader) return false;
+        // Check ninepatch shader pointer
+        if (!this.ninepatchShader) return false;
 
-        // Get ninebox shader uniforms locations
-        this.nineboxShader.bind();
-        this.uvSizeUniform = this.nineboxShader.getUniform("uvSize");
-        this.uvFactorUniform = this.nineboxShader.getUniform("uvFactor");
-        this.alphaUniform = this.nineboxShader.getUniform("alpha");
-        this.nineboxShader.unbind();
+        // Get ninepatch shader uniforms locations
+        this.ninepatchShader.bind();
+        this.uvSizeUniform = this.ninepatchShader.getUniform("uvSize");
+        this.uvFactorUniform = this.ninepatchShader.getUniform("uvFactor");
+        this.alphaUniform = this.ninepatchShader.getUniform("alpha");
+        this.ninepatchShader.unbind();
 
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
 
-        // Ninebox loaded
+        // Ninepatch loaded
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosition : Set ninebox position                                    //
-    //  param x : Ninebox X position                                          //
-    //  param y : Ninebox Y position                                          //
+    //  setPosition : Set ninepatch position                                  //
+    //  param x : Ninepatch X position                                        //
+    //  param y : Ninepatch Y position                                        //
     ////////////////////////////////////////////////////////////////////////////
     setPosition: function(x, y)
     {
@@ -131,8 +131,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPositionVec2 : Set ninebox position from a 2 components vector     //
-    //  param vector : 2 components vector to set ninebox position from       //
+    //  setPositionVec2 : Set ninepatch position from a 2 components vector   //
+    //  param vector : 2 components vector to set ninepatch position from     //
     ////////////////////////////////////////////////////////////////////////////
     setPositionVec2: function(vector)
     {
@@ -141,8 +141,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setX : Set ninebox X position                                         //
-    //  param x : Ninebox X position                                          //
+    //  setX : Set ninepatch X position                                       //
+    //  param x : Ninepatch X position                                        //
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
     {
@@ -150,8 +150,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setY : Set ninebox Y position                                         //
-    //  param y : Ninebox Y position                                          //
+    //  setY : Set ninepatch Y position                                       //
+    //  param y : Ninepatch Y position                                        //
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
     {
@@ -159,7 +159,7 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  move : Translate ninebox                                              //
+    //  move : Translate ninepatch                                            //
     //  param x : X axis translate value                                      //
     //  param y : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -170,8 +170,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveVec2 : Translate ninebox by a 2 components vector                 //
-    //  param vector : 2 components vector to translate ninebox by            //
+    //  moveVec2 : Translate ninepatch by a 2 components vector               //
+    //  param vector : 2 components vector to translate ninepatch by          //
     ////////////////////////////////////////////////////////////////////////////
     moveVec2: function(vector)
     {
@@ -180,7 +180,7 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate ninebox on X axis                                   //
+    //  moveX : Translate ninepatch on X axis                                 //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
@@ -189,7 +189,7 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate ninebox on Y axis                                   //
+    //  moveY : Translate ninepatch on Y axis                                 //
     //  param y : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
@@ -198,9 +198,9 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSize : Set ninebox size                                            //
-    //  param width : Ninebox width to set                                    //
-    //  param height : Ninebox height to set                                  //
+    //  setSize : Set ninepatch size                                          //
+    //  param width : Ninepatch width to set                                  //
+    //  param height : Ninepatch height to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
@@ -209,8 +209,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setSizeVec2 : Set ninebox size from a 2 components vector             //
-    //  param vector : 2 components vector to set ninebox size from           //
+    //  setSizeVec2 : Set ninepatch size from a 2 components vector           //
+    //  param vector : 2 components vector to set ninepatch size from         //
     ////////////////////////////////////////////////////////////////////////////
     setSizeVec2: function(vector)
     {
@@ -219,8 +219,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setWidth : Set ninebox width                                          //
-    //  param width : Ninebox width to set                                    //
+    //  setWidth : Set ninepatch width                                        //
+    //  param width : Ninepatch width to set                                  //
     ////////////////////////////////////////////////////////////////////////////
     setWidth: function(width)
     {
@@ -228,8 +228,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setHeight : Set ninebox height                                        //
-    //  param height : Ninebox height to set                                  //
+    //  setHeight : Set ninepatch height                                      //
+    //  param height : Ninepatch height to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
@@ -237,8 +237,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set ninebox alpha                                          //
-    //  param alpha : Ninebox alpha to set                                    //
+    //  setAlpha : Set ninepatch alpha                                        //
+    //  param alpha : Ninepatch alpha to set                                  //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
     {
@@ -246,8 +246,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setFactor : Set ninebox factor                                        //
-    //  param factor : Ninebox factor to set                                  //
+    //  setFactor : Set ninepatch factor                                      //
+    //  param factor : Ninepatch factor to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setFactor: function(factor)
     {
@@ -255,8 +255,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getX : Get ninebox X position                                         //
-    //  return : Ninebox X position                                           //
+    //  getX : Get ninepatch X position                                       //
+    //  return : Ninepatch X position                                         //
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
@@ -264,8 +264,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getY : Get ninebox Y position                                         //
-    //  return : Ninebox Y position                                           //
+    //  getY : Get ninepatch Y position                                       //
+    //  return : Ninepatch Y position                                         //
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
@@ -273,8 +273,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get ninebox width                                          //
-    //  return : Ninebox width                                                //
+    //  getWidth : Get ninepatch width                                        //
+    //  return : Ninepatch width                                              //
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
@@ -282,8 +282,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get ninebox height                                        //
-    //  return : Ninebox height                                               //
+    //  getHeight : Get ninepatch height                                      //
+    //  return : Ninepatch height                                             //
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
@@ -291,8 +291,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAlpha : Get ninebox alpha                                          //
-    //  return : Ninebox alpha                                                //
+    //  getAlpha : Get ninepatch alpha                                        //
+    //  return : Ninepatch alpha                                              //
     ////////////////////////////////////////////////////////////////////////////
     getAlpha: function()
     {
@@ -300,8 +300,8 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getFactor : Get ninebox factor                                        //
-    //  return : Ninebox factor                                               //
+    //  getFactor : Get ninepatch factor                                      //
+    //  return : Ninepatch factor                                             //
     ////////////////////////////////////////////////////////////////////////////
     getFactor: function()
     {
@@ -309,41 +309,41 @@ Ninebox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  render : Render ninebox                                               //
+    //  render : Render ninepatch                                             //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-        // Set ninebox model matrix
+        // Set ninepatch model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec2(this.position);
         this.modelMatrix.scaleVec2(this.size);
 
-        // Bind ninebox shader
-        this.nineboxShader.bind();
+        // Bind ninepatch shader
+        this.ninepatchShader.bind();
 
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
-        // Send ninebox shader uniforms
-        this.nineboxShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.nineboxShader.sendUniformVec2(this.uvSizeUniform, this.size);
-        this.nineboxShader.sendUniform(this.uvFactorUniform, this.uvFactor);
-        this.nineboxShader.sendUniform(this.alphaUniform, this.alpha);
+        // Send ninepatch shader uniforms
+        this.ninepatchShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.ninepatchShader.sendUniformVec2(this.uvSizeUniform, this.size);
+        this.ninepatchShader.sendUniform(this.uvFactorUniform, this.uvFactor);
+        this.ninepatchShader.sendUniform(this.alphaUniform, this.alpha);
 
         // Bind texture
         this.texture.bind();
 
         // Render VBO
         this.renderer.vertexBuffer.bind();
-        this.renderer.vertexBuffer.render(this.nineboxShader);
+        this.renderer.vertexBuffer.render(this.ninepatchShader);
         this.renderer.vertexBuffer.unbind();
 
         // Unbind texture
         this.texture.unbind();
 
-        // Unbind ninebox shader
-        this.nineboxShader.unbind();
+        // Unbind ninepatch shader
+        this.ninepatchShader.unbind();
     }
 };

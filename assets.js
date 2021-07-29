@@ -47,7 +47,7 @@ var TexturesAssets = [
     "scrollbar.png",
     "wospxfont.png",
     "testsprite.png",
-    "testninebox.png",
+    "testninepatch.png",
     "testbutton.png",
     "testtextbutton.png",
     "testtogglebutton.png",

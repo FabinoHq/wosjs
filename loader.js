@@ -59,7 +59,7 @@ function Loader(renderer, audio)
     this.lineShader = null;
     this.rectShader = null;
     this.spriteShader = null;
-    this.nineboxShader = null;
+    this.ninepatchShader = null;
     this.animSpriteShader = null;
     this.buttonShader = null;
     this.textButtonShader = null;
@@ -106,7 +106,7 @@ Loader.prototype = {
         this.lineShader = null;
         this.rectShader = null;
         this.spriteShader = null;
-        this.nineboxShader = null;
+        this.ninepatchShader = null;
         this.animSpriteShader = null;
         this.buttonShader = null;
         this.textButtonShader = null;
@@ -178,10 +178,10 @@ Loader.prototype = {
             return false;
         }
 
-        // Init ninebox shader
-        this.nineboxShader = new Shader(this.renderer.gl);
-        if (!this.nineboxShader.init(
-            defaultVertexShaderSrc, nineboxFragmentShaderSrc))
+        // Init ninepatch shader
+        this.ninepatchShader = new Shader(this.renderer.gl);
+        if (!this.ninepatchShader.init(
+            defaultVertexShaderSrc, ninepatchFragmentShaderSrc))
         {
             return false;
         }

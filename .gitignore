@@ -43,6 +43,7 @@
 !renderer/animsprite.js
 !renderer/procsprite.js
 !renderer/ninebox.js
+!renderer/ninepatch.js
 !renderer/plane.js
 !renderer/animplane.js
 !renderer/procplane.js
@@ -64,6 +65,7 @@
 !renderer/shaders/spriteshader.js
 !renderer/shaders/animspriteshader.js
 !renderer/shaders/nineboxshader.js
+!renderer/shaders/ninepatchshader.js
 !renderer/shaders/buttonshader.js
 !renderer/shaders/textbuttonshader.js
 !renderer/shaders/togglebuttonshader.js
@@ -105,6 +107,7 @@
 !textures/wospxfont.png
 !textures/testsprite.png
 !textures/testninebox.png
+!textures/testninepatch.png
 !textures/testbutton.png
 !textures/testtextbutton.png
 !textures/testtogglebutton.png

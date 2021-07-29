@@ -304,8 +304,8 @@ function Wos()
     this.testsprite = null;
     // Test procedural sprite
     this.testproc = null;
-    // Test ninebox
-    this.testninebox = null;
+    // Test ninepatch
+    this.testninepatch = null;
     // Test anim
     this.testanim = null;
     // Test button
@@ -429,12 +429,12 @@ Wos.prototype = {
         this.testproc = new ProcSprite(this.renderer);
         this.testproc.init();
 
-        // Init test ninebox
-        this.testninebox = new Ninebox(
-            this.renderer, this.loader.nineboxShader
+        // Init test ninepatch
+        this.testninepatch = new Ninepatch(
+            this.renderer, this.loader.ninepatchShader
         );
-        this.testninebox.init(
-            this.loader.getTexture("testninebox.png"), 0.4, 0.4, 15.0
+        this.testninepatch.init(
+            this.loader.getTexture("testninepatch.png"), 0.4, 0.4, 15.0
         );
 
         // Init test anim
@@ -980,11 +980,11 @@ Wos.prototype = {
         //this.testproc.setY(-this.testproc.getHeight()*0.5);
         //this.testproc.render();
 
-        // Render test ninebox
-        //this.testninebox.setSize(this.realMouseX*2.0, this.realMouseY*2.0);
-        //this.testninebox.setX(-this.testninebox.getWidth()*0.5);
-        //this.testninebox.setY(-this.testninebox.getHeight()*0.5);
-        //this.testninebox.render();
+        // Render test ninepatch
+        //this.testninepatch.setSize(this.realMouseX*2.0, this.realMouseY*2.0);
+        //this.testninepatch.setX(-this.testninepatch.getWidth()*0.5);
+        //this.testninepatch.setY(-this.testninepatch.getHeight()*0.5);
+        //this.testninepatch.render();
 
         // Render test anim
         //this.testanim.setX(-this.testanim.getWidth()*0.5);

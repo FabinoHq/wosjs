@@ -37,14 +37,14 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      renderer/nineboxshader.js : Ninebox shader                            //
+//      renderer/ninepatchshader.js : Ninepatch shader                        //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Ninebox fragment shader                                                   //
+//  Ninepatch fragment shader                                                 //
 ////////////////////////////////////////////////////////////////////////////////
-const nineboxFragmentShaderSrc = [
+const ninepatchFragmentShaderSrc = [
     "precision mediump float;",
     "precision mediump int;",
     "uniform sampler2D texture;",
@@ -55,13 +55,13 @@ const nineboxFragmentShaderSrc = [
     "",
     "void main()",
     "{",
-    "    vec2 nineSize = abs(uvSize*uvFactor);",
-    "    vec2 curCoord = texCoord*nineSize;",
+    "    vec2 patchSize = abs(uvSize*uvFactor);",
+    "    vec2 curCoord = texCoord*patchSize;",
     "    if (curCoord.x >= 0.25)",
     "    {",
-    "        if (curCoord.x >= (nineSize.x-0.25))",
+    "        if (curCoord.x >= (patchSize.x-0.25))",
     "        {",
-    "            curCoord.x = curCoord.x-nineSize.x;",
+    "            curCoord.x = curCoord.x-patchSize.x;",
     "        }",
     "        else",
     "        {",
@@ -70,17 +70,17 @@ const nineboxFragmentShaderSrc = [
     "    }",
     "    if (curCoord.y >= 0.25)",
     "    {",
-    "        if (curCoord.y >= (nineSize.y-0.25))",
+    "        if (curCoord.y >= (patchSize.y-0.25))",
     "        {",
-    "            curCoord.y = curCoord.y-nineSize.y;",
+    "            curCoord.y = curCoord.y-patchSize.y;",
     "        }",
     "        else",
     "        {",
     "            curCoord.y = 0.25+mod(curCoord.y, 0.5);",
     "        }",
     "    }",
-    "    if (nineSize.x <= 0.5) { curCoord.x = texCoord.x; }",
-    "    if (nineSize.y <= 0.5) { curCoord.y = texCoord.y; }",
+    "    if (patchSize.x <= 0.5) { curCoord.x = texCoord.x; }",
+    "    if (patchSize.y <= 0.5) { curCoord.y = texCoord.y; }",
     "    vec4 texColor = texture2D(texture, curCoord);",
     "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
     "}",
