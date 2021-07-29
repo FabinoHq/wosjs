@@ -403,7 +403,9 @@ BackRenderer.prototype = {
 
             // Enable blending
             this.renderer.gl.enable(this.renderer.gl.BLEND);
-            this.renderer.gl.blendFunc(
+            this.renderer.gl.blendFuncSeparate(
+                this.renderer.gl.SRC_ALPHA,
+                this.renderer.gl.ONE_MINUS_SRC_ALPHA,
                 this.renderer.gl.ONE, this.renderer.gl.ONE_MINUS_SRC_ALPHA
             );
             this.renderer.gl.blendEquation(this.renderer.gl.FUNC_ADD);
@@ -435,7 +437,9 @@ BackRenderer.prototype = {
 
             // Enable blending
             this.renderer.gl.enable(this.renderer.gl.BLEND);
-            this.renderer.gl.blendFunc(
+            this.renderer.gl.blendFuncSeparate(
+                this.renderer.gl.SRC_ALPHA,
+                this.renderer.gl.ONE_MINUS_SRC_ALPHA,
                 this.renderer.gl.ONE, this.renderer.gl.ONE_MINUS_SRC_ALPHA
             );
             this.renderer.gl.blendEquation(this.renderer.gl.FUNC_ADD);
@@ -462,7 +466,9 @@ BackRenderer.prototype = {
 
             // Enable blending
             this.renderer.gl.enable(this.renderer.gl.BLEND);
-            this.renderer.gl.blendFunc(
+            this.renderer.gl.blendFuncSeparate(
+                this.renderer.gl.SRC_ALPHA,
+                this.renderer.gl.ONE_MINUS_SRC_ALPHA,
                 this.renderer.gl.ONE, this.renderer.gl.ONE_MINUS_SRC_ALPHA
             );
             this.renderer.gl.blendEquation(this.renderer.gl.FUNC_ADD);

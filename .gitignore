@@ -42,7 +42,6 @@
 !renderer/sprite.js
 !renderer/animsprite.js
 !renderer/procsprite.js
-!renderer/ninebox.js
 !renderer/ninepatch.js
 !renderer/plane.js
 !renderer/animplane.js
@@ -64,7 +63,6 @@
 !renderer/shaders/rectshader.js
 !renderer/shaders/spriteshader.js
 !renderer/shaders/animspriteshader.js
-!renderer/shaders/nineboxshader.js
 !renderer/shaders/ninepatchshader.js
 !renderer/shaders/buttonshader.js
 !renderer/shaders/textbuttonshader.js
@@ -88,12 +86,13 @@
 !interface/guiprogressbar.js
 !interface/guisliderbar.js
 !interface/guitext.js
-!interface/guitextbutton.js
 !interface/guimultitext.js
 !interface/guitextbox.js
+!interface/guitextbutton.js
 !interface/guipxtext.js
 !interface/guipxmultitext.js
 !interface/guipxtextbox.js
+!interface/guipxtextbutton.js
 !audio/audioengine.js
 !audio/sound.js
 
@@ -106,7 +105,6 @@
 !textures/scrollbar.png
 !textures/wospxfont.png
 !textures/testsprite.png
-!textures/testninebox.png
 !textures/testninepatch.png
 !textures/testbutton.png
 !textures/testtextbutton.png

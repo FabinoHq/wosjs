@@ -241,7 +241,7 @@ GuiPxMultiText.prototype = {
         );
         this.renderer.gl.texImage2D(
             this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
-            this.width, this.height, 0, this.renderer.gl.RGBA,
+            1, 1, 0, this.renderer.gl.RGBA,
             this.renderer.gl.UNSIGNED_BYTE, null
         );
 

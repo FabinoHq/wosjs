@@ -37,73 +37,75 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      interface/guitextbutton.js : GUI TextButton management                //
+//      interface/guipxtextbutton.js : GUI Pixel TextButton management        //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GuiTextButton class definition                                            //
+//  GuiPxTextButton class definition                                          //
 //  param renderer : Renderer pointer                                         //
-//  param buttonShader : TextButton shader pointer                            //
+//  param buttonShader : PxTextButton shader pointer                          //
 //  param textShader : Text shader pointer                                    //
+//  param lineShader : Text line shader pointer                               //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiTextButton(renderer, buttonShader, textShader)
+function GuiPxTextButton(renderer, buttonShader, textShader, lineShader)
 {
     // Renderer pointer
     this.renderer = renderer;
 
-    // TextButton shader pointer
+    // PxTextButton shader pointer
     this.buttonShader = buttonShader;
 
-    // TextButton shader uniforms locations
+    // PxTextButton shader uniforms locations
     this.uvSizeUniform = -1;
     this.uvFactorUniform = -1;
     this.alphaUniform = -1;
     this.stateUniform = -1;
 
-    // TextButton texture
+    // PxTextButton texture
     this.texture = null;
-    // TextButton model matrix
+    // PxTextButton model matrix
     this.modelMatrix = new Matrix4x4();
 
-    // TextButton text
-    this.guitext = new GuiText(renderer, textShader);
-    // TextButton height
+    // PxTextButton text
+    this.guipxtext = new GuiPxText(renderer, textShader, lineShader);
+    // PxTextButton height
     this.height = 0.1;
-    // TextButton text offset
+    // PxTextButton text offset
     this.offset = new Vector2(0.0, 0.0);
-    // TextButton text color
+    // PxTextButton text color
     this.color = new Vector3(1.0, 1.0, 1.0);
-    // TextButton text alpha
+    // PxTextButton text alpha
     this.textAlpha = 1.0;
-    // TextButton text hover color
+    // PxTextButton text hover color
     this.hoverColor = new Vector3(1.0, 1.0, 1.0);
-    // TextButton text hover alpha
+    // PxTextButton text hover alpha
     this.textHoverAlpha = 1.0;
 
-    // TextButton position
+    // PxTextButton position
     this.position = new Vector2(0.0, 0.0);
-    // TextButton size
+    // PxTextButton size
     this.size = new Vector2(1.0, 1.0);
-    // TextButton texture UV factor
+    // PxTextButton texture UV factor
     this.uvFactor = 1.0;
-    // TextButton alpha
+    // PxTextButton alpha
     this.alpha = 1.0;
-    // TextButton state
+    // PxTextButton state
     this.buttonState = 0;
 }
 
-GuiTextButton.prototype = {
+GuiPxTextButton.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init GUI TextButton                                            //
+    //  init : Init GUI PxTextButton                                          //
     //  param texture : Texture pointer                                       //
+    //  param textTexture : Text texture pointer                              //
     //  param text : Text to set                                              //
-    //  param height : TextButton height                                      //
-    //  param factor : TextButton UV factor                                   //
+    //  param height : PxTextButton height                                    //
+    //  param factor : PxTextButton UV factor                                 //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(texture, text, height, factor)
+    init: function(texture, textTexture, text, height, factor)
     {
-        // Reset text button
+        // Reset pixel text button
         this.uvSizeUniform = -1;
         this.uvFactorUniform = -1;
         this.alphaUniform = -1;
@@ -123,7 +125,7 @@ GuiTextButton.prototype = {
         this.alpha = 1.0;
         this.buttonState = 0;
 
-        // Set text button height
+        // Set pixel text button height
         if (height !== undefined) this.height = height;
         if (this.height <= WOSDefaultMinTextHeight)
             this.height = WOSDefaultMinTextHeight;
@@ -149,18 +151,21 @@ GuiTextButton.prototype = {
         if (!this.texture) return false;
 
         // Set text
-        if (!this.guitext.init(text, this.height, false)) return false;
+        if (!this.guipxtext.init(true, textTexture, text, this.height, false))
+        {
+            return false;
+        }
 
-        // Set text button size
-        this.size.vec[0] = this.guitext.getWidth()+(this.height*0.5);
+        // Set pixel pixel text button size
+        this.size.vec[0] = this.guipxtext.getWidth()+(this.height*0.2);
         this.size.vec[1] = this.height;
 
-        // TextButton loaded
+        // PxTextButton loaded
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setTextOffset : Set text button text offset                           //
+    //  setTextOffset : Set pixel text button text offset                     //
     //  param x : X text offset to set                                        //
     //  param y : Y text offset to set                                        //
     ////////////////////////////////////////////////////////////////////////////
@@ -169,9 +174,9 @@ GuiTextButton.prototype = {
         this.offset.vec[0] = x;
         this.offset.vec[1] = y;
 
-        // Set text button size
-        this.size.vec[0] = this.guitext.getWidth()+
-            (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
+        // Set pixel text button size
+        this.size.vec[0] = this.guipxtext.getWidth()+
+            (this.height*0.2)+Math.abs(this.offset.vec[0]*2.0);
         this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
     },
 
@@ -184,39 +189,39 @@ GuiTextButton.prototype = {
         this.offset.vec[0] = vector.vec[0];
         this.offset.vec[1] = vector.vec[1];
 
-        // Set text button size
-        this.size.vec[0] = this.guitext.getWidth()+
-            (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
+        // Set pixel text button size
+        this.size.vec[0] = this.guipxtext.getWidth()+
+            (this.height*0.2)+Math.abs(this.offset.vec[0]*2.0);
         this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setTextOffsetX : Set text button text X offset                        //
-    //  param x : Text button text X offset to set                            //
+    //  setTextOffsetX : Set pixel text button text X offset                  //
+    //  param x : Pixel text button text X offset to set                      //
     ////////////////////////////////////////////////////////////////////////////
     setTextOffsetX: function(x)
     {
         this.offset.vec[0] = x;
 
-        // Set text button width
-        this.size.vec[0] = this.guitext.getWidth()+
-            (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
+        // Set pixel text button width
+        this.size.vec[0] = this.guipxtext.getWidth()+
+            (this.height*0.2)+Math.abs(this.offset.vec[0]*2.0);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setTextOffsetY : Set text button text Y offset                        //
-    //  param y : Text button text Y offset to set                            //
+    //  setTextOffsetY : Set pixel text button text Y offset                  //
+    //  param y : Pixel text button text Y offset to set                      //
     ////////////////////////////////////////////////////////////////////////////
     setTextOffsetY: function(y)
     {
         this.offset.vec[1] = y;
 
-        // Set text button height
+        // Set pixel text button height
         this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosition : Set text button position                                //
+    //  setPosition : Set pixel text button position                          //
     //  param x : X position to set                                           //
     //  param y : Y position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
@@ -237,7 +242,7 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setX : Set text button X position                                     //
+    //  setX : Set pixel text button X position                               //
     //  param x : X position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
@@ -246,7 +251,7 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setY : Set text button Y position                                     //
+    //  setY : Set pixel text button Y position                               //
     //  param y : Y position to set                                           //
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
@@ -255,7 +260,7 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  move : Translate text button                                          //
+    //  move : Translate pixel text button                                    //
     //  param x : X axis translate value                                      //
     //  param y : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -266,8 +271,8 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveVec2 : Translate text button by a 2 components vector             //
-    //  param vector : 2 components vector to translate text button by        //
+    //  moveVec2 : Translate pixel text button by a 2 components vector       //
+    //  param vector : 2 components vector to translate pixel text button by  //
     ////////////////////////////////////////////////////////////////////////////
     moveVec2: function(vector)
     {
@@ -276,7 +281,7 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveX : Translate text button on X axis                               //
+    //  moveX : Translate pixel text button on X axis                         //
     //  param x : X axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
@@ -285,7 +290,7 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  moveY : Translate text button on Y axis                               //
+    //  moveY : Translate pixel text button on Y axis                         //
     //  param x : Y axis translate value                                      //
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
@@ -294,8 +299,8 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setHeight : Set text button height                                    //
-    //  param height : TextButton height to set                               //
+    //  setHeight : Set pixel text button height                              //
+    //  param height : PxTextButton height to set                             //
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
@@ -306,11 +311,11 @@ GuiTextButton.prototype = {
             tthis.height = WOSDefaultMaxTextHeight;
 
         // Update text height
-        this.guitext.setHeight(this.height);
+        this.guipxtext.setHeight(this.height);
 
-        // Set text button size
-        this.size.vec[0] = this.guitext.getWidth()+
-            (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
+        // Set pixel text button size
+        this.size.vec[0] = this.guipxtext.getWidth()+
+            (this.height*0.2)+Math.abs(this.offset.vec[0]*2.0);
         this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
     },
 
@@ -363,8 +368,8 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAlpha : Set text button alpha                                      //
-    //  param alpha : TextButton alpha to set                                 //
+    //  setAlpha : Set pixel text button alpha                                //
+    //  param alpha : PxTextButton alpha to set                               //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
     {
@@ -372,8 +377,8 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setTextAlpha : Set text alpha                                         //
-    //  param alpha : TextButton text alpha to set                            //
+    //  setTextAlpha : Set pixel text alpha                                   //
+    //  param alpha : PxTextButton text alpha to set                          //
     ////////////////////////////////////////////////////////////////////////////
     setTextAlpha: function(textAlpha)
     {
@@ -381,12 +386,21 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setTextHoverAlpha : Set text hover alpha                              //
-    //  param alpha : TextButton text hover alpha to set                      //
+    //  setTextHoverAlpha : Set pixel text hover alpha                        //
+    //  param alpha : PxTextButton text hover alpha to set                    //
     ////////////////////////////////////////////////////////////////////////////
     setTextHoverAlpha: function(textHoverAlpha)
     {
         this.textHoverAlpha = textHoverAlpha;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSmooth : Set text smooth value                                     //
+    //  param smooth : Text smooth value to set                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setSmooth: function(smooth)
+    {
+        this.guipxtext.setSmooth(smooth);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -467,8 +481,8 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  isPicking : Get text button picking state                             //
-    //  return : True if the text button is picking                           //
+    //  isPicking : Get pixel text button picking state                       //
+    //  return : True if the pixel text button is picking                     //
     ////////////////////////////////////////////////////////////////////////////
     isPicking: function(mouseX, mouseY)
     {
@@ -477,17 +491,17 @@ GuiTextButton.prototype = {
             (mouseY >= this.position.vec[1]) &&
             (mouseY <= (this.position.vec[1] + this.size.vec[1])))
         {
-            // TextButton is picking
+            // PxTextButton is picking
             return true;
         }
 
-        // TextButton is not picking
+        // PxTextButton is not picking
         return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getX : Get text button X position                                     //
-    //  return : TextButton X position                                        //
+    //  getX : Get pixel text button X position                               //
+    //  return : PxTextButton X position                                      //
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
@@ -495,8 +509,8 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getY : Get text button Y position                                     //
-    //  return : TextButton Y position                                        //
+    //  getY : Get pixel text button Y position                               //
+    //  return : PxTextButton Y position                                      //
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
@@ -504,8 +518,8 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getWidth : Get text button width                                      //
-    //  return : TextButton width                                             //
+    //  getWidth : Get pixel text button width                                //
+    //  return : PxTextButton width                                           //
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
@@ -513,8 +527,8 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getHeight : Get text button height                                    //
-    //  return : TextButton height                                            //
+    //  getHeight : Get pixel text button height                              //
+    //  return : PxTextButton height                                          //
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
@@ -522,25 +536,25 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAlpha : Get text button alpha                                      //
-    //  return : TextButton alpha                                             //
-    ////////////////////////////////////////////////////////////////////////////
+    //  getAlpha : Get pixel text button alpha                                //
+    //  return : PxTextButton alpha                                           //
+    ///////////////////////////////////////////////////////////////////////////
     getAlpha: function()
     {
         return this.alpha;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  render : Render text button                                           //
+    //  render : Render pixel text button                                     //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {
-        // Set text button model matrix
+        // Set pixel text button model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec2(this.position);
         this.modelMatrix.scaleVec2(this.size);
 
-        // Bind text button shader
+        // Bind pixel text button shader
         this.buttonShader.bind();
 
         // Compute world matrix
@@ -566,26 +580,26 @@ GuiTextButton.prototype = {
         // Unbind texture
         this.texture.unbind();
 
-        // Unbind text button shader
+        // Unbind pixel text button shader
         this.buttonShader.unbind();
 
         // Render text
-        this.guitext.setPosition(
+        this.guipxtext.setPosition(
             this.position.vec[0]+this.offset.vec[0]+
-            (this.size.vec[0]*0.5)-(this.guitext.getWidth()*0.5),
+            (this.size.vec[0]*0.5)-(this.guipxtext.getWidth()*0.5),
             this.position.vec[1]+this.offset.vec[1]+
-            (this.size.vec[1]*0.5)-(this.guitext.getHeight()*0.54)
+            (this.size.vec[1]*0.5)-(this.guipxtext.getHeight()*0.5)
         );
         if ((this.buttonState == 1) || (this.buttonState == 3))
         {
-            this.guitext.setColorVec3(this.hoverColor);
-            this.guitext.setAlpha(this.textHoverAlpha);
+            this.guipxtext.setColorVec3(this.hoverColor);
+            this.guipxtext.setAlpha(this.textHoverAlpha);
         }
         else
         {
-            this.guitext.setColorVec3(this.color);
-            this.guitext.setAlpha(this.textAlpha);
+            this.guipxtext.setColorVec3(this.color);
+            this.guipxtext.setAlpha(this.textAlpha);
         }
-        this.guitext.render();
+        this.guipxtext.render();
     }
 };

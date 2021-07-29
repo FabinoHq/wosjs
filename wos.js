@@ -310,8 +310,6 @@ function Wos()
     this.testanim = null;
     // Test button
     this.testbutton = null;
-    // Test text button
-    this.testtextbutton = null;
     // Test toggle button
     this.testtogglebutton = null;
     // Test progress bar
@@ -324,12 +322,16 @@ function Wos()
     this.testmultitext = null;
     // Test text box
     this.testtextbox = null;
+    // Test text button
+    this.testtextbutton = null;
     // Test pixel text
     this.testpxtext = null;
     // Test pixel multi text
     this.testpxmultitext = null;
     // Test pixel text box
     this.testpxtextbox = null;
+    // Test pixel text button
+    this.testpxtextbutton = null;
 
     // Test camera
     this.camera = null;
@@ -512,7 +514,7 @@ Wos.prototype = {
         );
         this.testtextbutton.setTextOffset(-0.004, -0.005);
         this.testtextbutton.setColor(0.1, 0.1, 0.1);
-        this.testtextbutton.setHoverColor(0.22, 0.22, 0.22);
+        this.testtextbutton.setHoverColor(0.2, 0.2, 0.2);
 
         // Init test pixel text
         this.testpxtext = new GuiPxText(
@@ -520,9 +522,9 @@ Wos.prototype = {
             this.loader.backrendererShader
         );
         this.testpxtext.init(true,
-            this.loader.getTexture("wospxfont.png"), "Test pixel text", 0.08
+            this.loader.getTexture("wospxfont.png"), "Test pixel text", 0.1
         );
-        this.testpxtext.setSmooth(0.4);
+        this.testpxtext.setSmooth(0.15);
 
         // Init test pixel multiline text
         this.testpxmultitext = new GuiPxMultiText(
@@ -534,6 +536,7 @@ Wos.prototype = {
             "Test multi line pixel text\nTest line 2\nAnd line 3 of text.",
             1.0, 1.0, 0.1, true, this.loader.getTexture("scrollbar.png"), 0.03
         );
+        this.testpxmultitext.setSmooth(0.1);
 
         // Init test pixel text box
         this.testpxtextbox = new GuiPxTextBox(
@@ -543,6 +546,21 @@ Wos.prototype = {
         this.testpxtextbox.init(
             this.loader.getTexture("wospxfont.png"), 1.0, 0.1, "Test"
         );
+        this.testpxtextbox.setSmooth(0.1);
+
+        // Init test pixel text button
+        this.testpxtextbutton = new GuiPxTextButton(
+            this.renderer, this.loader.textButtonShader,
+            this.loader.pxTextShader, this.loader.backrendererShader
+        );
+        this.testpxtextbutton.init(
+            this.loader.getTexture("testtextbutton.png"),
+            this.loader.getTexture("wospxfont.png"), "Test", 0.1, 15.0
+        );
+        this.testpxtextbutton.setSmooth(0.1);
+        this.testpxtextbutton.setTextOffset(0.0, -0.002);
+        this.testpxtextbutton.setColor(0.1, 0.1, 0.1);
+        this.testpxtextbutton.setHoverColor(0.2, 0.2, 0.2);
 
         // Init test camera
         this.camera = new Camera();
@@ -769,6 +787,10 @@ Wos.prototype = {
         {
             this.testpxtextbox.mouseMove(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testpxtextbutton)
+        {
+            this.testpxtextbutton.mouseMove(this.realMouseX, this.realMouseY);
+        }*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -829,6 +851,10 @@ Wos.prototype = {
         {
             this.testpxtextbox.mousePress(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testpxtextbutton)
+        {
+            this.testpxtextbutton.mousePress(this.realMouseX, this.realMouseY);
+        }*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -873,6 +899,12 @@ Wos.prototype = {
         /*if (this.testpxtextbox)
         {
             this.testpxtextbox.mouseRelease(this.realMouseX, this.realMouseY);
+        }*/
+        /*if (this.testpxtextbutton)
+        {
+            this.testpxtextbutton.mouseRelease(
+                this.realMouseX, this.realMouseY
+            );
         }*/
     },
 
@@ -1046,6 +1078,11 @@ Wos.prototype = {
         //this.testpxtextbox.setX(-this.testpxtextbox.getWidth()*0.5);
         //this.testpxtextbox.setY(-this.testpxtextbox.getHeight()*0.5);
         //this.testpxtextbox.render();
+
+        // Render test pixel text button
+        //this.testpxtextbutton.setX(-this.testpxtextbutton.getWidth()*0.5);
+        //this.testpxtextbutton.setY(-this.testpxtextbutton.getHeight()*0.5);
+        //this.testpxtextbutton.render();
 
         // Render shadows
         /*if (this.renderer.maxQuality >= WOSRendererQualityHigh)

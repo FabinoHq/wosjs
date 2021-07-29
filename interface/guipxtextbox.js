@@ -329,6 +329,15 @@ GuiPxTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setSmooth : Set text smooth value                                     //
+    //  param smooth : Text smooth value to set                               //
+    ////////////////////////////////////////////////////////////////////////////
+    setSmooth: function(smooth)
+    {
+        this.guipxtext.setSmooth(smooth);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setText : Set pxtextbox internal text string                          //
     //  param text : Text to set                                              //
     ////////////////////////////////////////////////////////////////////////////
