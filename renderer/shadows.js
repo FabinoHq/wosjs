@@ -71,10 +71,8 @@ function Shadows(renderer)
 
     // Shadows position
     this.position = new Vector3(0.0, 0.0, 0.0);
-
     // Shadows angles
     this.angles = new Vector3(0.0, 0.0, 0.0);
-
     // Shadows fovy
     this.fovy = 90.0;
 
@@ -115,7 +113,7 @@ Shadows.prototype = {
         // Check renderer max quality
         if (this.renderer.maxQuality < WOSRendererQualityHigh) return false;
 
-        // Set shadows caster renderer size
+        // Set shadows caster texture size
         if (width !== undefined) this.width = Math.round(width);
         if (height !== undefined) this.height = Math.round(height);
         if (this.width <= 1) { this.width = 1; }
@@ -263,6 +261,91 @@ Shadows.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setTextureSize : Set shadows texture size                             //
+    //  param width : Width of the shadows texture                            //
+    //  param height : Height of the shadows texture                          //
+    ////////////////////////////////////////////////////////////////////////////
+    setTextureSize: function(width, height)
+    {
+        // Set shadows caster texture size
+        if (width !== undefined) this.width = Math.round(width);
+        if (height !== undefined) this.height = Math.round(height);
+        if (this.width <= 1) { this.width = 1; }
+        if (this.width >= WOSGLMaxTextureSize)
+        {
+            this.width = WOSGLMaxTextureSize;
+        }
+        if (this.height <= 1) { this.height = 1; }
+        if (this.height >= WOSGLMaxTextureSize)
+        {
+            this.height = WOSGLMaxTextureSize;
+        }
+        if (this.height > 0.0) this.ratio = this.width/this.height;
+
+        // Bind framebuffer
+        this.renderer.gl.bindFramebuffer(
+            this.renderer.gl.FRAMEBUFFER, this.framebuffer
+        );
+
+        // Update shadows texture
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);
+        this.renderer.gl.texImage2D(
+            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.RGBA,
+            this.width, this.height, 0, this.renderer.gl.RGBA,
+            this.renderer.gl.UNSIGNED_BYTE, null
+        );
+
+        // Attach texture to framebuffer
+        this.renderer.gl.framebufferTexture2D(
+            this.renderer.gl.FRAMEBUFFER, this.renderer.gl.COLOR_ATTACHMENT0,
+            this.renderer.gl.TEXTURE_2D, this.texture, 0
+        );
+
+        // Unbind texture
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+
+        // Update shadows depth texture
+        this.renderer.gl.bindTexture(
+            this.renderer.gl.TEXTURE_2D, this.depthTexture
+        );
+        this.renderer.gl.texImage2D(
+            this.renderer.gl.TEXTURE_2D, 0, this.renderer.gl.DEPTH_COMPONENT,
+            this.width, this.height, 0, this.renderer.gl.DEPTH_COMPONENT,
+            this.renderer.gl.UNSIGNED_INT, null
+        );
+
+        // Attach depth texture to framebuffer
+        this.renderer.gl.framebufferTexture2D(
+            this.renderer.gl.FRAMEBUFFER, this.renderer.gl.DEPTH_ATTACHMENT,
+            this.renderer.gl.TEXTURE_2D, this.depthTexture, 0
+        );
+
+        // Check framebuffer status
+        if (this.renderer.gl.checkFramebufferStatus(
+            this.renderer.gl.FRAMEBUFFER) !=
+            this.renderer.gl.FRAMEBUFFER_COMPLETE)
+        {
+            // Invalid framebuffer status
+            return false;
+        }
+
+        // Unbind texture
+        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+
+        // Unbind framebuffer
+        this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
+
+        // Set projection matrix
+        this.projMatrix.setIdentity();
+        this.projMatrix.setPerspective(
+            this.fovy, this.ratio, this.nearPlane, this.farPlane
+        );
+
+        // Shadows texture size updated
+        return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  clear : Clear shadows buffer                                          //
     ////////////////////////////////////////////////////////////////////////////
     clear: function()
@@ -282,6 +365,15 @@ Shadows.prototype = {
 
         // Enable depth test
         this.renderer.gl.enable(this.renderer.gl.DEPTH_TEST);
+
+        // Enable blending
+        this.renderer.gl.enable(this.renderer.gl.BLEND);
+        this.renderer.gl.blendFuncSeparate(
+            this.renderer.gl.SRC_ALPHA,
+            this.renderer.gl.ONE_MINUS_SRC_ALPHA,
+            this.renderer.gl.ONE, this.renderer.gl.ONE_MINUS_SRC_ALPHA
+        );
+        this.renderer.gl.blendEquation(this.renderer.gl.FUNC_ADD);
 
         // Set shadows buffer renderer clear color
         this.renderer.gl.clearColor(0.0, 0.0, 0.0, 0.0);
@@ -320,6 +412,15 @@ Shadows.prototype = {
 
         // Enable depth test
         this.renderer.gl.enable(this.renderer.gl.DEPTH_TEST);
+
+        // Enable blending
+        this.renderer.gl.enable(this.renderer.gl.BLEND);
+        this.renderer.gl.blendFuncSeparate(
+            this.renderer.gl.SRC_ALPHA,
+            this.renderer.gl.ONE_MINUS_SRC_ALPHA,
+            this.renderer.gl.ONE, this.renderer.gl.ONE_MINUS_SRC_ALPHA
+        );
+        this.renderer.gl.blendEquation(this.renderer.gl.FUNC_ADD);
 
         // Bind framebuffer
         this.renderer.gl.bindFramebuffer(

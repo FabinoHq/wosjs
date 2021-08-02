@@ -344,8 +344,6 @@ function Wos()
     this.pointLight = null;
     // Test spot light
     this.spotLight = null;
-    // Test shadows
-    this.shadows = null;
 
     // Test plane
     this.testplane = null;
@@ -424,6 +422,7 @@ Wos.prototype = {
         this.testrect.setAlpha(0.5);
 
         // Init test sprite
+        this.loader.getTexture("testsprite.png").setSmooth(false);
         this.testsprite = new Sprite(this.renderer, this.loader.spriteShader);
         this.testsprite.init(
             this.loader.getTexture("testsprite.png"), 0.09, 0.09
@@ -613,11 +612,8 @@ Wos.prototype = {
         this.renderer.dynamicLights.addSpotLight(this.spotLight);
         this.renderer.dynamicLights.update();
 
-        // Init test shadows
-        this.shadows = new Shadows(this.renderer);
-        this.shadows.init(512, 512);
-        this.shadows.setPosition(3.0, 3.0, -3.0);
-        this.shadows.setAngles(75.0, 230.0, 0.0);
+        // Clear renderer shadows
+        this.renderer.shadows.clear();
 
         // Init test plane
         this.testplane = new Plane(this.renderer, this.loader.spriteShader);
@@ -671,6 +667,9 @@ Wos.prototype = {
         this.skeletalmesh.setAnimation(1, 0);
         this.skeletalmesh.setFrametime(0, 0.7);
         this.skeletalmesh.setFrametime(1, 1.0);
+
+        // Clear renderer
+        this.renderer.clear();
 
         // Run WOS
         this.lastTime = window.performance.now()*0.001;
@@ -1114,10 +1113,10 @@ Wos.prototype = {
         // Render test window
         //this.testwindow.render();
 
-        // Render shadows
+        // Compute shadows
         /*if (this.renderer.maxQuality >= WOSRendererQualityHigh)
         {
-            this.shadows.clear();
+            this.renderer.shadows.clear();
 
             // Render test static mesh shadows
             this.staticmesh.render(0);
@@ -1145,9 +1144,9 @@ Wos.prototype = {
         //this.testprocplane.render(this.frametime);
 
         // Render test static mesh
-        //this.staticmesh.render(this.renderer.quality, this.shadows);
+        //this.staticmesh.render(this.renderer.quality);
 
         // Render test skeletal mesh
-        //this.skeletalmesh.render(this.renderer.quality, this.shadows);
+        //this.skeletalmesh.render(this.renderer.quality);
     }
 };

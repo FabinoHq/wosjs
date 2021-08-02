@@ -70,8 +70,8 @@ function Plane(renderer, planeShader)
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Plane size
     this.size = new Vector2(1.0, 1.0);
-    // Plane rotation angle
-    this.angle = new Vector3(0.0, 0.0, 0.0);
+    // Plane rotation angles
+    this.angles = new Vector3(0.0, 0.0, 0.0);
     // Plane texture UV size
     this.uvSize = new Vector2(1.0, 1.0);
     // Plane texture UV offset
@@ -100,7 +100,7 @@ Plane.prototype = {
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
-        this.angle.reset();
+        this.angles.reset();
         this.uvSize.setXY(1.0, 1.0);
         this.uvOffset.reset();
         this.alpha = 1.0;
@@ -286,9 +286,9 @@ Plane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setAngle: function(angleX, angleY, angleZ)
     {
-        this.angle.vec[0] = angleX;
-        this.angle.vec[1] = angleY;
-        this.angle.vec[2] = angleZ;
+        this.angles.vec[0] = angleX;
+        this.angles.vec[1] = angleY;
+        this.angles.vec[2] = angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -297,7 +297,7 @@ Plane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setAngleX: function(angleX)
     {
-        this.angle.vec[0] = angleX;
+        this.angles.vec[0] = angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -306,7 +306,7 @@ Plane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setAngleY: function(angleY)
     {
-        this.angle.vec[1] = angleY;
+        this.angles.vec[1] = angleY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -315,7 +315,7 @@ Plane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setAngleZ: function(angleZ)
     {
-        this.angle.vec[2] = angleZ;
+        this.angles.vec[2] = angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -326,9 +326,9 @@ Plane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angleX, angleY, angleZ)
     {
-        this.angle.vec[0] += angleX;
-        this.angle.vec[1] += angleY;
-        this.angle.vec[2] += angleZ;
+        this.angles.vec[0] += angleX;
+        this.angles.vec[1] += angleY;
+        this.angles.vec[2] += angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -337,7 +337,7 @@ Plane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
-        this.angle.vec[0] += angleX;
+        this.angles.vec[0] += angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -346,7 +346,7 @@ Plane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleY)
     {
-        this.angle.vec[1] += angleY;
+        this.angles.vec[1] += angleY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -355,7 +355,7 @@ Plane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
-        this.angle.vec[2] += angleZ;
+        this.angles.vec[2] += angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -455,7 +455,7 @@ Plane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getAngleX: function()
     {
-        return this.angle.vec[0];
+        return this.angles.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -464,7 +464,7 @@ Plane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getAngleY: function()
     {
-        return this.angle.vec[1];
+        return this.angles.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -473,7 +473,7 @@ Plane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getAngleZ: function()
     {
-        return this.angle.vec[2];
+        return this.angles.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -554,7 +554,7 @@ Plane.prototype = {
             this.modelMatrix.rotate(
                 angle, rotVec.vec[0], rotVec.vec[1], rotVec.vec[2]
             );
-            this.modelMatrix.rotateZ(this.angle.vec[2]);
+            this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
         else if (this.billboard == 2)
         {
@@ -574,7 +574,7 @@ Plane.prototype = {
             this.modelMatrix.rotate(
                 angle, rotVec.vec[0], rotVec.vec[1], rotVec.vec[2]
             );
-            this.modelMatrix.rotateZ(this.angle.vec[2]);
+            this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
         else if (this.billboard == 3)
         {
@@ -606,12 +606,12 @@ Plane.prototype = {
             angle = Math.acos(dotProduct)*180.0/Math.PI;
             if (delta2.vec[1] < 0.0) { this.modelMatrix.rotateX(angle); }
             else { this.modelMatrix.rotateX(-angle); }
-            this.modelMatrix.rotateZ(this.angle.vec[2]);
+            this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
         else
         {
             // No billboard mode
-            this.modelMatrix.rotateVec3(this.angle);
+            this.modelMatrix.rotateVec3(this.angles);
         }
         this.modelMatrix.translate(
             -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0

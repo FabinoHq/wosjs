@@ -431,6 +431,33 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAngleX : Set static mesh rotation X angle                          //
+    //  param angleX : Static mesh rotation X angle to set in degrees         //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleX: function(angleX)
+    {
+        this.angles.vec[0] = angleX;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleY : Set static mesh rotation Y angle                          //
+    //  param angleY : Static mesh rotation Y angle to set in degrees         //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleY: function(angleY)
+    {
+        this.angles.vec[1] = angleY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleZ : Set static mesh rotation Z angle                          //
+    //  param angleZ : Static mesh rotation Z angle to set in degrees         //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleZ: function(angleZ)
+    {
+        this.angles.vec[2] = angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  rotateX : Rotate static mesh on the X axis                            //
     //  param angleX : X angle to rotate static mesh by in degrees            //
     ////////////////////////////////////////////////////////////////////////////
@@ -577,9 +604,8 @@ StaticMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  render : Render static mesh                                           //
     //  param quality : Static mesh shader quality                            //
-    //  param shadows : Shadows manager pointer                               //
     ////////////////////////////////////////////////////////////////////////////
-    render: function(quality, shadows)
+    render: function(quality)
     {
         // Set static mesh model matrix
         this.modelMatrix.setIdentity();
@@ -599,7 +625,7 @@ StaticMesh.prototype = {
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Set maximum quality
-        if (!shadows)
+        if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
         {
             if (this.renderer.maxQuality >= WOSRendererQualityMedium)
             {
@@ -633,8 +659,8 @@ StaticMesh.prototype = {
             this.meshShader.bind();
 
             // Send high quality shader uniforms
-            this.shadowsMatrix.setMatrix(shadows.projMatrix);
-            this.shadowsMatrix.multiply(shadows.viewMatrix);
+            this.shadowsMatrix.setMatrix(this.renderer.shadows.projMatrix);
+            this.shadowsMatrix.multiply(this.renderer.shadows.viewMatrix);
 
             this.meshShader.sendWorldMatrix(this.renderer.worldMatrix);
             this.meshShader.sendModelMatrix(this.modelMatrix);
@@ -669,7 +695,7 @@ StaticMesh.prototype = {
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
             this.renderer.gl.bindTexture(
                 this.renderer.gl.TEXTURE_2D,
-                shadows.depthTexture
+                this.renderer.shadows.depthTexture
             );
             if (this.normalMap)
             {

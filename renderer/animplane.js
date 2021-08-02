@@ -73,7 +73,7 @@ function AnimPlane(renderer, animShader)
     // Animated plane size
     this.size = new Vector2(1.0, 1.0);
     // Animated plane rotation angle
-    this.angle = new Vector3(0.0, 0.0, 0.0);
+    this.angles = new Vector3(0.0, 0.0, 0.0);
     // Animated plane frame count
     this.count = new Vector2(1, 1);
     // Animated plane start frame
@@ -116,7 +116,7 @@ AnimPlane.prototype = {
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
-        this.angle.reset();
+        this.angles.reset();
         this.count.setXY(1, 1);
         if (countX !== undefined) this.count.vec[0] = countX;
         if (countY !== undefined) this.count.vec[1] = countY;
@@ -312,9 +312,9 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setAngle: function(angleX, angleY, angleZ)
     {
-        this.angle.vec[0] = angleX;
-        this.angle.vec[1] = angleY;
-        this.angle.vec[2] = angleZ;
+        this.angles.vec[0] = angleX;
+        this.angles.vec[1] = angleY;
+        this.angles.vec[2] = angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -323,7 +323,7 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setAngleX: function(angleX)
     {
-        this.angle.vec[0] = angleX;
+        this.angles.vec[0] = angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -332,7 +332,7 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setAngleY: function(angleY)
     {
-        this.angle.vec[1] = angleY;
+        this.angles.vec[1] = angleY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -341,7 +341,7 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setAngleZ: function(angleZ)
     {
-        this.angle.vec[2] = angleZ;
+        this.angles.vec[2] = angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -352,9 +352,9 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angleX, angleY, angleZ)
     {
-        this.angle.vec[0] += angleX;
-        this.angle.vec[1] += angleY;
-        this.angle.vec[2] += angleZ;
+        this.angles.vec[0] += angleX;
+        this.angles.vec[1] += angleY;
+        this.angles.vec[2] += angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -363,7 +363,7 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
-        this.angle.vec[0] += angleX;
+        this.angles.vec[0] += angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -372,7 +372,7 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleY)
     {
-        this.angle.vec[1] += angleY;
+        this.angles.vec[1] += angleY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -381,7 +381,7 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
-        this.angle.vec[2] += angleZ;
+        this.angles.vec[2] += angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -483,7 +483,7 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getAngleX: function()
     {
-        return this.angle.vec[0];
+        return this.angles.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -492,7 +492,7 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getAngleY: function()
     {
-        return this.angle.vec[1];
+        return this.angles.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -501,7 +501,7 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getAngleZ: function()
     {
-        return this.angle.vec[2];
+        return this.angles.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -740,7 +740,7 @@ AnimPlane.prototype = {
             this.modelMatrix.rotate(
                 angle, rotVec.vec[0], rotVec.vec[1], rotVec.vec[2]
             );
-            this.modelMatrix.rotateZ(this.angle.vec[2]);
+            this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
         else if (this.billboard == 2)
         {
@@ -760,7 +760,7 @@ AnimPlane.prototype = {
             this.modelMatrix.rotate(
                 angle, rotVec.vec[0], rotVec.vec[1], rotVec.vec[2]
             );
-            this.modelMatrix.rotateZ(this.angle.vec[2]);
+            this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
         else if (this.billboard == 3)
         {
@@ -792,12 +792,12 @@ AnimPlane.prototype = {
             angle = Math.acos(dotProduct)*180.0/Math.PI;
             if (delta2.vec[1] < 0.0) { this.modelMatrix.rotateX(angle); }
             else { this.modelMatrix.rotateX(-angle); }
-            this.modelMatrix.rotateZ(this.angle.vec[2]);
+            this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
         else
         {
             // No billboard mode
-            this.modelMatrix.rotateVec3(this.angle);
+            this.modelMatrix.rotateVec3(this.angles);
         }
         this.modelMatrix.translate(
             -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0

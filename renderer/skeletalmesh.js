@@ -678,6 +678,33 @@ SkeletalMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAngleX : Set skeletal mesh rotation X angle                        //
+    //  param angleX : Skeletal mesh rotation X angle to set in degrees       //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleX: function(angleX)
+    {
+        this.angles.vec[0] = angleX;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleY : Set skeletal mesh rotation Y angle                        //
+    //  param angleY : Skeletal mesh rotation Y angle to set in degrees       //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleY: function(angleY)
+    {
+        this.angles.vec[1] = angleY;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setAngleZ : Set skeletal mesh rotation Z angle                        //
+    //  param angleZ : Skeletal mesh rotation Z angle to set in degrees       //
+    ////////////////////////////////////////////////////////////////////////////
+    setAngleZ: function(angleZ)
+    {
+        this.angles.vec[2] = angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  rotateX : Rotate skeletal mesh on the X axis                          //
     //  param angleX : X angle to rotate skeletal mesh by in degrees          //
     ////////////////////////////////////////////////////////////////////////////
@@ -1028,9 +1055,8 @@ SkeletalMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  render : Render skeletal mesh                                         //
     //  param quality : Skeletal mesh shader quality                          //
-    //  param shadows : Shadows manager pointer                               //
     ////////////////////////////////////////////////////////////////////////////
-    render: function(quality, shadows)
+    render: function(quality)
     {
         // Set skeletal mesh model matrix
         this.modelMatrix.setIdentity();
@@ -1048,7 +1074,7 @@ SkeletalMesh.prototype = {
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Set maximum quality
-        if (!shadows)
+        if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
         {
             if (this.renderer.maxQuality >= WOSRendererQualityMedium)
             {
@@ -1081,8 +1107,8 @@ SkeletalMesh.prototype = {
             // High quality
             this.skeletalShader.bind();
 
-            this.shadowsMatrix.setMatrix(shadows.projMatrix);
-            this.shadowsMatrix.multiply(shadows.viewMatrix);
+            this.shadowsMatrix.setMatrix(this.renderer.shadows.projMatrix);
+            this.shadowsMatrix.multiply(this.renderer.shadows.viewMatrix);
 
             // Send high quality shader uniforms
             this.skeletalShader.sendWorldMatrix(this.renderer.worldMatrix);
@@ -1125,7 +1151,7 @@ SkeletalMesh.prototype = {
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
             this.renderer.gl.bindTexture(
                 this.renderer.gl.TEXTURE_2D,
-                shadows.depthTexture
+                this.renderer.shadows.depthTexture
             );
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
             this.normalMap.bind();

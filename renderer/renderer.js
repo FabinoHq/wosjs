@@ -63,6 +63,13 @@ const WOSRendererQualityLow = 0;
 const WOSRendererQualityMedium = 1;
 const WOSRendererQualityHigh = 2;
 
+////////////////////////////////////////////////////////////////////////////////
+//  WOS Renderer shadows quality                                              //
+////////////////////////////////////////////////////////////////////////////////
+const WOSRendererShadowsQualityLow = 0;
+const WOSRendererShadowsQualityMedium = 1;
+const WOSRendererShadowsQualityHigh = 2;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Renderer class definition                                                 //
@@ -134,6 +141,11 @@ function Renderer()
     this.normalMap = null;
     this.specularMap = null;
 
+    // Shadows
+    this.shadows = null;
+    this.maxShadowsQuality = WOSRendererShadowsQualityLow;
+    this.shadowsQuality = WOSRendererShadowsQualityLow;
+
     // Back renderers
     this.textLineRenderer = null;
     this.textFieldRenderer = null;
@@ -184,6 +196,7 @@ Renderer.prototype = {
         this.dynamicLights = null;
         this.normalMap = null;
         this.specularMap = null;
+        this.shadows = null;
         this.textLineRenderer = null;
         this.textFieldRenderer = null;
 
@@ -463,6 +476,38 @@ Renderer.prototype = {
         this.specularMap = new Texture(this);
         this.specularMap.init(1, 1, new Uint8Array([255, 255, 255, 255]));
 
+        // Init shadows
+        this.shadows = new Shadows(this);
+        this.maxShadowsQuality = WOSRendererShadowsQualityHigh;
+        this.shadowsQuality = WOSRendererShadowsQualityHigh;
+        if (!this.shadows)
+        {
+            // No shadows
+            this.maxShadowsQuality = WOSRendererShadowsQualityLow;
+            this.shadowsQuality = WOSRendererShadowsQualityLow;
+        }
+        if (!this.shadows.init(2048, 2048))
+        {
+            if (!this.shadows.init(512, 512))
+            {
+                // No shadows
+                this.maxShadowsQuality = WOSRendererShadowsQualityLow;
+                this.shadowsQuality = WOSRendererShadowsQualityLow;
+            }
+            else
+            {
+                // Medium quality shadows
+                this.maxShadowsQuality = WOSRendererShadowsQualityMedium;
+                this.shadowsQuality = WOSRendererShadowsQualityMedium;
+            }
+        }
+        if (this.shadowsQuality > WOSRendererShadowsQualityLow)
+        {
+            // Set default shadows
+            this.shadows.setPosition(3.0, 3.0, -3.0);
+            this.shadows.setAngles(75.0, 230.0, 0.0);
+        }
+
         // Init text line renderer
         this.textLineRenderer = new BackRenderer(this, this.shader);
         this.textLineRenderer.init(1, 1, true);
@@ -552,7 +597,40 @@ Renderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setQuality: function(quality)
     {
+        if (quality <= WOSRendererQualityLow) quality = WOSRendererQualityLow;
+        if (quality >= this.maxQuality) quality = this.maxQuality;
         this.quality = quality;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setShadowsQuality : Set renderer current shadows quality              //
+    //  param shadowsQuality : Current renderer shadows quality to set        //
+    ////////////////////////////////////////////////////////////////////////////
+    setShadowsQuality: function(shadowsQuality)
+    {
+        if (shadowsQuality <= WOSRendererShadowsQualityLow)
+        {
+            shadowsQuality = WOSRendererShadowsQualityLow;
+        }
+        if (shadowsQuality >= this.maxShadowsQuality)
+        {
+            shadowsQuality = this.maxShadowsQuality;
+        }
+        if (shadowsQuality == WOSRendererShadowsQualityHigh)
+        {
+            if (!this.shadows.setTextureSize(2048, 2048))
+            {
+                shadowsQuality = WOSRendererShadowsQualityMedium;
+            }
+        }
+        if (shadowsQuality == WOSRendererShadowsQualityMedium)
+        {
+            if (!this.shadows.setTextureSize(512, 512))
+            {
+                shadowsQuality = WOSRendererShadowsQualityLow;
+            }
+        }
+        this.shadowsQuality = shadowsQuality;
     },
 
     ////////////////////////////////////////////////////////////////////////////
