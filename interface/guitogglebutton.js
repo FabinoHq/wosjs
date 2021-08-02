@@ -249,6 +249,7 @@ GuiToggleButton.prototype = {
     //  mousePress : Handle mouse press event                                 //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the button is pressed                                //
     ////////////////////////////////////////////////////////////////////////////
     mousePress: function(mouseX, mouseY)
     {
@@ -258,12 +259,10 @@ GuiToggleButton.prototype = {
             {
                 case 0: case 1: case 2: case 3:
                     this.buttonState = 3;
-                    this.onButtonPressed();
                     return true;
 
                 case 4: case 5: case 6: case 7:
                     this.buttonState = 7;
-                    this.onButtonPressed();
                     return true;
 
                 default:
@@ -295,6 +294,7 @@ GuiToggleButton.prototype = {
     //  mouseRelease : Handle mouse release event                             //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the button is released                               //
     ////////////////////////////////////////////////////////////////////////////
     mouseRelease: function(mouseX, mouseY)
     {
@@ -308,7 +308,6 @@ GuiToggleButton.prototype = {
 
                  case 2: case 3:
                     this.buttonState = 5;
-                    this.onButtonReleased();
                     return true;
 
                 case 4: case 5:
@@ -317,7 +316,6 @@ GuiToggleButton.prototype = {
 
                  case 6: case 7:
                     this.buttonState = 1;
-                    this.onButtonReleased();
                     return true;
 
                 default:
@@ -349,6 +347,7 @@ GuiToggleButton.prototype = {
     //  mouseMove : Handle mouse move event                                   //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the button is pressed                                //
     ////////////////////////////////////////////////////////////////////////////
     mouseMove: function(mouseX, mouseY)
     {
@@ -362,7 +361,7 @@ GuiToggleButton.prototype = {
 
                 case 2: case 3:
                     this.buttonState = 3;
-                    break;
+                    return true;
 
                 case 4: case 5:
                     this.buttonState = 5;
@@ -370,7 +369,7 @@ GuiToggleButton.prototype = {
 
                 case 6: case 7:
                     this.buttonState = 7;
-                    break;
+                    return true;
 
                 default:
                     this.buttonState = 1;
@@ -387,7 +386,7 @@ GuiToggleButton.prototype = {
 
                 case 2: case 3:
                     this.buttonState = 2;
-                    break;
+                    return true;
 
                 case 4: case 5:
                     this.buttonState = 4;
@@ -395,13 +394,14 @@ GuiToggleButton.prototype = {
 
                 case 6: case 7:
                     this.buttonState = 6;
-                    break;
+                    return true;
 
                 default:
                     this.buttonState = 0;
                     break;
             }
         }
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////

@@ -52,7 +52,8 @@ var TexturesAssets = [
     "testtextbutton.png",
     "testtogglebutton.png",
     "testprogressbar.png",
-    "testsliderbar.png"
+    "testsliderbar.png",
+    "testwindow.png",
 ];
 
 // WOS models assets

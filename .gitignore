@@ -93,6 +93,7 @@
 !interface/guipxmultitext.js
 !interface/guipxtextbox.js
 !interface/guipxtextbutton.js
+!interface/guiwindow.js
 !audio/audioengine.js
 !audio/sound.js
 
@@ -111,6 +112,7 @@
 !textures/testtogglebutton.png
 !textures/testprogressbar.png
 !textures/testsliderbar.png
+!textures/testwindow.png
 
 # Models files
 !models/

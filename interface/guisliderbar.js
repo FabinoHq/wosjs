@@ -325,10 +325,12 @@ GuiSliderBar.prototype = {
     //  mouseRelease : Handle mouse release event                             //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the sliderbar is picking                             //
     ////////////////////////////////////////////////////////////////////////////
     mouseRelease: function(mouseX, mouseY)
     {
         this.sliderBarPressed = false;
+        return this.isPicking(mouseX, mouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////

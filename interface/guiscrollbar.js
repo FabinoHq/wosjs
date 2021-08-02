@@ -315,10 +315,12 @@ GuiScrollBar.prototype = {
     //  mouseRelease : Handle mouse release event                             //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the scrollbar is picking                             //
     ////////////////////////////////////////////////////////////////////////////
     mouseRelease: function(mouseX, mouseY)
     {
         this.scrollBarPressed = false;
+        return this.isPicking(mouseX, mouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////

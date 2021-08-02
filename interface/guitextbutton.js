@@ -91,6 +91,8 @@ function GuiTextButton(renderer, buttonShader, textShader)
     this.alpha = 1.0;
     // TextButton state
     this.buttonState = 0;
+    // TextButton fixed size
+    this.fixedSized = false;
 }
 
 GuiTextButton.prototype = {
@@ -122,6 +124,7 @@ GuiTextButton.prototype = {
         if (factor !== undefined) this.uvFactor = factor;
         this.alpha = 1.0;
         this.buttonState = 0;
+        this.fixedSized = false;
 
         // Set text button height
         if (height !== undefined) this.height = height;
@@ -170,9 +173,12 @@ GuiTextButton.prototype = {
         this.offset.vec[1] = y;
 
         // Set text button size
-        this.size.vec[0] = this.guitext.getWidth()+
-            (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
-        this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
+        if (this.fixedSize)
+        {
+            this.size.vec[0] = this.guitext.getWidth()+
+                (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
+            this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -185,9 +191,12 @@ GuiTextButton.prototype = {
         this.offset.vec[1] = vector.vec[1];
 
         // Set text button size
-        this.size.vec[0] = this.guitext.getWidth()+
-            (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
-        this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
+        if (this.fixedSize)
+        {
+            this.size.vec[0] = this.guitext.getWidth()+
+                (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
+            this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -199,8 +208,11 @@ GuiTextButton.prototype = {
         this.offset.vec[0] = x;
 
         // Set text button width
-        this.size.vec[0] = this.guitext.getWidth()+
-            (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
+        if (this.fixedSize)
+        {
+            this.size.vec[0] = this.guitext.getWidth()+
+                (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -212,7 +224,10 @@ GuiTextButton.prototype = {
         this.offset.vec[1] = y;
 
         // Set text button height
-        this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
+        if (this.fixedSize)
+        {
+            this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -294,6 +309,61 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setButtonSize : Set text button size                                  //
+    //  param buttonWidth : TextButton width to set                           //
+    //  param buttonHeight : TextButton height to set                         //
+    ////////////////////////////////////////////////////////////////////////////
+    setButtonSize: function(buttonWidth, buttonHeight)
+    {
+        if (this.fixedSize)
+        {
+            // Set fixed button size
+            this.size.vec[0] = buttonWidth;
+            this.size.vec[1] = buttonHeight;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setButtonSizeVec2 : Set text button size by a 2 components vector     //
+    //  param size : 2 components vector to set button size                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setButtonSizeVec2: function(size)
+    {
+        if (this.fixedSize)
+        {
+            // Set fixed button size
+            this.size.vec[0] = size.vec[0];
+            this.size.vec[1] = size.vec[1];
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setButtonWidth : Set text button width                                //
+    //  param buttonWidth : TextButton width to set                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setButtonWidth: function(width)
+    {
+        if (this.fixedSize)
+        {
+            // Set fixed button width
+            this.size.vec[0] = width;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setButtonHeight : Set text button height                              //
+    //  param buttonHeight : TextButton height to set                         //
+    ////////////////////////////////////////////////////////////////////////////
+    setButtonHeight: function(height)
+    {
+        if (this.fixedSize)
+        {
+            // Set fixed button height
+            this.size.vec[1] = height;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setHeight : Set text button height                                    //
     //  param height : TextButton height to set                               //
     ////////////////////////////////////////////////////////////////////////////
@@ -309,9 +379,12 @@ GuiTextButton.prototype = {
         this.guitext.setHeight(this.height);
 
         // Set text button size
-        this.size.vec[0] = this.guitext.getWidth()+
-            (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
-        this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
+        if (this.fixedSize)
+        {
+            this.size.vec[0] = this.guitext.getWidth()+
+                (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
+            this.size.vec[1] = this.height+Math.abs(this.offset.vec[1]*2.0);
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -390,9 +463,35 @@ GuiTextButton.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setText : Set GuiTextButton internal text string                      //
+    //  param text : Text to set                                              //
+    ////////////////////////////////////////////////////////////////////////////
+    setText: function(text)
+    {
+        this.guitext.setText(text);
+
+        // Recompute button width
+        if (!this.fixedSize)
+        {
+            this.size.vec[0] = this.guitext.getWidth()+
+                (this.height*0.5)+Math.abs(this.offset.vec[0]*2.0);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setFixedSize : Set text button fixed size                             //
+    //  param fixedSize : TextButton fixed size mode                          //
+    ////////////////////////////////////////////////////////////////////////////
+    setFixedSize: function(fixedSize)
+    {
+        this.fixedSize = fixedSize;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  mousePress : Handle mouse press event                                 //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the button is pressed                                //
     ////////////////////////////////////////////////////////////////////////////
     mousePress: function(mouseX, mouseY)
     {
@@ -412,6 +511,7 @@ GuiTextButton.prototype = {
     //  mouseRelease : Handle mouse release event                             //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the button is released                               //
     ////////////////////////////////////////////////////////////////////////////
     mouseRelease: function(mouseX, mouseY)
     {
@@ -435,6 +535,7 @@ GuiTextButton.prototype = {
     //  mouseMove : Handle mouse move event                                   //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the button is pressed                                //
     ////////////////////////////////////////////////////////////////////////////
     mouseMove: function(mouseX, mouseY)
     {
@@ -444,7 +545,7 @@ GuiTextButton.prototype = {
             {
                 case 2: case 3:
                     this.buttonState = 3;
-                    break;
+                    return true;
 
                 default:
                     this.buttonState = 1;
@@ -457,13 +558,14 @@ GuiTextButton.prototype = {
             {
                 case 2: case 3:
                     this.buttonState = 2;
-                    break;
+                    return true;
 
                 default:
                     this.buttonState = 0;
                     break;
             }
         }
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -519,6 +621,15 @@ GuiTextButton.prototype = {
     getHeight: function()
     {
         return this.size.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getTextHeight : Get text height                                       //
+    //  return : TextButton text height                                       //
+    ////////////////////////////////////////////////////////////////////////////
+    getTextHeight: function()
+    {
+        return this.height;
     },
 
     ////////////////////////////////////////////////////////////////////////////

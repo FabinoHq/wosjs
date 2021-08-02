@@ -320,6 +320,15 @@ GuiPxTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setCharAlpha : Set character alpha                                    //
+    //  param alpha : Text character alpha to set                             //
+    ////////////////////////////////////////////////////////////////////////////
+    setCharAlpha: function(alpha)
+    {
+        this.guipxtext.setCharAlpha(alpha);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setAlpha : Set pxtextbox alpha                                        //
     //  param alpha : Textbox alpha to set                                    //
     ////////////////////////////////////////////////////////////////////////////
@@ -676,6 +685,7 @@ GuiPxTextBox.prototype = {
     //  mousePress : Handle mouse press event                                 //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the textbox is selected                              //
     ////////////////////////////////////////////////////////////////////////////
     mousePress: function(mouseX, mouseY)
     {
@@ -710,17 +720,20 @@ GuiPxTextBox.prototype = {
             this.selection = false;
             this.pressed = true;
             this.selected = true;
+            return true;
         }
         else
         {
             this.selected = false;
         }
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  mouseRelease : Handle mouse release event                             //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the textbox is selected                              //
     ////////////////////////////////////////////////////////////////////////////
     mouseRelease: function(mouseX, mouseY)
     {
@@ -758,15 +771,18 @@ GuiPxTextBox.prototype = {
                     this.textsel.setSize(0, this.size.vec[1]);
                     this.selection = false;
                 }
+                return true;
             }
         }
         this.pressed = false;
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  mouseMove : Handle mouse move event                                   //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the textbox is selected                              //
     ////////////////////////////////////////////////////////////////////////////
     mouseMove: function(mouseX, mouseY)
     {
@@ -811,7 +827,9 @@ GuiPxTextBox.prototype = {
                 this.textsel.setSize(selSize, this.size.vec[1]);
                 this.selection = true;
             }
+            return true;
         }
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////

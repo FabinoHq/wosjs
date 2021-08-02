@@ -250,6 +250,7 @@ GuiButton.prototype = {
     //  mousePress : Handle mouse press event                                 //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the button is pressed                                //
     ////////////////////////////////////////////////////////////////////////////
     mousePress: function(mouseX, mouseY)
     {
@@ -262,12 +263,14 @@ GuiButton.prototype = {
         {
             this.buttonState = 0;
         }
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  mouseRelease : Handle mouse release event                             //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the button is released                               //
     ////////////////////////////////////////////////////////////////////////////
     mouseRelease: function(mouseX, mouseY)
     {
@@ -284,12 +287,14 @@ GuiButton.prototype = {
         {
             this.buttonState = 0;
         }
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  mouseMove : Handle mouse move event                                   //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
+    //  return : True if the button is pressed                                //
     ////////////////////////////////////////////////////////////////////////////
     mouseMove: function(mouseX, mouseY)
     {
@@ -299,7 +304,7 @@ GuiButton.prototype = {
             {
                 case 2: case 3:
                     this.buttonState = 3;
-                    break;
+                    return true;
 
                 default:
                     this.buttonState = 1;
@@ -312,13 +317,14 @@ GuiButton.prototype = {
             {
                 case 2: case 3:
                     this.buttonState = 2;
-                    break;
+                    return true;
 
                 default:
                     this.buttonState = 0;
                     break;
             }
         }
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////

@@ -332,6 +332,8 @@ function Wos()
     this.testpxtextbox = null;
     // Test pixel text button
     this.testpxtextbutton = null;
+    // Test window
+    this.testwindow = null;
 
     // Test camera
     this.camera = null;
@@ -562,6 +564,19 @@ Wos.prototype = {
         this.testpxtextbutton.setColor(0.1, 0.1, 0.1);
         this.testpxtextbutton.setHoverColor(0.2, 0.2, 0.2);
 
+        // Init test window
+        this.testwindow = new GuiWindow(
+            this.renderer, this.loader.ninepatchShader
+        );
+        this.testwindow.init(
+            this.loader.getTexture("testwindow.png"), 1.0, 1.0, 3.75
+        );
+        this.testwindow.setPosition(
+            -this.testwindow.getWidth()*0.5, -this.testwindow.getHeight()*0.5
+        );
+        this.testwindow.setTopBarSize(0.06);
+        this.testwindow.setResizeBarSize(0.014);
+
         // Init test camera
         this.camera = new Camera();
         this.camera.reset();
@@ -791,6 +806,10 @@ Wos.prototype = {
         {
             this.testpxtextbutton.mouseMove(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testwindow)
+        {
+            this.testwindow.mouseMove(this.realMouseX, this.realMouseY);
+        }*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -855,6 +874,10 @@ Wos.prototype = {
         {
             this.testpxtextbutton.mousePress(this.realMouseX, this.realMouseY);
         }*/
+        /*if (this.testwindow)
+        {
+            this.testwindow.mousePress(this.realMouseX, this.realMouseY);
+        }*/
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -905,6 +928,10 @@ Wos.prototype = {
             this.testpxtextbutton.mouseRelease(
                 this.realMouseX, this.realMouseY
             );
+        }*/
+        /*if (this.testwindow)
+        {
+            this.testwindow.mouseRelease(this.realMouseX, this.realMouseY);
         }*/
     },
 
@@ -1083,6 +1110,9 @@ Wos.prototype = {
         //this.testpxtextbutton.setX(-this.testpxtextbutton.getWidth()*0.5);
         //this.testpxtextbutton.setY(-this.testpxtextbutton.getHeight()*0.5);
         //this.testpxtextbutton.render();
+
+        // Render test window
+        //this.testwindow.render();
 
         // Render shadows
         /*if (this.renderer.maxQuality >= WOSRendererQualityHigh)
