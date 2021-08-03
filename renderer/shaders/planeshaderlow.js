@@ -37,32 +37,46 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      assets.js : WOS Assets management                                     //
+//      renderer/planeshaderlow.js : Low plane shader                         //
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// WOS textures assets
-var TexturesAssets = [
-    "cursor.png",
-    "scrollbar.png",
-    "wospxfont.png",
-    "testsprite.png",
-    "testninepatch.png",
-    "testbutton.png",
-    "testtextbutton.png",
-    "testtogglebutton.png",
-    "testprogressbar.png",
-    "testsliderbar.png",
-    "testwindow.png"
-];
+////////////////////////////////////////////////////////////////////////////////
+//  Low plane vertex shader                                                   //
+////////////////////////////////////////////////////////////////////////////////
+const planeVertexShaderLowSrc = [
+    "precision mediump float;",
+    "precision mediump int;",
+    "attribute vec3 vertexPos;",
+    "attribute vec2 vertexCoord;",
+    "uniform mat4 worldMatrix;",
+    "varying vec2 texCoord;",
+    "",
+    "void main()",
+    "{",
+    "    texCoord = vertexCoord;",
+    "    gl_Position = worldMatrix*vec4(vertexPos, 1.0);",
+    "}",
+    ""
+].join("\n");
 
-// WOS models assets
-var ModelsAssets = [
-    "testmodel.wmsh",
-    "testskeletal.wmsh"
-];
-
-// WOS sounds assets
-var SoundsAssets = [
-    "test.wav"
-];
+////////////////////////////////////////////////////////////////////////////////
+//  Low plane fragment shader                                                 //
+////////////////////////////////////////////////////////////////////////////////
+const planeFragmentShaderLowSrc = [
+    "precision mediump float;",
+    "precision mediump int;",
+    "uniform sampler2D texture;",
+    "varying vec2 texCoord;",
+    "uniform float alpha;",
+    "uniform vec2 uvOffset;",
+    "uniform vec2 uvSize;",
+    "",
+    "void main()",
+    "{",
+    "    vec4 texColor = texture2D(texture, (texCoord*uvSize)+uvOffset);",
+    "    if ((texColor.a*alpha) <= 0.0) discard;",
+    "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
+    "}",
+    ""
+].join("\n");

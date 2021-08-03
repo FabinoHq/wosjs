@@ -72,6 +72,12 @@
 !renderer/shaders/sliderbarshader.js
 !renderer/shaders/textshader.js
 !renderer/shaders/pxtextshader.js
+!renderer/shaders/planeshader.js
+!renderer/shaders/planeshadermedium.js
+!renderer/shaders/planeshaderlow.js
+!renderer/shaders/animplaneshader.js
+!renderer/shaders/animplaneshadermedium.js
+!renderer/shaders/animplaneshaderlow.js
 !renderer/shaders/staticmeshshader.js
 !renderer/shaders/staticmeshshadermedium.js
 !renderer/shaders/staticmeshshaderlow.js

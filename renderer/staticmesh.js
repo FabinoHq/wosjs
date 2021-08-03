@@ -269,6 +269,18 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setTexture : Set static mesh texture                                  //
+    //  param texture : Static mesh texture                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setTexture: function(texture)
+    {
+        if (texture)
+        {
+            this.texture = texture;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setNormalMap : Set static mesh normal map                             //
     //  param normalMap : Static mesh normal map                              //
     ////////////////////////////////////////////////////////////////////////////

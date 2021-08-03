@@ -37,32 +37,30 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      assets.js : WOS Assets management                                     //
+//      renderer/animplaneshaderlow.js : Low animated plane shader            //
 ////////////////////////////////////////////////////////////////////////////////
 
 
-// WOS textures assets
-var TexturesAssets = [
-    "cursor.png",
-    "scrollbar.png",
-    "wospxfont.png",
-    "testsprite.png",
-    "testninepatch.png",
-    "testbutton.png",
-    "testtextbutton.png",
-    "testtogglebutton.png",
-    "testprogressbar.png",
-    "testsliderbar.png",
-    "testwindow.png"
-];
-
-// WOS models assets
-var ModelsAssets = [
-    "testmodel.wmsh",
-    "testskeletal.wmsh"
-];
-
-// WOS sounds assets
-var SoundsAssets = [
-    "test.wav"
-];
+////////////////////////////////////////////////////////////////////////////////
+//  Low animated plane fragment shader                                        //
+////////////////////////////////////////////////////////////////////////////////
+const animPlaneFragmentShaderLowSrc = [
+    "precision mediump float;",
+    "precision mediump int;",
+    "uniform sampler2D texture;",
+    "varying vec2 texCoord;",
+    "uniform float alpha;",
+    "uniform vec2 count;",
+    "uniform vec2 current;",
+    "uniform vec2 next;",
+    "uniform float interp;",
+    "",
+    "void main()",
+    "{",
+    "    vec4 texColor = texture2D(texture, (texCoord+current)/count)*",
+    "        (1.0-interp)+texture2D(texture, (texCoord+next)/count)*interp;",
+    "    if ((texColor.a*alpha) <= 0.0) discard;",
+    "    gl_FragColor = vec4(texColor.rgb, texColor.a*alpha);",
+    "}",
+    ""
+].join("\n");

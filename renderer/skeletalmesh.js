@@ -497,8 +497,23 @@ SkeletalMesh.prototype = {
         // Set default specular map
         this.specularMap = this.renderer.specularMap;
 
+        // Compute initial frame
+        this.compute(0.0);
+
         // Skeletal mesh loaded
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setTexture : Set skeletal mesh texture                                //
+    //  param texture : Skeletal mesh texture                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    setTexture: function(texture)
+    {
+        if (texture)
+        {
+            this.texture = texture;
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////

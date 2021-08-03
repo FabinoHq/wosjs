@@ -88,6 +88,7 @@ function AnimSprite(renderer, animShader)
     this.next = new Vector2(0, 0);
     this.currentTime = 0.0;
     this.interpOffset = 0.0;
+    this.interp = 0.0;
 }
 
 AnimSprite.prototype = {
@@ -125,6 +126,7 @@ AnimSprite.prototype = {
         this.next.setXY(0, 0);
         this.currentTime = 0.0;
         this.interpOffset = 0.0;
+        this.interp = 0.0;
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -144,6 +146,9 @@ AnimSprite.prototype = {
         // Set texture
         this.texture = tex;
         if (!this.texture) return false;
+
+        // Compute initial frame
+        this.compute(0.0);
 
         // Sprite loaded
         return true;
@@ -552,13 +557,11 @@ AnimSprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  render : Render animated sprite                                       //
+    //  compute : Compute animated sprite                                     //
     //  param frametime : Frametime for animation update                      //
     ////////////////////////////////////////////////////////////////////////////
-    render: function(frametime)
+    compute: function(frametime)
     {
-        var interp = 0.0;
-
         // Update current animation time
         this.currentTime += frametime;
         if (this.frametime > 0.0)
@@ -583,9 +586,16 @@ AnimSprite.prototype = {
         }
 
         // Compute cubic interpolation
-        interp = this.interpOffset + (this.interpOffset - 
+        this.interp = this.interpOffset + (this.interpOffset - 
             this.interpOffset*this.interpOffset*(3.0-2.0*this.interpOffset));
+    },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  render : Render animated sprite                                       //
+    //  param frametime : Frametime for animation update                      //
+    ////////////////////////////////////////////////////////////////////////////
+    render: function()
+    {
         // Set animated sprite model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec2(this.position);
@@ -612,7 +622,7 @@ AnimSprite.prototype = {
         this.animShader.sendUniformVec2(this.countUniform, this.count);
         this.animShader.sendUniformVec2(this.currentUniform, this.current);
         this.animShader.sendUniformVec2(this.nextUniform, this.next);
-        this.animShader.sendUniform(this.interpUniform, interp);
+        this.animShader.sendUniform(this.interpUniform, this.interp);
 
         // Bind texture
         this.texture.bind();

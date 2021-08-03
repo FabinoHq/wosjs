@@ -69,6 +69,12 @@ function Loader(renderer, audio)
     this.sliderBarShader = null;
     this.textShader = null;
     this.pxTextShader = null;
+    this.planeShader = null;
+    this.planeShaderMedium = null;
+    this.planeShaderLow = null;
+    this.animPlaneShader = null;
+    this.animPlaneShaderMedium = null;
+    this.animPlaneShaderLow = null;
     this.staticMeshShader = null;
     this.staticMeshShaderMedium = null;
     this.staticMeshShaderLow = null;
@@ -116,6 +122,12 @@ Loader.prototype = {
         this.sliderBarShader = null;
         this.textShader = null;
         this.pxTextShader = null;
+        this.planeShader = null;
+        this.planeShaderMedium = null;
+        this.planeShaderLow = null;
+        this.animPlaneShader = null;
+        this.animPlaneShaderMedium = null;
+        this.animPlaneShaderLow = null;
         this.staticMeshShader = null;
         this.staticMeshShaderMedium = null;
         this.staticMeshShaderLow = null;
@@ -256,6 +268,72 @@ Loader.prototype = {
             defaultVertexShaderSrc, pxTextFragmentShaderSrc))
         {
             return false;
+        }
+
+        // Init plane shader
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
+        {
+            this.planeShader = new Shader(this.renderer.gl);
+            if (!this.planeShader.init(
+                planeVertexShaderSrc, planeFragmentShaderSrc))
+            {
+                return false;
+            }
+        }
+
+        // Init medium plane shader
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
+        {
+            this.planeShaderMedium = new Shader(this.renderer.gl);
+            if (!this.planeShaderMedium.init(
+                planeVertexShaderMediumSrc, planeFragmentShaderMediumSrc))
+            {
+                return false;
+            }
+        }
+
+        // Init low plane shader
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
+        {
+            this.planeShaderLow = new Shader(this.renderer.gl);
+            if (!this.planeShaderLow.init(
+                planeVertexShaderLowSrc, planeFragmentShaderLowSrc))
+            {
+                return false;
+            }
+        }
+
+        // Init anim plane shader
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
+        {
+            this.animPlaneShader = new Shader(this.renderer.gl);
+            if (!this.animPlaneShader.init(
+                planeVertexShaderSrc, animPlaneFragmentShaderSrc))
+            {
+                return false;
+            }
+        }
+
+        // Init medium anim plane shader
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
+        {
+            this.animPlaneShaderMedium = new Shader(this.renderer.gl);
+            if (!this.animPlaneShaderMedium.init(
+                planeVertexShaderMediumSrc, animPlaneFragmentShaderMediumSrc))
+            {
+                return false;
+            }
+        }
+
+        // Init low anim plane shader
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
+        {
+            this.animPlaneShaderLow = new Shader(this.renderer.gl);
+            if (!this.animPlaneShaderLow.init(
+                planeVertexShaderLowSrc, animPlaneFragmentShaderLowSrc))
+            {
+                return false;
+            }
         }
 
         // Init static mesh shader

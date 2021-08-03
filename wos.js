@@ -616,7 +616,12 @@ Wos.prototype = {
         this.renderer.shadows.clear();
 
         // Init test plane
-        this.testplane = new Plane(this.renderer, this.loader.spriteShader);
+        this.testplane = new Plane(
+            this.renderer,
+            this.loader.planeShader,
+            this.loader.planeShaderMedium,
+            this.loader.planeShaderLow
+        );
         this.testplane.init(
             this.loader.getTexture("testsprite.png"), 1.0, 1.0
         );
@@ -624,7 +629,10 @@ Wos.prototype = {
 
         // Init test anim plane
         this.testanimplane = new AnimPlane(
-            this.renderer, this.loader.animSpriteShader
+            this.renderer,
+            this.loader.animPlaneShader,
+            this.loader.animPlaneShaderMedium,
+            this.loader.animPlaneShaderLow
         );
         this.testanimplane.init(
             this.loader.getTexture("testsprite.png"), 1.0, 1.0, 2, 2
@@ -996,6 +1004,8 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     compute: function()
     {
+        //this.testanim.compute(this.frametime);
+        //this.testanimplane.compute(this.frametime);
         //this.skeletalmesh.compute(this.frametime);
     },
 

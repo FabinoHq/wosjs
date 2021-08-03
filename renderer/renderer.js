@@ -129,6 +129,7 @@ function Renderer()
 
     // Graphic pipeline
     this.vertexBuffer = null;
+    this.planeVertexBuffer = null;
     this.shader = null;
     this.worldMatrix = new Matrix4x4();
     this.projMatrix = new Matrix4x4();
@@ -187,6 +188,7 @@ Renderer.prototype = {
         this.vpoffx = 0.0;
         this.vpoffy = 0.0;
         this.vertexBuffer = null;
+        this.planeVertexBuffer = null;
         this.shader = null;
         this.worldMatrix.setIdentity();
         this.projMatrix.setIdentity();
@@ -388,6 +390,11 @@ Renderer.prototype = {
         this.vertexBuffer = new VertexBuffer(this.gl);
         if (!this.vertexBuffer) return false;
         if (!this.vertexBuffer.init()) return false;
+
+        // Init plane vbo
+        this.planeVertexBuffer = new MeshVertexBuffer(this);
+        if (!this.planeVertexBuffer) return false;
+        if (!this.planeVertexBuffer.init()) return false;
 
         // Init default shader
         this.shader = new Shader(this.gl);

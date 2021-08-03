@@ -45,24 +45,56 @@
 //  Plane class definition                                                    //
 //  param renderer : Renderer pointer                                         //
 //  param planeShader : Plane shader pointer                                  //
+//  param planeShaderMedium : Medium plane shader pointer                     //
+//  param planeShaderLow : Low plane shader pointer                           //
 ////////////////////////////////////////////////////////////////////////////////
-function Plane(renderer, planeShader)
+function Plane(renderer, planeShader, planeShaderMedium, planeShaderLow)
 {
     // Renderer pointer
     this.renderer = renderer;
 
     // Plane shader pointer
     this.planeShader = planeShader;
+    this.planeShaderMedium = planeShaderMedium;
+    this.planeShaderLow = planeShaderLow;
 
     // Plane shader uniforms locations
+    this.shadowsTextureLocation = -1;
+    this.normalMapLocation = -1;
+    this.specularMapLocation = -1;
+    this.cameraPosLocation = -1;
+    this.cameraPosLocationMedium = -1;
+    this.lightsTextureLocation = -1;
+    this.lightsTextureLocationMedium = -1;
+    this.shadowsMatrixLocation = -1;
+    this.worldLightVecUniform = -1;
+    this.worldLightVecUniformMedium = -1;
+    this.worldLightColorUniform = -1;
+    this.worldLightColorUniformMedium = -1;
+    this.worldLightAmbientUniform = -1;
+    this.worldLightAmbientUniformMedium = -1;
+    this.specularityUniform = -1;
+    this.specularityUniformMedium = -1;
     this.alphaUniform = -1;
+    this.alphaUniformMedium = -1;
+    this.alphaUniformLow = -1;
     this.uvSizeUniform = -1;
+    this.uvSizeUniformMedium = -1;
+    this.uvSizeUniformLow = -1;
     this.uvOffsetUniform = -1;
+    this.uvOffsetUniformMedium = -1;
+    this.uvOffsetUniformLow = -1;
 
     // Plane texture
     this.texture = null;
+    // Plane normal map
+    this.normalMap = null;
+    // Plane specular map
+    this.specularMap = null;
     // Plane model matrix
     this.modelMatrix = new Matrix4x4();
+    // Plane shadows matrix
+    this.shadowsMatrix = new Matrix4x4();
 
     // Plane billboard mode
     this.billboard = 0;
@@ -78,6 +110,8 @@ function Plane(renderer, planeShader)
     this.uvOffset = new Vector2(0.0, 0.0);
     // Plane alpha
     this.alpha = 1.0;
+    // Plane specularity
+    this.specularity = 0.0;
 }
 
 Plane.prototype = {
@@ -90,11 +124,36 @@ Plane.prototype = {
     init: function(texture, width, height)
     {
         // Reset Plane
+        this.shadowsTextureLocation = -1;
+        this.normalMapLocation = -1;
+        this.specularMapLocation = -1;
+        this.cameraPosLocation = -1;
+        this.cameraPosLocationMedium = -1;
+        this.lightsTextureLocation = -1;
+        this.lightsTextureLocationMedium = -1;
+        this.shadowsMatrixLocation = -1;
+        this.worldLightVecUniform = -1;
+        this.worldLightVecUniformMedium = -1;
+        this.worldLightColorUniform = -1;
+        this.worldLightColorUniformMedium = -1;
+        this.worldLightAmbientUniform = -1;
+        this.worldLightAmbientUniformMedium = -1;
+        this.specularityUniform = -1;
+        this.specularityUniformMedium = -1;
         this.alphaUniform = -1;
+        this.alphaUniformMedium = -1;
+        this.alphaUniformLow = -1;
         this.uvSizeUniform = -1;
+        this.uvSizeUniformMedium = -1;
+        this.uvSizeUniformLow = -1;
         this.uvOffsetUniform = -1;
+        this.uvOffsetUniformMedium = -1;
+        this.uvOffsetUniformLow = -1;
         this.texture = null;
+        this.normalMap = null;
+        this.specularMap = null;
         this.modelMatrix.setIdentity();
+        this.shadowsMatrix.setIdentity();
         this.billboard = 0;
         this.position.reset();
         this.size.setXY(1.0, 1.0);
@@ -104,26 +163,145 @@ Plane.prototype = {
         this.uvSize.setXY(1.0, 1.0);
         this.uvOffset.reset();
         this.alpha = 1.0;
+        this.specularity = 0.0;
 
         // Check renderer pointer
         if (!this.renderer) return false;
 
-        // Check plane shader pointer
-        if (!this.planeShader) return false;
+        // Check low plane shader pointer
+        if (!this.planeShaderLow) return false;
 
         // Get plane shader uniforms locations
-        this.planeShader.bind();
-        this.alphaUniform = this.planeShader.getUniform("alpha");
-        this.uvOffsetUniform = this.planeShader.getUniform("uvOffset");
-        this.uvSizeUniform = this.planeShader.getUniform("uvSize");
-        this.planeShader.unbind();
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
+        {
+            // Check plane shader pointer
+            if (!this.planeShader) return false;
+
+            this.planeShader.bind();
+            this.shadowsMatrixLocation = this.planeShader.getUniform(
+                "shadowsMatrix"
+            );
+            this.cameraPosLocation = this.planeShader.getUniform("cameraPos");
+            this.lightsTextureLocation = this.planeShader.getUniform(
+                "lightsTexture"
+            );
+            this.planeShader.sendIntUniform(this.lightsTextureLocation, 1);
+            this.shadowsTextureLocation = this.planeShader.getUniform(
+                "shadowsTexture"
+            );
+            this.planeShader.sendIntUniform(this.shadowsTextureLocation, 2);
+            this.normalMapLocation = this.planeShader.getUniform("normalMap");
+            this.planeShader.sendIntUniform(this.normalMapLocation, 3);
+            this.specularMapLocation = this.planeShader.getUniform(
+                "specularMap"
+            );
+            this.planeShader.sendIntUniform(this.specularMapLocation, 4);
+            this.worldLightVecUniform =
+                this.planeShader.getUniform("worldLightVec");
+            this.worldLightColorUniform =
+                this.planeShader.getUniform("worldLightColor");
+            this.worldLightAmbientUniform =
+                this.planeShader.getUniform("worldLightAmbient");
+            this.specularityUniform = this.planeShader.getUniform(
+                "specularity"
+            );
+            this.alphaUniform = this.planeShader.getUniform("alpha");
+            this.uvOffsetUniform = this.planeShader.getUniform("uvOffset");
+            this.uvSizeUniform = this.planeShader.getUniform("uvSize");
+            this.planeShader.unbind();
+        }
+
+        // Get medium plane shader uniforms locations
+        if (this.renderer.maxQuality >= WOSRendererQualityMedium)
+        {
+            // Check medium plane shader pointer
+            if (!this.planeShaderMedium) return false;
+
+            this.planeShaderMedium.bind();
+            this.cameraPosLocationMedium = this.planeShaderMedium.getUniform(
+                "cameraPos"
+            );
+            this.lightsTextureLocationMedium =
+                this.planeShaderMedium.getUniform("lightsTexture");
+            this.planeShaderMedium.sendIntUniform(
+                this.lightsTextureLocationMedium, 1
+            );
+            this.worldLightVecUniformMedium =
+                this.planeShaderMedium.getUniform("worldLightVec");
+            this.worldLightColorUniformMedium =
+                this.planeShaderMedium.getUniform("worldLightColor");
+            this.worldLightAmbientUniformMedium =
+                this.planeShaderMedium.getUniform("worldLightAmbient");
+            this.specularityUniformMedium = this.planeShaderMedium.getUniform(
+                "specularity"
+            );
+            this.alphaUniformMedium = this.planeShaderMedium.getUniform(
+                "alpha"
+            );
+            this.uvOffsetUniformMedium = this.planeShaderMedium.getUniform(
+                "uvOffset"
+            );
+            this.uvSizeUniformMedium = this.planeShaderMedium.getUniform(
+                "uvSize"
+            );
+            this.planeShaderMedium.unbind();
+        }
+
+        // Get low plane shader uniforms locations
+        this.planeShaderLow.bind();
+        this.alphaUniformLow = this.planeShaderLow.getUniform("alpha");
+        this.uvOffsetUniformLow = this.planeShaderLow.getUniform("uvOffset");
+        this.uvSizeUniformLow = this.planeShaderLow.getUniform("uvSize");
+        this.planeShaderLow.unbind();
 
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
 
+        // Set default normal map
+        this.normalMap = this.renderer.normalMap;
+
+        // Set default specular map
+        this.specularMap = this.renderer.specularMap;
+
         // Plane loaded
         return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setTexture : Set plane texture                                        //
+    //  param texture : Plane texture                                         //
+    ////////////////////////////////////////////////////////////////////////////
+    setTexture: function(texture)
+    {
+        if (texture)
+        {
+            this.texture = texture;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setNormalMap : Set plane normal map                                   //
+    //  param normalMap : Plane normal map                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setNormalMap: function(normalMap)
+    {
+        if (normalMap)
+        {
+            this.normalMap = normalMap;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setSpecularMap : Set plane specular map                               //
+    //  param specularMap : Plane specular map                                //
+    ////////////////////////////////////////////////////////////////////////////
+    setSpecularMap: function(specularMap)
+    {
+        if (specularMap)
+        {
+            this.specularMap = specularMap;
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -405,6 +583,15 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setSpecularity : Set plane specularity                                //
+    //  param specularity : Plane specularity to set                          //
+    ////////////////////////////////////////////////////////////////////////////
+    setSpecularity: function(specularity)
+    {
+        this.specularity = specularity;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  getX : Get plane X position                                           //
     //  return : Plane X position                                             //
     ////////////////////////////////////////////////////////////////////////////
@@ -523,8 +710,9 @@ Plane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  render : Render plane                                                 //
+    //  param quality : Plane shader quality                                  //
     ////////////////////////////////////////////////////////////////////////////
-    render: function()
+    render: function(quality)
     {
         var upVec = new Vector3();
         var rotVec = new Vector3();
@@ -618,32 +806,211 @@ Plane.prototype = {
         );
         this.modelMatrix.scaleVec2(this.size);
 
-        // Bind plane shader
-        this.planeShader.bind();
-
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
         this.renderer.worldMatrix.multiply(this.modelMatrix);
 
-        // Send shader uniforms
-        this.planeShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.planeShader.sendUniform(this.alphaUniform, this.alpha);
-        this.planeShader.sendUniformVec2(this.uvOffsetUniform, this.uvOffset);
-        this.planeShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
+        // Set maximum quality
+        if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
+        {
+            if (this.renderer.maxQuality >= WOSRendererQualityMedium)
+            {
+                if (quality >= WOSRendererQualityMedium)
+                {
+                    quality = WOSRendererQualityMedium;
+                }
+                else
+                {
+                    quality = WOSRendererQualityLow;
+                }
+            }
+            else
+            {
+                quality = WOSRendererQualityLow;
+            }
+        }
+        if (quality >= this.renderer.quality)
+        {
+            quality = this.renderer.quality;
+        }
+        if (quality >= this.renderer.maxQuality)
+        {
+            quality = this.renderer.maxQuality;
+        }
 
-        // Bind texture
-        this.texture.bind();
+        // Render plane
+        if (quality == WOSRendererQualityHigh)
+        {
+            // High quality
+            this.planeShader.bind();
 
-        // Render VBO
-        this.renderer.vertexBuffer.bind();
-        this.renderer.vertexBuffer.render(this.planeShader);
-        this.renderer.vertexBuffer.unbind();
+            // Send high quality shader uniforms
+            this.shadowsMatrix.setMatrix(this.renderer.shadows.projMatrix);
+            this.shadowsMatrix.multiply(this.renderer.shadows.viewMatrix);
 
-        // Unbind texture
-        this.texture.unbind();
+            this.planeShader.sendWorldMatrix(this.renderer.worldMatrix);
+            this.planeShader.sendModelMatrix(this.modelMatrix);
+            this.planeShader.sendUniformMat4(
+                this.shadowsMatrixLocation, this.shadowsMatrix
+            );
+            this.planeShader.sendUniformVec3(
+                this.cameraPosLocation, this.renderer.camera.position
+            );
+            this.planeShader.sendUniformVec3(
+                this.worldLightVecUniform, this.renderer.worldLight.direction
+            );
+            this.planeShader.sendUniformVec4(
+                this.worldLightColorUniform, this.renderer.worldLight.color
+            );
+            this.planeShader.sendUniformVec4(
+                this.worldLightAmbientUniform, this.renderer.worldLight.ambient
+            );
+            this.planeShader.sendUniform(
+                this.specularityUniform, this.specularity
+            );
+            this.planeShader.sendUniform(this.alphaUniform, this.alpha);
+            this.planeShader.sendUniformVec2(
+                this.uvOffsetUniform, this.uvOffset
+            );
+            this.planeShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
 
-        // Unbind plane shader
-        this.planeShader.unbind();
+            // Bind texture
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+            this.texture.bind();
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+            this.renderer.gl.bindTexture(
+                this.renderer.gl.TEXTURE_2D,
+                this.renderer.dynamicLights.lightsTexture
+            );
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
+            this.renderer.gl.bindTexture(
+                this.renderer.gl.TEXTURE_2D,
+                this.renderer.shadows.depthTexture
+            );
+            if (this.normalMap)
+            {
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
+                this.normalMap.bind();
+            }
+            if (this.specularMap)
+            {
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
+                this.specularMap.bind();
+            }
+
+            // Render VBO
+            this.renderer.planeVertexBuffer.bind();
+            this.renderer.planeVertexBuffer.render(this.planeShader, quality);
+            this.renderer.planeVertexBuffer.unbind();
+
+            // Unbind texture
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+            this.texture.unbind();
+
+            // Unbind plane shader
+            this.planeShader.unbind();
+        }
+        else if (quality == WOSRendererQualityMedium)
+        {
+            // Medium quality
+            this.planeShaderMedium.bind();
+
+            // Send medium quality shader uniforms
+            this.planeShaderMedium.sendWorldMatrix(this.renderer.worldMatrix);
+            this.planeShaderMedium.sendModelMatrix(this.modelMatrix);
+            this.planeShaderMedium.sendUniformVec3(
+                this.cameraPosLocationMedium, this.renderer.camera.position
+            );
+            this.planeShaderMedium.sendUniformVec3(
+                this.worldLightVecUniformMedium,
+                this.renderer.worldLight.direction
+            );
+            this.planeShaderMedium.sendUniformVec4(
+                this.worldLightColorUniformMedium,
+                this.renderer.worldLight.color
+            );
+            this.planeShaderMedium.sendUniformVec4(
+                this.worldLightAmbientUniformMedium,
+                this.renderer.worldLight.ambient
+            );
+            this.planeShaderMedium.sendUniform(
+                this.specularityUniformMedium, this.specularity
+            );
+            this.planeShaderMedium.sendUniform(
+                this.alphaUniformMedium, this.alpha
+            );
+            this.planeShaderMedium.sendUniformVec2(
+                this.uvOffsetUniformMedium, this.uvOffset
+            );
+            this.planeShaderMedium.sendUniformVec2(
+                this.uvSizeUniformMedium, this.uvSize
+            );
+
+            // Bind texture
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+            this.texture.bind();
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+            this.renderer.gl.bindTexture(
+                this.renderer.gl.TEXTURE_2D,
+                this.renderer.dynamicLights.lightsTexture
+            );
+
+            // Render VBO
+            this.renderer.planeVertexBuffer.bind();
+            this.renderer.planeVertexBuffer.render(
+                this.planeShaderMedium, quality
+            );
+            this.renderer.planeVertexBuffer.unbind();
+
+            // Unbind texture
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+            this.texture.unbind();
+
+            // Unbind plane shader
+            this.planeShaderMedium.unbind();
+        }
+        else
+        {
+            // Low quality
+            this.planeShaderLow.bind();
+
+            // Send low quality shader uniforms
+            this.planeShaderLow.sendWorldMatrix(this.renderer.worldMatrix);
+            this.planeShaderLow.sendUniform(this.alphaUniformLow, this.alpha);
+            this.planeShaderLow.sendUniformVec2(
+                this.uvOffsetUniformLow, this.uvOffset
+            );
+            this.planeShaderLow.sendUniformVec2(
+                this.uvSizeUniformLow, this.uvSize
+            );
+
+            // Bind texture
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+            this.texture.bind();
+
+            // Render VBO
+            this.renderer.planeVertexBuffer.bind();
+            this.renderer.planeVertexBuffer.render(
+                this.planeShaderLow, quality
+            );
+            this.renderer.planeVertexBuffer.unbind();
+
+            // Unbind texture
+            this.texture.unbind();
+
+            // Unbind plane shader
+            this.planeShaderLow.unbind();
+        }
     }
 };
