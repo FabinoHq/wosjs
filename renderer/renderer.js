@@ -70,6 +70,12 @@ const WOSRendererShadowsQualityLow = 0;
 const WOSRendererShadowsQualityMedium = 1;
 const WOSRendererShadowsQualityHigh = 2;
 
+////////////////////////////////////////////////////////////////////////////////
+//  WOS Renderer animations quality                                           //
+////////////////////////////////////////////////////////////////////////////////
+const WOSRendererAnimQualityLow = 0;
+const WOSRendererAnimQualityHigh = 1;
+
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Renderer class definition                                                 //
@@ -147,6 +153,9 @@ function Renderer()
     this.maxShadowsQuality = WOSRendererShadowsQualityLow;
     this.shadowsQuality = WOSRendererShadowsQualityLow;
 
+    // Animations
+    this.animQuality = WOSRendererAnimQualityHigh;
+
     // Back renderers
     this.textLineRenderer = null;
     this.textFieldRenderer = null;
@@ -199,6 +208,9 @@ Renderer.prototype = {
         this.normalMap = null;
         this.specularMap = null;
         this.shadows = null;
+        this.maxShadowsQuality = WOSRendererShadowsQualityLow;
+        this.shadowsQuality = WOSRendererShadowsQualityLow;
+        this.animQuality = WOSRendererAnimQualityHigh;
         this.textLineRenderer = null;
         this.textFieldRenderer = null;
 
@@ -641,6 +653,23 @@ Renderer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAnimQuality : Set renderer current animations quality              //
+    //  param quality : Current renderer animations quality to set            //
+    ////////////////////////////////////////////////////////////////////////////
+    setAnimQuality: function(animQuality)
+    {
+        if (animQuality <= WOSRendererAnimQualityLow)
+        {
+            animQuality = WOSRendererAnimQualityLow;
+        }
+        if (animQuality >= WOSRendererAnimQualityHigh)
+        {
+            animQuality = WOSRendererAnimQualityHigh;
+        }
+        this.animQuality = animQuality;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setSubzone : Set rendering sub zone                                   //
     //  param width : Sub zone width                                          //
     //  param height : Sub zone height                                        //
@@ -998,12 +1027,39 @@ Renderer.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getMaxQuality : Get renderer's max quality                            //
+    //  getMaxQuality : Get renderer max quality                              //
     //  return : Maximum quality of the renderer                              //
     ////////////////////////////////////////////////////////////////////////////
     getMaxQuality: function()
     {
         return this.maxQuality;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getQuality : Get current renderer quality                             //
+    //  return : Current quality of the renderer                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getQuality: function()
+    {
+        return this.quality;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getShadowsQuality : Get current renderer shadows quality              //
+    //  return : Current shadows quality of the renderer                      //
+    ////////////////////////////////////////////////////////////////////////////
+    getShadowsQuality: function()
+    {
+        return this.shadowsQuality;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAnimQuality : Get current renderer animations quality              //
+    //  return : Current animations quality of the renderer                   //
+    ////////////////////////////////////////////////////////////////////////////
+    getAnimQuality: function()
+    {
+        return this.animQuality;
     },
 
     ////////////////////////////////////////////////////////////////////////////

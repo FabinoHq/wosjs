@@ -103,7 +103,35 @@ function divideToInt(x, n)
 ////////////////////////////////////////////////////////////////////////////////
 function linearInterp(x, y, t)
 {
-    return (1.0-t)*x + t*y;
+    return x + t*(y-x);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//  cubicInterp : Cubic interpolation                                         //
+//  param x : First value                                                     //
+//  param y : Second value                                                    //
+//  param t : Percentage of the interpolation between first and second value  //
+//  return : Interpolated value                                               //
+////////////////////////////////////////////////////////////////////////////////
+function cubicInterp(x, y, t)
+{
+    return x + (t*t*(3.0-2.0*t))*(y-x);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+//  hermitInterp : Hermit interpolation                                       //
+//  param w : Previous value                                                  //
+//  param x : First value                                                     //
+//  param y : Second value                                                    //
+//  param z : Next value                                                      //
+//  param t : Percentage of the interpolation between first and second value  //
+//  return : Interpolated value                                               //
+////////////////////////////////////////////////////////////////////////////////
+function hermitInterp(w, x, y, z, t)
+{
+    var dx = 0.5*(x-w)+0.5*(y-x);
+    var dy = 0.5*(y-x)+0.5*(z-y);
+    return x + (t*t*(3.0-2.0*t))*(y-x) + dx*(t*t*t-2.0*t*t+t) + dy*(t*t*t-t*t);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

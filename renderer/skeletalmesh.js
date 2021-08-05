@@ -905,20 +905,28 @@ SkeletalMesh.prototype = {
         var i = 0;
         var tmpMat = new Matrix4x4();
         var animGroup = -1;
+        var prevFrame = -1;
         var currentFrame = -1;
         var nextFrame = -1;
+        var nextFrame2 = -1;
         var currentAnim = -1;
         var currentBone = 0;
         var currentFrametime = 0.0;
         var currentTime = 0.0;
         var keyFrames = 0;
+        var prevI = 0;
         var curI = 0;
         var nextI = 0;
+        var nextI2 = 0;
         var animated = false;
+        var prevPos = new Vector3();
         var pos = new Vector3();
         var nextPos = new Vector3();
+        var nextPos2 = new Vector3();
+        var prevRot = new Vector3();
         var rot = new Vector3();
         var nextRot = new Vector3();
+        var nextRot2 = new Vector3();
         var attachedBone = 0;
         for (i = 0; i < this.animGroups; ++i)
         {
@@ -984,6 +992,18 @@ SkeletalMesh.prototype = {
                     {
                         nextFrame = 0;
                     }
+                    prevFrame = currentFrame-1;
+                    if (prevFrame <= 0)
+                    {
+                        prevFrame = this.keyFrames
+                            [animGroup][this.currentAnims[animGroup]]-1;
+                    }
+                    nextFrame2 = nextFrame+1;
+                    if (nextFrame2 >=
+                        this.keyFrames[animGroup][this.currentAnims[animGroup]])
+                    {
+                        nextFrame2 = 0;
+                    }
                     if (currentFrame >= 0)
                     {
                         currentAnim = this.currentAnims[animGroup];
@@ -1011,8 +1031,45 @@ SkeletalMesh.prototype = {
                             this.animations[animGroup][currentAnim][nextI+4],
                             this.animations[animGroup][currentAnim][nextI+5]
                         );
-                        pos.linearInterp(pos, nextPos, currentTime);
-                        rot.linearInterp(rot, nextRot, currentTime);
+                        if (this.renderer.animQuality ==
+                            WOSRendererAnimQualityHigh)
+                        {
+                            // High quality hermit interpolation
+                            prevI = (currentBone*keyFrames*6)+(prevFrame*6);
+                            nextI2 = (currentBone*keyFrames*6)+(nextFrame2*6);
+                            prevPos.setXYZ(
+                            this.animations[animGroup][currentAnim][prevI],
+                            this.animations[animGroup][currentAnim][prevI+1],
+                            this.animations[animGroup][currentAnim][prevI+2]
+                            );
+                            prevRot.setXYZ(
+                            this.animations[animGroup][currentAnim][prevI+3],
+                            this.animations[animGroup][currentAnim][prevI+4],
+                            this.animations[animGroup][currentAnim][prevI+5]
+                            );
+                            nextPos2.setXYZ(
+                            this.animations[animGroup][currentAnim][nextI2],
+                            this.animations[animGroup][currentAnim][nextI2+1],
+                            this.animations[animGroup][currentAnim][nextI2+2]
+                            );
+                            nextRot2.setXYZ(
+                            this.animations[animGroup][currentAnim][nextI2+3],
+                            this.animations[animGroup][currentAnim][nextI2+4],
+                            this.animations[animGroup][currentAnim][nextI2+5]
+                            );
+                            pos.hermitInterp(
+                                prevPos, pos, nextPos, nextPos2, currentTime
+                            );
+                            rot.hermitInterp(
+                                prevRot, rot, nextRot, nextRot2, currentTime
+                            );
+                        }
+                        else
+                        {
+                            // Low quality linear interpolation
+                            pos.linearInterp(pos, nextPos, currentTime);
+                            rot.linearInterp(rot, nextRot, currentTime);
+                        }
                         this.bonesMatrices[i].translateVec3(pos);
                         this.bonesMatrices[i].rotateVec3(rot);
                         animated = true;

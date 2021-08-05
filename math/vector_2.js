@@ -164,11 +164,40 @@ Vector2.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  linearInterp : Linear interpolation                                   //
+    //  param v1 : First vector                                               //
+    //  param v2 : Second vector                                              //
+    //  param t : Percentage of the interpolation between v1 and v2           //
     ////////////////////////////////////////////////////////////////////////////
     linearInterp: function(v1, v2, t)
     {
-        this.vec[0] = (1.0-t)*v1.vec[0] + t*v2.vec[0];
-        this.vec[1] = (1.0-t)*v1.vec[1] + t*v2.vec[1];
+        this.vec[0] = v1.vec[0] + t*(v2.vec[0]-v1.vec[0]);
+        this.vec[1] = v1.vec[1] + t*(v2.vec[1]-v1.vec[1]);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  cubicInterp : Cubic interpolation                                     //
+    //  param v1 : First vector                                               //
+    //  param v2 : Second vector                                              //
+    //  param t : Percentage of the interpolation between v1 and v2           //
+    ////////////////////////////////////////////////////////////////////////////
+    cubicInterp: function(v1, v2, t)
+    {
+        this.vec[0] = v1.vec[0] + (t*t*(3.0-2.0*t))*(v2.vec[0]-v1.vec[0]);
+        this.vec[1] = v1.vec[1] + (t*t*(3.0-2.0*t))*(v2.vec[1]-v1.vec[1]);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  hermitInterp : Hermit interpolation                                   //
+    //  param v0 : Previous vector                                            //
+    //  param v1 : First vector                                               //
+    //  param v2 : Second vector                                              //
+    //  param v3 : Next vector                                                //
+    //  param t : Percentage of the interpolation between v1 and v2           //
+    ////////////////////////////////////////////////////////////////////////////
+    hermitInterp: function(v0, v1, v2, v3, t)
+    {
+        this.vec[0] = hermitInterp(v0.vec[0],v1.vec[0],v2.vec[0],v3.vec[0], t);
+        this.vec[1] = hermitInterp(v0.vec[1],v1.vec[1],v2.vec[1],v3.vec[1], t);
     },
 
     ////////////////////////////////////////////////////////////////////////////
