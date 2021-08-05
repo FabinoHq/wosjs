@@ -992,18 +992,6 @@ SkeletalMesh.prototype = {
                     {
                         nextFrame = 0;
                     }
-                    prevFrame = currentFrame-1;
-                    if (prevFrame <= 0)
-                    {
-                        prevFrame = this.keyFrames
-                            [animGroup][this.currentAnims[animGroup]]-1;
-                    }
-                    nextFrame2 = nextFrame+1;
-                    if (nextFrame2 >=
-                        this.keyFrames[animGroup][this.currentAnims[animGroup]])
-                    {
-                        nextFrame2 = 0;
-                    }
                     if (currentFrame >= 0)
                     {
                         currentAnim = this.currentAnims[animGroup];
@@ -1035,6 +1023,18 @@ SkeletalMesh.prototype = {
                             WOSRendererAnimQualityHigh)
                         {
                             // High quality hermit interpolation
+                            prevFrame = currentFrame-1;
+                            if (prevFrame < 0)
+                            {
+                                prevFrame = this.keyFrames
+                                    [animGroup][this.currentAnims[animGroup]]-1;
+                            }
+                            nextFrame2 = nextFrame+1;
+                            if (nextFrame2 >= this.keyFrames[
+                                animGroup][this.currentAnims[animGroup]])
+                            {
+                                nextFrame2 = 0;
+                            }
                             prevI = (currentBone*keyFrames*6)+(prevFrame*6);
                             nextI2 = (currentBone*keyFrames*6)+(nextFrame2*6);
                             prevPos.setXYZ(
