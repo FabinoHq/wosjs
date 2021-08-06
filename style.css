@@ -61,7 +61,7 @@ body
 /******************************************************************************/
 canvas
 {
-    cursor: url("textures/cursor.png"), auto;
+    cursor: url("cursors/default.png"), auto;
     position: absolute;
     top: 0px;
     left: 0px;

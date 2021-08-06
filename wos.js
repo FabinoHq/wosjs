@@ -383,8 +383,9 @@ Wos.prototype = {
         {
             this.wos.initDone();
         }
-        this.loader.loadShaders();
+        this.loader.loadCursors();
         this.loader.loadFonts();
+        this.loader.loadShaders();
         this.loader.loadTextures();
         this.loader.loadModels();
         this.loader.loadSounds();
@@ -707,6 +708,7 @@ Wos.prototype = {
     handleOnResize: function()
     {
         this.renderer.handleOnResize();
+        //this.testwindow.handleOnResize();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1005,6 +1007,8 @@ Wos.prototype = {
     compute: function()
     {
         //this.testanim.compute(this.frametime);
+        //this.testtextbox.compute(this.frametime);
+        //this.testpxtextbox.compute(this.frametime);
         //this.testanimplane.compute(this.frametime);
         //this.skeletalmesh.compute(this.frametime);
     },

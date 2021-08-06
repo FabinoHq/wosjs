@@ -811,6 +811,22 @@ Renderer.prototype = {
         this.height = window.innerHeight;
         if (this.width <= 1.0) this.width = 1.0;
         if (this.height <= 1.0) this.height = 1.0;
+
+        // Aspect ratio clamping
+        this.vpwidth = this.width;
+        this.vpheight = this.height;
+        if (WOSRatioMaxClamping)
+        {
+            if (this.vpwidth >= this.vpheight*WOSRatioXMax)
+                this.vpwidth = this.vpheight*WOSRatioXMax;
+            if (this.vpheight >= this.vpwidth*WOSRatioYMax)
+                this.vpheight = this.vpwidth*WOSRatioYMax;
+        }
+        if (this.vpwidth <= 1.0) this.vpwidth = 1.0;
+        if (this.vpheight <= 1.0) this.vpheight = 1.0;
+        this.vpoffx = (this.width-this.vpwidth)*0.5;
+        this.vpoffy = (this.height-this.vpheight)*0.5;
+        if (this.vpheight > 0.0) this.ratio = this.vpwidth/this.vpheight;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -829,6 +845,84 @@ Renderer.prototype = {
     handleContextRestored: function()
     {
         console.log("context restored");
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setDefaultCursor : Set default mouse cursor                           //
+    ////////////////////////////////////////////////////////////////////////////
+    setDefaultCursor: function()
+    {
+        this.context.style.cursor = 'url("cursors/default.png"), auto';
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setCrosshairCursor : Set crosshair mouse cursor                       //
+    ////////////////////////////////////////////////////////////////////////////
+    setCrosshairCursor: function()
+    {
+        this.context.style.cursor =
+            'url("cursors/crosshair.png") 16 16, crosshair';
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setTextCursor : Set text mouse cursor                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    setTextCursor: function()
+    {
+        this.context.style.cursor = 'url("cursors/textcursor.png") 8 12, text';
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setGrabCursor : Set grab mouse cursor                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    setGrabCursor: function()
+    {
+        this.context.style.cursor = 'url("cursors/grabcursor.png") 10 10, grab';
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setGrabbingCursor : Set grabbing mouse cursor                         //
+    ////////////////////////////////////////////////////////////////////////////
+    setGrabbingCursor: function()
+    {
+        this.context.style.cursor =
+            'url("cursors/grabbingcursor.png") 8 8, grabbing';
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setEWResizeCursor : Set east-west resize mouse cursor                 //
+    ////////////////////////////////////////////////////////////////////////////
+    setEWResizeCursor: function()
+    {
+        this.context.style.cursor =
+            'url("cursors/ewresize.png") 12 5, ew-resize';
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setNSResizeCursor : Set north-south resize mouse cursor               //
+    ////////////////////////////////////////////////////////////////////////////
+    setNSResizeCursor: function()
+    {
+        this.context.style.cursor =
+            'url("cursors/nsresize.png") 5 12, ns-resize';
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setNESWResizeCursor : Set north-east south-west resize mouse cursor   //
+    ////////////////////////////////////////////////////////////////////////////
+    setNESWResizeCursor: function()
+    {
+        this.context.style.cursor =
+            'url("cursors/neswresize.png") 9 9, nesw-resize';
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setNWSEResizeCursor : Set north-west south-east resize mouse cursor   //
+    ////////////////////////////////////////////////////////////////////////////
+    setNWSEResizeCursor: function()
+    {
+        this.context.style.cursor =
+            'url("cursors/nwseresize.png") 9 9, nwse-resize';
     },
 
     ////////////////////////////////////////////////////////////////////////////

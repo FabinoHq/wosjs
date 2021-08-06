@@ -43,7 +43,6 @@
 
 // WOS textures assets
 var TexturesAssets = [
-    "cursor.png",
     "scrollbar.png",
     "wospxfont.png",
     "testsprite.png",

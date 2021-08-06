@@ -90,6 +90,7 @@ const WOSDefaultPxTextBoxCursorOffsetFactor = -0.02;
 const WOSDefaultPxTextBoxTextOffsetFactor = -0.08;
 const WOSDefaultPxTextBoxCheckWidthFactor = 0.005;
 const WOSDefaultPxTextBoxCheckWidthOffset = 0.002;
+const WOSDefaultPxTextBoxStateTime = 0.5;
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +125,10 @@ function GuiPxTextBox(renderer, textShader)
     this.cursorPos = 0;
     // Cursor offset
     this.cursorOffset = 0.0;
+    // Cursor state
+    this.cursorState = true;
+    // Cursor time
+    this.cursorTime = 0.0;
 
     // Pxtextbox states
     this.selected = false;
@@ -167,6 +172,8 @@ GuiPxTextBox.prototype = {
         this.selStartOffset = 0.0;
         this.selEnd = 0;
         this.selEndOffset = 0.0;
+        this.cursorState = true;
+        this.cursorTime = 0.0;
 
         // Clamp pxtextbox size
         if (this.size.vec[0] <= WOSDefaultPxTextBoxMinWidth)
@@ -365,6 +372,8 @@ GuiPxTextBox.prototype = {
         // Update cursor
         this.cursorPos = this.guipxtext.getLength();
         this.cursorOffset = this.guipxtext.getCharPos(this.cursorPos);
+        this.cursorState = true;
+        this.cursorTime = 0.0;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -462,6 +471,8 @@ GuiPxTextBox.prototype = {
                     }
                 }
             }
+            this.cursorState = true;
+            this.cursorTime = 0.0;
         }
     },
 
@@ -544,6 +555,8 @@ GuiPxTextBox.prototype = {
                     }
                 }
             }
+            this.cursorState = true;
+            this.cursorTime = 0.0;
         }
     },
 
@@ -573,6 +586,8 @@ GuiPxTextBox.prototype = {
                 this.cursorOffset = this.guipxtext.getCharPos(this.cursorPos);
             }
             this.pressed = false;
+            this.cursorState = true;
+            this.cursorTime = 0.0;
         }
     },
 
@@ -603,6 +618,8 @@ GuiPxTextBox.prototype = {
                 }
             }
             this.pressed = false;
+            this.cursorState = true;
+            this.cursorTime = 0.0;
         }
     },
 
@@ -631,6 +648,8 @@ GuiPxTextBox.prototype = {
                     );
                 }
             }
+            this.cursorState = true;
+            this.cursorTime = 0.0;
         }
     },
 
@@ -720,6 +739,8 @@ GuiPxTextBox.prototype = {
             this.selection = false;
             this.pressed = true;
             this.selected = true;
+            this.cursorState = true;
+            this.cursorTime = 0.0;
             return true;
         }
         else
@@ -771,6 +792,7 @@ GuiPxTextBox.prototype = {
                     this.textsel.setSize(0, this.size.vec[1]);
                     this.selection = false;
                 }
+                this.pressed = false;
                 return true;
             }
         }
@@ -793,6 +815,9 @@ GuiPxTextBox.prototype = {
 
         if (this.pressed)
         {
+            // Set text cursor
+            this.renderer.setTextCursor();
+
             // Compute mouse x offset
             mouseOffX = mouseX-this.position.vec[0];
             if (mouseOffX <= 0.0) mouseOffX = 0.0;
@@ -827,7 +852,22 @@ GuiPxTextBox.prototype = {
                 this.textsel.setSize(selSize, this.size.vec[1]);
                 this.selection = true;
             }
+            this.cursorState = true;
+            this.cursorTime = 0.0;
             return true;
+        }
+        else
+        {
+            if (this.isPicking(mouseX, mouseY))
+            {
+                // Set text cursor
+                this.renderer.setTextCursor();
+            }
+            else
+            {
+                // Set default cursor
+                this.renderer.setDefaultCursor();
+            }
         }
         return false;
     },
@@ -924,6 +964,20 @@ GuiPxTextBox.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  compute : Compute textbox                                             //
+    //  param frametime : Frametime for textbox update                        //
+    ////////////////////////////////////////////////////////////////////////////
+    compute: function(frametime)
+    {
+        this.cursorTime += frametime;
+        if (this.cursorTime >= WOSDefaultPxTextBoxStateTime)
+        {
+            this.cursorState = !this.cursorState;
+            this.cursorTime -= WOSDefaultPxTextBoxStateTime;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  render : Render pxtextbox                                             //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
@@ -959,16 +1013,19 @@ GuiPxTextBox.prototype = {
             else
             {
                 // Render cursor
-                this.textcursor.setPosition(
-                    this.position.vec[0]+
-                    (this.size.vec[1]*WOSDefaultPxTextBoxTextOffsetFactor)+
-                    this.cursorOffset+
-                    (this.size.vec[1]*WOSDefaultPxTextBoxCursorOffsetFactor),
-                    this.position.vec[1]+(this.size.vec[1]*
-                    (1.0-WOSDefaultPxTextBoxCursorHeightFactor)*0.5)
-                );
-                this.textcursor.setAlpha(this.alpha);
-                this.textcursor.render();
+                if (this.cursorState)
+                {
+                    this.textcursor.setPosition(
+                        this.position.vec[0]+
+                        (this.size.vec[1]*WOSDefaultPxTextBoxTextOffsetFactor)+
+                        this.cursorOffset+(this.size.vec[1]*
+                        WOSDefaultPxTextBoxCursorOffsetFactor),
+                        this.position.vec[1]+(this.size.vec[1]*
+                        (1.0-WOSDefaultPxTextBoxCursorHeightFactor)*0.5)
+                    );
+                    this.textcursor.setAlpha(this.alpha);
+                    this.textcursor.render();
+                }
             }
         }
     }

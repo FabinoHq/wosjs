@@ -103,6 +103,18 @@
 !audio/audioengine.js
 !audio/sound.js
 
+# Cursors files
+!cursors/
+!cursors/default.png
+!cursors/textcursor.png
+!cursors/grabcursor.png
+!cursors/grabbingcursor.png
+!cursors/ewresize.png
+!cursors/nsresize.png
+!cursors/ewresize.png
+!cursors/neswresize.png
+!cursors/nwseresize.png
+
 # Fonts files
 !fonts/wosfont.otf
 

@@ -404,6 +404,30 @@ Loader.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  loadCursors : Load all cursors                                        //
+    ////////////////////////////////////////////////////////////////////////////
+    loadCursors: function()
+    {
+        // Check renderer
+        if (!this.renderer) return false;
+
+        // Preload cursors
+        this.renderer.setDefaultCursor();
+        this.renderer.setCrosshairCursor();
+        this.renderer.setTextCursor();
+        this.renderer.setGrabCursor();
+        this.renderer.setGrabbingCursor();
+        this.renderer.setEWResizeCursor();
+        this.renderer.setNSResizeCursor();
+        this.renderer.setNESWResizeCursor();
+        this.renderer.setNWSEResizeCursor();
+
+        // Set default cursor
+        this.renderer.setDefaultCursor();
+        return true;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  loadFonts : Load all fonts                                            //
     ////////////////////////////////////////////////////////////////////////////
     loadFonts: function()
