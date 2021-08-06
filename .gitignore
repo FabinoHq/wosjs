@@ -106,6 +106,7 @@
 # Cursors files
 !cursors/
 !cursors/default.png
+!cursors/crosshair.png
 !cursors/textcursor.png
 !cursors/grabcursor.png
 !cursors/grabbingcursor.png
@@ -120,7 +121,6 @@
 
 # Textures files
 !textures/
-!textures/cursor.png
 !textures/scrollbar.png
 !textures/wospxfont.png
 !textures/testsprite.png
