@@ -74,9 +74,15 @@ GLIndexDataType = ((typeof Uint16Array != "undefined") ?
 
 GLArrayDataType = ((typeof Float32Array != "undefined") ?
                     (Float32Array) : ((typeof WebGLFloatArray != "undefined") ?
-                    (WebGlFloatArray) : (Array)));
+                    (WebGLFloatArray) : (Array)));
 
 MapArrayDataType = Array;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  AudioContext definition                                                   //
+////////////////////////////////////////////////////////////////////////////////
+const AudioContext = (window.AudioContext || window.webKitAudioContext);
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -371,7 +377,6 @@ Wos.prototype = {
         // Init audio engine
         this.audio = new AudioEngine();
         this.audio.init();
-        //this.audio.enable();
 
         // Init assets loader
         this.loader = new Loader(this.renderer, this.audio);
@@ -402,12 +407,6 @@ Wos.prototype = {
         );
         this.backrenderer.init(1024, 1024);
         this.backrenderer.clear();
-
-        // Play test sound
-        if (this.audio.enabled)
-        {
-            this.loader.getSound("test.wav").play();
-        }
 
         // Init test line
         this.testline = new Line(this.renderer, this.loader.lineShader);

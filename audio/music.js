@@ -37,145 +37,107 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      audio/audioengine.js : WOS Audio engine management                    //
+//      audio/music.js : WOS music management                                 //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  AudioEngine class definition                                              //
+//  Music class definition                                                    //
+//  param audio : Audio engine pointer                                        //
 ////////////////////////////////////////////////////////////////////////////////
-function AudioEngine()
+function Music(audio)
 {
-    // Audio engine loaded status
+    // Music loaded status
     this.loaded = false;
 
-    // Audio engine enabled status
-    this.enabled = false;
+    // Audio engine pointer
+    this.audio = audio;
 
-    // Audio engine context
-    this.context = null;
+    // Music buffer asset
+    this.buffer = new Audio();
 
-    // Audio engine master gain
-    this.master = null;
-    // Audio engine sound gain
-    this.soundGain = null;
-    // Audio engine music gain
-    this.musicGain = null;
+    // Music
+    this.music = null;
+
+    // Music playing state
+    this.playing = false;
 }
 
-AudioEngine.prototype = {
+Music.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init audio engine                                              //
+    //  play : Play music                                                     //
+    //  param src : Music source to play                                      //
     ////////////////////////////////////////////////////////////////////////////
-    init: function()
+    play: function(src)
     {
-        // Reset audio engine
-        this.loaded = false;
+        // Reset music
+        this.music = null;
+        this.playing = false;
 
-        // Create audio context
-        try
+        // Check audio engine
+        if (!this.audio) return false;
+
+        // Check audio context
+        if (!this.audio.context) return false;
+
+        // Check source url
+        if (!src) return false;
+
+        // Play music
+        if (!this.loaded)
         {
-            this.context = new AudioContext();
+            this.loaded = true;
+            this.music = this.audio.context.createMediaElementSource(
+                this.buffer
+            );
+            this.music.connect(this.audio.musicGain);
+            this.buffer.src = src;
+            this.buffer.addEventListener("canplaythrough", this.startPlay());
+            this.buffer.onended = this.onMusicEnd;
         }
-        catch(e)
+        else
         {
-            this.context = null;
+            this.buffer.src = src;
+            this.buffer.addEventListener("canplaythrough", this.startPlay());
         }
-
-        // Check context
-        if (!this.context) return false;
-
-        // Suspend audio context
-        this.context.suspend();
-
-        // Create master gain
-        this.master = this.context.createGain();
-        this.master.connect(this.context.destination);
-
-        // Create sounds gain
-        this.soundGain = this.context.createGain();
-        this.soundGain.connect(this.master);
-
-        // Create music gain
-        this.musicGain = this.context.createGain();
-        this.musicGain.connect(this.master);
-
-        // Audio engine successfully loaded
-        this.loaded = true;
-        return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  enable : Enable audio engine                                          //
+    //  startPlay : Start music when buffer is ready                          //
     ////////////////////////////////////////////////////////////////////////////
-    enable: function()
+    startPlay: function()
     {
         if (this.loaded)
         {
-            // Enable audio context
-            if (this.context.state == "suspended")
+            if (!this.playing)
             {
-                this.context.resume();
+                this.buffer.play();
+                this.playing = true;
             }
-            this.enabled = true;
         }
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  disable : Disable audio engine                                        //
+    //  stop : Stop music                                                     //
     ////////////////////////////////////////////////////////////////////////////
-    disable: function()
+    stop: function()
     {
         if (this.loaded)
         {
-            // Disable audio engine
-            if (this.context.state == "running")
+            if (this.playing)
             {
-                this.context.suspend();
+                this.buffer.pause();
+                this.buffer.src = "";
+                this.playing = false;
             }
-            this.enabled = false;
         }
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setMasterGain : Set audio engine master gain                          //
-    //  param masterGain : Master gain to set                                 //
+    //  onMusicEnd : Called when the music ended                              //
     ////////////////////////////////////////////////////////////////////////////
-    setMasterGain: function(masterGain)
+    onMusicEnd: function()
     {
-        if (this.loaded)
-        {
-            if (masterGain <= 0.0) masterGain = 0.0;
-            if (masterGain >= 1.0) masterGain = 1.0;
-            this.master.gain.value = (masterGain*masterGain);
-        }
-    },
 
-    ////////////////////////////////////////////////////////////////////////////
-    //  setSoundGain : Set audio engine sound gain                            //
-    //  param soundGain : Sound gain to set                                   //
-    ////////////////////////////////////////////////////////////////////////////
-    setSoundGain: function(soundGain)
-    {
-        if (this.loaded)
-        {
-            if (soundGain <= 0.0) soundGain = 0.0;
-            if (soundGain >= 1.0) soundGain = 1.0;
-            this.soundGain.gain.value = (soundGain*soundGain);
-        }
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setMusicGain : Set audio engine music gain                            //
-    //  param musicGain : Music gain to set                                   //
-    ////////////////////////////////////////////////////////////////////////////
-    setMusicGain: function(musicGain)
-    {
-        if (this.loaded)
-        {
-            if (musicGain <= 0.0) musicGain = 0.0;
-            if (musicGain >= 1.0) musicGain = 1.0;
-            this.musicGain.gain.value = (musicGain*musicGain);
-        }
     }
 };

@@ -49,8 +49,8 @@ function ModelData()
     // Model data loaded state
     this.loaded = false;
 
-    // Model data
-    this.model = null;
+    // Model data request
+    this.req = null;
 
     // Skeletal model
     this.skeletalModel = false;
@@ -96,15 +96,18 @@ ModelData.prototype = {
         if (!src) return false;
 
         // Load model data
-        this.model = new XMLHttpRequest();
-        this.model.open('GET', src);
-        this.model.staticmesh = this;
-        this.model.onloadend = function()
+        this.req = new XMLHttpRequest();
+        this.req.open('GET', src);
+        this.req.staticmesh = this;
+        this.req.onload = function()
         {
-            this.staticmesh.handleModelLoaded();
-            if (this.staticmesh.loaded) this.staticmesh.onModelLoaded();
+            if (this.status == 200)
+            {
+                this.staticmesh.handleModelLoaded();
+                if (this.staticmesh.loaded) this.staticmesh.onModelLoaded();
+            }
         }
-        this.model.send();
+        this.req.send();
 
         // Mesh data loaded
         return true;
@@ -134,7 +137,7 @@ ModelData.prototype = {
         var animValues = 0;
         var currentRead = 0;
         var currentIndex = 0;
-        var modelData = this.model.responseText.split(' ');
+        var modelData = this.req.responseText.split(' ');
         var modelDataLen = modelData.length;
 
         if (modelDataLen >= 8)

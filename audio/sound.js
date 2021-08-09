@@ -43,17 +43,29 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Sound class definition                                                    //
+//  param audio : Audio engine pointer                                        //
 ////////////////////////////////////////////////////////////////////////////////
-function Sound(audioContext)
+function Sound(audio)
 {
     // Sound loaded status
     this.loaded = false;
 
-    // Audio context pointer
-    this.audioContext = audioContext;
+    // Audio engine pointer
+    this.audio = audio;
 
-    // Sound asset
+    // Sound buffer request
+    this.req = null;
+
+    // Sound buffer asset
+    this.buffer = null;
+
+    // Sound
     this.sound = null;
+
+    // Sound playing state
+    this.playing = false;
+    // Sound loop state
+    this.loop = false;
 }
 
 Sound.prototype = {
@@ -63,48 +75,60 @@ Sound.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     load: function(src)
     {
+        // Reset sound
         this.loaded = false;
+        this.buffer = null;
         this.sound = null;
+        this.playing = false;
+
+        // Check audio engine
+        if (!this.audio) return false;
 
         // Check audio context
-        if (!this.audioContext) return false;
+        if (!this.audio.context) return false;
 
-        // Create sound
-        this.sound = this.audioContext.createBufferSource();
-        this.sound.loop = false;
+        // Check source url
+        if (!src) return false;
 
-        // Load sound
-        var req = new XMLHttpRequest();
-        req.open("GET", src, true);
-        req.responseType = "arraybuffer";
-        req.snd = this;
-        req.onload = function()
+        // Create sound buffer
+        this.buffer = this.audio.context.createBufferSource();
+
+        // Load sound buffer
+        this.req = new XMLHttpRequest();
+        this.req.open("GET", src, true);
+        this.req.responseType = "arraybuffer";
+        this.req.snd = this;
+        this.req.onload = function()
         {
-            this.snd.audioContext.decodeAudioData(req.response,
-            function(buffer) {
-                req.snd.sound.buffer = buffer;
-                req.snd.handleSoundLoaded();
-            });
+            if (this.status == 200)
+            {
+                var snd = this.snd;
+                snd.audio.context.decodeAudioData(this.response,
+                function(buffer) {
+                    snd.buffer.buffer = buffer;
+                    snd.loaded = true;
+                    snd.onSoundLoaded();
+                });
+            }
         }
-        req.send();
+        this.req.send();
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  handleSoundLoaded : Called when sound loading finished                //
+    //  setLoop : Set sound loop state                                        //
+    //  param loop : Sound loop state to set                                  //
     ////////////////////////////////////////////////////////////////////////////
-    handleSoundLoaded: function()
+    setLoop: function(loop)
     {
-        // Connect sound to context
-        this.sound.connect(this.audioContext.destination);
-
-        // Sound loaded
-        this.loaded = true;
-        this.onSoundLoaded();
+        if (this.loaded)
+        {
+            this.loop = loop;
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  handleSoundLoaded : Called when sound is fully loaded                 //
+    //  onSoundLoaded : Called when sound is fully loaded                     //
     ////////////////////////////////////////////////////////////////////////////
     onSoundLoaded: function()
     {
@@ -118,9 +142,42 @@ Sound.prototype = {
     {
         if (this.loaded)
         {
+            // Create sound
+            this.sound = new AudioBufferSourceNode(this.audio.context);
+            this.sound.buffer = this.buffer.buffer;
+            if (!this.sound.start) this.sound.start = this.sound.noteOn;
+            if (!this.sound.stop) this.sound.stop = this.sound.noteOff;
+            this.sound.loop = this.loop;
+            this.sound.onended = this.onSoundEnd;
+
+            // Play sound
+            this.sound.connect(this.audio.soundGain);
             this.sound.start(0);
+            this.playing = true;
         }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  stop : Stop sound                                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    stop: function()
+    {
+        if (this.loaded)
+        {
+            if (this.playing)
+            {
+                this.sound.stop(0);
+                this.sound.disconnect(this.audio.soundGain);
+                this.playing = false;
+            }
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  onSoundEnd : Called when the sound ended                              //
+    ////////////////////////////////////////////////////////////////////////////
+    onSoundEnd: function()
+    {
+
     }
 };
-
-

@@ -592,7 +592,7 @@ Loader.prototype = {
         sndlen = SoundsAssets.length;
         for (i = 0; i < sndlen; ++i)
         {
-            this.sounds[i] = new Sound(this.audio.context);
+            this.sounds[i] = new Sound(this.audio);
             this.sounds[i].loader = this;
             this.sounds[i].onSoundLoaded = function()
             {

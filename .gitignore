@@ -100,8 +100,11 @@
 !interface/guipxtextbox.js
 !interface/guipxtextbutton.js
 !interface/guiwindow.js
+
+!audio/
 !audio/audioengine.js
 !audio/sound.js
+!audio/music.js
 
 # Cursors files
 !cursors/
@@ -138,4 +141,6 @@
 !models/testskeletal.wmsh
 
 # Sounds files
+!sounds/
 !sounds/test.wav
+!sounds/test.ogg
