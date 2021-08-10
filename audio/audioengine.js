@@ -79,6 +79,12 @@ function AudioEngine()
     this.soundValue = 0.8;
     // Sound gain target
     this.soundTarget = 0.8;
+    // Audio engine ui sound gain
+    this.uisoundGain = null;
+    // UI sound gain value
+    this.uisoundValue = 0.5;
+    // UI sound gain target
+    this.uisoundTarget = 0.5;
     // Audio engine music gain
     this.musicGain = null;
     // Music gain value
@@ -114,6 +120,9 @@ AudioEngine.prototype = {
         this.soundGain = null;
         this.soundValue = 0.8;
         this.soundTarget = 0.8;
+        this.uisoundGain = null;
+        this.uisoundValue = 0.5;
+        this.uisoundTarget = 0.5;
         this.musicGain = null;
         this.musicValue = 0.8;
         this.musicTarget = 0.8;
@@ -151,6 +160,13 @@ AudioEngine.prototype = {
         this.soundValue = 0.8;
         this.soundTarget = 0.8;
         this.soundGain.gain.value = this.soundValue*this.soundValue;
+
+        // Create ui sounds gain
+        this.uisoundGain = this.context.createGain();
+        this.uisoundGain.connect(this.masterGain);
+        this.uisoundValue = 0.5;
+        this.uisoundTarget = 0.5;
+        this.uisoundGain.gain.value = this.uisoundValue*this.uisoundValue;
 
         // Create music gain
         this.musicGain = this.context.createGain();
@@ -212,6 +228,7 @@ AudioEngine.prototype = {
     {
         var deltaMaster = 0.0;
         var deltaSound = 0.0;
+        var deltaUISound = 0.0;
         var deltaMusic = 0.0;
 
         if (this.loaded)
@@ -256,6 +273,29 @@ AudioEngine.prototype = {
                     this.soundValue = this.soundTarget;
                 }
                 this.soundGain.gain.value = this.soundValue*this.soundValue;
+            }
+
+            // Update ui sound gain
+            deltaUISound = this.uisoundTarget-this.uisoundValue;
+            if (deltaUISound > 0.0)
+            {
+                this.uisoundValue += frametime*WOSDefaultAudioFadeGainFactor;
+                if (this.uisoundValue >= this.uisoundTarget)
+                {
+                    this.uisoundValue = this.uisoundTarget;
+                }
+                this.uisoundGain.gain.value =
+                    this.uisoundValue*this.uisoundValue;
+            }
+            else if (deltaUISound < 0.0)
+            {
+                this.uisoundValue -= frametime*WOSDefaultAudioFadeGainFactor;
+                if (this.uisoundValue <= this.uisoundTarget)
+                {
+                    this.uisoundValue = this.uisoundTarget;
+                }
+                this.uisoundGain.gain.value =
+                    this.uisoundValue*this.uisoundValue;
             }
 
             // Update music gain
@@ -366,6 +406,20 @@ AudioEngine.prototype = {
             if (soundGain <= 0.0) soundGain = 0.0;
             if (soundGain >= 1.0) soundGain = 1.0;
             this.soundTarget = soundGain;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setUISoundGain : Set audio engine ui sound gain                       //
+    //  param uisoundGain : UI sound gain to set                              //
+    ////////////////////////////////////////////////////////////////////////////
+    setUISoundGain: function(uisoundGain)
+    {
+        if (this.loaded)
+        {
+            if (uisoundGain <= 0.0) uisoundGain = 0.0;
+            if (uisoundGain >= 1.0) uisoundGain = 1.0;
+            this.uisoundTarget = uisoundGain;
         }
     },
 

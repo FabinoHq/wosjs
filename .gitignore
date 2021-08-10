@@ -104,6 +104,7 @@
 !audio/
 !audio/audioengine.js
 !audio/sound.js
+!audio/uisound.js
 !audio/music.js
 
 # Cursors files

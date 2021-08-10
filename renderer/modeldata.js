@@ -92,6 +92,25 @@ ModelData.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     load: function(src)
     {
+        // Reset model data
+        this.loaded = false;
+        this.request = null;
+        this.skeletalModel = false;
+        this.facesCount = 0;
+        this.vertices = null;
+        this.texCoords = null;
+        this.normals = null;
+        this.indices = null;
+        this.bonesCount = 0;
+        this.bonesParents = null;
+        this.bonesPositions = null;
+        this.bonesAngles = null;
+        this.bonesIndices = null;
+        this.bonesWeights = null;
+        this.animBones = null;
+        this.animFrames = null;
+        this.animations = null;
+
         // Check source url
         if (!src) return false;
 

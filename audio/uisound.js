@@ -37,49 +37,49 @@
 //   For more information, please refer to <http://unlicense.org>             //
 ////////////////////////////////////////////////////////////////////////////////
 //    WOS : Web Operating System                                              //
-//      audio/sound.js : WOS sound management                                 //
+//      audio/uisound.js : WOS user interface sound management                //
 ////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Sound class definition                                                    //
+//  UISound class definition                                                  //
 //  param audio : Audio engine pointer                                        //
 ////////////////////////////////////////////////////////////////////////////////
-function Sound(audio)
+function UISound(audio)
 {
-    // Sound loaded status
+    // UISound loaded status
     this.loaded = false;
 
     // Audio engine pointer
     this.audio = audio;
 
-    // Sound buffer request
+    // UISound buffer request
     this.request = null;
 
-    // Sound buffer asset
+    // UISound buffer asset
     this.buffer = null;
 
-    // Sound
-    this.sound = null;
+    // UISound
+    this.uisound = null;
 
-    // Sound playing state
+    // UISound playing state
     this.playing = false;
-    // Sound loop state
+    // UISound loop state
     this.loop = false;
 }
 
-Sound.prototype = {
+UISound.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  load : Load sound                                                     //
-    //  param src : Sound source to load                                      //
+    //  load : Load ui sound                                                  //
+    //  param src : UISound source to load                                    //
     ////////////////////////////////////////////////////////////////////////////
     load: function(src)
     {
-        // Reset sound
+        // Reset UISound
         this.loaded = false;
         this.request = null;
         this.buffer = null;
-        this.sound = null;
+        this.uisound = null;
         this.playing = false;
 
         // Check audio engine
@@ -91,10 +91,10 @@ Sound.prototype = {
         // Check source url
         if (!src) return false;
 
-        // Create sound buffer
+        // Create ui sound buffer
         this.buffer = this.audio.context.createBufferSource();
 
-        // Load sound buffer
+        // Load ui sound buffer
         this.request = new XMLHttpRequest();
         this.request.open("GET", src, true);
         this.request.responseType = "arraybuffer";
@@ -118,7 +118,7 @@ Sound.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setSound : Set sound from an existing sound resource                  //
-    //  param sound : Sound resource to set sound from                        //
+    //  param sound : Sound resource to set ui sound from                     //
     ////////////////////////////////////////////////////////////////////////////
     setSound: function(sound)
     {
@@ -126,7 +126,7 @@ Sound.prototype = {
         this.loaded = false;
         this.request = null;
         this.buffer = null;
-        this.sound = null;
+        this.uisound = null;
         this.playing = false;
 
         // Check audio engine
@@ -151,8 +151,8 @@ Sound.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setLoop : Set sound loop state                                        //
-    //  param loop : Sound loop state to set                                  //
+    //  setLoop : Set ui sound loop state                                     //
+    //  param loop : UISound loop state to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setLoop: function(loop)
     {
@@ -163,7 +163,7 @@ Sound.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  onSoundLoaded : Called when sound is fully loaded                     //
+    //  onSoundLoaded : Called when ui sound is fully loaded                  //
     ////////////////////////////////////////////////////////////////////////////
     onSoundLoaded: function()
     {
@@ -171,29 +171,29 @@ Sound.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  play : Play sound                                                     //
+    //  play : Play ui sound                                                  //
     ////////////////////////////////////////////////////////////////////////////
     play: function()
     {
         if (this.loaded)
         {
-            // Create sound
-            this.sound = new AudioBufferSourceNode(this.audio.context);
-            this.sound.buffer = this.buffer.buffer;
-            if (!this.sound.start) this.sound.start = this.sound.noteOn;
-            if (!this.sound.stop) this.sound.stop = this.sound.noteOff;
-            this.sound.loop = this.loop;
-            this.sound.onended = this.onSoundEnd;
+            // Create uisound
+            this.uisound = new AudioBufferSourceNode(this.audio.context);
+            this.uisound.buffer = this.buffer.buffer;
+            if (!this.uisound.start) this.uisound.start = this.uisound.noteOn;
+            if (!this.uisound.stop) this.uisound.stop = this.uisound.noteOff;
+            this.uisound.loop = this.loop;
+            this.uisound.onended = this.onSoundEnd;
 
             // Play sound
-            this.sound.connect(this.audio.soundGain);
-            this.sound.start(0);
+            this.uisound.connect(this.audio.uisoundGain);
+            this.uisound.start(0);
             this.playing = true;
         }
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  stop : Stop sound                                                     //
+    //  stop : Stop ui sound                                                  //
     ////////////////////////////////////////////////////////////////////////////
     stop: function()
     {
@@ -201,15 +201,15 @@ Sound.prototype = {
         {
             if (this.playing)
             {
-                this.sound.stop(0);
-                this.sound.disconnect(this.audio.soundGain);
+                this.uisound.stop(0);
+                this.uisound.disconnect(this.audio.uisoundGain);
                 this.playing = false;
             }
         }
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  onSoundEnd : Called when the sound ended                              //
+    //  onSoundEnd : Called when the ui sound ended                           //
     ////////////////////////////////////////////////////////////////////////////
     onSoundEnd: function()
     {
