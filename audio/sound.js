@@ -54,7 +54,7 @@ function Sound(audio)
     this.audio = audio;
 
     // Sound buffer request
-    this.req = null;
+    this.request = null;
 
     // Sound buffer asset
     this.buffer = null;
@@ -94,11 +94,11 @@ Sound.prototype = {
         this.buffer = this.audio.context.createBufferSource();
 
         // Load sound buffer
-        this.req = new XMLHttpRequest();
-        this.req.open("GET", src, true);
-        this.req.responseType = "arraybuffer";
-        this.req.snd = this;
-        this.req.onload = function()
+        this.request = new XMLHttpRequest();
+        this.request.open("GET", src, true);
+        this.request.responseType = "arraybuffer";
+        this.request.snd = this;
+        this.request.onload = function()
         {
             if (this.status == 200)
             {
@@ -111,7 +111,7 @@ Sound.prototype = {
                 });
             }
         }
-        this.req.send();
+        this.request.send();
         return true;
     },
 

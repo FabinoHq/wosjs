@@ -58,9 +58,6 @@ function Music(audio)
 
     // Music
     this.music = null;
-
-    // Music playing state
-    this.playing = false;
 }
 
 Music.prototype = {
@@ -87,16 +84,19 @@ Music.prototype = {
         if (!this.loaded)
         {
             this.loaded = true;
+            this.buffer.pause();
+            this.buffer.src = "";
             this.music = this.audio.context.createMediaElementSource(
                 this.buffer
             );
-            this.music.connect(this.audio.musicGain);
+            this.music.connect(this.audio.crossFaderGain);
             this.buffer.src = src;
             this.buffer.addEventListener("canplaythrough", this.startPlay());
             this.buffer.onended = this.onMusicEnd;
         }
         else
         {
+            this.buffer.pause();
             this.buffer.src = src;
             this.buffer.addEventListener("canplaythrough", this.startPlay());
         }
@@ -109,11 +109,7 @@ Music.prototype = {
     {
         if (this.loaded)
         {
-            if (!this.playing)
-            {
-                this.buffer.play();
-                this.playing = true;
-            }
+            this.buffer.play();
         }
     },
 
@@ -124,12 +120,8 @@ Music.prototype = {
     {
         if (this.loaded)
         {
-            if (this.playing)
-            {
-                this.buffer.pause();
-                this.buffer.src = "";
-                this.playing = false;
-            }
+            this.buffer.pause();
+            this.buffer.src = "";
         }
     },
 

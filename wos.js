@@ -1005,6 +1005,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     compute: function()
     {
+        this.audio.compute(this.frametime);
         //this.testanim.compute(this.frametime);
         //this.testtextbox.compute(this.frametime);
         //this.testpxtextbox.compute(this.frametime);
