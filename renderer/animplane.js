@@ -925,7 +925,7 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function(quality)
     {
-        var upVec = new Vector3();
+        var lookAtVec = new Vector3();
         var rotVec = new Vector3();
         var delta = new Vector3();
         var delta2 = new Vector3();
@@ -938,15 +938,15 @@ AnimPlane.prototype = {
         if (this.billboard == 1)
         {
             // Cylindrical billboard (Y)
-            upVec.setXYZ(0.0, 0.0, 1.0);
+            lookAtVec.setXYZ(0.0, 0.0, 1.0);
             delta.setXYZ(
                 this.renderer.camera.position.vec[0] + this.position.vec[0],
                 0.0,
                 this.renderer.camera.position.vec[2] + this.position.vec[2]
             );
             delta.normalize();
-            rotVec.crossProduct(upVec, delta);
-            dotProduct = upVec.dotProduct(delta);
+            rotVec.crossProduct(lookAtVec, delta);
+            dotProduct = lookAtVec.dotProduct(delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
             angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
@@ -958,15 +958,15 @@ AnimPlane.prototype = {
         else if (this.billboard == 2)
         {
             // Cylindrical billboard (X)
-            upVec.setXYZ(0.0, 0.0, 1.0);
+            lookAtVec.setXYZ(0.0, 0.0, 1.0);
             delta.setXYZ(
                 0.0,
                 this.renderer.camera.position.vec[1] + this.position.vec[1],
                 this.renderer.camera.position.vec[2] + this.position.vec[2]
             );
             delta.normalize();
-            rotVec.crossProduct(upVec, delta);
-            dotProduct = upVec.dotProduct(delta);
+            rotVec.crossProduct(lookAtVec, delta);
+            dotProduct = lookAtVec.dotProduct(delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
             angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
@@ -978,15 +978,15 @@ AnimPlane.prototype = {
         else if (this.billboard == 3)
         {
             // Spherical billboard
-            upVec.setXYZ(0.0, 0.0, 1.0);
+            lookAtVec.setXYZ(0.0, 0.0, 1.0);
             delta.setXYZ(
                 this.renderer.camera.position.vec[0] + this.position.vec[0],
                 0.0,
                 this.renderer.camera.position.vec[2] + this.position.vec[2]
             );
             delta.normalize();
-            rotVec.crossProduct(upVec, delta);
-            dotProduct = upVec.dotProduct(delta);
+            rotVec.crossProduct(lookAtVec, delta);
+            dotProduct = lookAtVec.dotProduct(delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
             angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;

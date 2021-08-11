@@ -174,7 +174,7 @@ Vector4.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  add : Vectorial addition                                              //
+    //  add : Vector addition                                                 //
     //  param vector : Vector to add                                          //
     ////////////////////////////////////////////////////////////////////////////
     add: function(vector)
@@ -186,7 +186,7 @@ Vector4.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  addXYZW : Vectorial addition from seperate components                 //
+    //  addXYZW : Vector addition from seperate components                    //
     //  param x : Value to add to the vector's X component                    //
     //  param y : Value to add to the vector's Y component                    //
     //  param z : Value to add to the vector's Z component                    //
@@ -234,6 +234,69 @@ Vector4.prototype = {
     addW: function(w)
     {
         this.vec[3] += w;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  subtract : Vector subtraction                                         //
+    //  param vector : Vector to subtract                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    subtract: function(vector)
+    {
+        this.vec[0] -= vector.vec[0];
+        this.vec[1] -= vector.vec[1];
+        this.vec[2] -= vector.vec[2];
+        this.vec[3] -= vector.vec[3];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  subtractXYZW : Vector subtraction from seperate components            //
+    //  param x : Value to subtract to the vector's X component               //
+    //  param y : Value to subtract to the vector's Y component               //
+    //  param z : Value to subtract to the vector's Z component               //
+    //  param w : Value to subtract to the vector's W component               //
+    ////////////////////////////////////////////////////////////////////////////
+    subtractXYZW: function(x, y, z, w)
+    {
+        this.vec[0] -= x;
+        this.vec[1] -= y;
+        this.vec[2] -= z;
+        this.vec[3] -= w;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  subtractX : Subtract a value to the vector's X component              //
+    //  param x : Value to subtract to the vector's X component               //
+    ////////////////////////////////////////////////////////////////////////////
+    subtractX: function(x)
+    {
+        this.vec[0] -= x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  subtractY : Subtract a value to the vector's Y component              //
+    //  param y : Value to subtract to the vector's Y component               //
+    ////////////////////////////////////////////////////////////////////////////
+    subtractY: function(y)
+    {
+        this.vec[1] -= y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  subtractZ : Subtract a value to the vector's Z component              //
+    //  param z : Value to subtract to the vector's Z component               //
+    ////////////////////////////////////////////////////////////////////////////
+    subtractZ: function(z)
+    {
+        this.vec[2] -= z;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  subtractW : Subtract a value to the vector's W component              //
+    //  param w : Value to subtract to the vector's W component               //
+    ////////////////////////////////////////////////////////////////////////////
+    subtractW: function(w)
+    {
+        this.vec[3] -= w;
     },
 
     ////////////////////////////////////////////////////////////////////////////

@@ -46,6 +46,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 const WOSDefaultAudioFadeGainFactor = 0.7;
 const WOSDefaultAudioCrossFadeFactor = 0.2;
+const WOSDefaultAudioPannerFactor = 1.0;
+const WOSDefaultAudioDistanceFactor = 0.05;
+const WOSDefaultAudioDistanceFade = 1.2;
+const WOSDefaultAudioPanningFade = 1.8;
 const WOSAudioMusicStandby = 0;
 const WOSAudioMusicFadeIn = 1;
 const WOSAudioMusicPlaying = 2;
@@ -102,6 +106,13 @@ function AudioEngine()
     this.crossFaderState = WOSAudioMusicStandby;
     // Music crossfader value
     this.crossFaderValue = 0.0;
+
+    // Listener position
+    this.position = new Vector3(0.0, 0.0, 0.0);
+    // Listener target
+    this.target = new Vector3(0.0, 0.0, 0.0);
+    // Listener upward
+    this.upward = new Vector3(0.0, 1.0, 0.0);
 }
 
 AudioEngine.prototype = {
@@ -130,6 +141,9 @@ AudioEngine.prototype = {
         this.crossFaderGain = null;
         this.crossFaderState = WOSAudioMusicStandby;
         this.crossFaderValue = 0.0;
+        this.position.reset();
+        this.target.reset();
+        this.upward.setXYZ(0.0, 1.0, 0.0);
 
         // Create audio context
         try
@@ -157,22 +171,16 @@ AudioEngine.prototype = {
         // Create sounds gain
         this.soundGain = this.context.createGain();
         this.soundGain.connect(this.masterGain);
-        this.soundValue = 0.8;
-        this.soundTarget = 0.8;
         this.soundGain.gain.value = this.soundValue*this.soundValue;
 
         // Create ui sounds gain
         this.uisoundGain = this.context.createGain();
         this.uisoundGain.connect(this.masterGain);
-        this.uisoundValue = 0.5;
-        this.uisoundTarget = 0.5;
         this.uisoundGain.gain.value = this.uisoundValue*this.uisoundValue;
 
         // Create music gain
         this.musicGain = this.context.createGain();
         this.musicGain.connect(this.masterGain);
-        this.musicValue = 0.8;
-        this.musicTarget = 0.8;
         this.musicGain.gain.value = this.musicValue*this.musicValue;
 
         // Create music instance
@@ -226,16 +234,13 @@ AudioEngine.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     compute: function(frametime)
     {
-        var deltaMaster = 0.0;
-        var deltaSound = 0.0;
-        var deltaUISound = 0.0;
-        var deltaMusic = 0.0;
+        var delta = 0.0;
 
         if (this.loaded)
         {
-            // Update master gain
-            deltaMaster = this.masterTarget-this.masterValue;
-            if (deltaMaster > 0.0)
+            // Compute master gain
+            delta = this.masterTarget-this.masterValue;
+            if (delta > 0.0)
             {
                 this.masterValue += frametime*WOSDefaultAudioFadeGainFactor;
                 if (this.masterValue >= this.masterTarget)
@@ -244,7 +249,7 @@ AudioEngine.prototype = {
                 }
                 this.masterGain.gain.value = this.masterValue*this.masterValue;
             }
-            else if (deltaMaster < 0.0)
+            else if (delta < 0.0)
             {
                 this.masterValue -= frametime*WOSDefaultAudioFadeGainFactor;
                 if (this.masterValue <= this.masterTarget)
@@ -254,9 +259,9 @@ AudioEngine.prototype = {
                 this.masterGain.gain.value = this.masterValue*this.masterValue;
             }
 
-            // Update sound gain
-            deltaSound = this.soundTarget-this.soundValue;
-            if (deltaSound > 0.0)
+            // Compute sound gain
+            delta = this.soundTarget-this.soundValue;
+            if (delta > 0.0)
             {
                 this.soundValue += frametime*WOSDefaultAudioFadeGainFactor;
                 if (this.soundValue >= this.soundTarget)
@@ -265,7 +270,7 @@ AudioEngine.prototype = {
                 }
                 this.soundGain.gain.value = this.soundValue*this.soundValue;
             }
-            else if (deltaSound < 0.0)
+            else if (delta < 0.0)
             {
                 this.soundValue -= frametime*WOSDefaultAudioFadeGainFactor;
                 if (this.soundValue <= this.soundTarget)
@@ -275,9 +280,9 @@ AudioEngine.prototype = {
                 this.soundGain.gain.value = this.soundValue*this.soundValue;
             }
 
-            // Update ui sound gain
-            deltaUISound = this.uisoundTarget-this.uisoundValue;
-            if (deltaUISound > 0.0)
+            // Compute ui sound gain
+            delta = this.uisoundTarget-this.uisoundValue;
+            if (delta > 0.0)
             {
                 this.uisoundValue += frametime*WOSDefaultAudioFadeGainFactor;
                 if (this.uisoundValue >= this.uisoundTarget)
@@ -287,7 +292,7 @@ AudioEngine.prototype = {
                 this.uisoundGain.gain.value =
                     this.uisoundValue*this.uisoundValue;
             }
-            else if (deltaUISound < 0.0)
+            else if (delta < 0.0)
             {
                 this.uisoundValue -= frametime*WOSDefaultAudioFadeGainFactor;
                 if (this.uisoundValue <= this.uisoundTarget)
@@ -298,9 +303,9 @@ AudioEngine.prototype = {
                     this.uisoundValue*this.uisoundValue;
             }
 
-            // Update music gain
-            deltaMusic = this.musicTarget-this.musicValue;
-            if (deltaMusic > 0.0)
+            // Compute music gain
+            delta = this.musicTarget-this.musicValue;
+            if (delta > 0.0)
             {
                 this.musicValue += frametime*WOSDefaultAudioFadeGainFactor;
                 if (this.musicValue >= this.musicTarget)
@@ -309,7 +314,7 @@ AudioEngine.prototype = {
                 }
                 this.musicGain.gain.value = this.musicValue*this.musicValue;
             }
-            else if (deltaMusic < 0.0)
+            else if (delta < 0.0)
             {
                 this.musicValue -= frametime*WOSDefaultAudioFadeGainFactor;
                 if (this.musicValue <= this.musicTarget)
@@ -319,7 +324,7 @@ AudioEngine.prototype = {
                 this.musicGain.gain.value = this.musicValue*this.musicValue;
             }
 
-            // Update music crossfader
+            // Compute music crossfader
             switch (this.crossFaderState)
             {
                 // Play music
@@ -469,6 +474,64 @@ AudioEngine.prototype = {
         {
             // Stop music
             this.crossFaderState = WOSAudioMusicFadeOut;
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setListenerPos : Set listener position                                //
+    //  param x : X position of the listener                                  //
+    //  param y : Y position of the listener                                  //
+    //  param z : Z position of the listener                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    setListenerPos: function(x, y, z)
+    {
+        if (this.loaded && x && y && z)
+        {
+            this.position.setXYZ(x, y, z);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setListenerPosVec3 : Set listener position from a 3 component vector  //
+    //  param vector : 3 component vector to set listener position from       //
+    ////////////////////////////////////////////////////////////////////////////
+    setListenerPosVec3: function(vector)
+    {
+        if (this.loaded && vector)
+        {
+            this.position.setVector(vector);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setListenerOrientation : Set listener orientation                     //
+    //  param x : X orientation of the listener                               //
+    //  param y : Y orientation of the listener                               //
+    //  param z : Z orientation of the listener                               //
+    //  param xUp : X up orientation of the listener                          //
+    //  param yUp : Y up orientation of the listener                          //
+    //  param zUp : Z up orientation of the listener                          //
+    ////////////////////////////////////////////////////////////////////////////
+    setListenerOrientation: function(x, y, z, xUp, yUp, zUp)
+    {
+        if (this.loaded && x && y && z && xUp && yUp && zUp)
+        {
+            this.target.setXYZ(x, y, z);
+            this.upward.setXYZ(xUp, yUp, zUp);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setListenerOrientationVec3 : Set listener orientation from a vector   //
+    //  param target : 3 component vector to set listener orientation from    //
+    //  param upward : 3 component up vector to set listener orientation from //
+    ////////////////////////////////////////////////////////////////////////////
+    setListenerOrientationVec3: function(target, upward)
+    {
+        if (this.loaded && target && upward)
+        {
+            this.target.setVector(target);
+            this.upward.setVector(upward);
         }
     }
 };

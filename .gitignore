@@ -103,6 +103,7 @@
 
 !audio/
 !audio/audioengine.js
+!audio/soundbuffer.js
 !audio/sound.js
 !audio/uisound.js
 !audio/music.js

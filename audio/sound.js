@@ -53,14 +53,28 @@ function Sound(audio)
     // Audio engine pointer
     this.audio = audio;
 
-    // Sound buffer request
-    this.request = null;
-
     // Sound buffer asset
     this.buffer = null;
 
     // Sound
     this.sound = null;
+
+    // Sound panner
+    this.panner = null;
+    // Panner value
+    this.pannerValue = 0.0;
+    // Panner target
+    this.pannerTarget = 0.0;
+    // Sound distance
+    this.distance = null;
+    // Distance value
+    this.distanceValue = 0.0;
+    // Distance target
+    this.distanceTarget = 0.0;
+    // Sound position
+    this.position = new Vector3(0.0, 0.0, 0.0);
+    // Sound distance factor
+    this.distanceFactor = WOSDefaultAudioDistanceFactor;
 
     // Sound playing state
     this.playing = false;
@@ -70,82 +84,55 @@ function Sound(audio)
 
 Sound.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  load : Load sound                                                     //
-    //  param src : Sound source to load                                      //
+    //  setSoundBuffer : Set sound buffer                                     //
+    //  param soundBuffer : Sound buffer to set sound from                    //
     ////////////////////////////////////////////////////////////////////////////
-    load: function(src)
+    setSoundBuffer: function(soundBuffer)
     {
         // Reset sound
         this.loaded = false;
-        this.request = null;
         this.buffer = null;
         this.sound = null;
+        this.panner = null;
+        this.pannerValue = 0.0;
+        this.pannerTarget = 0.0;
+        this.distance = null;
+        this.distanceValue = 0.0;
+        this.distanceTarget = 0.0;
+        this.position.reset();
+        this.distanceFactor = WOSDefaultAudioDistanceFactor;
         this.playing = false;
+        this.loop = false;
 
         // Check audio engine
         if (!this.audio) return false;
 
         // Check audio context
         if (!this.audio.context) return false;
-
-        // Check source url
-        if (!src) return false;
-
-        // Create sound buffer
-        this.buffer = this.audio.context.createBufferSource();
-
-        // Load sound buffer
-        this.request = new XMLHttpRequest();
-        this.request.open("GET", src, true);
-        this.request.responseType = "arraybuffer";
-        this.request.snd = this;
-        this.request.onload = function()
-        {
-            if (this.status == 200)
-            {
-                var snd = this.snd;
-                snd.audio.context.decodeAudioData(this.response,
-                function(buffer) {
-                    snd.buffer.buffer = buffer;
-                    snd.loaded = true;
-                    snd.onSoundLoaded();
-                });
-            }
-        }
-        this.request.send();
-        return true;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setSound : Set sound from an existing sound resource                  //
-    //  param sound : Sound resource to set sound from                        //
-    ////////////////////////////////////////////////////////////////////////////
-    setSound: function(sound)
-    {
-        // Reset sound
-        this.loaded = false;
-        this.request = null;
-        this.buffer = null;
-        this.sound = null;
-        this.playing = false;
-
-        // Check audio engine
-        if (!this.audio) return false;
-
-        // Check audio context
-        if (!this.audio.context) return false;
-
-        // Check sound resource
-        if (!sound) return false;
 
         // Check sound buffer
-        if (!sound.buffer) return false;
+        if (!soundBuffer) return false;
 
-        // Check sound loaded state
-        if (!sound.loaded) return false;
+        // Check sound buffer resource
+        if (!soundBuffer.buffer) return false;
+
+        // Check sound buffer loaded state
+        if (!soundBuffer.loaded) return false;
 
         // Set sound buffer
-        this.buffer = sound.buffer;
+        this.buffer = soundBuffer.buffer;
+
+        // Create panner
+        this.panner = this.audio.context.createStereoPanner();
+        this.panner.connect(this.audio.soundGain);
+        this.panner.pan.value = this.pannerValue;
+
+        // Create distance gain
+        this.distance = this.audio.context.createGain();
+        this.distance.connect(this.panner);
+        this.distance.gain.value = this.distanceValue*this.distanceValue;
+
+        // Sound loaded
         this.loaded = true;
         return true;
     },
@@ -163,11 +150,91 @@ Sound.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  onSoundLoaded : Called when sound is fully loaded                     //
+    //  setDistanceFactor : Set sound distance gain factor                    //
+    //  param distanceFactor : Distance gain factor to set                    //
     ////////////////////////////////////////////////////////////////////////////
-    onSoundLoaded: function()
+    setDistanceFactor: function(distanceFactor)
     {
+        if (this.loaded)
+        {
+            this.distanceFactor = distanceFactor;
+        }
+    },
 
+    ////////////////////////////////////////////////////////////////////////////
+    //  compute : Compute sound                                               //
+    ////////////////////////////////////////////////////////////////////////////
+    compute: function(frametime)
+    {
+        var delta = new Vector3();
+        var cross = new Vector3();
+        var deltaVal = 0.0;
+
+        if (this.loaded)
+        {
+            cross.crossProduct(this.audio.target, this.audio.upward);
+            delta.setXYZ(
+                this.audio.position.vec[0] + this.position.vec[0],
+                this.audio.position.vec[1] + this.position.vec[1],
+                this.audio.position.vec[2] + this.position.vec[2]
+            );
+
+            // Set sound distance
+            this.distanceTarget = (1.0-(delta.length()*this.distanceFactor));
+            if (this.distanceTarget <= 0.0) this.distanceTarget = 0.0;
+            if (this.distanceTarget >= 1.0) this.distanceTarget = 1.0;
+
+            // Set sound panning
+            delta.normalize();
+            dotProduct = cross.dotProduct(delta);
+            this.pannerTarget = dotProduct;
+            if (this.pannerTarget <= -1.0) this.pannerTarget = -1.0;
+            if (this.pannerTarget >= 1.0) this.pannerTarget = 1.0;
+
+            // Compute distance gain
+            deltaVal = this.distanceTarget-this.distanceValue;
+            if (deltaVal > 0.0)
+            {
+                this.distanceValue += frametime*WOSDefaultAudioDistanceFade;
+                if (this.distanceValue >= this.distanceTarget)
+                {
+                    this.distanceValue = this.distanceTarget;
+                }
+                this.distance.gain.value =
+                    this.distanceValue*this.distanceValue;
+            }
+            else if (deltaVal < 0.0)
+            {
+                this.distanceValue -= frametime*WOSDefaultAudioDistanceFade;
+                if (this.distanceValue <= this.distanceTarget)
+                {
+                    this.distanceValue = this.distanceTarget;
+                }
+                this.distance.gain.value =
+                    this.distanceValue*this.distanceValue;
+            }
+
+            // Compute panner
+            deltaVal = this.pannerTarget-this.pannerValue;
+            if (deltaVal > 0.0)
+            {
+                this.pannerValue += frametime*WOSDefaultAudioPanningFade;
+                if (this.pannerValue >= this.pannerTarget)
+                {
+                    this.pannerValue = this.pannerTarget;
+                }
+                this.panner.pan.value = this.pannerValue;
+            }
+            else if (deltaVal < 0.0)
+            {
+                this.pannerValue -= frametime*WOSDefaultAudioPanningFade;
+                if (this.pannerValue <= this.pannerTarget)
+                {
+                    this.pannerValue = this.pannerTarget;
+                }
+                this.panner.pan.value = this.pannerValue;
+            }
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -186,7 +253,7 @@ Sound.prototype = {
             this.sound.onended = this.onSoundEnd;
 
             // Play sound
-            this.sound.connect(this.audio.soundGain);
+            this.sound.connect(this.distance);
             this.sound.start(0);
             this.playing = true;
         }
@@ -214,5 +281,31 @@ Sound.prototype = {
     onSoundEnd: function()
     {
 
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPosition : Set sound position                                      //
+    //  param x : X position of the sound                                     //
+    //  param y : Y position of the sound                                     //
+    //  param z : Z position of the sound                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosition: function(x, y, z)
+    {
+        if (this.loaded && x && y && z)
+        {
+            this.position.setXYZ(x, y, z);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPositionVec3 : Set sound position from a 3 component vector        //
+    //  param vector : 3 component vector to set sound position from          //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec3: function(vector)
+    {
+        if (this.loaded && vector)
+        {
+            this.position.setVector(vector);
+        }
     }
 };

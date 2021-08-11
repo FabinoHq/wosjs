@@ -56,6 +56,10 @@ function Camera()
     // Camera angles
     this.angles = new Vector3(0.0, 0.0, 0.0);
 
+    // Camera movement vectors
+    this.target = new Vector3(0.0, 0.0, 0.0);
+    this.upward = new Vector3(0.0, 1.0, 0.0);
+
     // Camera fovy
     this.fovy = 90.0;
 
@@ -75,6 +79,8 @@ Camera.prototype = {
         this.viewMatrix.setIdentity();
         this.position.reset();
         this.angles.reset();
+        this.target.reset();
+        this.upward.setXYZ(0.0, 1.0, 0.0);
         this.fovy = 90.0;
         this.nearPlane = 0.001;
         this.farPlane = 1000.0;
@@ -86,6 +92,14 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     compute: function(ratio)
     {
+        // Compute camera target
+        this.target.vec[0] = Math.cos(this.angles.vec[0]*Math.PI/180.0);
+        this.target.vec[0] *= Math.sin(this.angles.vec[1]*Math.PI/180.0);
+        this.target.vec[1] = Math.sin(this.angles.vec[0]*Math.PI/180.0);
+        this.target.vec[2] = Math.cos(this.angles.vec[0]*Math.PI/180.0);
+        this.target.vec[2] *= Math.cos(this.angles.vec[1]*Math.PI/180.0);
+        this.target.normalize();
+
         // Compute projection matrix
         this.projMatrix.setIdentity();
         this.projMatrix.setPerspective(

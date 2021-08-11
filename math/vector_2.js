@@ -124,7 +124,7 @@ Vector2.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  add : Vectorial addition                                              //
+    //  add : Vector addition                                                 //
     //  param vector : Vector to add                                          //
     ////////////////////////////////////////////////////////////////////////////
     add: function(vector)
@@ -134,7 +134,7 @@ Vector2.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  addXY : Vectorial addition from seperate components                   //
+    //  addXY : Vector addition from seperate components                      //
     //  param x : Value to add to the vector's X component                    //
     //  param y : Value to add to the vector's Y component                    //
     ////////////////////////////////////////////////////////////////////////////
@@ -160,6 +160,45 @@ Vector2.prototype = {
     addY: function(y)
     {
         this.vec[1] += y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  subtract : Vector subtraction                                         //
+    //  param vector : Vector to subtract                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    subtract: function(vector)
+    {
+        this.vec[0] -= vector.vec[0];
+        this.vec[1] -= vector.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  subtractXY : Vector subtraction from seperate components              //
+    //  param x : Value to subtract to the vector's X component               //
+    //  param y : Value to subtract to the vector's Y component               //
+    ////////////////////////////////////////////////////////////////////////////
+    subtractXY: function(x, y)
+    {
+        this.vec[0] -= x;
+        this.vec[1] -= y;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  subtractX : Subtract a value to the vector's X component              //
+    //  param x : Value to subtract to the vector's X component               //
+    ////////////////////////////////////////////////////////////////////////////
+    subtractX: function(x)
+    {
+        this.vec[0] -= x;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  subtractY : Subtract a value to the vector's Y component              //
+    //  param y : Value to subtract to the vector's Y component               //
+    ////////////////////////////////////////////////////////////////////////////
+    subtractY: function(y)
+    {
+        this.vec[1] -= y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
