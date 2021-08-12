@@ -151,6 +151,18 @@ function SkeletalMesh(renderer,
     this.alpha = 1.0;
     // Static mesh specularity
     this.specularity = 0.0;
+
+    // Temp matrix
+    this.tmpMat = new Matrix4x4();
+    // Temp vectors
+    this.prevPos = new Vector3();
+    this.pos = new Vector3();
+    this.nextPos = new Vector3();
+    this.nextPos2 = new Vector3();
+    this.prevRot = new Vector3();
+    this.rot = new Vector3();
+    this.nextRot = new Vector3();
+    this.nextRot2 = new Vector3();
 }
 
 SkeletalMesh.prototype = {
@@ -222,6 +234,7 @@ SkeletalMesh.prototype = {
         this.scale = 1.0;
         this.alpha = 1.0;
         this.specularity = 0.0;
+        this.tmpMat.setIdentity();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -903,7 +916,6 @@ SkeletalMesh.prototype = {
     compute: function(frametime)
     {
         var i = 0;
-        var tmpMat = new Matrix4x4();
         var animGroup = -1;
         var prevFrame = -1;
         var currentFrame = -1;
@@ -919,14 +931,6 @@ SkeletalMesh.prototype = {
         var nextI = 0;
         var nextI2 = 0;
         var animated = false;
-        var prevPos = new Vector3();
-        var pos = new Vector3();
-        var nextPos = new Vector3();
-        var nextPos2 = new Vector3();
-        var prevRot = new Vector3();
-        var rot = new Vector3();
-        var nextRot = new Vector3();
-        var nextRot2 = new Vector3();
         var attachedBone = 0;
         for (i = 0; i < this.animGroups; ++i)
         {
@@ -999,22 +1003,22 @@ SkeletalMesh.prototype = {
                         keyFrames = this.keyFrames[animGroup][currentAnim];
                         curI = (currentBone*keyFrames*6)+(currentFrame*6);
                         nextI = (currentBone*keyFrames*6)+(nextFrame*6);
-                        pos.setXYZ(
+                        this.pos.setXYZ(
                             this.animations[animGroup][currentAnim][curI],
                             this.animations[animGroup][currentAnim][curI+1],
                             this.animations[animGroup][currentAnim][curI+2]
                         );
-                        rot.setXYZ(
+                        this.rot.setXYZ(
                             this.animations[animGroup][currentAnim][curI+3],
                             this.animations[animGroup][currentAnim][curI+4],
                             this.animations[animGroup][currentAnim][curI+5]
                         );
-                        nextPos.setXYZ(
+                        this.nextPos.setXYZ(
                             this.animations[animGroup][currentAnim][nextI],
                             this.animations[animGroup][currentAnim][nextI+1],
                             this.animations[animGroup][currentAnim][nextI+2]
                         );
-                        nextRot.setXYZ(
+                        this.nextRot.setXYZ(
                             this.animations[animGroup][currentAnim][nextI+3],
                             this.animations[animGroup][currentAnim][nextI+4],
                             this.animations[animGroup][currentAnim][nextI+5]
@@ -1037,41 +1041,47 @@ SkeletalMesh.prototype = {
                             }
                             prevI = (currentBone*keyFrames*6)+(prevFrame*6);
                             nextI2 = (currentBone*keyFrames*6)+(nextFrame2*6);
-                            prevPos.setXYZ(
+                            this.prevPos.setXYZ(
                             this.animations[animGroup][currentAnim][prevI],
                             this.animations[animGroup][currentAnim][prevI+1],
                             this.animations[animGroup][currentAnim][prevI+2]
                             );
-                            prevRot.setXYZ(
+                            this.prevRot.setXYZ(
                             this.animations[animGroup][currentAnim][prevI+3],
                             this.animations[animGroup][currentAnim][prevI+4],
                             this.animations[animGroup][currentAnim][prevI+5]
                             );
-                            nextPos2.setXYZ(
+                            this.nextPos2.setXYZ(
                             this.animations[animGroup][currentAnim][nextI2],
                             this.animations[animGroup][currentAnim][nextI2+1],
                             this.animations[animGroup][currentAnim][nextI2+2]
                             );
-                            nextRot2.setXYZ(
+                            this.nextRot2.setXYZ(
                             this.animations[animGroup][currentAnim][nextI2+3],
                             this.animations[animGroup][currentAnim][nextI2+4],
                             this.animations[animGroup][currentAnim][nextI2+5]
                             );
-                            pos.hermitInterp(
-                                prevPos, pos, nextPos, nextPos2, currentTime
+                            this.pos.hermitInterp(
+                                this.prevPos, this.pos,
+                                this.nextPos, this.nextPos2, currentTime
                             );
-                            rot.hermitInterp(
-                                prevRot, rot, nextRot, nextRot2, currentTime
+                            this.rot.hermitInterp(
+                                this.prevRot, this.rot,
+                                this.nextRot, this.nextRot2, currentTime
                             );
                         }
                         else
                         {
                             // Low quality linear interpolation
-                            pos.linearInterp(pos, nextPos, currentTime);
-                            rot.linearInterp(rot, nextRot, currentTime);
+                            this.pos.linearInterp(
+                                this.pos, this.nextPos, currentTime
+                            );
+                            this.rot.linearInterp(
+                                this.rot, this.nextRot, currentTime
+                            );
                         }
-                        this.bonesMatrices[i].translateVec3(pos);
-                        this.bonesMatrices[i].rotateVec3(rot);
+                        this.bonesMatrices[i].translateVec3(this.pos);
+                        this.bonesMatrices[i].rotateVec3(this.rot);
                         animated = true;
                     }
                     ++this.currentBones[animGroup];
@@ -1086,26 +1096,26 @@ SkeletalMesh.prototype = {
             }
 
             // Multiply bone matrix by inverse bind pose matrix
-            tmpMat.setMatrix(this.bonesMatrices[i]);
-            tmpMat.multiply(this.bonesInverses[i]);
+            this.tmpMat.setMatrix(this.bonesMatrices[i]);
+            this.tmpMat.multiply(this.bonesInverses[i]);
 
             // Copy bone matrix to bones array
-            this.bonesArray[i*16] = tmpMat.matrix[0];
-            this.bonesArray[(i*16)+1] = tmpMat.matrix[1];
-            this.bonesArray[(i*16)+2] = tmpMat.matrix[2];
-            this.bonesArray[(i*16)+3] = tmpMat.matrix[3];
-            this.bonesArray[(i*16)+4] = tmpMat.matrix[4];
-            this.bonesArray[(i*16)+5] = tmpMat.matrix[5];
-            this.bonesArray[(i*16)+6] = tmpMat.matrix[6];
-            this.bonesArray[(i*16)+7] = tmpMat.matrix[7];
-            this.bonesArray[(i*16)+8] = tmpMat.matrix[8];
-            this.bonesArray[(i*16)+9] = tmpMat.matrix[9];
-            this.bonesArray[(i*16)+10] = tmpMat.matrix[10];
-            this.bonesArray[(i*16)+11] = tmpMat.matrix[11];
-            this.bonesArray[(i*16)+12] = tmpMat.matrix[12];
-            this.bonesArray[(i*16)+13] = tmpMat.matrix[13];
-            this.bonesArray[(i*16)+14] = tmpMat.matrix[14];
-            this.bonesArray[(i*16)+15] = tmpMat.matrix[15];
+            this.bonesArray[i*16] = this.tmpMat.matrix[0];
+            this.bonesArray[(i*16)+1] = this.tmpMat.matrix[1];
+            this.bonesArray[(i*16)+2] = this.tmpMat.matrix[2];
+            this.bonesArray[(i*16)+3] = this.tmpMat.matrix[3];
+            this.bonesArray[(i*16)+4] = this.tmpMat.matrix[4];
+            this.bonesArray[(i*16)+5] = this.tmpMat.matrix[5];
+            this.bonesArray[(i*16)+6] = this.tmpMat.matrix[6];
+            this.bonesArray[(i*16)+7] = this.tmpMat.matrix[7];
+            this.bonesArray[(i*16)+8] = this.tmpMat.matrix[8];
+            this.bonesArray[(i*16)+9] = this.tmpMat.matrix[9];
+            this.bonesArray[(i*16)+10] = this.tmpMat.matrix[10];
+            this.bonesArray[(i*16)+11] = this.tmpMat.matrix[11];
+            this.bonesArray[(i*16)+12] = this.tmpMat.matrix[12];
+            this.bonesArray[(i*16)+13] = this.tmpMat.matrix[13];
+            this.bonesArray[(i*16)+14] = this.tmpMat.matrix[14];
+            this.bonesArray[(i*16)+15] = this.tmpMat.matrix[15];
         }
 
         // Bind bones matrices texture

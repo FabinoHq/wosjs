@@ -44,7 +44,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Default vertex buffer vertices                                            //
 ////////////////////////////////////////////////////////////////////////////////
-var defaultVertices = new GLArrayDataType([
+const defaultVertices = new GLArrayDataType([
     0.0, 0.0, 0.0,
     1.0, 0.0, 0.0,
     1.0, 1.0, 0.0,
@@ -54,7 +54,7 @@ var defaultVertices = new GLArrayDataType([
 ////////////////////////////////////////////////////////////////////////////////
 //  Default vertex buffer texture coordinates                                 //
 ////////////////////////////////////////////////////////////////////////////////
-var defaultTexCoords = new GLArrayDataType([
+const defaultTexCoords = new GLArrayDataType([
     0.0, 1.0,
     1.0, 1.0,
     1.0, 0.0,
@@ -64,7 +64,7 @@ var defaultTexCoords = new GLArrayDataType([
 ////////////////////////////////////////////////////////////////////////////////
 //  Default vertex buffer indices                                             //
 ////////////////////////////////////////////////////////////////////////////////
-var defaultIndices = new GLIndexDataType([
+const defaultIndices = new GLIndexDataType([
     0, 1, 2,
     2, 3, 0
 ]);

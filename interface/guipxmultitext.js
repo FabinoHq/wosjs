@@ -871,6 +871,7 @@ GuiPxMultiText.prototype = {
         var lineStart = 0;
         var lineEnd = 0;
         var lineReturn = "";
+
         if ((index >= 0) && (index < this.lines.length))
         {
             // Look for line indexes in internal text

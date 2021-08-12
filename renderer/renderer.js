@@ -999,9 +999,6 @@ Renderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     renderText: function(text, width, height, fontsize)
     {
-        var textData = null;
-        var pixelsData = null;
-
         // Update offscreen canvas size
         this.offCanvas.width = Math.round(width);
         this.offCanvas.height = Math.round(height);
@@ -1077,9 +1074,6 @@ Renderer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     renderImage: function(image, width, height)
     {
-        var imageData = null;
-        var pixelsData = null;
-
         // Update offscreen canvas size
         this.offCanvas.width = Math.round(width);
         this.offCanvas.height = Math.round(height);

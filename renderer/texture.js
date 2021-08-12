@@ -221,8 +221,6 @@ Texture.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     handleImageLoaded: function()
     {
-        var pixelsData = null;
-
         // Check texture size
         if (this.image.width <= 0) return;
         if (this.image.width > WOSGLMaxTextureSize) return;

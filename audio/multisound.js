@@ -105,6 +105,10 @@ function MultiSound(audio)
     this.index = 0;
     // MultiSound loop state
     this.loop = true;
+
+    // Temp vectors
+    this.delta = new Vector3();
+    this.cross = new Vector3();
 }
 
 MultiSound.prototype = {
@@ -132,6 +136,8 @@ MultiSound.prototype = {
         this.soundState = WOSAudioMultiSoundStandby;
         this.index = 0;
         this.loop = true;
+        this.delta.reset();
+        this.cross.reset();
 
         // Check audio engine
         if (!this.audio) return false;
@@ -227,9 +233,7 @@ MultiSound.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     compute: function(frametime)
     {
-        var delta = new Vector3();
-        var cross = new Vector3();
-        var deltaVal = 0.0;
+        var delta = 0.0;
 
         // Check frametime
         if (!frametime) return;
@@ -334,28 +338,28 @@ MultiSound.prototype = {
             }
 
             // Compute multi sound spatialization
-            cross.crossProduct(this.audio.target, this.audio.upward);
-            delta.setXYZ(
+            this.cross.crossProduct(this.audio.target, this.audio.upward);
+            this.delta.setXYZ(
                 this.audio.position.vec[0] + this.position.vec[0],
                 this.audio.position.vec[1] + this.position.vec[1],
                 this.audio.position.vec[2] + this.position.vec[2]
             );
 
             // Set multi sound distance
-            this.distanceTarget = (1.0-(delta.length()*this.distanceFactor));
+            this.distanceTarget = 1.0-(this.delta.length()*this.distanceFactor);
             if (this.distanceTarget <= 0.0) this.distanceTarget = 0.0;
             if (this.distanceTarget >= 1.0) this.distanceTarget = 1.0;
 
             // Set multi sound panning
-            delta.normalize();
-            dotProduct = cross.dotProduct(delta);
+            this.delta.normalize();
+            dotProduct = this.cross.dotProduct(this.delta);
             this.pannerTarget = dotProduct;
             if (this.pannerTarget <= -1.0) this.pannerTarget = -1.0;
             if (this.pannerTarget >= 1.0) this.pannerTarget = 1.0;
 
             // Compute distance gain
-            deltaVal = this.distanceTarget-this.distanceValue;
-            if (deltaVal > 0.0)
+            delta = this.distanceTarget-this.distanceValue;
+            if (delta > 0.0)
             {
                 this.distanceValue += frametime*WOSDefaultAudioDistanceFade;
                 if (this.distanceValue >= this.distanceTarget)
@@ -365,7 +369,7 @@ MultiSound.prototype = {
                 this.distance.gain.value =
                     this.distanceValue*this.distanceValue;
             }
-            else if (deltaVal < 0.0)
+            else if (delta < 0.0)
             {
                 this.distanceValue -= frametime*WOSDefaultAudioDistanceFade;
                 if (this.distanceValue <= this.distanceTarget)
@@ -377,8 +381,8 @@ MultiSound.prototype = {
             }
 
             // Compute panner
-            deltaVal = this.pannerTarget-this.pannerValue;
-            if (deltaVal > 0.0)
+            delta = this.pannerTarget-this.pannerValue;
+            if (delta > 0.0)
             {
                 this.pannerValue += frametime*WOSDefaultAudioPanningFade;
                 if (this.pannerValue >= this.pannerTarget)
@@ -387,7 +391,7 @@ MultiSound.prototype = {
                 }
                 this.panner.pan.value = this.pannerValue;
             }
-            else if (deltaVal < 0.0)
+            else if (delta < 0.0)
             {
                 this.pannerValue -= frametime*WOSDefaultAudioPanningFade;
                 if (this.pannerValue <= this.pannerTarget)

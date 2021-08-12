@@ -44,7 +44,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Default vertex buffer normals                                             //
 ////////////////////////////////////////////////////////////////////////////////
-var defaultNormals = new GLArrayDataType([
+const defaultNormals = new GLArrayDataType([
     0.0, 0.0, 1.0,
     0.0, 0.0, 1.0,
     0.0, 0.0, 1.0,

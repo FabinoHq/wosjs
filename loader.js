@@ -434,7 +434,7 @@ Loader.prototype = {
     {
         // Check renderer
         if (!this.renderer) return false;
-        
+
         // Prerender text
         var textWidth = this.renderer.getTextWidth("TextWidth", 20.0);
         var textPixels = this.renderer.renderTextData(

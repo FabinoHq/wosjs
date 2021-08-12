@@ -44,7 +44,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Default skeletal vertex buffer bones indices                              //
 ////////////////////////////////////////////////////////////////////////////////
-var defaultBonesIndices = new GLIndexDataType([
+const defaultBonesIndices = new GLIndexDataType([
     0, 0, 0, 0,
     0, 0, 0, 0,
     0, 0, 0, 0,
@@ -54,7 +54,7 @@ var defaultBonesIndices = new GLIndexDataType([
 ////////////////////////////////////////////////////////////////////////////////
 //  Default skeletal vertex buffer bones weights                              //
 ////////////////////////////////////////////////////////////////////////////////
-var defaultBonesWeights = new GLArrayDataType([
+const defaultBonesWeights = new GLArrayDataType([
     1.0, 0.0, 0.0, 0.0,
     1.0, 0.0, 0.0, 0.0,
     1.0, 0.0, 0.0, 0.0,

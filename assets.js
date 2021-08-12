@@ -42,7 +42,7 @@
 
 
 // WOS textures assets
-var TexturesAssets = [
+const TexturesAssets = [
     "scrollbar.png",
     "wospxfont.png",
     "testsprite.png",
@@ -56,12 +56,12 @@ var TexturesAssets = [
 ];
 
 // WOS models assets
-var ModelsAssets = [
+const ModelsAssets = [
     "testmodel.wmsh",
     "testskeletal.wmsh"
 ];
 
 // WOS sounds assets
-var SoundsAssets = [
+const SoundsAssets = [
     "test.ogg"
 ];

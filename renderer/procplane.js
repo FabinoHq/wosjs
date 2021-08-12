@@ -100,6 +100,12 @@ function ProcPlane(renderer)
     this.alpha = 1.0;
     // Procedural plane specularity
     this.specularity = 0.0;
+
+    // Temp vectors
+    this.lookAtVec = new Vector3();
+    this.rotVec = new Vector3();
+    this.delta = new Vector3();
+    this.delta2 = new Vector3();
 }
 
 ProcPlane.prototype = {
@@ -152,6 +158,10 @@ ProcPlane.prototype = {
         this.time = 0.0;
         this.alpha = 1.0;
         this.specularity = 0.0;
+        this.lookAtVec.reset();
+        this.rotVec.reset();
+        this.delta.reset();
+        this.delta2.reset();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -644,11 +654,8 @@ ProcPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     render: function(quality)
     {
-        var lookAtVec = new Vector3();
-        var rotVec = new Vector3();
-        var delta = new Vector3();
-        var delta2 = new Vector3();
         var dotProduct = 0.0;
+        var angle = 0.0;
 
         // Set procedural plane model matrix
         this.modelMatrix.setIdentity();
@@ -656,72 +663,81 @@ ProcPlane.prototype = {
         if (this.billboard == 1)
         {
             // Cylindrical billboard (Y)
-            lookAtVec.setXYZ(0.0, 0.0, 1.0);
-            delta.setXYZ(
+            this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
+            this.delta.setXYZ(
                 this.renderer.camera.position.vec[0] + this.position.vec[0],
                 0.0,
                 this.renderer.camera.position.vec[2] + this.position.vec[2]
             );
-            delta.normalize();
-            rotVec.crossProduct(lookAtVec, delta);
-            dotProduct = lookAtVec.dotProduct(delta);
+            this.delta.normalize();
+            this.rotVec.crossProduct(this.lookAtVec, this.delta);
+            dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
             angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
             this.modelMatrix.rotate(
-                angle, rotVec.vec[0], rotVec.vec[1], rotVec.vec[2]
+                angle,
+                this.rotVec.vec[0],
+                this.rotVec.vec[1],
+                this.rotVec.vec[2]
             );
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
         else if (this.billboard == 2)
         {
             // Cylindrical billboard (X)
-            lookAtVec.setXYZ(0.0, 0.0, 1.0);
-            delta.setXYZ(
+            this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
+            this.delta.setXYZ(
                 0.0,
                 this.renderer.camera.position.vec[1] + this.position.vec[1],
                 this.renderer.camera.position.vec[2] + this.position.vec[2]
             );
-            delta.normalize();
-            rotVec.crossProduct(lookAtVec, delta);
-            dotProduct = lookAtVec.dotProduct(delta);
+            this.delta.normalize();
+            this.rotVec.crossProduct(this.lookAtVec, this.delta);
+            dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
             angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
             this.modelMatrix.rotate(
-                angle, rotVec.vec[0], rotVec.vec[1], rotVec.vec[2]
+                angle,
+                this.rotVec.vec[0],
+                this.rotVec.vec[1],
+                this.rotVec.vec[2]
             );
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
         else if (this.billboard == 3)
         {
             // Spherical billboard
-            lookAtVec.setXYZ(0.0, 0.0, 1.0);
-            delta.setXYZ(
+            this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
+            this.delta.setXYZ(
                 this.renderer.camera.position.vec[0] + this.position.vec[0],
                 0.0,
                 this.renderer.camera.position.vec[2] + this.position.vec[2]
             );
-            delta.normalize();
-            rotVec.crossProduct(lookAtVec, delta);
-            dotProduct = lookAtVec.dotProduct(delta);
+            this.delta.normalize();
+            this.rotVec.crossProduct(this.lookAtVec, this.delta);
+            dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
             angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
             this.modelMatrix.rotate(
-                angle, rotVec.vec[0], rotVec.vec[1], rotVec.vec[2]
+                angle,
+                this.rotVec.vec[0],
+                this.rotVec.vec[1],
+                this.rotVec.vec[2]
             );
-            delta2.setXYZ(
+            this.delta2.setXYZ(
                 this.renderer.camera.position.vec[0] + this.position.vec[0],
                 this.renderer.camera.position.vec[1] + this.position.vec[1],
                 this.renderer.camera.position.vec[2] + this.position.vec[2]
             );
-            delta2.normalize();
-            dotProduct = delta.dotProduct(delta2);
+            this.delta2.normalize();
+            dotProduct = this.delta.dotProduct(this.delta2);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
             angle = Math.acos(dotProduct)*180.0/Math.PI;
-            if (delta2.vec[1] < 0.0) { this.modelMatrix.rotateX(angle); }
+            if (this.delta2.vec[1] < 0.0) { this.modelMatrix.rotateX(angle); }
             else { this.modelMatrix.rotateX(-angle); }
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }

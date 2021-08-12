@@ -46,7 +46,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 function BoundingBox()
 {
+    // Bounding box position
     this.position = new Vector2(0.0, 0.0);
+
+    // Bounding box half size
     this.halfsize = new Vector2(0.0, 0.0);
 }
 
@@ -367,12 +370,8 @@ BoundingBox.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     collideBox: function(collision, box, offset)
     {
-        var padding = new Vector2(0.0, 0.0);
-        padding.vec[0] = box.halfsize.vec[0];
-        padding.vec[1] = box.halfsize.vec[1];
-
         // Dynamic sweep collision
-        if (!this.collideSegment(collision, box.position, offset, padding))
+        if (!this.collideSegment(collision, box.position, offset, box.halfsize))
         {
             collision.reset();
             collision.setFactor(1.0);
@@ -386,4 +385,3 @@ BoundingBox.prototype = {
         return true;
     }
 };
-
