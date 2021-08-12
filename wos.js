@@ -92,10 +92,11 @@ var messageBoxText = "";
 function messageBox()
 {
     // Display default WOS message
+    document.getElementById("woscreen").style.display = "none";
     document.getElementById("woscreen").hidden = true;
     var message = document.createElement('p');
-    var textMessage = "Unfortunately, WOS is not working on your ";
-    textMessage += "browser.<br />Please try using a different one.";
+    var textMessage = "Unfortunately, WOS is not working on your browser.";
+    textMessage += "<br />Please try using a different one.";
     message.innerHTML = textMessage;
     message.style.color = "rgb(255, 127, 0)";
     message.style.fontSize = "1.8em";
@@ -104,20 +105,20 @@ function messageBox()
     message.style.width = "100%";
     message.style.top = "42%";
     message.style.display = "block";
-    message.style.hidden = false;
+    message.hidden = false;
     document.body.appendChild(message);
 
     // Display error message
     var error = document.createElement('p');
     error.innerHTML = messageBoxText;
-    error.style.color = "rgb(128, 128, 128)";
+    error.style.color = "rgb(127, 127, 127)";
     error.style.fontSize = "1.2em";
     error.style.textAlign = "center";
     error.style.verticalAlign = "middle";
     error.style.width = "100%";
     error.style.top = "55%";
     error.style.display = "block";
-    error.style.hidden = false;
+    error.hidden = false;
     document.body.appendChild(error);
 }
 
@@ -141,7 +142,7 @@ window.onload = function()
     else
     {
         // Could not create WOS
-        messageBoxText = "[0x00] Could not create WOS";
+        messageBoxText = "[0x0000] Could not create WOS";
         messageBox();
     }
 }
@@ -464,13 +465,13 @@ Wos.prototype = {
         if (!this.backrenderer)
         {
             // Could not create backrenderer
-            messageBoxText = "[0x20] Could not create backrenderer";
+            messageBoxText = "[0x0020] Could not create backrenderer";
             return false;
         }
         if (!this.backrenderer.init(1024, 1024))
         {
             // Could not init backrenderer
-            messageBoxText = "[0x21] Could not init backrenderer";
+            messageBoxText = "[0x0021] Could not init backrenderer";
             return false;
         }
         this.backrenderer.clear();
@@ -480,13 +481,13 @@ Wos.prototype = {
         if (!this.testline)
         {
             // Could not create test line
-            messageBoxText = "[0x22] Could not create test line";
+            messageBoxText = "[0x0022] Could not create test line";
             return false;
         }
         if (!this.testline.init(0.1, -0.5, -0.5, 0.5, 0.5))
         {
             // Could not init test line
-            messageBoxText = "[0x23] Could not init test line";
+            messageBoxText = "[0x0023] Could not init test line";
             return false;
         }
         this.testline.setColor(0.4, 0.0, 0.8);
@@ -498,13 +499,13 @@ Wos.prototype = {
         if (!this.testrect)
         {
             // Could not create test rect
-            messageBoxText = "[0x24] Could not create test rect";
+            messageBoxText = "[0x0024] Could not create test rect";
             return false;
         }
         if (!this.testrect.init(0.1, 0.8, 0.4))
         {
             // Could not init test rect
-            messageBoxText = "[0x25] Could not init test rect";
+            messageBoxText = "[0x0025] Could not init test rect";
             return false;
         }
         this.testrect.setColor(0.0, 0.2, 0.8);
@@ -516,14 +517,14 @@ Wos.prototype = {
         if (!this.testsprite)
         {
             // Could not create test sprite
-            messageBoxText = "[0x26] Could not create test sprite";
+            messageBoxText = "[0x0026] Could not create test sprite";
             return false;
         }
         if (!this.testsprite.init(
             this.loader.getTexture("testsprite.png"), 0.09, 0.09))
         {
             // Could not init test sprite
-            messageBoxText = "[0x27] Could not init test sprite";
+            messageBoxText = "[0x0027] Could not init test sprite";
             return false;
         }
 
@@ -532,13 +533,13 @@ Wos.prototype = {
         if (!this.testproc)
         {
             // Could not create test procedural sprite
-            messageBoxText = "[0x28] Could not create test procedural sprite";
+            messageBoxText = "[0x0028] Could not create test procedural sprite";
             return false;
         }
         if (!this.testproc.init())
         {
             // Could not init test procedural sprite
-            messageBoxText = "[0x29] Could not init test procedural sprite";
+            messageBoxText = "[0x0029] Could not init test procedural sprite";
             return false;
         }
 
@@ -549,14 +550,14 @@ Wos.prototype = {
         if (!this.testninepatch)
         {
             // Could not create test ninepatch
-            messageBoxText = "[0x2A] Could not create test ninepatch";
+            messageBoxText = "[0x002A] Could not create test ninepatch";
             return false;
         }
         if (!this.testninepatch.init(
             this.loader.getTexture("testninepatch.png"), 0.4, 0.4, 15.0))
         {
             // Could not init test ninepatch
-            messageBoxText = "[0x2B] Could not init test ninepatch";
+            messageBoxText = "[0x002B] Could not init test ninepatch";
             return false;
         }
 
@@ -567,14 +568,14 @@ Wos.prototype = {
         if (!this.testanim)
         {
             // Could not create test anim
-            messageBoxText = "[0x2C] Could not create test anim";
+            messageBoxText = "[0x002C] Could not create test anim";
             return false;
         }
         if (!this.testanim.init(
             this.loader.getTexture("testsprite.png"), 1.0, 1.0, 2, 2))
         {
             // Could not init test anim
-            messageBoxText = "[0x2D] Could not init test anim";
+            messageBoxText = "[0x002D] Could not init test anim";
             return false;
         }
         this.testanim.setFrametime(1.0);
@@ -589,14 +590,14 @@ Wos.prototype = {
         if (!this.testbutton)
         {
             // Could not create test button
-            messageBoxText = "[0x2E] Could not create test button";
+            messageBoxText = "[0x002E] Could not create test button";
             return false;
         }
         if (!this.testbutton.init(
             this.loader.getTexture("testbutton.png"), 0.12, 0.06))
         {
             // Could not init test button
-            messageBoxText = "[0x2F] Could not init test button";
+            messageBoxText = "[0x002F] Could not init test button";
             return false;
         }
 
@@ -607,14 +608,14 @@ Wos.prototype = {
         if (!this.testtogglebutton)
         {
             // Could not create test toggle button
-            messageBoxText = "[0x30] Could not create test toggle button";
+            messageBoxText = "[0x0030] Could not create test toggle button";
             return false;
         }
         if (!this.testtogglebutton.init(
             this.loader.getTexture("testtogglebutton.png"), 0.12, 0.12))
         {
             // Could not init test toggle button
-            messageBoxText = "[0x31] Could not init test toggle button";
+            messageBoxText = "[0x0031] Could not init test toggle button";
             return false;
         }
 
@@ -625,14 +626,14 @@ Wos.prototype = {
         if (!this.testprogressbar)
         {
             // Could not create test progress bar
-            messageBoxText = "[0x32] Could not create test progress bar";
+            messageBoxText = "[0x0032] Could not create test progress bar";
             return false;
         }
         if (!this.testprogressbar.init(
             this.loader.getTexture("testprogressbar.png"), 0.8, 0.06, 15.0))
         {
             // Could not init test progress bar
-            messageBoxText = "[0x33] Could not init test progress bar";
+            messageBoxText = "[0x0033] Could not init test progress bar";
             return false;
         }
 
@@ -643,14 +644,14 @@ Wos.prototype = {
         if (!this.testsliderbar)
         {
             // Could not create test slider bar
-            messageBoxText = "[0x34] Could not create test slider bar";
+            messageBoxText = "[0x0034] Could not create test slider bar";
             return false;
         }
         if (!this.testsliderbar.init(
             this.loader.getTexture("testsliderbar.png"), 0.8, 0.06, 15.0))
         {
             // Could not init test slider bar
-            messageBoxText = "[0x35] Could not init test slider bar";
+            messageBoxText = "[0x0035] Could not init test slider bar";
             return false;
         }
         this.testsliderbar.setCursorOffset(0.013);
@@ -660,13 +661,13 @@ Wos.prototype = {
         if (!this.testtext)
         {
             // Could not create test text
-            messageBoxText = "[0x36] Could not create test text";
+            messageBoxText = "[0x0036] Could not create test text";
             return false;
         }
         if (!this.testtext.init("Test text", 0.1))
         {
             // Could not init test text
-            messageBoxText = "[0x37] Could not init test text";
+            messageBoxText = "[0x0037] Could not init test text";
             return false;
         }
 
@@ -678,7 +679,7 @@ Wos.prototype = {
         if (!this.testmultitext)
         {
             // Could not create test multiline text
-            messageBoxText = "[0x38] Could not create test multiline text";
+            messageBoxText = "[0x0038] Could not create test multiline text";
             return false;
         }
         if (!this.testmultitext.init(
@@ -686,7 +687,7 @@ Wos.prototype = {
             1.0, 1.0, 0.1, true, this.loader.getTexture("scrollbar.png"), 0.03))
         {
             // Could not init test multiline text
-            messageBoxText = "[0x39] Could not init test multiline text";
+            messageBoxText = "[0x0039] Could not init test multiline text";
             return false;
         }
 
@@ -697,13 +698,13 @@ Wos.prototype = {
         if (!this.testtextbox)
         {
             // Could not create test text box
-            messageBoxText = "[0x3A] Could not create test text box";
+            messageBoxText = "[0x003A] Could not create test text box";
             return false;
         }
         if (!this.testtextbox.init(false, 1.0, 0.1, "Test"))
         {
             // Could not init test text box
-            messageBoxText = "[0x3B] Could not init test text box";
+            messageBoxText = "[0x003B] Could not init test text box";
             return false;
         }
         this.testtextbox.setSelected(true);
@@ -715,14 +716,14 @@ Wos.prototype = {
         if (!this.testtextbutton)
         {
             // Could not create test text button
-            messageBoxText = "[0x3C] Could not create test text button";
+            messageBoxText = "[0x003C] Could not create test text button";
             return false;
         }
         if (!this.testtextbutton.init(
             this.loader.getTexture("testtextbutton.png"), "Test", 0.1, 15.0))
         {
             // Could not init test text button
-            messageBoxText = "[0x3D] Could not init test text button";
+            messageBoxText = "[0x003D] Could not init test text button";
             return false;
         }
         this.testtextbutton.setTextOffset(-0.004, -0.005);
@@ -737,14 +738,14 @@ Wos.prototype = {
         if (!this.testpxtext)
         {
             // Could not create test pixel text
-            messageBoxText = "[0x3E] Could not create test pixel text";
+            messageBoxText = "[0x003E] Could not create test pixel text";
             return false;
         }
         if (!this.testpxtext.init(true,
             this.loader.getTexture("wospxfont.png"), "Test pixel text", 0.1))
         {
             // Could not init test pixel text
-            messageBoxText = "[0x3F] Could not init test pixel text";
+            messageBoxText = "[0x003F] Could not init test pixel text";
             return false;
         }
         this.testpxtext.setSmooth(0.15);
@@ -757,7 +758,7 @@ Wos.prototype = {
         if (!this.testpxmultitext)
         {
             // Could not create test pixel multi text
-            messageBoxText = "[0x40] Could not create test pixel multi text";
+            messageBoxText = "[0x0040] Could not create test pixel multi text";
             return false;
         }
         if (!this.testpxmultitext.init(true,
@@ -766,7 +767,7 @@ Wos.prototype = {
             1.0, 1.0, 0.1, true, this.loader.getTexture("scrollbar.png"), 0.03))
         {
             // Could not init test pixel multi text
-            messageBoxText = "[0x41] Could not init test pixel multi text";
+            messageBoxText = "[0x0041] Could not init test pixel multi text";
             return false;
         }
         this.testpxmultitext.setSmooth(0.1);
@@ -779,14 +780,14 @@ Wos.prototype = {
         if (!this.testpxtextbox)
         {
             // Could not create test pixel text box
-            messageBoxText = "[0x42] Could not create test pixel text box";
+            messageBoxText = "[0x0042] Could not create test pixel text box";
             return false;
         }
         if (!this.testpxtextbox.init(
             this.loader.getTexture("wospxfont.png"), 1.0, 0.1, "Test"))
         {
             // Could not init test pixel text box
-            messageBoxText = "[0x43] Could not init test pixel text box";
+            messageBoxText = "[0x0043] Could not init test pixel text box";
             return false;
         }
         this.testpxtextbox.setSmooth(0.1);
@@ -799,7 +800,7 @@ Wos.prototype = {
         if (!this.testpxtextbutton)
         {
             // Could not create test pixel text button
-            messageBoxText = "[0x44] Could not create test pixel text button";
+            messageBoxText = "[0x0044] Could not create test pixel text button";
             return false;
         }
         if (!this.testpxtextbutton.init(
@@ -807,7 +808,7 @@ Wos.prototype = {
             this.loader.getTexture("wospxfont.png"), "Test", 0.1, 15.0))
         {
             // Could not init test pixel text button
-            messageBoxText = "[0x45] Could not init test pixel text button";
+            messageBoxText = "[0x0045] Could not init test pixel text button";
             return false;
         }
         this.testpxtextbutton.setSmooth(0.1);
@@ -822,14 +823,14 @@ Wos.prototype = {
         if (!this.testwindow)
         {
             // Could not create test window
-            messageBoxText = "[0x46] Could not create test window";
+            messageBoxText = "[0x0046] Could not create test window";
             return false;
         }
         if (!this.testwindow.init(
             this.loader.getTexture("testwindow.png"), 1.0, 1.0, 3.75))
         {
             // Could not init test window
-            messageBoxText = "[0x47] Could not init test window";
+            messageBoxText = "[0x0047] Could not init test window";
             return false;
         }
         this.testwindow.setPosition(
@@ -843,7 +844,7 @@ Wos.prototype = {
         if (!this.camera)
         {
             // Could not create test camera
-            messageBoxText = "[0x48] Could not create test camera";
+            messageBoxText = "[0x0048] Could not create test camera";
             return false;
         }
         this.camera.reset();
@@ -856,7 +857,7 @@ Wos.prototype = {
         if (!this.freeflycam)
         {
             // Could not create test freefly camera
-            messageBoxText = "[0x49] Could not create test freefly camera";
+            messageBoxText = "[0x0049] Could not create test freefly camera";
             return false;
         }
         this.freeflycam.reset();
@@ -869,7 +870,7 @@ Wos.prototype = {
         if (!this.pointLight)
         {
             // Could not create test point light
-            messageBoxText = "[0x4A] Could not create test point light";
+            messageBoxText = "[0x004A] Could not create test point light";
             return false;
         }
         this.pointLight.setPosition(3.0, 3.0, -3.0);
@@ -882,7 +883,7 @@ Wos.prototype = {
         if (!this.spotLight)
         {
             // Could not create test spot light
-            messageBoxText = "[0x4B] Could not create test spot light";
+            messageBoxText = "[0x004B] Could not create test spot light";
             return false;
         }
         this.spotLight.setPosition(-1.0, 1.5, 0.0);
@@ -911,14 +912,14 @@ Wos.prototype = {
         if (!this.testplane)
         {
             // Could not create test plane
-            messageBoxText = "[0x4C] Could not create test plane";
+            messageBoxText = "[0x004C] Could not create test plane";
             return false;
         }
         if (!this.testplane.init(
             this.loader.getTexture("testsprite.png"), 1.0, 1.0))
         {
             // Could not init test plane
-            messageBoxText = "[0x4D] Could not init test plane";
+            messageBoxText = "[0x004D] Could not init test plane";
             return false;
         }
         this.testplane.setBillboard(0);
@@ -933,14 +934,14 @@ Wos.prototype = {
         if (!this.testanimplane)
         {
             // Could not create test anim plane
-            messageBoxText = "[0x4E] Could not create test anim plane";
+            messageBoxText = "[0x004E] Could not create test anim plane";
             return false;
         }
         if (!this.testanimplane.init(
             this.loader.getTexture("testsprite.png"), 1.0, 1.0, 2, 2))
         {
             // Could not init test anim plane
-            messageBoxText = "[0x4F] Could not init test anim plane";
+            messageBoxText = "[0x004F] Could not init test anim plane";
             return false;
         }
         this.testanimplane.setFrametime(1.0);
@@ -954,13 +955,13 @@ Wos.prototype = {
         if (!this.testprocplane)
         {
             // Could not create test procedural plane
-            messageBoxText = "[0x50] Could not create test procedural plane";
+            messageBoxText = "[0x0050] Could not create test procedural plane";
             return false;
         }
         if (!this.testprocplane.init())
         {
             // Could not init test procedural plane
-            messageBoxText = "[0x51] Could not init test procedural plane";
+            messageBoxText = "[0x0051] Could not init test procedural plane";
             return false;
         }
         this.testprocplane.setBillboard(0);
@@ -975,7 +976,7 @@ Wos.prototype = {
         if (!this.staticmesh)
         {
             // Could not create test static mesh
-            messageBoxText = "[0x52] Could not create test static mesh";
+            messageBoxText = "[0x0052] Could not create test static mesh";
             return false;
         }
         if (!this.staticmesh.init(
@@ -983,7 +984,7 @@ Wos.prototype = {
             this.loader.getTexture("testsprite.png")))
         {
             // Could not init test static mesh
-            messageBoxText = "[0x53] Could not init test static mesh";
+            messageBoxText = "[0x0053] Could not init test static mesh";
             return false;
         }
 
@@ -997,7 +998,7 @@ Wos.prototype = {
         if (!this.skeletalmesh)
         {
             // Could not create test skeletal mesh
-            messageBoxText = "[0x54] Could not create test skeletal mesh";
+            messageBoxText = "[0x0054] Could not create test skeletal mesh";
             return false;
         }
         if (!this.skeletalmesh.init(
@@ -1005,7 +1006,7 @@ Wos.prototype = {
             this.loader.getTexture("testsprite.png")))
         {
             // Could not init test skeletal mesh
-            messageBoxText = "[0x55] Could not init test skeletal mesh";
+            messageBoxText = "[0x0055] Could not init test skeletal mesh";
             return false;
         }
         this.skeletalmesh.setAnimation(0, 0);
