@@ -148,6 +148,19 @@ function distance(x1, y1, x2, y2)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+//  randomInt : Random integer generation                                     //
+//  param min : Minimum integer value                                         //
+//  param max : Maximum integer value                                         //
+//  return : Random integer between min and max                               //
+////////////////////////////////////////////////////////////////////////////////
+function randomInt(min, max)
+{
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return (Math.floor(Math.random()*(max-min+1)) + min);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 //  pseudoRand : 2D based pseudo-random value                                 //
 //  param seed : Normalized seed of the pseudo-random generation              //
 //  param x : X offset                                                        //
