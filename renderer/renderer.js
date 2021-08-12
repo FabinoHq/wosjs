@@ -221,6 +221,7 @@ Renderer.prototype = {
         if (!this.context)
         {
             // Invalid canvas context
+            messageBoxText = "[0x01] Invalid canvas context";
             return false;
         }
 
@@ -252,6 +253,7 @@ Renderer.prototype = {
         if (!this.gl)
         {
             // No valid context found
+            messageBoxText = "[0x02] No valid context found";
             return false;
         }
 
@@ -266,6 +268,7 @@ Renderer.prototype = {
         if (!this.texFloatExt)
         {
             // Texture float extension is not supported
+            messageBoxText = "[0x03] Texture float extension is not supported";
             return false;
         }
 
@@ -309,6 +312,7 @@ Renderer.prototype = {
             (this.maxCombTextureUnits < 2))
         {
             // Not enough texture units
+            messageBoxText = "[0x04] Not enough texture units";
             return false;
         }
 
@@ -334,6 +338,7 @@ Renderer.prototype = {
         if (this.maxTextureSize < WOSGLMaxTextureSize)
         {
             // Invalid maximum texture size
+            messageBoxText = "[0x05] Invalid maximum texture size";
             return false;
         }
 
@@ -344,6 +349,7 @@ Renderer.prototype = {
         if (this.maxVertexAttribs < 4)
         {
             // Not enough vertex attribs
+            messageBoxText = "[0x06] Not enough vertex attribs";
             return false;
         }
 
@@ -390,28 +396,68 @@ Renderer.prototype = {
 
         // Create offscreen canvas
         this.offCanvas = document.createElement('canvas');
-        if (!this.offCanvas) return false;
+        if (!this.offCanvas)
+        {
+            // Could not create offscreen canvas
+            messageBoxText = "[0x07] Could not create offscreen canvas";
+            return false;
+        }
         this.offCanvas.width = 1;
         this.offCanvas.height = 1;
 
         // Get offscreen context
         this.offContext = this.offCanvas.getContext('2d');
-        if (!this.offContext) return false;
+        if (!this.offContext)
+        {
+            // Could not get offscreen context
+            messageBoxText = "[0x08] Could not get offscreen context";
+            return false;
+        }
 
         // Init default vbo
         this.vertexBuffer = new VertexBuffer(this.gl);
-        if (!this.vertexBuffer) return false;
-        if (!this.vertexBuffer.init()) return false;
+        if (!this.vertexBuffer)
+        {
+            // Could not create default vbo
+            messageBoxText = "[0x09] Could not create default vbo";
+            return false;
+        }
+        if (!this.vertexBuffer.init())
+        {
+            // Could not init default vbo
+            messageBoxText = "[0x0A] Could not init default vbo";
+            return false;
+        }
 
         // Init plane vbo
         this.planeVertexBuffer = new MeshVertexBuffer(this);
-        if (!this.planeVertexBuffer) return false;
-        if (!this.planeVertexBuffer.init()) return false;
+        if (!this.planeVertexBuffer)
+        {
+            // Could not create plane vbo
+            messageBoxText = "[0x0B] Could not create plane vbo";
+            return false;
+        }
+        if (!this.planeVertexBuffer.init())
+        {
+            // Could not init plane vbo
+            messageBoxText = "[0x0C] Could not init plane vbo";
+            return false;
+        }
 
         // Init default shader
         this.shader = new Shader(this.gl);
-        if (!this.shader) return false;
-        if (!this.shader.init()) return false;
+        if (!this.shader)
+        {
+            // Could not create default shader
+            messageBoxText = "[0x0D] Could not create default shader";
+            return false;
+        }
+        if (!this.shader.init())
+        {
+            // Could not init default shader
+            messageBoxText = "[0x0E] Could not init default shader";
+            return false;
+        }
 
         // Set renderer clear color
         this.gl.clearColor(
@@ -478,22 +524,66 @@ Renderer.prototype = {
 
         // Init world light
         this.worldLight = new WorldLight(this);
-        this.worldLight.init();
+        if (!this.worldLight)
+        {
+            // Could not create world light
+            messageBoxText = "[0x10] Could not create world light";
+            return false;
+        }
+        if (!this.worldLight.init())
+        {
+            // Could not init world light
+            messageBoxText = "[0x11] Could not init world light";
+            return false;
+        }
         this.worldLight.setDirection(0.2, 0.1, 0.9);
         this.worldLight.setColor(1.0, 1.0, 1.0, 0.2);
         this.worldLight.setAmbient(1.0, 1.0, 1.0, 0.1);
 
         // Init dynamic lights
         this.dynamicLights = new DynamicLights(this);
-        this.dynamicLights.init();
+        if (!this.dynamicLights)
+        {
+            // Could not create dynamic lights
+            messageBoxText = "[0x12] Could not create dynamic lights";
+            return false;
+        }
+        if (!this.dynamicLights.init())
+        {
+            // Could not init dynamic lights
+            messageBoxText = "[0x13] Could not init dynamic lights";
+            return false;
+        }
 
         // Init default normal map
         this.normalMap = new Texture(this);
-        this.normalMap.init(1, 1, new Uint8Array([128, 128, 255, 255]));
+        if (!this.normalMap)
+        {
+            // Could not create default normal map
+            messageBoxText = "[0x14] Could not create default normal map";
+            return false;
+        }
+        if (!this.normalMap.init(1, 1, new Uint8Array([128, 128, 255, 255])))
+        {
+            // Could not init default normal map
+            messageBoxText = "[0x15] Could not init default normal map";
+            return false;
+        }
 
         // Init default specular map
         this.specularMap = new Texture(this);
-        this.specularMap.init(1, 1, new Uint8Array([255, 255, 255, 255]));
+        if (!this.specularMap)
+        {
+            // Could not create default specular map
+            messageBoxText = "[0x16] Could not create default specular map";
+            return false;
+        }
+        if (!this.specularMap.init(1, 1, new Uint8Array([255, 255, 255, 255])))
+        {
+            // Could not init default specular map
+            messageBoxText = "[0x17] Could not init default specular map";
+            return false;
+        }
 
         // Init shadows
         this.shadows = new Shadows(this);
@@ -529,11 +619,33 @@ Renderer.prototype = {
 
         // Init text line renderer
         this.textLineRenderer = new BackRenderer(this, this.shader);
-        this.textLineRenderer.init(1, 1, true);
+        if (!this.textLineRenderer)
+        {
+            // Could not create text line renderer
+            messageBoxText = "[0x18] Could not create text line renderer";
+            return false;
+        }
+        if (!this.textLineRenderer.init(1, 1, true))
+        {
+            // Could not init text line renderer
+            messageBoxText = "[0x19] Could not init text line renderer";
+            return false;
+        }
 
         // Init text field renderer
         this.textFieldRenderer = new BackRenderer(this, this.shader);
-        this.textFieldRenderer.init(1, 1, true);
+        if (!this.textFieldRenderer)
+        {
+            // Could not create text field renderer
+            messageBoxText = "[0x1A] Could not create text field renderer";
+            return false;
+        }
+        if (!this.textFieldRenderer.init(1, 1, true))
+        {
+            // Could not init text field renderer
+            messageBoxText = "[0x1B] Could not init text field renderer";
+            return false;
+        }
 
         // Renderer is successfully loaded
         this.loaded = true;

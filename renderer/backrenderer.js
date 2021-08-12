@@ -223,19 +223,19 @@ BackRenderer.prototype = {
                 this.renderer.gl.COLOR_ATTACHMENT0,
                 this.renderer.gl.TEXTURE_2D, this.texture, 0
             );
-        }
 
-        // Check framebuffer status
-        if (this.renderer.gl.checkFramebufferStatus(
-            this.renderer.gl.FRAMEBUFFER) !=
-            this.renderer.gl.FRAMEBUFFER_COMPLETE)
-        {
-            // Invalid framebuffer status
-            return false;
-        }
+            // Unbind texture
+            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
-        // Unbind texture
-        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+            // Check framebuffer status
+            if (this.renderer.gl.checkFramebufferStatus(
+                this.renderer.gl.FRAMEBUFFER) !=
+                this.renderer.gl.FRAMEBUFFER_COMPLETE)
+            {
+                // Invalid framebuffer status
+                return false;
+            }
+        }
 
         // Unbind framebuffer
         this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
