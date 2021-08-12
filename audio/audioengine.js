@@ -164,8 +164,6 @@ AudioEngine.prototype = {
         // Create master gain
         this.masterGain = this.context.createGain();
         this.masterGain.connect(this.context.destination);
-        this.masterValue = 0.5;
-        this.masterTarget = 0.5;
         this.masterGain.gain.value = this.masterValue*this.masterValue;
 
         // Create sounds gain
@@ -236,6 +234,10 @@ AudioEngine.prototype = {
     {
         var delta = 0.0;
 
+        // Check frametime
+        if (!frametime) return;
+
+        // Compute audio engine
         if (this.loaded)
         {
             // Compute master gain
@@ -478,12 +480,12 @@ AudioEngine.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setListenerPos : Set listener position                                //
+    //  setPosition : Set listener position                                   //
     //  param x : X position of the listener                                  //
     //  param y : Y position of the listener                                  //
     //  param z : Z position of the listener                                  //
     ////////////////////////////////////////////////////////////////////////////
-    setListenerPos: function(x, y, z)
+    setPosition: function(x, y, z)
     {
         if (this.loaded && x && y && z)
         {
@@ -492,10 +494,10 @@ AudioEngine.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setListenerPosVec3 : Set listener position from a 3 component vector  //
+    //  setPositionVec3 : Set listener position from a 3 component vector     //
     //  param vector : 3 component vector to set listener position from       //
     ////////////////////////////////////////////////////////////////////////////
-    setListenerPosVec3: function(vector)
+    setPositionVec3: function(vector)
     {
         if (this.loaded && vector)
         {
@@ -504,7 +506,7 @@ AudioEngine.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setListenerOrientation : Set listener orientation                     //
+    //  setOrientation : Set listener orientation                             //
     //  param x : X orientation of the listener                               //
     //  param y : Y orientation of the listener                               //
     //  param z : Z orientation of the listener                               //
@@ -512,7 +514,7 @@ AudioEngine.prototype = {
     //  param yUp : Y up orientation of the listener                          //
     //  param zUp : Z up orientation of the listener                          //
     ////////////////////////////////////////////////////////////////////////////
-    setListenerOrientation: function(x, y, z, xUp, yUp, zUp)
+    setOrientation: function(x, y, z, xUp, yUp, zUp)
     {
         if (this.loaded && x && y && z && xUp && yUp && zUp)
         {
@@ -522,11 +524,11 @@ AudioEngine.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setListenerOrientationVec3 : Set listener orientation from a vector   //
+    //  setOrientationVec3 : Set listener orientation from a vector           //
     //  param target : 3 component vector to set listener orientation from    //
     //  param upward : 3 component up vector to set listener orientation from //
     ////////////////////////////////////////////////////////////////////////////
-    setListenerOrientationVec3: function(target, upward)
+    setOrientationVec3: function(target, upward)
     {
         if (this.loaded && target && upward)
         {

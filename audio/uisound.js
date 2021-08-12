@@ -67,10 +67,10 @@ function UISound(audio)
 
 UISound.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  setSoundBuffer : Set sound buffer                                     //
+    //  init : Init ui sound                                                  //
     //  param soundBuffer : Sound buffer to set ui sound from                 //
     ////////////////////////////////////////////////////////////////////////////
-    setSoundBuffer: function(sound)
+    init: function(soundBuffer)
     {
         // Reset sound
         this.loaded = false;
@@ -84,17 +84,17 @@ UISound.prototype = {
         // Check audio context
         if (!this.audio.context) return false;
 
-        // Check sound resource
-        if (!sound) return false;
-
         // Check sound buffer
-        if (!sound.buffer) return false;
+        if (!soundBuffer) return false;
 
-        // Check sound loaded state
-        if (!sound.loaded) return false;
+        // Check sound buffer resource
+        if (!soundBuffer.buffer) return false;
+
+        // Check sound buffer loaded state
+        if (!soundBuffer.loaded) return false;
 
         // Set sound buffer
-        this.buffer = sound.buffer;
+        this.buffer = soundBuffer.buffer;
         this.loaded = true;
         return true;
     },

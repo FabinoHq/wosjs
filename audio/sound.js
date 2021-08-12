@@ -84,10 +84,10 @@ function Sound(audio)
 
 Sound.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  setSoundBuffer : Set sound buffer                                     //
+    //  init : Init sound                                                     //
     //  param soundBuffer : Sound buffer to set sound from                    //
     ////////////////////////////////////////////////////////////////////////////
-    setSoundBuffer: function(soundBuffer)
+    init: function(soundBuffer)
     {
         // Reset sound
         this.loaded = false;
@@ -170,8 +170,13 @@ Sound.prototype = {
         var cross = new Vector3();
         var deltaVal = 0.0;
 
+        // Check frametime
+        if (!frametime) return;
+
+        // Compute sound audio
         if (this.loaded)
         {
+            // Compute sound spatialization
             cross.crossProduct(this.audio.target, this.audio.upward);
             delta.setXYZ(
                 this.audio.position.vec[0] + this.position.vec[0],
@@ -269,7 +274,7 @@ Sound.prototype = {
             if (this.playing)
             {
                 this.sound.stop(0);
-                this.sound.disconnect(this.audio.soundGain);
+                this.sound.disconnect(this.distance);
                 this.playing = false;
             }
         }

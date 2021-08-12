@@ -63,5 +63,5 @@ var ModelsAssets = [
 
 // WOS sounds assets
 var SoundsAssets = [
-    "test.ogg",
+    "test.ogg"
 ];
