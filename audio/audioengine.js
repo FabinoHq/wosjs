@@ -62,7 +62,7 @@ const WOSAudioMusicFadeOut = 4;
 ////////////////////////////////////////////////////////////////////////////////
 function AudioEngine()
 {
-    // Audio engine loaded status
+    // Audio engine loaded state
     this.loaded = false;
 
     // Audio engine enabled status
@@ -118,6 +118,7 @@ function AudioEngine()
 AudioEngine.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init audio engine                                              //
+    //  return : True if the audio engine is successfully loaded              //
     ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
@@ -163,29 +164,42 @@ AudioEngine.prototype = {
 
         // Create master gain
         this.masterGain = this.context.createGain();
+        if (!this.masterGain) return false;
         this.masterGain.connect(this.context.destination);
         this.masterGain.gain.value = this.masterValue*this.masterValue;
 
         // Create sounds gain
         this.soundGain = this.context.createGain();
+        if (!this.soundGain) return false;
         this.soundGain.connect(this.masterGain);
         this.soundGain.gain.value = this.soundValue*this.soundValue;
 
         // Create ui sounds gain
         this.uisoundGain = this.context.createGain();
+        if (!this.uisoundGain) return false;
         this.uisoundGain.connect(this.masterGain);
         this.uisoundGain.gain.value = this.uisoundValue*this.uisoundValue;
 
         // Create music gain
         this.musicGain = this.context.createGain();
+        if (!this.musicGain) return false;
         this.musicGain.connect(this.masterGain);
         this.musicGain.gain.value = this.musicValue*this.musicValue;
 
         // Create music instance
         this.music = new Music(this);
+        if (!this.music) return false;
+        this.music.onMusicEnd = function()
+        {
+            this.audio.crossFaderValue = 0.0;
+            this.audio.crossFaderGain.gain.value = 0.0;
+            this.audio.crossFaderState = WOSAudioMusicStandby;
+            this.audio.onMusicEnd();
+        };
 
         // Create music crossfader gain
         this.crossFaderGain = this.context.createGain();
+        if (!this.crossFaderGain) return false;
         this.crossFaderGain.connect(this.musicGain);
         this.crossFaderGain.gain.value = 0.0;
         this.crossFaderValue = 0.0;
@@ -229,13 +243,11 @@ AudioEngine.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  compute : Compute audio engine                                        //
+    //  param frametime : Frametime to compute audio engine                   //
     ////////////////////////////////////////////////////////////////////////////
     compute: function(frametime)
     {
         var delta = 0.0;
-
-        // Check frametime
-        if (!frametime) return;
 
         // Compute audio engine
         if (this.loaded)
@@ -445,6 +457,64 @@ AudioEngine.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setPosition : Set listener position                                   //
+    //  param x : X position of the listener                                  //
+    //  param y : Y position of the listener                                  //
+    //  param z : Z position of the listener                                  //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosition: function(x, y, z)
+    {
+        if (this.loaded)
+        {
+            this.position.setXYZ(x, y, z);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPositionVec3 : Set listener position from a 3 component vector     //
+    //  param vector : 3 component vector to set listener position from       //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec3: function(vector)
+    {
+        if (this.loaded)
+        {
+            this.position.setVector(vector);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setOrientation : Set listener orientation                             //
+    //  param x : X orientation of the listener                               //
+    //  param y : Y orientation of the listener                               //
+    //  param z : Z orientation of the listener                               //
+    //  param xUp : X up orientation of the listener                          //
+    //  param yUp : Y up orientation of the listener                          //
+    //  param zUp : Z up orientation of the listener                          //
+    ////////////////////////////////////////////////////////////////////////////
+    setOrientation: function(x, y, z, xUp, yUp, zUp)
+    {
+        if (this.loaded)
+        {
+            this.target.setXYZ(x, y, z);
+            this.upward.setXYZ(xUp, yUp, zUp);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setOrientationVec3 : Set listener orientation from a vector           //
+    //  param target : 3 component vector to set listener orientation from    //
+    //  param upward : 3 component up vector to set listener orientation from //
+    ////////////////////////////////////////////////////////////////////////////
+    setOrientationVec3: function(target, upward)
+    {
+        if (this.loaded)
+        {
+            this.target.setVector(target);
+            this.upward.setVector(upward);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  playMusic : Play music                                                //
     //  param src : Music source to play                                      //
     ////////////////////////////////////////////////////////////////////////////
@@ -480,60 +550,10 @@ AudioEngine.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setPosition : Set listener position                                   //
-    //  param x : X position of the listener                                  //
-    //  param y : Y position of the listener                                  //
-    //  param z : Z position of the listener                                  //
+    //  onMusicEnd : Called when the music ended                              //
     ////////////////////////////////////////////////////////////////////////////
-    setPosition: function(x, y, z)
+    onMusicEnd: function()
     {
-        if (this.loaded && x && y && z)
-        {
-            this.position.setXYZ(x, y, z);
-        }
-    },
 
-    ////////////////////////////////////////////////////////////////////////////
-    //  setPositionVec3 : Set listener position from a 3 component vector     //
-    //  param vector : 3 component vector to set listener position from       //
-    ////////////////////////////////////////////////////////////////////////////
-    setPositionVec3: function(vector)
-    {
-        if (this.loaded && vector)
-        {
-            this.position.setVector(vector);
-        }
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setOrientation : Set listener orientation                             //
-    //  param x : X orientation of the listener                               //
-    //  param y : Y orientation of the listener                               //
-    //  param z : Z orientation of the listener                               //
-    //  param xUp : X up orientation of the listener                          //
-    //  param yUp : Y up orientation of the listener                          //
-    //  param zUp : Z up orientation of the listener                          //
-    ////////////////////////////////////////////////////////////////////////////
-    setOrientation: function(x, y, z, xUp, yUp, zUp)
-    {
-        if (this.loaded && x && y && z && xUp && yUp && zUp)
-        {
-            this.target.setXYZ(x, y, z);
-            this.upward.setXYZ(xUp, yUp, zUp);
-        }
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setOrientationVec3 : Set listener orientation from a vector           //
-    //  param target : 3 component vector to set listener orientation from    //
-    //  param upward : 3 component up vector to set listener orientation from //
-    ////////////////////////////////////////////////////////////////////////////
-    setOrientationVec3: function(target, upward)
-    {
-        if (this.loaded && target && upward)
-        {
-            this.target.setVector(target);
-            this.upward.setVector(upward);
-        }
     }
 };

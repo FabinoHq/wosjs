@@ -47,23 +47,27 @@
 ////////////////////////////////////////////////////////////////////////////////
 function Music(audio)
 {
-    // Music loaded status
+    // Music loaded state
     this.loaded = false;
 
     // Audio engine pointer
     this.audio = audio;
 
-    // Music buffer asset
+    // Music buffer
     this.buffer = new Audio();
 
     // Music
     this.music = null;
+
+    // Music playing state
+    this.playing = false;
 }
 
 Music.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  play : Play music                                                     //
     //  param src : Music source to play                                      //
+    //  return : True if the music is now playing                             //
     ////////////////////////////////////////////////////////////////////////////
     play: function(src)
     {
@@ -84,15 +88,19 @@ Music.prototype = {
         if (!this.loaded)
         {
             this.loaded = true;
-            this.buffer.pause();
-            this.buffer.src = "";
             this.music = this.audio.context.createMediaElementSource(
                 this.buffer
             );
             this.music.connect(this.audio.crossFaderGain);
             this.buffer.src = src;
             this.buffer.addEventListener("canplaythrough", this.startPlay());
-            this.buffer.onended = this.onMusicEnd;
+            this.buffer.music = this;
+            this.buffer.onended = function()
+            {
+                this.src = "";
+                this.music.playing = false;
+                this.music.onMusicEnd();
+            };
         }
         else
         {
@@ -100,6 +108,7 @@ Music.prototype = {
             this.buffer.src = src;
             this.buffer.addEventListener("canplaythrough", this.startPlay());
         }
+        return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -110,6 +119,7 @@ Music.prototype = {
         if (this.loaded)
         {
             this.buffer.play();
+            this.playing = true;
         }
     },
 
@@ -122,7 +132,18 @@ Music.prototype = {
         {
             this.buffer.pause();
             this.buffer.src = "";
+            this.playing = false;
+            this.onMusicEnd();
         }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  isPlaying : Get music playing state                                   //
+    //  return : True if the music is playing                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    isPlaying: function()
+    {
+        return this.playing;
     },
 
     ////////////////////////////////////////////////////////////////////////////

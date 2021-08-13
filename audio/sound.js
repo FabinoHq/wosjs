@@ -47,7 +47,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 function Sound(audio)
 {
-    // Sound loaded status
+    // Sound loaded state
     this.loaded = false;
 
     // Audio engine pointer
@@ -76,10 +76,8 @@ function Sound(audio)
     // Sound distance factor
     this.distanceFactor = WOSDefaultAudioDistanceFactor;
 
-    // Sound playing state
-    this.playing = false;
-    // Sound loop state
-    this.loop = false;
+    // Sound playing count
+    this.playingCount = 0;
 
     // Temp vectors
     this.delta = new Vector3();
@@ -90,6 +88,7 @@ Sound.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init sound                                                     //
     //  param soundBuffer : Sound buffer to set sound from                    //
+    //  return : True if the sound is successfully loaded                     //
     ////////////////////////////////////////////////////////////////////////////
     init: function(soundBuffer)
     {
@@ -105,8 +104,7 @@ Sound.prototype = {
         this.distanceTarget = 0.0;
         this.position.reset();
         this.distanceFactor = WOSDefaultAudioDistanceFactor;
-        this.playing = false;
-        this.loop = false;
+        this.playingCount = 0;
         this.delta.reset();
         this.cross.reset();
 
@@ -127,32 +125,23 @@ Sound.prototype = {
 
         // Set sound buffer
         this.buffer = soundBuffer.buffer;
+        if (!this.buffer) return false;
 
         // Create panner
         this.panner = this.audio.context.createStereoPanner();
+        if (!this.panner) return false;
         this.panner.connect(this.audio.soundGain);
         this.panner.pan.value = this.pannerValue;
 
         // Create distance gain
         this.distance = this.audio.context.createGain();
+        if (!this.distance) return false;
         this.distance.connect(this.panner);
         this.distance.gain.value = this.distanceValue*this.distanceValue;
 
         // Sound loaded
         this.loaded = true;
         return true;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setLoop : Set sound loop state                                        //
-    //  param loop : Sound loop state to set                                  //
-    ////////////////////////////////////////////////////////////////////////////
-    setLoop: function(loop)
-    {
-        if (this.loaded)
-        {
-            this.loop = loop;
-        }
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -168,14 +157,47 @@ Sound.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setPosition : Set sound position                                      //
+    //  param x : X position of the sound                                     //
+    //  param y : Y position of the sound                                     //
+    //  param z : Z position of the sound                                     //
+    ////////////////////////////////////////////////////////////////////////////
+    setPosition: function(x, y, z)
+    {
+        if (this.loaded)
+        {
+            this.position.setXYZ(x, y, z);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setPositionVec3 : Set sound position from a 3 component vector        //
+    //  param vector : 3 component vector to set sound position from          //
+    ////////////////////////////////////////////////////////////////////////////
+    setPositionVec3: function(vector)
+    {
+        if (this.loaded)
+        {
+            this.position.setVector(vector);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  isPlaying : Get sound playing state                                   //
+    //  return : True if the sound is playing                                 //
+    ////////////////////////////////////////////////////////////////////////////
+    isPlaying: function()
+    {
+        return (this.playingCount <= 0);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  compute : Compute sound                                               //
+    //  param frametime : Frametime to compute sound                          //
     ////////////////////////////////////////////////////////////////////////////
     compute: function(frametime)
     {
         var delta = 0.0;
-
-        // Check frametime
-        if (!frametime) return;
 
         // Compute sound audio
         if (this.loaded)
@@ -243,6 +265,9 @@ Sound.prototype = {
                 }
                 this.panner.pan.value = this.pannerValue;
             }
+
+            this.distance.gain.value = 1.0;
+            this.panner.pan.value = 0.0;
         }
     },
 
@@ -258,29 +283,25 @@ Sound.prototype = {
             this.sound.buffer = this.buffer.buffer;
             if (!this.sound.start) this.sound.start = this.sound.noteOn;
             if (!this.sound.stop) this.sound.stop = this.sound.noteOff;
-            this.sound.loop = this.loop;
-            this.sound.onended = this.onSoundEnd;
+            this.sound.loop = false;
+            this.sound.snd = this;
+            this.sound.onended = function()
+            {
+                // UI sound ended
+                --this.snd.playingCount;
+                if (this.snd.playingCount <= 0)
+                {
+                    // All ui sound instances ended
+                    this.snd.playingCount = 0;
+                    this.snd.onSoundEnd();
+                }
+                this.disconnect();
+            };
 
             // Play sound
             this.sound.connect(this.distance);
             this.sound.start(0);
-            this.playing = true;
-        }
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  stop : Stop sound                                                     //
-    ////////////////////////////////////////////////////////////////////////////
-    stop: function()
-    {
-        if (this.loaded)
-        {
-            if (this.playing)
-            {
-                this.sound.stop(0);
-                this.sound.disconnect(this.distance);
-                this.playing = false;
-            }
+            ++this.playingCount;
         }
     },
 
@@ -290,31 +311,5 @@ Sound.prototype = {
     onSoundEnd: function()
     {
 
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setPosition : Set sound position                                      //
-    //  param x : X position of the sound                                     //
-    //  param y : Y position of the sound                                     //
-    //  param z : Z position of the sound                                     //
-    ////////////////////////////////////////////////////////////////////////////
-    setPosition: function(x, y, z)
-    {
-        if (this.loaded && x && y && z)
-        {
-            this.position.setXYZ(x, y, z);
-        }
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  setPositionVec3 : Set sound position from a 3 component vector        //
-    //  param vector : 3 component vector to set sound position from          //
-    ////////////////////////////////////////////////////////////////////////////
-    setPositionVec3: function(vector)
-    {
-        if (this.loaded && vector)
-        {
-            this.position.setVector(vector);
-        }
     }
 };

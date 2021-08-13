@@ -56,7 +56,7 @@ function SoundBuffer(audio)
     // Sound buffer request
     this.request = null;
 
-    // Sound buffer asset
+    // Sound buffer
     this.buffer = null;
 }
 
@@ -64,6 +64,7 @@ SoundBuffer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  load : Load sound buffer                                              //
     //  param src : Sound buffer source to load                               //
+    //  return : True if the sound buffer is now loading                      //
     ////////////////////////////////////////////////////////////////////////////
     load: function(src)
     {
@@ -83,9 +84,11 @@ SoundBuffer.prototype = {
 
         // Create sound buffer
         this.buffer = this.audio.context.createBufferSource();
+        if (!this.buffer) return false;
 
         // Load sound buffer
         this.request = new XMLHttpRequest();
+        if (!this.request) return false;
         this.request.open("GET", src, true);
         this.request.responseType = "arraybuffer";
         this.request.snd = this;

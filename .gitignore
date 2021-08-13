@@ -106,6 +106,7 @@
 !audio/soundbuffer.js
 !audio/sound.js
 !audio/multisound.js
+!audio/loopsound.js
 !audio/uisound.js
 !audio/music.js
 

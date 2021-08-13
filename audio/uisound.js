@@ -53,22 +53,21 @@ function UISound(audio)
     // Audio engine pointer
     this.audio = audio;
 
-    // UISound buffer asset
+    // UISound buffer
     this.buffer = null;
 
     // UISound
     this.uisound = null;
 
-    // UISound playing state
-    this.playing = false;
-    // UISound loop state
-    this.loop = false;
+    // UISound playing count
+    this.playingCount = 0;
 }
 
 UISound.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init ui sound                                                  //
     //  param soundBuffer : Sound buffer to set ui sound from                 //
+    //  return : True if the ui sound is successfully loaded                  //
     ////////////////////////////////////////////////////////////////////////////
     init: function(soundBuffer)
     {
@@ -76,7 +75,7 @@ UISound.prototype = {
         this.loaded = false;
         this.buffer = null;
         this.uisound = null;
-        this.playing = false;
+        this.playingCount = 0;
 
         // Check audio engine
         if (!this.audio) return false;
@@ -95,20 +94,19 @@ UISound.prototype = {
 
         // Set sound buffer
         this.buffer = soundBuffer.buffer;
+        if (!this.buffer) return false;
+
         this.loaded = true;
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setLoop : Set ui sound loop state                                     //
-    //  param loop : UISound loop state to set                                //
+    //  isPlaying : Get ui sound playing state                                //
+    //  return : True if the ui sound is playing                              //
     ////////////////////////////////////////////////////////////////////////////
-    setLoop: function(loop)
+    isPlaying: function()
     {
-        if (this.loaded)
-        {
-            this.loop = loop;
-        }
+        return (this.playingCount <= 0);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -123,29 +121,25 @@ UISound.prototype = {
             this.uisound.buffer = this.buffer.buffer;
             if (!this.uisound.start) this.uisound.start = this.uisound.noteOn;
             if (!this.uisound.stop) this.uisound.stop = this.uisound.noteOff;
-            this.uisound.loop = this.loop;
-            this.uisound.onended = this.onSoundEnd;
+            this.uisound.loop = false;
+            this.uisound.snd = this;
+            this.uisound.onended = function()
+            {
+                // Sound ended
+                --this.snd.playingCount;
+                if (this.snd.playingCount <= 0)
+                {
+                    // All ui sound instances ended
+                    this.snd.playingCount = 0;
+                    this.snd.onSoundEnd();
+                }
+                this.disconnect();
+            };
 
             // Play sound
             this.uisound.connect(this.audio.uisoundGain);
             this.uisound.start(0);
-            this.playing = true;
-        }
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  stop : Stop ui sound                                                  //
-    ////////////////////////////////////////////////////////////////////////////
-    stop: function()
-    {
-        if (this.loaded)
-        {
-            if (this.playing)
-            {
-                this.uisound.stop(0);
-                this.uisound.disconnect(this.audio.uisoundGain);
-                this.playing = false;
-            }
+            ++this.playingCount;
         }
     },
 
