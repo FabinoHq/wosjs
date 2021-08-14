@@ -90,6 +90,7 @@ MeshVertexBuffer.prototype = {
     //  param texcoords : Texture coordinates                                 //
     //  param normals : Normals                                               //
     //  param indices : Triangles indices                                     //
+    //  return : True if VBO is successfully loaded                           //
     ////////////////////////////////////////////////////////////////////////////
     init: function(vertCount, vertices, texcoords, normals, indices)
     {
@@ -121,19 +122,11 @@ MeshVertexBuffer.prototype = {
 
         // Create VBO
         this.vertexBuffer = this.renderer.gl.createBuffer();
-        if (!this.vertexBuffer)
-        {
-            // Could not create VBO
-            return false;
-        }
+        if (!this.vertexBuffer) return false;
 
         // Create EBO
         this.elementBuffer = this.renderer.gl.createBuffer();
-        if (!this.elementBuffer)
-        {
-            // Could not create EBO
-            return false;
-        }
+        if (!this.elementBuffer) return false;
 
         // Compute tangents
         this.computeTangents();
@@ -363,7 +356,7 @@ MeshVertexBuffer.prototype = {
             );
         }
 
-        // Draw triangles
+        // Render VBO
         this.renderer.gl.drawElements(
             this.renderer.gl.TRIANGLES,
             this.vertCount,

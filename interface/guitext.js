@@ -76,8 +76,8 @@ function GuiText(renderer, textShader)
     this.textShader = textShader;
 
     // Text shader uniforms locations
-    this.colorUniform = -1;
-    this.alphaUniform = -1;
+    this.colorUniform = null;
+    this.alphaUniform = null;
 
     // GuiText generated texture
     this.texture = null;
@@ -117,6 +117,7 @@ GuiText.prototype = {
     //  param text : Text to set                                              //
     //  param height : Text field height                                      //
     //  param hide : Text hide mode                                           //
+    //  return : True if GUI Text is successfully loaded                      //
     ////////////////////////////////////////////////////////////////////////////
     init: function(text, height, hide)
     {
@@ -126,13 +127,17 @@ GuiText.prototype = {
         var pixelsDataHeight = 0;
 
         // Reset GuiText
-        this.colorUniform = -1;
-        this.alphaUniform = -1;
+        this.colorUniform = null;
+        this.alphaUniform = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
         this.angle = 0.0;
+        if (!this.size) return false;
         this.size.setXY(0.05, 0.05);
+        if (!this.color) return false;
         this.color.setXYZ(1.0, 1.0, 1.0);
         this.alpha = 1.0;
         this.text = "";
@@ -214,7 +219,9 @@ GuiText.prototype = {
         // Get text shader uniforms locations
         this.textShader.bind();
         this.colorUniform = this.textShader.getUniform("color");
+        if (!this.colorUniform) return false;
         this.alphaUniform = this.textShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.textShader.unbind();
 
         // Set text width
@@ -282,7 +289,7 @@ GuiText.prototype = {
 
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
-        // Text loaded
+        // GUI Text successfully loaded
         return true;
     },
 

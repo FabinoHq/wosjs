@@ -101,14 +101,12 @@ VertexBuffer.prototype = {
     //  param vertices : Vertices                                             //
     //  param texcoords : Texture coordinates                                 //
     //  param indices : Triangles indices                                     //
+    //  return : True if VBO is successfully loaded                           //
     ////////////////////////////////////////////////////////////////////////////
     init: function(vertCount, vertices, texcoords, indices)
     {
         // Check gl pointer
-        if (!this.gl)
-        {
-            return false;
-        }
+        if (!this.gl) return false;
 
         // Check vertex buffer data
         if ((vertCount > 0) && vertices && texcoords && indices)
@@ -130,19 +128,11 @@ VertexBuffer.prototype = {
 
         // Create VBO
         this.vertexBuffer = this.gl.createBuffer();
-        if (!this.vertexBuffer)
-        {
-            // Could not create VBO
-            return false;
-        }
+        if (!this.vertexBuffer) return false;
 
         // Create EBO
         this.elementBuffer = this.gl.createBuffer();
-        if (!this.elementBuffer)
-        {
-            // Could not create EBO
-            return false;
-        }
+        if (!this.elementBuffer) return false;
 
         // Update VBO
         this.updateBuffer();
@@ -231,7 +221,7 @@ VertexBuffer.prototype = {
             0, this.texCoordsOffset
         );
 
-        // Draw triangles
+        // Render VBO
         this.gl.drawElements(
             this.gl.TRIANGLES,
             this.vertCount,

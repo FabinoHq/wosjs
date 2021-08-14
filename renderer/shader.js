@@ -68,9 +68,9 @@ function Shader(glPointer)
     this.bonesWeightsLocation = -1;
 
     // Shader uniforms locations
-    this.textureLocation = -1;
-    this.worldMatrixLocation = -1;
-    this.modelMatrixLocation = -1;
+    this.textureLocation = null;
+    this.worldMatrixLocation = null;
+    this.modelMatrixLocation = null;
 }
 
 Shader.prototype = {
@@ -78,6 +78,7 @@ Shader.prototype = {
     //  init : Init shader                                                    //
     //  param vertexSrc: Vertex shader source                                 //
     //  param fragmentSrc : Fragment shader source                            //
+    //  return : True if shader is successfully loaded                        //
     ////////////////////////////////////////////////////////////////////////////
     init: function(vertexSrc, fragmentSrc)
     {
@@ -91,9 +92,11 @@ Shader.prototype = {
         this.texCoordsLocation = -1;
         this.normalsLocation = -1;
         this.tangentsLocation = -1;
-        this.textureLocation = -1;
-        this.worldMatrixLocation = -1;
-        this.modelMatrixLocation = -1;
+        this.bonesIndicesLocation = -1;
+        this.bonesWeightsLocation = -1;
+        this.textureLocation = null;
+        this.worldMatrixLocation = null;
+        this.modelMatrixLocation = null;
 
         // Check gl pointer
         if (!this.gl)
@@ -126,7 +129,7 @@ Shader.prototype = {
         ))
         {
             // Compiler status
-            console.log("Vert shader error : ");
+            console.log("Vertex shader error : ");
             console.log(this.gl.getShaderInfoLog(this.vertexShader));
 
             // Could not compile vertex shader
@@ -155,7 +158,7 @@ Shader.prototype = {
         ))
         {
             // Compiler status
-            console.log("Frag shader error: ");
+            console.log("Fragment shader error: ");
             console.log(this.gl.getShaderInfoLog(this.fragmentShader));
 
             // Could not compile fragment shader
@@ -197,13 +200,13 @@ Shader.prototype = {
         this.vertexLocation = this.gl.getAttribLocation(
             this.shaderProgram, "vertexPos"
         );
-        if (this.vertexLocation == -1) return false;
+        if (this.vertexLocation < 0) return false;
 
         // Get texture coords attribute location
         this.texCoordsLocation = this.gl.getAttribLocation(
             this.shaderProgram, "vertexCoord"
         );
-        if (this.texCoordsLocation == -1) return false;
+        if (this.texCoordsLocation < 0) return false;
 
         // Get normals attribute location
         this.normalsLocation = this.gl.getAttribLocation(
@@ -229,14 +232,16 @@ Shader.prototype = {
         this.textureLocation = this.gl.getUniformLocation(
             this.shaderProgram, "texture"
         );
-        if (this.textureLocation == -1) return false;
-        this.gl.uniform1i(this.textureLocation, 0);
+        if (this.textureLocation)
+        {
+            this.gl.uniform1i(this.textureLocation, 0);
+        }
 
         // Get world matrix location
         this.worldMatrixLocation = this.gl.getUniformLocation(
             this.shaderProgram, "worldMatrix"
         );
-        if (this.worldMatrixLocation == -1) return false;
+        if (!this.worldMatrixLocation) return false;
 
         // Get model matrix location
         this.modelMatrixLocation = this.gl.getUniformLocation(
@@ -283,10 +288,13 @@ Shader.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     sendModelMatrix: function(modelMatrix)
     {
-        this.gl.uniformMatrix4fv(
-            this.modelMatrixLocation,
-            false, modelMatrix.matrix
-        );
+        if (this.modelMatrixLocation)
+        {
+            this.gl.uniformMatrix4fv(
+                this.modelMatrixLocation,
+                false, modelMatrix.matrix
+            );
+        }
     },
 
     ////////////////////////////////////////////////////////////////////////////

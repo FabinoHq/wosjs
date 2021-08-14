@@ -88,7 +88,7 @@ Sound.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init sound                                                     //
     //  param soundBuffer : Sound buffer to set sound from                    //
-    //  return : True if the sound is successfully loaded                     //
+    //  return : True if sound is successfully loaded                         //
     ////////////////////////////////////////////////////////////////////////////
     init: function(soundBuffer)
     {
@@ -102,10 +102,13 @@ Sound.prototype = {
         this.distance = null;
         this.distanceValue = 0.0;
         this.distanceTarget = 0.0;
+        if (!this.position) return false;
         this.position.reset();
         this.distanceFactor = WOSDefaultAudioDistanceFactor;
         this.playingCount = 0;
+        if (!this.delta) return false;
         this.delta.reset();
+        if (!this.cross) return false;
         this.cross.reset();
 
         // Check audio engine
@@ -139,7 +142,7 @@ Sound.prototype = {
         this.distance.connect(this.panner);
         this.distance.gain.value = this.distanceValue*this.distanceValue;
 
-        // Sound loaded
+        // Sound successfully loaded
         this.loaded = true;
         return true;
     },

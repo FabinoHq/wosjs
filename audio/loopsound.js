@@ -111,13 +111,14 @@ function LoopSound(audio)
 
 LoopSound.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init loop sound                                                //
-    //  return : True if the loop sound is successfully loaded                //
+    //  init : Init LoopSound                                                 //
+    //  return : True if LoopSound is successfully loaded                     //
     ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
         // Reset sound
         this.loaded = false;
+        if (!this.buffers) return false;
         this.soundA = null;
         this.soundB = null;
         this.soundAGain = null;
@@ -130,11 +131,14 @@ LoopSound.prototype = {
         this.distance = null;
         this.distanceValue = 0.0;
         this.distanceTarget = 0.0;
+        if (!this.position) return false;
         this.position.reset();
         this.distanceFactor = WOSDefaultAudioDistanceFactor;
         this.soundState = WOSAudioLoopSoundStandby;
         this.index = 0;
+        if (!this.delta) return false;
         this.delta.reset();
+        if (!this.cross) return false;
         this.cross.reset();
 
         // Check audio engine
@@ -167,7 +171,7 @@ LoopSound.prototype = {
         this.soundBGain.connect(this.distance);
         this.soundBGain.gain.value = 0.0;
 
-        // LoopSound loaded
+        // LoopSound successfully loaded
         this.loaded = true;
         return true;
     },

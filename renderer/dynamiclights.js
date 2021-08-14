@@ -73,6 +73,7 @@ function DynamicLights(renderer)
 DynamicLights.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init dynamic lights                                            //
+    //  return : True if dynamic lights are successfully loaded               //
     ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
@@ -94,20 +95,25 @@ DynamicLights.prototype = {
 
         // Create point lights array
         this.pointLights = new Array(WOSMaxPointLights);
+        if (!this.pointLights) return false;
         for (i = 0; i < WOSMaxPointLights; ++i)
         {
             this.pointLights[i] = new PointLight();
+            if (!this.pointLights[i]) return false;
         }
 
         // Create spot lights array
         this.spotLights = new Array(WOSMaxSpotLights);
+        if (!this.spotLights) return false;
         for (i = 0; i < WOSMaxSpotLights; ++i)
         {
             this.spotLights[i] = new SpotLight();
+            if (!this.spotLights[i]) return false;
         }
 
         // Create dynamic lights texture
         this.lightsTexture = this.renderer.gl.createTexture();
+        if (!this.lightsTexture) return false;
         this.renderer.gl.bindTexture(
             this.renderer.gl.TEXTURE_2D, this.lightsTexture
         );
@@ -135,6 +141,7 @@ DynamicLights.prototype = {
 
         // Create lights array
         this.lightsArray = new GLArrayDataType(WOSMaxDynamicLights*16);
+        if (!this.lightsArray) return false;
         for (i = 0; i < WOSMaxDynamicLights; ++i)
         {
             this.lightsArray[(i*16)] = 0.0;
@@ -155,7 +162,7 @@ DynamicLights.prototype = {
             this.lightsArray[(i*16)+15] = 0.0;
         }
 
-        // Dynamic light loaded
+        // Dynamic lights successfully loaded
         return true;
     },
 

@@ -55,11 +55,11 @@ function AnimSprite(renderer, animShader)
     this.animShader = animShader;
 
     // Animated sprite shader uniforms locations
-    this.alphaUniform = -1;
-    this.countUniform = -1;
-    this.currentUniform = -1;
-    this.nextUniform = -1;
-    this.interpUniform = -1;
+    this.alphaUniform = null;
+    this.countUniform = null;
+    this.currentUniform = null;
+    this.nextUniform = null;
+    this.interpUniform = null;
 
     // Animated sprite texture
     this.texture = null;
@@ -99,30 +99,39 @@ AnimSprite.prototype = {
     //  param height : Animated sprite height                                 //
     //  param countX : Animated sprite frames count in U texture axis         //
     //  param countY : Animated sprite frames count in V texture axis         //
+    //  return : True if animated sprite is successfully loaded               //
     ////////////////////////////////////////////////////////////////////////////
     init: function(tex, width, height, countX, countY)
     {
         // Reset animated sprite
-        this.alphaUniform = -1;
-        this.countUniform = -1;
-        this.currentUniform = -1;
-        this.nextUniform = -1;
-        this.interpUniform = -1;
+        this.alphaUniform = null;
+        this.countUniform = null;
+        this.currentUniform = null;
+        this.nextUniform = null;
+        this.interpUniform = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.angle = 0.0;
+        if (!this.count) return false;
         this.count.setXY(1, 1);
         if (countX !== undefined) this.count.vec[0] = countX;
         if (countY !== undefined) this.count.vec[1] = countY;
+        if (!this.start) return false;
         this.start.setXY(0, 0);
+        if (!this.end) return false;
         this.end.setXY(0, 0);
         this.frametime = 1.0;
         this.alpha = 1.0;
+        if (!this.current) return false;
         this.current.setXY(0, 0);
+        if (!this.next) return false;
         this.next.setXY(0, 0);
         this.currentTime = 0.0;
         this.interpOffset = 0.0;
@@ -137,10 +146,15 @@ AnimSprite.prototype = {
         // Get animated sprite shader uniforms locations
         this.animShader.bind();
         this.alphaUniform = this.animShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.countUniform = this.animShader.getUniform("count");
+        if (!this.countUniform) return false;
         this.currentUniform = this.animShader.getUniform("current");
+        if (!this.currentUniform) return false;
         this.nextUniform = this.animShader.getUniform("next");
+        if (!this.nextUniform) return false;
         this.interpUniform = this.animShader.getUniform("interp");
+        if (!this.interpUniform) return false;
         this.animShader.unbind();
 
         // Set texture
@@ -150,7 +164,7 @@ AnimSprite.prototype = {
         // Compute initial frame
         this.compute(0.0);
 
-        // Sprite loaded
+        // Animated sprite successfully loaded
         return true;
     },
 
@@ -558,7 +572,7 @@ AnimSprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  compute : Compute animated sprite                                     //
-    //  param frametime : Frametime for animation update                      //
+    //  param frametime : Frametime to compute animation update               //
     ////////////////////////////////////////////////////////////////////////////
     compute: function(frametime)
     {
@@ -592,7 +606,6 @@ AnimSprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  render : Render animated sprite                                       //
-    //  param frametime : Frametime for animation update                      //
     ////////////////////////////////////////////////////////////////////////////
     render: function()
     {

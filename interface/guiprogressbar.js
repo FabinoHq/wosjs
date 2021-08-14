@@ -55,9 +55,9 @@ function GuiProgressBar(renderer, progressBarShader)
     this.progressBarShader = progressBarShader;
 
     // ProgressBar shader uniforms locations
-    this.alphaUniform = -1;
-    this.uvSizeUniform = -1;
-    this.uvFactorUniform = -1;
+    this.alphaUniform = null;
+    this.uvSizeUniform = null;
+    this.uvFactorUniform = null;
 
     // ProgressBar texture
     this.texture = null;
@@ -86,19 +86,24 @@ GuiProgressBar.prototype = {
     //  param width : ProgressBar width                                       //
     //  param height : ProgressBar height                                     //
     //  param factor : ProgressBar UV factor                                  //
+    //  return : True if GUI ProgressBar is successfully loaded               //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, factor)
     {
         // Reset progress bar
-        this.alphaUniform = -1;
-        this.uvSizeUniform = -1;
-        this.uvFactorUniform = -1;
+        this.alphaUniform = null;
+        this.uvSizeUniform = null;
+        this.uvFactorUniform = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
+        if (!this.uvSize) return false;
         this.uvSize.setXY(1.0, 1.0);
         this.uvFactor = 1.0;
         if (factor !== undefined) this.uvFactor = factor;
@@ -114,15 +119,18 @@ GuiProgressBar.prototype = {
         // Get progress bar shader uniforms locations
         this.progressBarShader.bind();
         this.alphaUniform = this.progressBarShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.uvSizeUniform = this.progressBarShader.getUniform("uvSize");
+        if (!this.uvSizeUniform) return false;
         this.uvFactorUniform = this.progressBarShader.getUniform("uvFactor");
+        if (!this.uvFactorUniform) return false;
         this.progressBarShader.unbind();
 
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
 
-        // ProgressBar loaded
+        // GUI ProgressBar successfully loaded
         return true;
     },
 

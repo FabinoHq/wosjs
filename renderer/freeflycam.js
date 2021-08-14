@@ -81,25 +81,36 @@ function FreeflyCam()
 FreeflyCam.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  reset : Reset the freefly camera                                      //
+    //  return : True if freefly camera is successfully reset                 //
     ////////////////////////////////////////////////////////////////////////////
     reset: function()
     {
         // Reset freefly camera
+        if (!this.projMatrix) return false;
         this.projMatrix.setIdentity();
+        if (!this.viewMatrix) return false;
         this.viewMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.angles) return false;
         this.angles.reset();
         this.fovy = 90.0;
         this.nearPlane = 0.001;
         this.farPlane = 1000.0;
         this.speed = 1.0;
+        if (!this.target) return false;
         this.target.reset();
+        if (!this.upward) return false;
         this.upward.setXYZ(0.0, 1.0, 0.0);
+        if (!this.cross) return false;
         this.cross.reset();
         this.forward = false;
         this.backward = false;
         this.leftward = false;
         this.rightward = false;
+
+        // Freefly camera sucessfully reset
+        return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////

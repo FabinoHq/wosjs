@@ -43,13 +43,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //  SpotLight class definition                                                //
-//  param renderer : Renderer pointer                                         //
 ////////////////////////////////////////////////////////////////////////////////
-function SpotLight(renderer)
+function SpotLight()
 {
-    // Renderer pointer
-    this.renderer = renderer;
-
     // Spot light position
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Spot light direction
@@ -72,12 +68,16 @@ SpotLight.prototype = {
     //  param position : Position of the spot light                           //
     //  param direction : Direction of the spot light                         //
     //  param color : Color of the spot light                                 //
+    //  return : True if spot light is successfully loaded                    //
     ////////////////////////////////////////////////////////////////////////////
     init: function(position, direction, color)
     {
         // Reset spot light
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.direction) return false;
         this.direction.reset();
+        if (!this.color) return false;
         this.color.reset();
         this.radius = 1.0;
         this.falloffRadius = 2.0;
@@ -93,10 +93,7 @@ SpotLight.prototype = {
         // Set spot light color
         if (color) this.color.setVector(color);
 
-        // Check renderer pointer
-        if (!this.renderer) return false;
-
-        // Spot light loaded
+        // Spot light successfully loaded
         return true;
     },
 
@@ -141,7 +138,7 @@ SpotLight.prototype = {
     setPositionVec3: function(position)
     {
         // Set spot light position
-        if (position) this.position.setVector(position);
+        this.position.setVector(position);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -193,13 +190,10 @@ SpotLight.prototype = {
     setDirectionVec3: function(direction)
     {
         // Set spot light direction
-        if (direction)
-        {
-            this.direction.setXYZ(
-                -direction.vec[0], -direction.vec[1], -direction.vec[2]
-            );
-            this.direction.normalize();
-        }
+        this.direction.setXYZ(
+            -direction.vec[0], -direction.vec[1], -direction.vec[2]
+        );
+        this.direction.normalize();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -222,7 +216,7 @@ SpotLight.prototype = {
     setColorVec4: function(color)
     {
         // Set spot light color
-        if (color) this.color.setVector(color);
+        this.color.setVector(color);
     },
 
     ////////////////////////////////////////////////////////////////////////////

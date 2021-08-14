@@ -55,8 +55,8 @@ function GuiToggleButton(renderer, toggleButtonShader)
     this.toggleButtonShader = toggleButtonShader;
 
     // Toggle button shader uniforms locations
-    this.alphaUniform = -1;
-    this.stateUniform = -1;
+    this.alphaUniform = null;
+    this.stateUniform = null;
 
     // Toggle button texture
     this.texture = null;
@@ -83,15 +83,19 @@ GuiToggleButton.prototype = {
     //  param width : Toggle button width                                     //
     //  param height : Toggle button height                                   //
     //  param round : Round button                                            //
+    //  return : True if GUI Toggle button is successfully loaded             //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, round)
     {
         // Reset toggle button
-        this.alphaUniform = -1;
-        this.buttonStateUniform = -1;
+        this.alphaUniform = null;
+        this.stateUniform = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
@@ -108,14 +112,16 @@ GuiToggleButton.prototype = {
         // Get toggle button shader uniforms locations
         this.toggleButtonShader.bind();
         this.alphaUniform = this.toggleButtonShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.stateUniform = this.toggleButtonShader.getUniform("buttonState");
+        if (!this.stateUniform) return false;
         this.toggleButtonShader.unbind();
 
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
 
-        // Toggle button loaded
+        // GUI Toggle button successfully loaded
         return true;
     },
 

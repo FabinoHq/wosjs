@@ -118,7 +118,7 @@ function AudioEngine()
 AudioEngine.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init audio engine                                              //
-    //  return : True if the audio engine is successfully loaded              //
+    //  return : True if audio engine is successfully loaded                  //
     ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
@@ -142,8 +142,11 @@ AudioEngine.prototype = {
         this.crossFaderGain = null;
         this.crossFaderState = WOSAudioMusicStandby;
         this.crossFaderValue = 0.0;
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.target) return false;
         this.target.reset();
+        if (!this.upward) return false;
         this.upward.setXYZ(0.0, 1.0, 0.0);
 
         // Create audio context

@@ -71,19 +71,29 @@ function Camera()
 Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  reset : Reset the camera                                              //
+    //  return : True if camera is successfully reset                         //
     ////////////////////////////////////////////////////////////////////////////
     reset: function()
     {
         // Reset camera
+        if (!this.projMatrix) return false;
         this.projMatrix.setIdentity();
+        if (!this.viewMatrix) return false;
         this.viewMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.angles) return false;
         this.angles.reset();
+        if (!this.target) return false;
         this.target.reset();
+        if (!this.upward) return false;
         this.upward.setXYZ(0.0, 1.0, 0.0);
         this.fovy = 90.0;
         this.nearPlane = 0.001;
         this.farPlane = 1000.0;
+
+        // Camera successfully reset
+        return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////

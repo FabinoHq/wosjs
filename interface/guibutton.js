@@ -55,8 +55,8 @@ function GuiButton(renderer, buttonShader)
     this.buttonShader = buttonShader;
 
     // Button shader uniforms locations
-    this.alphaUniform = -1;
-    this.stateUniform = -1;
+    this.alphaUniform = null;
+    this.stateUniform = null;
 
     // Button texture
     this.texture = null;
@@ -83,15 +83,19 @@ GuiButton.prototype = {
     //  param width : Button width                                            //
     //  param height : Button height                                          //
     //  param round : Round button                                            //
+    //  return : True if GUI Button is successfully loaded                    //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, round)
     {
         // Reset button
-        this.alphaUniform = -1;
-        this.buttonStateUniform = -1;
+        this.alphaUniform = null;
+        this.stateUniform = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
@@ -109,14 +113,16 @@ GuiButton.prototype = {
         // Get button shader uniforms locations
         this.buttonShader.bind();
         this.alphaUniform = this.buttonShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.stateUniform = this.buttonShader.getUniform("buttonState");
+        if (!this.stateUniform) return false;
         this.buttonShader.unbind();
 
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
 
-        // Button loaded
+        // GUI Button successfully loaded
         return true;
     },
 
@@ -329,6 +335,8 @@ GuiButton.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  isPicking : Get button picking state                                  //
+    //  param mouseX : Cursor X position                                      //
+    //  param mouseY : Cursor Y position                                      //
     //  return : True if the button is picking                                //
     ////////////////////////////////////////////////////////////////////////////
     isPicking: function(mouseX, mouseY)

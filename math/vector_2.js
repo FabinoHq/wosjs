@@ -48,7 +48,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 function Vector2(x, y)
 {
-    // 2 components vector representation
     this.vec = new GLArrayDataType(2);
     this.vec[0] = 0.0;
     this.vec[1] = 0.0;

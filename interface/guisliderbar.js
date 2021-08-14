@@ -55,11 +55,11 @@ function GuiSliderBar(renderer, sliderBarShader)
     this.sliderBarShader = sliderBarShader;
 
     // SliderBar shader uniforms locations
-    this.alphaUniform = -1;
-    this.uvSizeUniform = -1;
-    this.uvFactorUniform = -1;
-    this.sliderValueUniform = -1;
-    this.drawCursorUniform = -1;
+    this.alphaUniform = null;
+    this.uvSizeUniform = null;
+    this.uvFactorUniform = null;
+    this.sliderValueUniform = null;
+    this.drawCursorUniform = null;
 
     // SliderBar texture
     this.texture = null;
@@ -89,24 +89,31 @@ GuiSliderBar.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init GUI SliderBar                                             //
     //  param texture : Texture pointer                                       //
-    //  param width : ProgressBar width                                       //
-    //  param height : ProgressBar height                                     //
+    //  param width : SliderBar width                                         //
+    //  param height : SliderBar height                                       //
     //  param factor : ScrollBar UV factor                                    //
+    //  return : True if GUI SliderBar is successfully loaded                 //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, factor)
     {
         // Reset slider bar
-        this.alphaUniform = -1;
-        this.uvSizeUniform = -1;
-        this.uvFactorUniform = -1;
+        this.alphaUniform = null;
+        this.uvSizeUniform = null;
+        this.uvFactorUniform = null;
+        this.sliderValueUniform = null;
+        this.drawCursorUniform = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         if (this.size.vec[0] <= 0.0) { this.size.vec[0] = 0.0; }
         if (this.size.vec[1] <= 0.0) { this.size.vec[1] = 0.0; }
+        if (!this.uvSize) return false;
         this.uvSize.setXY(1.0, 1.0);
         this.uvFactor = 1.0;
         if (factor !== undefined) this.uvFactor = factor;
@@ -124,19 +131,24 @@ GuiSliderBar.prototype = {
         // Get slider bar shader uniforms locations
         this.sliderBarShader.bind();
         this.alphaUniform = this.sliderBarShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.uvSizeUniform = this.sliderBarShader.getUniform("uvSize");
+        if (!this.uvSizeUniform) return false;
         this.uvFactorUniform = this.sliderBarShader.getUniform("uvFactor");
+        if (!this.uvFactorUniform) return false;
         this.sliderValueUniform = this.sliderBarShader.getUniform(
             "sliderValue"
         );
+        if (!this.sliderValueUniform) return false;
         this.drawCursorUniform = this.sliderBarShader.getUniform("drawCursor");
+        if (!this.drawCursorUniform) return false;
         this.sliderBarShader.unbind();
 
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
 
-        // ProgressBar loaded
+        // GUI SliderBar successfully loaded
         return true;
     },
 
@@ -220,8 +232,8 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setSize : Set slider bar size                                         //
-    //  param width : ProgressBar width to set                                //
-    //  param height : ProgressBar height to set                              //
+    //  param width : SliderBar width to set                                  //
+    //  param height : SliderBar height to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setSize: function(width, height)
     {
@@ -245,7 +257,7 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setWidth : Set slider bar width                                       //
-    //  param width : ProgressBar width to set                                //
+    //  param width : SliderBar width to set                                  //
     ////////////////////////////////////////////////////////////////////////////
     setWidth: function(width)
     {
@@ -255,7 +267,7 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setHeight : Set slider bar height                                     //
-    //  param height : ProgressBar height to set                              //
+    //  param height : SliderBar height to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setHeight: function(height)
     {
@@ -265,7 +277,7 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAlpha : Set slider bar alpha                                       //
-    //  param alpha : ProgressBar alpha to set                                //
+    //  param alpha : SliderBar alpha to set                                  //
     ////////////////////////////////////////////////////////////////////////////
     setAlpha: function(alpha)
     {
@@ -274,7 +286,7 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setFactor : Set slider bar factor                                     //
-    //  param factor : ProgressBar factor to set                              //
+    //  param factor : SliderBar factor to set                                //
     ////////////////////////////////////////////////////////////////////////////
     setFactor: function(factor)
     {
@@ -373,7 +385,7 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getX : Get slider bar X position                                      //
-    //  return : ProgressBar X position                                       //
+    //  return : SliderBar X position                                         //
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
@@ -382,7 +394,7 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getY : Get slider bar Y position                                      //
-    //  return : ProgressBar Y position                                       //
+    //  return : SliderBar Y position                                         //
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
@@ -391,7 +403,7 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getWidth : Get slider bar width                                       //
-    //  return : ProgressBar width                                            //
+    //  return : SliderBar width                                              //
     ////////////////////////////////////////////////////////////////////////////
     getWidth: function()
     {
@@ -400,7 +412,7 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getHeight : Get slider bar height                                     //
-    //  return : ProgressBar height                                           //
+    //  return : SliderBar height                                             //
     ////////////////////////////////////////////////////////////////////////////
     getHeight: function()
     {
@@ -409,7 +421,7 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAlpha : Get slider bar alpha                                       //
-    //  return : ProgressBar alpha                                            //
+    //  return : SliderBar alpha                                              //
     ////////////////////////////////////////////////////////////////////////////
     getAlpha: function()
     {
@@ -418,7 +430,7 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getFactor : Get slider bar factor                                     //
-    //  return : ProgressBar factor                                           //
+    //  return : SliderBar factor                                             //
     ////////////////////////////////////////////////////////////////////////////
     getFactor: function()
     {
@@ -427,7 +439,7 @@ GuiSliderBar.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getValue : Get slider bar value                                       //
-    //  return : ProgressBar value                                            //
+    //  return : SliderBar value                                              //
     ////////////////////////////////////////////////////////////////////////////
     getValue: function()
     {

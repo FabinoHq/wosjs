@@ -55,9 +55,9 @@ function Sprite(renderer, spriteShader)
     this.spriteShader = spriteShader;
 
     // Sprite shader uniforms locations
-    this.alphaUniform = -1;
-    this.uvSizeUniform = -1;
-    this.uvOffsetUniform = -1;
+    this.alphaUniform = null;
+    this.uvSizeUniform = null;
+    this.uvOffsetUniform = null;
 
     // Sprite texture
     this.texture = null;
@@ -84,21 +84,27 @@ Sprite.prototype = {
     //  param texture : Texture pointer                                       //
     //  param width : Sprite width                                            //
     //  param height : Sprite height                                          //
+    //  return : True if sprite is successfully loaded                        //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height)
     {
         // Reset sprite
-        this.alphaUniform = -1;
-        this.uvSizeUniform = -1;
-        this.uvOffsetUniform = -1;
+        this.alphaUniform = null;
+        this.uvSizeUniform = null;
+        this.uvOffsetUniform = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.angle = 0.0;
+        if (!this.uvSize) return false;
         this.uvSize.setXY(1.0, 1.0);
+        if (!this.uvOffset) return false;
         this.uvOffset.reset();
         this.alpha = 1.0;
 
@@ -111,15 +117,18 @@ Sprite.prototype = {
         // Get sprite shader uniforms locations
         this.spriteShader.bind();
         this.alphaUniform = this.spriteShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.uvOffsetUniform = this.spriteShader.getUniform("uvOffset");
+        if (!this.uvOffsetUniform) return false;
         this.uvSizeUniform = this.spriteShader.getUniform("uvSize");
+        if (!this.uvSizeUniform) return false;
         this.spriteShader.unbind();
 
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
 
-        // Sprite loaded
+        // Sprite successfully loaded
         return true;
     },
 
@@ -440,4 +449,3 @@ Sprite.prototype = {
         this.spriteShader.unbind();
     }
 };
-

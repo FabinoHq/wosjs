@@ -65,9 +65,9 @@ function UISound(audio)
 
 UISound.prototype = {
     ////////////////////////////////////////////////////////////////////////////
-    //  init : Init ui sound                                                  //
-    //  param soundBuffer : Sound buffer to set ui sound from                 //
-    //  return : True if the ui sound is successfully loaded                  //
+    //  init : Init UI sound                                                  //
+    //  param soundBuffer : Sound buffer to set UI sound from                 //
+    //  return : True if UI sound is successfully loaded                      //
     ////////////////////////////////////////////////////////////////////////////
     init: function(soundBuffer)
     {
@@ -96,13 +96,14 @@ UISound.prototype = {
         this.buffer = soundBuffer.buffer;
         if (!this.buffer) return false;
 
+        // UI sound successfully loaded
         this.loaded = true;
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  isPlaying : Get ui sound playing state                                //
-    //  return : True if the ui sound is playing                              //
+    //  isPlaying : Get UI sound playing state                                //
+    //  return : True if the UI sound is playing                              //
     ////////////////////////////////////////////////////////////////////////////
     isPlaying: function()
     {
@@ -110,13 +111,13 @@ UISound.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  play : Play ui sound                                                  //
+    //  play : Play UI sound                                                  //
     ////////////////////////////////////////////////////////////////////////////
     play: function()
     {
         if (this.loaded)
         {
-            // Create uisound
+            // Create UI sound
             this.uisound = new AudioBufferSourceNode(this.audio.context);
             this.uisound.buffer = this.buffer.buffer;
             if (!this.uisound.start) this.uisound.start = this.uisound.noteOn;
@@ -129,7 +130,7 @@ UISound.prototype = {
                 --this.snd.playingCount;
                 if (this.snd.playingCount <= 0)
                 {
-                    // All ui sound instances ended
+                    // All UI sound instances ended
                     this.snd.playingCount = 0;
                     this.snd.onSoundEnd();
                 }
@@ -144,7 +145,7 @@ UISound.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  onSoundEnd : Called when the ui sound ended                           //
+    //  onSoundEnd : Called when the UI sound ended                           //
     ////////////////////////////////////////////////////////////////////////////
     onSoundEnd: function()
     {

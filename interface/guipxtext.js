@@ -78,11 +78,11 @@ function GuiPxText(renderer, textShader, lineShader)
     this.lineShader = lineShader;
 
     // Text shader uniforms locations
-    this.colorUniform = -1;
-    this.alphaUniform = -1;
-    this.smoothUniform = -1;
-    this.uvSizeUniform = -1;
-    this.uvOffsetUniform = -1;
+    this.colorUniform = null;
+    this.alphaUniform = null;
+    this.smoothUniform = null;
+    this.uvSizeUniform = null;
+    this.uvOffsetUniform = null;
 
     // GuiPxText glyphs texture
     this.texture = null;
@@ -135,32 +135,40 @@ GuiPxText.prototype = {
     //  param text : Text to set                                              //
     //  param height : Text field height                                      //
     //  param hide : Text hide mode                                           //
+    //  return : True if GUI PxText is successfully loaded                    //
     ////////////////////////////////////////////////////////////////////////////
     init: function(lineOptimize, texture, text, height, hide)
     {
         var i = 0;
 
         // Reset GuiText
-        this.colorUniform = -1;
-        this.alphaUniform = -1;
-        this.smoothUniform = -1;
-        this.uvSizeUniform = -1;
-        this.uvOffsetUniform = -1;
+        this.colorUniform = null;
+        this.alphaUniform = null;
+        this.smoothUniform = null;
+        this.uvSizeUniform = null;
+        this.uvOffsetUniform = null;
         this.texture = null;
         this.lineTexture = null;
         this.needUpdate = false;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
         this.angle = 0.0;
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
+        if (!this.color) return false;
         this.color.setXYZ(1.0, 1.0, 1.0);
+        if (!this.uvSize) return false;
         this.uvSize.setXY(WOSDefaultPxTextUVWidth, WOSDefaultPxTextUVHeight);
+        if (!this.uvOffset) return false;
         this.uvOffset.reset();
         this.charAlpha = 1.0;
         this.alpha = 1.0;
         this.smooth = 0.1;
         this.text = "";
         this.textLength = 0;
+        if (!this.charsize) return false;
         this.charsize.setXY(1.0, 1.0);
         this.hidden = false;
         this.hidetext = "";
@@ -233,10 +241,15 @@ GuiPxText.prototype = {
         // Get text shader uniforms locations
         this.textShader.bind();
         this.colorUniform = this.textShader.getUniform("color");
+        if (!this.colorUniform) return false;
         this.alphaUniform = this.textShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.smoothUniform = this.textShader.getUniform("smooth");
+        if (!this.smoothUniform) return false;
         this.uvOffsetUniform = this.textShader.getUniform("uvOffset");
+        if (!this.uvOffsetUniform) return false;
         this.uvSizeUniform = this.textShader.getUniform("uvSize");
+        if (!this.uvSizeUniform) return false;
         this.textShader.unbind();
 
         // Set texture
@@ -291,10 +304,10 @@ GuiPxText.prototype = {
             this.renderer.gl.LINEAR
         );
 
-        // Text line need update
+        // PxText line need update
         this.needUpdate = true;
 
-        // Text loaded
+        // GUI PxText successfully loaded
         return true;
     },
 
@@ -890,9 +903,11 @@ GuiPxText.prototype = {
                 // Set text line renderer size
                 this.renderer.textLineRenderer.setShader(this.lineShader);
                 this.renderer.textLineRenderer.setTexture(this.lineTexture);
-                this.renderer.textLineRenderer.setRenderSize(
-                    lineWidth, lineHeight
-                );
+                if (!this.renderer.textLineRenderer.setRenderSize(
+                    lineWidth, lineHeight))
+                {
+                    return;
+                }
 
                 // Render into text line renderer
                 this.renderer.textLineRenderer.clear();

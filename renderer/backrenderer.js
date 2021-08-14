@@ -55,7 +55,7 @@ function BackRenderer(renderer, backrendererShader)
     this.backrendererShader = backrendererShader;
 
     // Background renderer shader uniforms locations
-    this.alphaUniform = -1;
+    this.alphaUniform = null;
 
     // Size of the background renderer
     this.width = 0;
@@ -93,18 +93,23 @@ BackRenderer.prototype = {
     //  param width : Width of the background renderer                        //
     //  param height : Height of the background renderer                      //
     //  param useExternalTexture : Use external texture for rendering         //
+    //  return : True if background renderer is successfully loaded           //
     ////////////////////////////////////////////////////////////////////////////
     init: function(width, height, useExternalTexture)
     {
         // Reset background renderer
+        this.alphaUniform = null;
         this.width = 0;
         this.height = 0;
         this.ratio = 1.0;
         this.framebuffer = null;
         this.depthbuffer = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         this.angle = 0.0;
         this.alpha = 1.0;
@@ -277,6 +282,7 @@ BackRenderer.prototype = {
     //  setRenderSize : Set background renderer rendering size                //
     //  param width : Width of the background renderer in pixels              //
     //  param height : Height of the background renderer in pixels            //
+    //  return : True if rendering size successfully updated                  //
     ////////////////////////////////////////////////////////////////////////////
     setRenderSize: function(width, height)
     {
@@ -327,11 +333,23 @@ BackRenderer.prototype = {
             this.renderer.gl.TEXTURE_2D, this.texture, 0
         );
 
+        // Check framebuffer status
+        if (this.renderer.gl.checkFramebufferStatus(
+            this.renderer.gl.FRAMEBUFFER) !=
+            this.renderer.gl.FRAMEBUFFER_COMPLETE)
+        {
+            // Invalid framebuffer status
+            return false;
+        }
+
         // Unbind texture
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
         // Unbind framebuffer
         this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
+
+        // Rendering size successfully updated
+        return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -734,7 +752,10 @@ BackRenderer.prototype = {
 
         // Send shader uniforms
         this.backrendererShader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.backrendererShader.sendUniform(this.alphaUniform, this.alpha);
+        if (this.alphaUniform)
+        {
+            this.backrendererShader.sendUniform(this.alphaUniform, this.alpha);
+        }
 
         // Bind texture
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, this.texture);

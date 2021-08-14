@@ -43,13 +43,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //  WorldLight class definition                                               //
-//  param renderer : Renderer pointer                                         //
 ////////////////////////////////////////////////////////////////////////////////
-function WorldLight(renderer)
+function WorldLight()
 {
-    // Renderer pointer
-    this.renderer = renderer;
-
     // Light direction
     this.direction = new Vector3(0.0, 0.0, 0.0);
     // Light color
@@ -64,12 +60,16 @@ WorldLight.prototype = {
     //  param direction : Direction of the world light                        //
     //  param color : Color of the world light                                //
     //  param ambient : Ambient color of the world light                      //
+    //  return : True if world light is successfully loaded                   //
     ////////////////////////////////////////////////////////////////////////////
     init: function(direction, color, ambient)
     {
         // Reset world light
+        if (!this.direction) return false;
         this.direction.reset();
+        if (!this.color) return false;
         this.color.reset();
+        if (!this.ambient) return false;
         this.ambient.reset();
 
         // Set world light direction
@@ -81,10 +81,7 @@ WorldLight.prototype = {
         // Set world light ambient color
         if (ambient) this.ambient.setVector(ambient);
 
-        // Check renderer pointer
-        if (!this.renderer) return false;
-
-        // World light loaded
+        // World light successfully loaded
         return true;
     },
 
@@ -95,11 +92,10 @@ WorldLight.prototype = {
     setDirectionVec3: function(direction)
     {
         // Set world light direction
-        if (direction)
-        {
-            this.direction.setVector(direction);
-            this.direction.normalize();
-        }
+        this.direction.setXYZ(
+            -direction.vec[0], -direction.vec[1], -direction.vec[2]
+        );
+        this.direction.normalize();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -111,7 +107,7 @@ WorldLight.prototype = {
     setDirection: function(x, y, z)
     {
         // Set world light direction
-        this.direction.setXYZ(x, y, z);
+        this.direction.setXYZ(-x, -y, -z);
         this.direction.normalize();
     },
 
@@ -122,7 +118,7 @@ WorldLight.prototype = {
     setColorVec4: function(color)
     {
         // Set world light color
-        if (color) this.color.setVector(color);
+        this.color.setVector(color);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -145,7 +141,7 @@ WorldLight.prototype = {
     setAmbientVec4: function(ambient)
     {
         // Set world light ambient color
-        if (ambient) this.ambient.setVector(ambient);
+        this.ambient.setVector(ambient);
     },
 
     ////////////////////////////////////////////////////////////////////////////

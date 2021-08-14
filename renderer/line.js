@@ -55,10 +55,10 @@ function Line(renderer, lineShader)
     this.lineShader = lineShader;
 
     // Line shader uniforms locations
-    this.colorUniform = -1;
-    this.alphaUniform = -1;
-    this.ratioUniform = -1;
-    this.smoothUniform = -1;
+    this.colorUniform = null;
+    this.alphaUniform = null;
+    this.ratioUniform = null;
+    this.smoothUniform = null;
 
     // Line model matrix
     this.modelMatrix = new Matrix4x4();
@@ -84,27 +84,26 @@ Line.prototype = {
     //  param originY : Line origin Y position                                //
     //  param targetX : Line target X position                                //
     //  param targetY : Line target Y position                                //
+    //  return : True if line is successfully loaded                          //
     ////////////////////////////////////////////////////////////////////////////
     init: function(thickness, originX, originY, targetX, targetY)
     {
         // Reset line
-        var dx = 0.0;
-        var dy = 0.0;
-        var length = 0.0;
-        this.colorUniform = -1;
-        this.alphaUniform = -1;
-        this.ratioUniform = -1;
-        this.smoothUniform = -1;
+        this.colorUniform = null;
+        this.alphaUniform = null;
+        this.ratioUniform = null;
+        this.smoothUniform = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.origin) return false;
         this.origin.reset();
+        if (!this.target) return false;
         this.target.setXY(1.0, 1.0);
         if (originX !== undefined) this.origin.vec[0] = originX;
         if (originY !== undefined) this.origin.vec[1] = originY;
         if (targetX !== undefined) this.target.vec[0] = targetX;
         if (targetY !== undefined) this.target.vec[1] = targetY;
-        dx = this.target.vec[0]-this.origin.vec[0];
-        dy = this.target.vec[1]-this.origin.vec[1];
-        length = Math.sqrt(dx*dx+dy*dy);
+        if (!this.color) return false;
         this.color.setXYZ(1.0, 1.0, 1.0);
         this.alpha = 1.0;
         this.thickness = 0.01;
@@ -120,12 +119,16 @@ Line.prototype = {
         // Get line shader uniforms locations
         this.lineShader.bind();
         this.colorUniform = this.lineShader.getUniform("color");
+        if (!this.colorUniform) return false;
         this.alphaUniform = this.lineShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.ratioUniform = this.lineShader.getUniform("ratio");
+        if (!this.ratioUniform) return false;
         this.smoothUniform = this.lineShader.getUniform("smooth");
+        if (!this.smoothUniform) return false;
         this.lineShader.unbind();
 
-        // Line loaded
+        // Line successfully loaded
         return true;
     },
 

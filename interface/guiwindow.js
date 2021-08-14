@@ -91,16 +91,21 @@ GuiWindow.prototype = {
     //  param width : Window width                                            //
     //  param height : Window height                                          //
     //  param factor : Window UV factor                                       //
+    //  return : True if GUI Window is successfully loaded                    //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, factor)
     {
         // Reset window
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.alpha = 1.0;
+        if (!this.minSize) return false;
         this.minSize.setXY(0.2, 0.2);
+        if (!this.maxSize) return false;
         this.maxSize.setXY(3.8, 1.9);
         this.movable = true;
         this.resizable = true;
@@ -111,15 +116,17 @@ GuiWindow.prototype = {
         this.grabBottomWindow = false;
         this.grabLeftWindow = false;
         this.grabRightWindow = false;
+        if (!this.grabPosition) return false;
         this.grabPosition.reset();
 
         // Check renderer pointer
         if (!this.renderer) return false;
 
         // Init ninepatch
+        if (!this.ninepatch) return false;
         if (!this.ninepatch.init(texture, width, height, factor)) return false;
 
-        // Window loaded
+        // GUI Window successfully loaded
         return true;
     },
 

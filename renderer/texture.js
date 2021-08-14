@@ -72,11 +72,13 @@ Texture.prototype = {
     //  param width : Texture width                                           //
     //  param height : Texture height                                         //
     //  param data : Texture data                                             //
+    //  return : True if default 1x1 texture is successfully loaded           //
     ////////////////////////////////////////////////////////////////////////////
     init: function(width, height, data)
     {
         // Reset texture
         this.loaded = false;
+        this.image = null;
         this.tex = null;
         this.width = 0;
         this.height = 0;
@@ -142,7 +144,7 @@ Texture.prototype = {
         // Unbind texture
         this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
-        // Texture successfully loaded
+        // Default 1x1 texture successfully loaded
         this.loaded = true;
         return true;
     },
@@ -151,6 +153,7 @@ Texture.prototype = {
     //  load : Load texture                                                   //
     //  param src : URL of the source image                                   //
     //  param smooth : Texture smooth attribute                               //
+    //  return : True if texture is now loading                               //
     ////////////////////////////////////////////////////////////////////////////
     load: function(src, smooth)
     {
@@ -209,9 +212,14 @@ Texture.prototype = {
         {
             this.texture.handleImageLoaded();
             if (this.texture.loaded) this.texture.onTextureLoaded();
+            else this.texture.onTextureError();
+        }
+        this.image.onerror = function()
+        {
+            this.texture.onTextureError();
         }
 
-        // Start loading image
+        // Texture is now loading
         this.image.src = src;
         return true;
     },
@@ -288,6 +296,14 @@ Texture.prototype = {
     //  onTextureLoaded : Called when texture is fully loaded                 //
     ////////////////////////////////////////////////////////////////////////////
     onTextureLoaded: function()
+    {
+
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  onTextureError : Called when texture failed to load                   //
+    ////////////////////////////////////////////////////////////////////////////
+    onTextureError: function()
     {
 
     },

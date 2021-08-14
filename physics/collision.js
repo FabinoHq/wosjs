@@ -290,4 +290,3 @@ Collision.prototype = {
         return this.factor;
     }
 };
-

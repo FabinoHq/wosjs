@@ -57,10 +57,10 @@ function GuiPxTextButton(renderer, buttonShader, textShader, lineShader)
     this.buttonShader = buttonShader;
 
     // PxTextButton shader uniforms locations
-    this.uvSizeUniform = -1;
-    this.uvFactorUniform = -1;
-    this.alphaUniform = -1;
-    this.stateUniform = -1;
+    this.uvSizeUniform = null;
+    this.uvFactorUniform = null;
+    this.alphaUniform = null;
+    this.stateUniform = null;
 
     // PxTextButton texture
     this.texture = null;
@@ -104,23 +104,30 @@ GuiPxTextButton.prototype = {
     //  param text : Text to set                                              //
     //  param height : PxTextButton height                                    //
     //  param factor : PxTextButton UV factor                                 //
+    //  return : True if GUI PxTextButton is successfully loaded              //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, textTexture, text, height, factor)
     {
         // Reset pixel text button
-        this.uvSizeUniform = -1;
-        this.uvFactorUniform = -1;
-        this.alphaUniform = -1;
-        this.buttonStateUniform = -1;
+        this.uvSizeUniform = null;
+        this.uvFactorUniform = null;
+        this.alphaUniform = null;
+        this.buttonStateUniform = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
         this.height = 0.1;
+        if (!this.offset) return false;
         this.offset.reset();
+        if (!this.color) return false;
         this.color.setXYZ(1.0, 1.0, 1.0);
         this.textAlpha = 1.0;
+        if (!this.hoverColor) return false;
         this.hoverColor.setXYZ(1.0, 1.0, 1.0);
         this.textHoverAlpha = 1.0;
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         this.uvFactor = 1.0;
         if (factor !== undefined) this.uvFactor = factor;
@@ -144,9 +151,13 @@ GuiPxTextButton.prototype = {
         // Get button shader uniforms locations
         this.buttonShader.bind();
         this.uvSizeUniform = this.buttonShader.getUniform("uvSize");
+        if (!this.uvSizeUniform) return false;
         this.uvFactorUniform = this.buttonShader.getUniform("uvFactor");
+        if (!this.uvFactorUniform) return false;
         this.alphaUniform = this.buttonShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.stateUniform = this.buttonShader.getUniform("buttonState");
+        if (!this.stateUniform) return false;
         this.buttonShader.unbind();
 
         // Set texture
@@ -154,6 +165,7 @@ GuiPxTextButton.prototype = {
         if (!this.texture) return false;
 
         // Set text
+        if (!this.guipxtext) return false;
         if (!this.guipxtext.init(true, textTexture, text, this.height, false))
         {
             return false;
@@ -163,7 +175,7 @@ GuiPxTextButton.prototype = {
         this.size.vec[0] = this.guipxtext.getWidth()+(this.height*0.2);
         this.size.vec[1] = this.height;
 
-        // PxTextButton loaded
+        // GUI PxTextButton successfully loaded
         return true;
     },
 

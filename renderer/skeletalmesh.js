@@ -60,31 +60,31 @@ function SkeletalMesh(renderer,
     this.skeletalShaderLow = skeletalShaderLow;
 
     // Skeletal mesh shader uniforms locations
-    this.shadowsTextureLocation = -1;
-    this.normalMapLocation = -1;
-    this.specularMapLocation = -1;
-    this.cameraPosLocation = -1;
-    this.cameraPosLocationMedium = -1;
-    this.bonesMatricesLocation = -1;
-    this.bonesMatricesLocationMedium = -1;
-    this.bonesMatricesLocationLow = -1;
-    this.bonesCountUniform = -1;
-    this.bonesCountUniformMedium = -1;
-    this.bonesCountUniformLow = -1;
-    this.lightsTextureLocation = -1;
-    this.lightsTextureLocationMedium = -1;
-    this.shadowsMatrixLocation = -1;
-    this.worldLightVecUniform = -1;
-    this.worldLightVecUniformMedium = -1;
-    this.worldLightColorUniform = -1;
-    this.worldLightColorUniformMedium = -1;
-    this.worldLightAmbientUniform = -1;
-    this.worldLightAmbientUniformMedium = -1;
-    this.specularityUniform = -1;
-    this.specularityUniformMedium = -1;
-    this.alphaUniform = -1;
-    this.alphaUniformMedium = -1;
-    this.alphaUniformLow = -1;
+    this.shadowsTextureLocation = null;
+    this.normalMapLocation = null;
+    this.specularMapLocation = null;
+    this.bonesMatricesLocation = null;
+    this.bonesMatricesLocationMedium = null;
+    this.bonesMatricesLocationLow = null;
+    this.cameraPosUniform = null;
+    this.cameraPosUniformMedium = null;
+    this.bonesCountUniform = null;
+    this.bonesCountUniformMedium = null;
+    this.bonesCountUniformLow = null;
+    this.lightsTextureLocation = null;
+    this.lightsTextureLocationMedium = null;
+    this.shadowsMatrixLocation = null;
+    this.worldLightVecUniform = null;
+    this.worldLightVecUniformMedium = null;
+    this.worldLightColorUniform = null;
+    this.worldLightColorUniformMedium = null;
+    this.worldLightAmbientUniform = null;
+    this.worldLightAmbientUniformMedium = null;
+    this.specularityUniform = null;
+    this.specularityUniformMedium = null;
+    this.alphaUniform = null;
+    this.alphaUniformMedium = null;
+    this.alphaUniformLow = null;
 
     // Skeletal mesh vertex buffer
     this.vertexBuffer = null;
@@ -140,6 +140,10 @@ function SkeletalMesh(renderer,
     this.attachedMesh = null;
     // Skeletal mesh bones attachment
     this.attachedBones = null;
+    // Skeletal mesh root attachment
+    this.attachedRoot = null;
+    // Skeletal mesh root bone attachment
+    this.attachedRootBone = 0;
 
     // Skeletal mesh position
     this.position = new Vector3(0.0, 0.0, 0.0);
@@ -170,6 +174,7 @@ SkeletalMesh.prototype = {
     //  init : Init skeletal mesh                                             //
     //  param model : Model pointer                                           //
     //  param texture : Texture pointer                                       //
+    //  return : True if skeletal mesh is successfully loaded                 //
     ////////////////////////////////////////////////////////////////////////////
     init: function(model, texture)
     {
@@ -179,36 +184,38 @@ SkeletalMesh.prototype = {
         var found = false;
 
         // Reset skeletal mesh
-        this.shadowsTextureLocation = -1;
-        this.normalMapLocation = -1;
-        this.specularMapLocation = -1;
-        this.cameraPosLocation = -1;
-        this.cameraPosLocationMedium = -1;
-        this.bonesMatricesLocation = -1;
-        this.bonesMatricesLocationMedium = -1;
-        this.bonesMatricesLocationLow = -1;
-        this.bonesCountUniform = -1;
-        this.bonesCountUniformMedium = -1;
-        this.bonesCountUniformLow = -1;
-        this.lightsTextureLocation = -1;
-        this.lightsTextureLocationMedium = -1;
-        this.shadowsMatrixLocation = -1;
-        this.worldLightVecUniform = -1;
-        this.worldLightVecUniformMedium = -1;
-        this.worldLightColorUniform = -1;
-        this.worldLightColorUniformMedium = -1;
-        this.worldLightAmbientUniform = -1;
-        this.worldLightAmbientUniformMedium = -1;
-        this.specularityUniform = -1;
-        this.specularityUniformMedium = -1;
-        this.alphaUniform = -1;
-        this.alphaUniformMedium = -1;
-        this.alphaUniformLow = -1;
+        this.shadowsTextureLocation = null;
+        this.normalMapLocation = null;
+        this.specularMapLocation = null;
+        this.bonesMatricesLocation = null;
+        this.bonesMatricesLocationMedium = null;
+        this.bonesMatricesLocationLow = null;
+        this.cameraPosUniform = null;
+        this.cameraPosUniformMedium = null;
+        this.bonesCountUniform = null;
+        this.bonesCountUniformMedium = null;
+        this.bonesCountUniformLow = null;
+        this.lightsTextureLocation = null;
+        this.lightsTextureLocationMedium = null;
+        this.shadowsMatrixLocation = null;
+        this.worldLightVecUniform = null;
+        this.worldLightVecUniformMedium = null;
+        this.worldLightColorUniform = null;
+        this.worldLightColorUniformMedium = null;
+        this.worldLightAmbientUniform = null;
+        this.worldLightAmbientUniformMedium = null;
+        this.specularityUniform = null;
+        this.specularityUniformMedium = null;
+        this.alphaUniform = null;
+        this.alphaUniformMedium = null;
+        this.alphaUniformLow = null;
         this.vertexBuffer = null;
         this.texture = null;
         this.normalMap = null;
         this.specularMap = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.shadowsMatrix) return false;
         this.shadowsMatrix.setIdentity();
         this.bonesCount = 0;
         this.bonesParents = null;
@@ -229,12 +236,33 @@ SkeletalMesh.prototype = {
         this.currentBones = null;
         this.attachedMesh = null;
         this.attachedBones = null;
+        this.attachedRoot = null;
+        this.attachedRootBone = 0;
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.angles) return false;
         this.angles.reset();
         this.scale = 1.0;
         this.alpha = 1.0;
         this.specularity = 0.0;
+        if (!this.tmpMat) return false;
         this.tmpMat.setIdentity();
+        if (!this.prevPos) return false;
+        this.prevPos.reset();
+        if (!this.pos) return false;
+        this.pos.reset();
+        if (!this.nextPos) return false;
+        this.nextPos.reset();
+        if (!this.nextPos2) return false;
+        this.nextPos2.reset();
+        if (!this.prevRot) return false;
+        this.prevRot.reset();
+        if (!this.rot) return false;
+        this.rot.reset();
+        if (!this.nextRot) return false;
+        this.nextRot.reset();
+        if (!this.nextRot2) return false;
+        this.nextRot2.reset();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -255,42 +283,55 @@ SkeletalMesh.prototype = {
             this.shadowsMatrixLocation = this.skeletalShader.getUniform(
                 "shadowsMatrix"
             );
-            this.cameraPosLocation = this.skeletalShader.getUniform(
-                "cameraPos"
-            );
+            if (!this.shadowsMatrixLocation) return false;
             this.bonesMatricesLocation = this.skeletalShader.getUniform(
                 "bonesMatrices"
             );
+            if (!this.bonesMatricesLocation) return false;
             this.skeletalShader.sendIntUniform(this.bonesMatricesLocation, 1);
             this.bonesCountUniform = this.skeletalShader.getUniform(
                 "bonesCount"
             );
+            if (!this.bonesCountUniform) return false;
             this.lightsTextureLocation = this.skeletalShader.getUniform(
                 "lightsTexture"
             );
+            if (!this.lightsTextureLocation) return false;
             this.skeletalShader.sendIntUniform(this.lightsTextureLocation, 2);
             this.shadowsTextureLocation = this.skeletalShader.getUniform(
                 "shadowsTexture"
             );
+            if (!this.shadowsTextureLocation) return false;
             this.skeletalShader.sendIntUniform(this.shadowsTextureLocation, 3);
             this.normalMapLocation = this.skeletalShader.getUniform(
                 "normalMap"
             );
+            if (!this.normalMapLocation) return false;
             this.skeletalShader.sendIntUniform(this.normalMapLocation, 4);
             this.specularMapLocation = this.skeletalShader.getUniform(
                 "specularMap"
             );
+            if (!this.specularMapLocation) return false;
             this.skeletalShader.sendIntUniform(this.specularMapLocation, 5);
+            this.cameraPosUniform = this.skeletalShader.getUniform(
+                "cameraPos"
+            );
+            if (!this.cameraPosUniform) return false;
             this.worldLightVecUniform =
                 this.skeletalShader.getUniform("worldLightVec");
+            if (!this.worldLightVecUniform) return false;
             this.worldLightColorUniform =
                 this.skeletalShader.getUniform("worldLightColor");
+            if (!this.worldLightColorUniform) return false;
             this.worldLightAmbientUniform =
                 this.skeletalShader.getUniform("worldLightAmbient");
+            if (!this.worldLightAmbientUniform) return false;
             this.specularityUniform = this.skeletalShader.getUniform(
                 "specularity"
             );
+            if (!this.specularityUniform) return false;
             this.alphaUniform = this.skeletalShader.getUniform("alpha");
+            if (!this.alphaUniform) return false;
             this.skeletalShader.unbind();
         }
 
@@ -301,33 +342,42 @@ SkeletalMesh.prototype = {
             if (!this.skeletalShaderMedium) return false;
 
             this.skeletalShaderMedium.bind();
-            this.cameraPosLocationMedium = this.skeletalShaderMedium.getUniform(
-                "cameraPos"
-            );
             this.bonesMatricesLocationMedium =
                 this.skeletalShaderMedium.getUniform("bonesMatrices");
+            if (!this.bonesMatricesLocationMedium) return false;
             this.skeletalShaderMedium.sendIntUniform(
                 this.bonesMatricesLocationMedium, 1
             );
             this.bonesCountUniformMedium = this.skeletalShaderMedium.getUniform(
                 "bonesCount"
             );
+            if (!this.bonesCountUniformMedium) return false;
             this.lightsTextureLocationMedium =
                 this.skeletalShaderMedium.getUniform("lightsTexture");
+            if (!this.lightsTextureLocationMedium) return false;
             this.skeletalShaderMedium.sendIntUniform(
                 this.lightsTextureLocationMedium, 2
             );
+            this.cameraPosUniformMedium = this.skeletalShaderMedium.getUniform(
+                "cameraPos"
+            );
+            if (!this.cameraPosUniformMedium) return false;
             this.worldLightVecUniformMedium =
                 this.skeletalShaderMedium.getUniform("worldLightVec");
+            if (!this.worldLightVecUniformMedium) return false;
             this.worldLightColorUniformMedium =
                 this.skeletalShaderMedium.getUniform("worldLightColor");
+            if (!this.worldLightColorUniformMedium) return false;
             this.worldLightAmbientUniformMedium =
                 this.skeletalShaderMedium.getUniform("worldLightAmbient");
+            if (!this.worldLightAmbientUniformMedium) return false;
             this.specularityUniformMedium =
                 this.skeletalShaderMedium.getUniform("specularity");
+            if (!this.specularityUniformMedium) return false;
             this.alphaUniformMedium = this.skeletalShaderMedium.getUniform(
                 "alpha"
             );
+            if (!this.alphaUniformMedium) return false;
             this.skeletalShaderMedium.unbind();
         }
 
@@ -336,11 +386,14 @@ SkeletalMesh.prototype = {
         this.bonesMatricesLocationLow = this.skeletalShaderLow.getUniform(
             "bonesMatrices"
         );
+        if (!this.bonesMatricesLocationLow) return false;
         this.skeletalShaderLow.sendIntUniform(this.bonesMatricesLocationLow, 1);
         this.bonesCountUniformLow = this.skeletalShaderLow.getUniform(
             "bonesCount"
         );
+        if (!this.bonesCountUniformLow) return false;
         this.alphaUniformLow = this.skeletalShaderLow.getUniform("alpha");
+        if (!this.alphaUniformLow) return false;
         this.skeletalShaderLow.unbind();
 
         // Check model pointer
@@ -513,7 +566,7 @@ SkeletalMesh.prototype = {
         // Compute initial frame
         this.compute(0.0);
 
-        // Skeletal mesh loaded
+        // Skeletal mesh successfully loaded
         return true;
     },
 
@@ -554,6 +607,15 @@ SkeletalMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  resetAttachment : Reset skeletal mesh attachments                     //
+    ////////////////////////////////////////////////////////////////////////////
+    resetAttachment: function()
+    {
+        this.attachedMesh = null;
+        this.attachedRoot = null;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setAttachment : Set skeletal mesh attachment mesh                     //
     //  param skeletalMesh : Skeletal mesh to attach skeletal mesh to         //
     ////////////////////////////////////////////////////////////////////////////
@@ -562,6 +624,7 @@ SkeletalMesh.prototype = {
         if (skeletalMesh)
         {
             this.attachedMesh = skeletalMesh;
+            this.attachedRoot = null;
         }
     },
 
@@ -574,9 +637,28 @@ SkeletalMesh.prototype = {
     {
         if (this.attachedMesh)
         {
-            if ((bone >= 0 && bone) <= (this.attachedBones.length))
+            if ((bone >= 0) && (bone <= this.attachedBones.length))
             {
                 this.attachedBones[bone] = skeletalBone;
+            }
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setRootAttachment : Set skeletal mesh root bone attachment mesh       //
+    //  param skeletalMesh : Skeletal mesh to attach skeletal root bone to    //
+    //  param skeletalBone : Skeletal mesh bone to attach root bone to        //
+    ////////////////////////////////////////////////////////////////////////////
+    setRootAttachment: function(skeletalMesh, skeletalBone)
+    {
+        if (skeletalMesh)
+        {
+            if ((skeletalBone >= 0) &&
+                (skeletalBone <= skeletalMesh.bonesCount))
+            {
+                this.attachedRoot = skeletalMesh;
+                this.attachedRootBone = skeletalBone;
+                this.attachedMesh = null;
             }
         }
     },
@@ -1144,7 +1226,16 @@ SkeletalMesh.prototype = {
         this.modelMatrix.setIdentity();
         if (this.attachedMesh)
         {
+            // Mesh attachment
             this.modelMatrix.setMatrix(this.attachedMesh.modelMatrix);
+        }
+        if (this.attachedRoot)
+        {
+            // Root bone attachment
+            this.modelMatrix.setMatrix(this.attachedRoot.modelMatrix);
+            this.modelMatrix.multiply(
+                this.attachedRoot.bonesMatrices[this.attachedRootBone]
+            );
         }
         this.modelMatrix.translateVec3(this.position);
         this.modelMatrix.rotateVec3(this.angles);
@@ -1199,7 +1290,7 @@ SkeletalMesh.prototype = {
                 this.shadowsMatrixLocation, this.shadowsMatrix
             );
             this.skeletalShader.sendUniformVec3(
-                this.cameraPosLocation, this.renderer.camera.position
+                this.cameraPosUniform, this.renderer.camera.position
             );
             this.skeletalShader.sendUniform(
                 this.bonesCountUniform, this.bonesCount
@@ -1273,7 +1364,7 @@ SkeletalMesh.prototype = {
             );
             this.skeletalShaderMedium.sendModelMatrix(this.modelMatrix);
             this.skeletalShaderMedium.sendUniformVec3(
-                this.cameraPosLocationMedium, this.renderer.camera.position
+                this.cameraPosUniformMedium, this.renderer.camera.position
             );
             this.skeletalShaderMedium.sendUniform(
                 this.bonesCountUniformMedium, this.bonesCount

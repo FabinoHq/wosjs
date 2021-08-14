@@ -49,7 +49,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 function Vector3(x, y, z)
 {
-    // 3 components vector representation
     this.vec = new GLArrayDataType(3);
     this.vec[0] = 0.0;
     this.vec[1] = 0.0;

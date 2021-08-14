@@ -55,9 +55,9 @@ function GuiScrollBar(renderer, scrollBarShader)
     this.scrollBarShader = scrollBarShader;
 
     // ScrollBar shader uniforms locations
-    this.alphaUniform = -1;
-    this.uvSizeUniform = -1;
-    this.uvFactorUniform = -1;
+    this.alphaUniform = null;
+    this.uvSizeUniform = null;
+    this.uvFactorUniform = null;
 
     // ScrollBar texture
     this.texture = null;
@@ -90,17 +90,24 @@ GuiScrollBar.prototype = {
     //  param width : ScrollBar width                                         //
     //  param height : ScrollBar height                                       //
     //  param factor : ScrollBar UV factor                                    //
+    //  return : True if GUI ScrollBar is successfully loaded                 //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, factor)
     {
         // Reset scrollbar
-        this.alphaUniform = -1;
+        this.alphaUniform = null;
+        this.uvSizeUniform = null;
+        this.uvFactorUniform = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
+        if (!this.uvSize) return false;
         this.uvSize.setXY(1.0, 1.0);
         this.uvFactor = 1.0;
         if (factor !== undefined) this.uvFactor = factor;
@@ -118,15 +125,18 @@ GuiScrollBar.prototype = {
         // Get scrollbar shader uniforms locations
         this.scrollBarShader.bind();
         this.alphaUniform = this.scrollBarShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.uvSizeUniform = this.scrollBarShader.getUniform("uvSize");
+        if (!this.uvSizeUniform) return false;
         this.uvFactorUniform = this.scrollBarShader.getUniform("uvFactor");
+        if (!this.uvFactorUniform) return false;
         this.scrollBarShader.unbind();
 
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
 
-        // ScrollBar loaded
+        // GUI ScrollBar successfully loaded
         return true;
     },
 

@@ -42,6 +42,15 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+//  WOS anim plane billboard modes                                            //
+////////////////////////////////////////////////////////////////////////////////
+const WOSAnimPlaneBillboardNone = 0;
+const WOSAnimPlaneBillboardCylindricalY = 1;
+const WOSAnimPlaneBillboardCylindricalX = 2;
+const WOSAnimPlaneBillboardSpherical = 3;
+
+
+////////////////////////////////////////////////////////////////////////////////
 //  AnimPlane class definition                                                //
 //  param renderer : Renderer pointer                                         //
 //  param animShader : Animated plane shader pointer                          //
@@ -58,37 +67,37 @@ function AnimPlane(renderer, animPlaneShader,
     this.animPlaneShaderLow = animPlaneShaderLow;
 
     // Animated plane shader uniforms locations
-    this.shadowsTextureLocation = -1;
-    this.normalMapLocation = -1;
-    this.specularMapLocation = -1;
-    this.cameraPosLocation = -1;
-    this.cameraPosLocationMedium = -1;
-    this.lightsTextureLocation = -1;
-    this.lightsTextureLocationMedium = -1;
-    this.shadowsMatrixLocation = -1;
-    this.worldLightVecUniform = -1;
-    this.worldLightVecUniformMedium = -1;
-    this.worldLightColorUniform = -1;
-    this.worldLightColorUniformMedium = -1;
-    this.worldLightAmbientUniform = -1;
-    this.worldLightAmbientUniformMedium = -1;
-    this.specularityUniform = -1;
-    this.specularityUniformMedium = -1;
-    this.alphaUniform = -1;
-    this.alphaUniformMedium = -1;
-    this.alphaUniformLow = -1;
-    this.countUniform = -1;
-    this.countUniformMedium = -1;
-    this.countUniformLow = -1;
-    this.currentUniform = -1;
-    this.currentUniformMedium = -1;
-    this.currentUniformLow = -1;
-    this.nextUniform = -1;
-    this.nextUniformMedium = -1;
-    this.nextUniformLow = -1;
-    this.interpUniform = -1;
-    this.interpUniformMedium = -1;
-    this.interpUniformLow = -1;
+    this.lightsTextureLocation = null;
+    this.lightsTextureLocationMedium = null;
+    this.shadowsTextureLocation = null;
+    this.normalMapLocation = null;
+    this.specularMapLocation = null;
+    this.shadowsMatrixLocation = null;
+    this.cameraPosUniform = null;
+    this.cameraPosUniformMedium = null;
+    this.worldLightVecUniform = null;
+    this.worldLightVecUniformMedium = null;
+    this.worldLightColorUniform = null;
+    this.worldLightColorUniformMedium = null;
+    this.worldLightAmbientUniform = null;
+    this.worldLightAmbientUniformMedium = null;
+    this.specularityUniform = null;
+    this.specularityUniformMedium = null;
+    this.alphaUniform = null;
+    this.alphaUniformMedium = null;
+    this.alphaUniformLow = null;
+    this.countUniform = null;
+    this.countUniformMedium = null;
+    this.countUniformLow = null;
+    this.currentUniform = null;
+    this.currentUniformMedium = null;
+    this.currentUniformLow = null;
+    this.nextUniform = null;
+    this.nextUniformMedium = null;
+    this.nextUniformLow = null;
+    this.interpUniform = null;
+    this.interpUniformMedium = null;
+    this.interpUniformLow = null;
 
     // Animated plane texture
     this.texture = null;
@@ -102,7 +111,7 @@ function AnimPlane(renderer, animPlaneShader,
     this.shadowsMatrix = new Matrix4x4();
 
     // Animated plane billboard mode
-    this.billboard = 0;
+    this.billboard = WOSAnimPlaneBillboardNone;
     // Animated plane position
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Animated plane size
@@ -144,66 +153,81 @@ AnimPlane.prototype = {
     //  param height : Animated plane height                                  //
     //  param countX : Animated plane frames count in U texture axis          //
     //  param countY : Animated plane frames count in V texture axis          //
+    //  return : True if animated plane is successfully loaded                //
     ////////////////////////////////////////////////////////////////////////////
     init: function(tex, width, height, countX, countY)
     {
         // Reset animated plane
-        this.shadowsTextureLocation = -1;
-        this.normalMapLocation = -1;
-        this.specularMapLocation = -1;
-        this.cameraPosLocation = -1;
-        this.cameraPosLocationMedium = -1;
-        this.lightsTextureLocation = -1;
-        this.lightsTextureLocationMedium = -1;
-        this.shadowsMatrixLocation = -1;
-        this.worldLightVecUniform = -1;
-        this.worldLightVecUniformMedium = -1;
-        this.worldLightColorUniform = -1;
-        this.worldLightColorUniformMedium = -1;
-        this.worldLightAmbientUniform = -1;
-        this.worldLightAmbientUniformMedium = -1;
-        this.specularityUniform = -1;
-        this.specularityUniformMedium = -1;
-        this.alphaUniform = -1;
-        this.alphaUniformMedium = -1;
-        this.alphaUniformLow = -1;
-        this.countUniform = -1;
-        this.countUniformMedium = -1;
-        this.countUniformLow = -1;
-        this.currentUniform = -1;
-        this.currentUniformMedium = -1;
-        this.currentUniformLow = -1;
-        this.nextUniform = -1;
-        this.nextUniformMedium = -1;
-        this.nextUniformLow = -1;
-        this.interpUniform = -1;
-        this.interpUniformMedium = -1;
-        this.interpUniformLow = -1;
+        this.lightsTextureLocation = null;
+        this.lightsTextureLocationMedium = null;
+        this.shadowsTextureLocation = null;
+        this.normalMapLocation = null;
+        this.specularMapLocation = null;
+        this.shadowsMatrixLocation = null;
+        this.cameraPosUniform = null;
+        this.cameraPosUniformMedium = null;
+        this.worldLightVecUniform = null;
+        this.worldLightVecUniformMedium = null;
+        this.worldLightColorUniform = null;
+        this.worldLightColorUniformMedium = null;
+        this.worldLightAmbientUniform = null;
+        this.worldLightAmbientUniformMedium = null;
+        this.specularityUniform = null;
+        this.specularityUniformMedium = null;
+        this.alphaUniform = null;
+        this.alphaUniformMedium = null;
+        this.alphaUniformLow = null;
+        this.countUniform = null;
+        this.countUniformMedium = null;
+        this.countUniformLow = null;
+        this.currentUniform = null;
+        this.currentUniformMedium = null;
+        this.currentUniformLow = null;
+        this.nextUniform = null;
+        this.nextUniformMedium = null;
+        this.nextUniformLow = null;
+        this.interpUniform = null;
+        this.interpUniformMedium = null;
+        this.interpUniformLow = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.shadowsMatrix) return false;
         this.shadowsMatrix.setIdentity();
-        this.billboard = 0;
+        this.billboard = WOSAnimPlaneBillboardNone;
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
+        if (!this.angles) return false;
         this.angles.reset();
+        if (!this.count) return false;
         this.count.setXY(1, 1);
         if (countX !== undefined) this.count.vec[0] = countX;
         if (countY !== undefined) this.count.vec[1] = countY;
+        if (!this.start) return false;
         this.start.setXY(0, 0);
+        if (!this.end) return false;
         this.end.setXY(0, 0);
         this.frametime = 1.0;
         this.alpha = 1.0;
         this.specularity = 0.0;
+        if (!this.current) return false;
         this.current.setXY(0, 0);
+        if (!this.next) return false;
         this.next.setXY(0, 0);
         this.currentTime = 0.0;
         this.interpOffset = 0.0;
         this.interp = 0.0;
+        if (!this.lookAtVec) return false;
         this.lookAtVec.reset();
+        if (!this.rotVec) return false;
         this.rotVec.reset();
+        if (!this.delta) return false;
         this.delta.reset();
+        if (!this.delta2) return false;
         this.delta2.reset();
 
         // Check renderer pointer
@@ -219,42 +243,57 @@ AnimPlane.prototype = {
             if (!this.animPlaneShader) return false;
 
             this.animPlaneShader.bind();
-            this.shadowsMatrixLocation = this.animPlaneShader.getUniform(
-                "shadowsMatrix"
-            );
-            this.cameraPosLocation = this.animPlaneShader.getUniform(
-                "cameraPos"
-            );
             this.lightsTextureLocation = this.animPlaneShader.getUniform(
                 "lightsTexture"
             );
+            if (!this.lightsTextureLocation) return false;
             this.animPlaneShader.sendIntUniform(this.lightsTextureLocation, 1);
             this.shadowsTextureLocation = this.animPlaneShader.getUniform(
                 "shadowsTexture"
             );
+            if (!this.shadowsTextureLocation) return false;
             this.animPlaneShader.sendIntUniform(this.shadowsTextureLocation, 2);
             this.normalMapLocation = this.animPlaneShader.getUniform(
                 "normalMap"
             );
+            if (!this.normalMapLocation) return false;
             this.animPlaneShader.sendIntUniform(this.normalMapLocation, 3);
             this.specularMapLocation = this.animPlaneShader.getUniform(
                 "specularMap"
             );
+            if (!this.specularMapLocation) return false;
             this.animPlaneShader.sendIntUniform(this.specularMapLocation, 4);
+            this.shadowsMatrixLocation = this.animPlaneShader.getUniform(
+                "shadowsMatrix"
+            );
+            if (!this.shadowsMatrixLocation) return false;
+            this.cameraPosUniform = this.animPlaneShader.getUniform(
+                "cameraPos"
+            );
+            if (!this.cameraPosUniform) return false;
             this.worldLightVecUniform =
                 this.animPlaneShader.getUniform("worldLightVec");
+            if (!this.worldLightVecUniform) return false;
             this.worldLightColorUniform =
                 this.animPlaneShader.getUniform("worldLightColor");
+            if (!this.worldLightColorUniform) return false;
             this.worldLightAmbientUniform =
                 this.animPlaneShader.getUniform("worldLightAmbient");
+            if (!this.worldLightAmbientUniform) return false;
             this.specularityUniform = this.animPlaneShader.getUniform(
                 "specularity"
             );
+            if (!this.specularityUniform) return false;
             this.alphaUniform = this.animPlaneShader.getUniform("alpha");
+            if (!this.alphaUniform) return false;
             this.countUniform = this.animPlaneShader.getUniform("count");
+            if (!this.countUniform) return false;
             this.currentUniform = this.animPlaneShader.getUniform("current");
+            if (!this.currentUniform) return false;
             this.nextUniform = this.animPlaneShader.getUniform("next");
+            if (!this.nextUniform) return false;
             this.interpUniform = this.animPlaneShader.getUniform("interp");
+            if (!this.interpUniform) return false;
             this.animPlaneShader.unbind();
         }
 
@@ -265,46 +304,62 @@ AnimPlane.prototype = {
             if (!this.animPlaneShaderMedium) return false;
 
             this.animPlaneShaderMedium.bind();
-            this.cameraPosLocationMedium =
+            this.cameraPosUniformMedium =
                 this.animPlaneShaderMedium.getUniform("cameraPos");
+            if (!this.cameraPosUniformMedium) return false;
             this.lightsTextureLocationMedium =
                 this.animPlaneShaderMedium.getUniform("lightsTexture");
+            if (!this.lightsTextureLocationMedium) return false;
             this.animPlaneShaderMedium.sendIntUniform(
                 this.lightsTextureLocationMedium, 1
             );
             this.worldLightVecUniformMedium =
                 this.animPlaneShaderMedium.getUniform("worldLightVec");
+            if (!this.worldLightVecUniformMedium) return false;
             this.worldLightColorUniformMedium =
                 this.animPlaneShaderMedium.getUniform("worldLightColor");
+            if (!this.worldLightColorUniformMedium) return false;
             this.worldLightAmbientUniformMedium =
                 this.animPlaneShaderMedium.getUniform("worldLightAmbient");
+            if (!this.worldLightAmbientUniformMedium) return false;
             this.specularityUniformMedium =
                 this.animPlaneShaderMedium.getUniform("specularity");
+            if (!this.specularityUniformMedium) return false;
             this.alphaUniformMedium = this.animPlaneShaderMedium.getUniform(
                 "alpha"
             );
+            if (!this.alphaUniformMedium) return false;
             this.countUniformMedium = this.animPlaneShaderMedium.getUniform(
                 "count"
             );
+            if (!this.countUniformMedium) return false;
             this.currentUniformMedium = this.animPlaneShaderMedium.getUniform(
                 "current"
             );
+            if (!this.currentUniformMedium) return false;
             this.nextUniformMedium = this.animPlaneShaderMedium.getUniform(
                 "next"
             );
+            if (!this.nextUniformMedium) return false;
             this.interpUniformMedium = this.animPlaneShaderMedium.getUniform(
                 "interp"
             );
+            if (!this.interpUniformMedium) return false;
             this.animPlaneShaderMedium.unbind();
         }
 
         // Get low animated plane shader uniforms locations
         this.animPlaneShaderLow.bind();
         this.alphaUniformLow = this.animPlaneShaderLow.getUniform("alpha");
+        if (!this.alphaUniformLow) return false;
         this.countUniformLow = this.animPlaneShaderLow.getUniform("count");
+        if (!this.countUniformLow) return false;
         this.currentUniformLow = this.animPlaneShaderLow.getUniform("current");
+        if (!this.currentUniformLow) return false;
         this.nextUniformLow = this.animPlaneShaderLow.getUniform("next");
+        if (!this.nextUniformLow) return false;
         this.interpUniformLow = this.animPlaneShaderLow.getUniform("interp");
+        if (!this.interpUniformLow) return false;
         this.animPlaneShaderLow.unbind();
 
         // Set texture
@@ -313,14 +368,16 @@ AnimPlane.prototype = {
 
         // Set default normal map
         this.normalMap = this.renderer.normalMap;
+        if (!this.normalMap) return false;
 
         // Set default specular map
         this.specularMap = this.renderer.specularMap;
+        if (!this.specularMap) return false;
 
         // Compute initial frame
         this.compute(0.0);
 
-        // Sprite loaded
+        // Animated plane successfully loaded
         return true;
     },
 
@@ -366,8 +423,14 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setBillboard: function(billboard)
     {
-        if (billboard <= 0) { billboard = 0; }
-        if (billboard >= 3) { billboard = 3; }
+        if (billboard <= WOSAnimPlaneBillboardNone)
+        {
+            billboard = WOSAnimPlaneBillboardNone;
+        }
+        if (billboard >= WOSAnimPlaneBillboardSpherical)
+        {
+            billboard = WOSAnimPlaneBillboardSpherical;
+        }
         this.billboard = billboard;
     },
 
@@ -941,7 +1004,7 @@ AnimPlane.prototype = {
         // Set animated plane model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec3(this.position);
-        if (this.billboard == 1)
+        if (this.billboard == WOSAnimPlaneBillboardCylindricalY)
         {
             // Cylindrical billboard (Y)
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -964,7 +1027,7 @@ AnimPlane.prototype = {
             );
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
-        else if (this.billboard == 2)
+        else if (this.billboard == WOSAnimPlaneBillboardCylindricalX)
         {
             // Cylindrical billboard (X)
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -987,7 +1050,7 @@ AnimPlane.prototype = {
             );
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
-        else if (this.billboard == 3)
+        else if (this.billboard == WOSAnimPlaneBillboardSpherical)
         {
             // Spherical billboard
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -1081,7 +1144,7 @@ AnimPlane.prototype = {
                 this.shadowsMatrixLocation, this.shadowsMatrix
             );
             this.animPlaneShader.sendUniformVec3(
-                this.cameraPosLocation, this.renderer.camera.position
+                this.cameraPosUniform, this.renderer.camera.position
             );
             this.animPlaneShader.sendUniformVec3(
                 this.worldLightVecUniform, this.renderer.worldLight.direction
@@ -1160,7 +1223,7 @@ AnimPlane.prototype = {
             );
             this.animPlaneShaderMedium.sendModelMatrix(this.modelMatrix);
             this.animPlaneShaderMedium.sendUniformVec3(
-                this.cameraPosLocationMedium, this.renderer.camera.position
+                this.cameraPosUniformMedium, this.renderer.camera.position
             );
             this.animPlaneShaderMedium.sendUniformVec3(
                 this.worldLightVecUniformMedium,

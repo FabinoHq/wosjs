@@ -67,11 +67,12 @@ Music.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  play : Play music                                                     //
     //  param src : Music source to play                                      //
-    //  return : True if the music is now playing                             //
+    //  return : True if music is now playing                                 //
     ////////////////////////////////////////////////////////////////////////////
     play: function(src)
     {
         // Reset music
+        if (!this.buffer) return false;
         this.music = null;
         this.playing = false;
 
@@ -108,6 +109,8 @@ Music.prototype = {
             this.buffer.src = src;
             this.buffer.addEventListener("canplaythrough", this.startPlay());
         }
+
+        // Music is now playing
         return true;
     },
 

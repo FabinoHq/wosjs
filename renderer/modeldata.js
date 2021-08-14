@@ -89,6 +89,7 @@ ModelData.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  load : Load model data                                                //
     //  param src : URL of the source model file                              //
+    //  return : True if model data is now loading                            //
     ////////////////////////////////////////////////////////////////////////////
     load: function(src)
     {
@@ -116,6 +117,7 @@ ModelData.prototype = {
 
         // Load model data
         this.request = new XMLHttpRequest();
+        if (!this.request) return false;
         this.request.open('GET', src);
         this.request.staticmesh = this;
         this.request.onload = function()
@@ -125,15 +127,19 @@ ModelData.prototype = {
                 this.staticmesh.handleModelLoaded();
                 if (this.staticmesh.loaded) this.staticmesh.onModelLoaded();
             }
+            else
+            {
+                this.staticmesh.onModelError();
+            }
         }
         this.request.send();
 
-        // Mesh data loaded
+        // Model data is now loading
         return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  handleModelLoaded : Source model is loaded                            //
+    //  handleModelLoaded : Model data is successfully loaded                 //
     ////////////////////////////////////////////////////////////////////////////
     handleModelLoaded: function()
     {
@@ -392,6 +398,14 @@ ModelData.prototype = {
     //  onModelLoaded : Called when model is fully loaded                     //
     ////////////////////////////////////////////////////////////////////////////
     onModelLoaded: function()
+    {
+
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  onModelError : Called when model is not loaded                        //
+    ////////////////////////////////////////////////////////////////////////////
+    onModelError: function()
     {
 
     }

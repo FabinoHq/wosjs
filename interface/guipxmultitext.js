@@ -123,6 +123,7 @@ GuiPxMultiText.prototype = {
     //  param lineHeight : Text line height                                   //
     //  param scrollable : Text line scrollable state                         //
     //  param scrollBarTexture : ScrollBar texture                            //
+    //  return : True if GUI PxMultiText is successfully loaded               //
     ////////////////////////////////////////////////////////////////////////////
     init: function(lineOptimize, texture, text, width, height, lineHeight,
         scrollable, scrollBarTexture, scrollBarWidth)
@@ -139,10 +140,13 @@ GuiPxMultiText.prototype = {
         this.fieldTexture = null;
         this.needUpdate = false;
         this.height = 0.0;
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
+        if (!this.color) return false;
         this.color.setXYZ(1.0, 1.0, 1.0);
         this.charAlpha = 1.0;
         this.alpha = 1.0;
@@ -216,6 +220,7 @@ GuiPxMultiText.prototype = {
             this.scrollBar = new GuiScrollBar(
                 this.renderer, this.scrollBarShader
             );
+            if (!this.scrollBar) return false;
             if (!this.scrollBar.init(
                 scrollBarTexture, scrollBarWidth, 1.0, 15.0))
             {
@@ -272,10 +277,10 @@ GuiPxMultiText.prototype = {
         // Set text
         this.setText(text);
 
-        // PxMultitext need update
+        // PxMultiText need update
         this.needUpdate = true;
 
-        // PxMultitext text loaded
+        // GUI PxMultiText successfully loaded
         return true;
     },
 
@@ -717,7 +722,7 @@ GuiPxMultiText.prototype = {
             }
         }
 
-        // PxMultitext need update
+        // PxMultiText need update
         this.needUpdate = true;
     },
 
@@ -934,7 +939,7 @@ GuiPxMultiText.prototype = {
                 this.scrollBar.setScrollHeight(1.0/(this.maxOffset+1.0));
             }
 
-            // PxMultitext need update
+            // PxMultiText need update
             this.needUpdate = true;
         }
     },
@@ -1124,11 +1129,11 @@ GuiPxMultiText.prototype = {
             (mouseY >= this.position.vec[1]) &&
             (mouseY <= (this.position.vec[1] + this.size.vec[1])))
         {
-            // PxMultitext is picking
+            // PxMultiText is picking
             return true;
         }
 
-        // PxMultitext is not picking
+        // PxMultiText is not picking
         return false;
     },
 
@@ -1247,9 +1252,11 @@ GuiPxMultiText.prototype = {
             this.size.vec[1] = fieldHeight/WOSDefaultPxTextScaleYFactor;
             this.renderer.textFieldRenderer.setShader(this.fieldShader);
             this.renderer.textFieldRenderer.setTexture(this.fieldTexture);
-            this.renderer.textFieldRenderer.setRenderSize(
-                fieldWidth, fieldHeight
-            );
+            if (!this.renderer.textFieldRenderer.setRenderSize(
+                fieldWidth, fieldHeight))
+            {
+                return;
+            }
 
             // Render into background renderer
             this.renderer.textFieldRenderer.clear();
@@ -1305,9 +1312,11 @@ GuiPxMultiText.prototype = {
                         this.renderer.textLineRenderer.setTexture(
                             this.lines[i].lineTexture
                         );
-                        this.renderer.textLineRenderer.setRenderSize(
-                            lineWidth, lineHeight
-                        );
+                        if (!this.renderer.textLineRenderer.setRenderSize(
+                            lineWidth, lineHeight))
+                        {
+                            return;
+                        }
 
                         // Render into background renderer
                         this.renderer.textLineRenderer.clear();
@@ -1552,7 +1561,7 @@ GuiPxMultiText.prototype = {
             // Set renderer as active
             this.renderer.setActive();
 
-            // PxMultitext updated
+            // PxMultiText updated
             this.needUpdate = false;
         }
 

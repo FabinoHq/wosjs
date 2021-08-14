@@ -55,11 +55,11 @@ function Rect(renderer, rectShader)
     this.rectShader = rectShader;
 
     // Rect shader uniforms locations
-    this.colorUniform = -1;
-    this.alphaUniform = -1;
-    this.widthUniform = -1;
-    this.heightUniform = -1;
-    this.thicknessUniform = -1;
+    this.colorUniform = null;
+    this.alphaUniform = null;
+    this.widthUniform = null;
+    this.heightUniform = null;
+    this.thicknessUniform = null;
 
     // Rect model matrix
     this.modelMatrix = new Matrix4x4();
@@ -84,21 +84,26 @@ Rect.prototype = {
     //  param thickness : Rect borders thickness                              //
     //  param width : Rect width                                              //
     //  param height : Rect height                                            //
+    //  return : True if rect is successfully loaded                          //
     ////////////////////////////////////////////////////////////////////////////
     init: function(thickness, width, height)
     {
         // Reset rect
-        this.colorUniform = -1;
-        this.alphaUniform = -1;
-        this.widthUniform = -1;
-        this.heightUniform = -1;
-        this.thicknessUniform = -1;
+        this.colorUniform = null;
+        this.alphaUniform = null;
+        this.widthUniform = null;
+        this.heightUniform = null;
+        this.thicknessUniform = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.angle = 0.0;
+        if (!this.color) return false;
         this.color.setXYZ(1.0, 1.0, 1.0);
         this.alpha = 1.0;
         this.thickness = 0.01;
@@ -113,13 +118,18 @@ Rect.prototype = {
         // Get rect shader uniforms locations
         this.rectShader.bind();
         this.colorUniform = this.rectShader.getUniform("color");
+        if (!this.colorUniform) return false;
         this.alphaUniform = this.rectShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.widthUniform = this.rectShader.getUniform("width");
+        if (!this.widthUniform) return false;
         this.heightUniform = this.rectShader.getUniform("height");
+        if (!this.heightUniform) return false;
         this.thicknessUniform = this.rectShader.getUniform("thickness");
+        if (!this.thicknessUniform) return false;
         this.rectShader.unbind();
 
-        // Rect loaded
+        // Rect successfully loaded
         return true;
     },
 
@@ -405,4 +415,3 @@ Rect.prototype = {
         this.rectShader.unbind();
     }
 };
-

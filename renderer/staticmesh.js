@@ -59,25 +59,25 @@ function StaticMesh(renderer, meshShader, meshShaderMedium, meshShaderLow)
     this.meshShaderLow = meshShaderLow;
 
     // Static mesh shader uniforms locations
-    this.shadowsTextureLocation = -1;
-    this.normalMapLocation = -1;
-    this.specularMapLocation = -1;
-    this.cameraPosLocation = -1;
-    this.cameraPosLocationMedium = -1;
-    this.lightsTextureLocation = -1;
-    this.lightsTextureLocationMedium = -1;
-    this.shadowsMatrixLocation = -1;
-    this.worldLightVecUniform = -1;
-    this.worldLightVecUniformMedium = -1;
-    this.worldLightColorUniform = -1;
-    this.worldLightColorUniformMedium = -1;
-    this.worldLightAmbientUniform = -1;
-    this.worldLightAmbientUniformMedium = -1;
-    this.specularityUniform = -1;
-    this.specularityUniformMedium = -1;
-    this.alphaUniform = -1;
-    this.alphaUniformMedium = -1;
-    this.alphaUniformLow = -1;
+    this.lightsTextureLocation = null;
+    this.lightsTextureLocationMedium = null;
+    this.shadowsTextureLocation = null;
+    this.normalMapLocation = null;
+    this.specularMapLocation = null;
+    this.shadowsMatrixLocation = null;
+    this.cameraPosUniform = null;
+    this.cameraPosUniformMedium = null;
+    this.worldLightVecUniform = null;
+    this.worldLightVecUniformMedium = null;
+    this.worldLightColorUniform = null;
+    this.worldLightColorUniformMedium = null;
+    this.worldLightAmbientUniform = null;
+    this.worldLightAmbientUniformMedium = null;
+    this.specularityUniform = null;
+    this.specularityUniformMedium = null;
+    this.alphaUniform = null;
+    this.alphaUniformMedium = null;
+    this.alphaUniformLow = null;
 
     // Static mesh vertex buffer
     this.vertexBuffer = null;
@@ -115,37 +115,43 @@ StaticMesh.prototype = {
     //  init : Init static mesh                                               //
     //  param model : Model pointer                                           //
     //  param texture : Texture pointer                                       //
+    //  return : True if static mesh is successfully loaded                   //
     ////////////////////////////////////////////////////////////////////////////
     init: function(model, texture)
     {
         // Reset static mesh
-        this.shadowsTextureLocation = -1;
-        this.normalMapLocation = -1;
-        this.specularMapLocation = -1;
-        this.cameraPosLocation = -1;
-        this.cameraPosLocationMedium = -1;
-        this.lightsTextureLocation = -1;
-        this.lightsTextureLocationMedium = -1;
-        this.shadowsMatrixLocation = -1;
-        this.worldLightVecUniform = -1;
-        this.worldLightVecUniformMedium = -1;
-        this.worldLightColorUniform = -1;
-        this.worldLightColorUniformMedium = -1;
-        this.worldLightAmbientUniform = -1;
-        this.worldLightAmbientUniformMedium = -1;
-        this.specularityUniform = -1;
-        this.specularityUniformMedium = -1;
-        this.alphaUniform = -1;
-        this.alphaUniformMedium = -1;
-        this.alphaUniformLow = -1;
+        this.lightsTextureLocation = null;
+        this.lightsTextureLocationMedium = null;
+        this.shadowsTextureLocation = null;
+        this.normalMapLocation = null;
+        this.specularMapLocation = null;
+        this.shadowsMatrixLocation = null;
+        this.cameraPosUniform = null;
+        this.cameraPosUniformMedium = null;
+        this.worldLightVecUniform = null;
+        this.worldLightVecUniformMedium = null;
+        this.worldLightColorUniform = null;
+        this.worldLightColorUniformMedium = null;
+        this.worldLightAmbientUniform = null;
+        this.worldLightAmbientUniformMedium = null;
+        this.specularityUniform = null;
+        this.specularityUniformMedium = null;
+        this.alphaUniform = null;
+        this.alphaUniformMedium = null;
+        this.alphaUniformLow = null;
         this.vertexBuffer = null;
         this.texture = null;
         this.normalMap = null;
         this.specularMap = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.shadowsMatrix) return false;
+        this.shadowsMatrix.setIdentity();
         this.attachedMesh = null;
         this.attachedBone = 0;
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.angles) return false;
         this.angles.reset();
         this.scale = 1.0;
         this.alpha = 1.0;
@@ -167,32 +173,43 @@ StaticMesh.prototype = {
             if (!this.meshShader) return false;
 
             this.meshShader.bind();
-            this.shadowsMatrixLocation = this.meshShader.getUniform(
-                "shadowsMatrix"
-            );
-            this.cameraPosLocation = this.meshShader.getUniform("cameraPos");
             this.lightsTextureLocation = this.meshShader.getUniform(
                 "lightsTexture"
             );
+            if (!this.lightsTextureLocation) return false;
             this.meshShader.sendIntUniform(this.lightsTextureLocation, 1);
             this.shadowsTextureLocation = this.meshShader.getUniform(
                 "shadowsTexture"
             );
+            if (!this.shadowsTextureLocation) return false;
             this.meshShader.sendIntUniform(this.shadowsTextureLocation, 2);
             this.normalMapLocation = this.meshShader.getUniform("normalMap");
+            if (!this.normalMapLocation) return false;
             this.meshShader.sendIntUniform(this.normalMapLocation, 3);
             this.specularMapLocation = this.meshShader.getUniform(
                 "specularMap"
             );
+            if (!this.specularMapLocation) return false;
             this.meshShader.sendIntUniform(this.specularMapLocation, 4);
+            this.shadowsMatrixLocation = this.meshShader.getUniform(
+                "shadowsMatrix"
+            );
+            if (!this.shadowsMatrixLocation) return false;
+            this.cameraPosUniform = this.meshShader.getUniform("cameraPos");
+            if (!this.cameraPosUniform) return false;
             this.worldLightVecUniform =
                 this.meshShader.getUniform("worldLightVec");
+            if (!this.worldLightVecUniform) return false;
             this.worldLightColorUniform =
                 this.meshShader.getUniform("worldLightColor");
+            if (!this.worldLightColorUniform) return false;
             this.worldLightAmbientUniform =
                 this.meshShader.getUniform("worldLightAmbient");
+            if (!this.worldLightAmbientUniform) return false;
             this.specularityUniform = this.meshShader.getUniform("specularity");
+            if (!this.specularityUniform) return false;
             this.alphaUniform = this.meshShader.getUniform("alpha");
+            if (!this.alphaUniform) return false;
             this.meshShader.unbind();
         }
 
@@ -203,31 +220,39 @@ StaticMesh.prototype = {
             if (!this.meshShaderMedium) return false;
 
             this.meshShaderMedium.bind();
-            this.cameraPosLocationMedium = this.meshShaderMedium.getUniform(
-                "cameraPos"
-            );
             this.lightsTextureLocationMedium = this.meshShaderMedium.getUniform(
                 "lightsTexture"
             );
+            if (!this.lightsTextureLocationMedium) return false;
             this.meshShaderMedium.sendIntUniform(
                 this.lightsTextureLocationMedium, 1
             );
+            this.cameraPosUniformMedium = this.meshShaderMedium.getUniform(
+                "cameraPos"
+            );
+            if (!this.cameraPosUniformMedium) return false;
             this.worldLightVecUniformMedium =
                 this.meshShaderMedium.getUniform("worldLightVec");
+            if (!this.worldLightVecUniformMedium) return false;
             this.worldLightColorUniformMedium =
                 this.meshShaderMedium.getUniform("worldLightColor");
+            if (!this.worldLightColorUniformMedium) return false;
             this.worldLightAmbientUniformMedium =
                 this.meshShaderMedium.getUniform("worldLightAmbient");
+            if (!this.worldLightAmbientUniformMedium) return false;
             this.specularityUniformMedium = this.meshShaderMedium.getUniform(
                 "specularity"
             );
+            if (!this.specularityUniformMedium) return false;
             this.alphaUniformMedium = this.meshShaderMedium.getUniform("alpha");
+            if (!this.alphaUniformMedium) return false;
             this.meshShaderMedium.unbind();
         }
 
         // Get low static mesh shader uniforms locations
         this.meshShaderLow.bind();
         this.alphaUniformLow = this.meshShaderLow.getUniform("alpha");
+        if (!this.alphaUniformLow) return false;
         this.meshShaderLow.unbind();
 
         // Check model pointer
@@ -264,7 +289,7 @@ StaticMesh.prototype = {
         // Set default specular map
         this.specularMap = this.renderer.specularMap;
 
-        // Static mesh loaded
+        // Static mesh successfully loaded
         return true;
     },
 
@@ -680,7 +705,7 @@ StaticMesh.prototype = {
                 this.shadowsMatrixLocation, this.shadowsMatrix
             );
             this.meshShader.sendUniformVec3(
-                this.cameraPosLocation, this.renderer.camera.position
+                this.cameraPosUniform, this.renderer.camera.position
             );
             this.meshShader.sendUniformVec3(
                 this.worldLightVecUniform, this.renderer.worldLight.direction
@@ -749,7 +774,7 @@ StaticMesh.prototype = {
             this.meshShaderMedium.sendWorldMatrix(this.renderer.worldMatrix);
             this.meshShaderMedium.sendModelMatrix(this.modelMatrix);
             this.meshShaderMedium.sendUniformVec3(
-                this.cameraPosLocationMedium, this.renderer.camera.position
+                this.cameraPosUniformMedium, this.renderer.camera.position
             );
             this.meshShaderMedium.sendUniformVec3(
                 this.worldLightVecUniformMedium,

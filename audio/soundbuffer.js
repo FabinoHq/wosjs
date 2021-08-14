@@ -64,7 +64,7 @@ SoundBuffer.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  load : Load sound buffer                                              //
     //  param src : Sound buffer source to load                               //
-    //  return : True if the sound buffer is now loading                      //
+    //  return : True if sound buffer is now loading                          //
     ////////////////////////////////////////////////////////////////////////////
     load: function(src)
     {
@@ -104,8 +104,14 @@ SoundBuffer.prototype = {
                     snd.onSoundLoaded();
                 });
             }
+            else
+            {
+                this.snd.onSoundError();
+            }
         }
         this.request.send();
+
+        // Sound buffer is now loading
         return true;
     },
 
@@ -115,5 +121,13 @@ SoundBuffer.prototype = {
     onSoundLoaded: function()
     {
 
-    }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  onSoundError : Called when sound buffer is not loaded                 //
+    ////////////////////////////////////////////////////////////////////////////
+    onSoundError: function()
+    {
+
+    },
 };

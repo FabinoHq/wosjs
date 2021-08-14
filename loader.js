@@ -461,6 +461,12 @@ Loader.prototype = {
             {
                 this.loader.handleTexturesLoaded();
             }
+            this.textures[i].onTextureError = function()
+            {
+                // Could not load texture
+                messageBoxText = "[0x0105] Could not load texture";
+                this.loader.onAssetsError();
+            }
             this.textures[i].load("textures/" + TexturesAssets[i], true);
         }
         return true;
@@ -524,6 +530,12 @@ Loader.prototype = {
             this.models[i].onModelLoaded = function()
             {
                 this.loader.handleModelsLoaded();
+            }
+            this.models[i].onModelError = function()
+            {
+                // Could not load model
+                messageBoxText = "[0x0106] Could not load model";
+                this.loader.onAssetsError();
             }
             this.models[i].load("models/" + ModelsAssets[i]);
         }
@@ -592,6 +604,12 @@ Loader.prototype = {
             {
                 this.loader.handleSoundLoaded();
             }
+            this.sounds[i].onSoundError = function()
+            {
+                // Could not load sound
+                messageBoxText = "[0x0107] Could not load sound";
+                this.loader.onAssetsError();
+            }
             this.sounds[i].load("sounds/" + SoundsAssets[i]);
         }
         return true;
@@ -620,6 +638,14 @@ Loader.prototype = {
     //  onAssetsLoaded : Called when all assets are loaded                    //
     ////////////////////////////////////////////////////////////////////////////
     onAssetsLoaded: function()
+    {
+
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  onAssetsError : Called when an asset is missing                       //
+    ////////////////////////////////////////////////////////////////////////////
+    onAssetsError: function()
     {
 
     },

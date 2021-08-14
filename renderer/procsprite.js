@@ -56,9 +56,9 @@ function ProcSprite(renderer)
     this.modelMatrix = new Matrix4x4();
 
     // Procedural sprite shader uniforms locations
-    this.alphaUniform = -1;
-    this.timeUniform = -1;
-    this.offsetUniform = -1;
+    this.alphaUniform = null;
+    this.timeUniform = null;
+    this.offsetUniform = null;
 
     // Procedural sprite position
     this.position = new Vector2(0.0, 0.0);
@@ -80,20 +80,25 @@ ProcSprite.prototype = {
     //  param shaderSrc : Procedural sprite fragment shader source            //
     //  param width : Procedural sprite width                                 //
     //  param height : Procedural sprite height                               //
+    //  return : True if procedural sprite is loaded                          //
     ////////////////////////////////////////////////////////////////////////////
     init: function(shaderSrc, width, height)
     {
         // Reset procedural sprite
         this.shader = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
-        this.alphaUniform = -1;
-        this.timeUniform = -1;
-        this.offsetUniform = -1;
+        this.alphaUniform = null;
+        this.timeUniform = null;
+        this.offsetUniform = null;
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.angle = 0.0;
+        if (!this.offset) return false;
         this.offset.reset();
         this.time = 0.0;
         this.alpha = 1.0;
@@ -116,7 +121,7 @@ ProcSprite.prototype = {
         this.offsetUniform = this.shader.getUniform("offset");
         this.shader.unbind();
 
-        // Procedural sprite loaded
+        // Procedural sprite successfully loaded
         return true;
     },
 
@@ -420,9 +425,18 @@ ProcSprite.prototype = {
 
         // Send shader uniforms
         this.shader.sendWorldMatrix(this.renderer.worldMatrix);
-        this.shader.sendUniform(this.alphaUniform, this.alpha);
-        this.shader.sendUniform(this.timeUniform, this.time);
-        this.shader.sendUniformVec2(this.offsetUniform, this.offset);
+        if (this.alphaUniform)
+        {
+            this.shader.sendUniform(this.alphaUniform, this.alpha);
+        }
+        if (this.timeUniform)
+        {
+            this.shader.sendUniform(this.timeUniform, this.time);
+        }
+        if (this.offsetUniform)
+        {
+            this.shader.sendUniformVec2(this.offsetUniform, this.offset);
+        }
 
         // Render VBO
         this.renderer.vertexBuffer.bind();

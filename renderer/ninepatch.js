@@ -55,9 +55,9 @@ function Ninepatch(renderer, ninepatchShader)
     this.ninepatchShader = ninepatchShader;
 
     // Ninepatch shader uniforms locations
-    this.alphaUniform = -1;
-    this.uvSizeUniform = -1;
-    this.uvFactorUniform = -1;
+    this.alphaUniform = null;
+    this.uvSizeUniform = null;
+    this.uvFactorUniform = null;
 
     // Ninepatch texture
     this.texture = null;
@@ -81,16 +81,20 @@ Ninepatch.prototype = {
     //  param width : Ninepatch width                                         //
     //  param height : Ninepatch height                                       //
     //  param factor : Ninepatch UV factor                                    //
+    //  return : True if ninepatch is successfully loaded                     //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, factor)
     {
         // Reset ninepatch
-        this.alphaUniform = -1;
-        this.uvSizeUniform = -1;
-        this.uvFactorUniform = -1;
+        this.alphaUniform = null;
+        this.uvSizeUniform = null;
+        this.uvFactorUniform = null;
         this.texture = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
@@ -107,15 +111,18 @@ Ninepatch.prototype = {
         // Get ninepatch shader uniforms locations
         this.ninepatchShader.bind();
         this.uvSizeUniform = this.ninepatchShader.getUniform("uvSize");
+        if (!this.uvSizeUniform) return false;
         this.uvFactorUniform = this.ninepatchShader.getUniform("uvFactor");
+        if (!this.uvFactorUniform) return false;
         this.alphaUniform = this.ninepatchShader.getUniform("alpha");
+        if (!this.alphaUniform) return false;
         this.ninepatchShader.unbind();
 
         // Set texture
         this.texture = texture;
         if (!this.texture) return false;
 
-        // Ninepatch loaded
+        // Ninepatch successfully loaded
         return true;
     },
 

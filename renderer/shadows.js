@@ -86,6 +86,7 @@ Shadows.prototype = {
     //  init : Init shadows                                                   //
     //  param width : Width of the background renderer                        //
     //  param height : Height of the background renderer                      //
+    //  return : True if shadows successfully loaded                          //
     ////////////////////////////////////////////////////////////////////////////
     init: function(width, height)
     {
@@ -96,9 +97,13 @@ Shadows.prototype = {
         this.framebuffer = null;
         this.texture = null;
         this.depthTexture = null;
+        if (!this.projMatrix) return false;
         this.projMatrix.setIdentity();
+        if (!this.viewMatrix) return false;
         this.viewMatrix.setIdentity();
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.angles) return false;
         this.angles.reset();
         this.fovy = 90.0;
         this.nearPlane = 0.01;
@@ -256,7 +261,7 @@ Shadows.prototype = {
         // Set view matrix
         this.viewMatrix.setIdentity();
 
-        // Shadows loaded
+        // Shadows successfully loaded
         return true;
     },
 
@@ -264,6 +269,7 @@ Shadows.prototype = {
     //  setTextureSize : Set shadows texture size                             //
     //  param width : Width of the shadows texture                            //
     //  param height : Height of the shadows texture                          //
+    //  return : True if shadows texture size successfully updated            //
     ////////////////////////////////////////////////////////////////////////////
     setTextureSize: function(width, height)
     {

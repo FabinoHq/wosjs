@@ -149,6 +149,7 @@ GuiTextBox.prototype = {
     //  param height : TextBox field height                                   //
     //  param text : Text to set                                              //
     //  param hide : Text hide mode                                           //
+    //  return : True if GUI TextBox is successfully loaded                   //
     ////////////////////////////////////////////////////////////////////////////
     init: function(asciiMode, width, height, text, hide)
     {
@@ -157,7 +158,9 @@ GuiTextBox.prototype = {
         this.textbox = null;
         this.textsel = null;
         this.textcursor = null;
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
@@ -223,7 +226,7 @@ GuiTextBox.prototype = {
         this.cursorPos = this.guitext.getLength();
         this.cursorOffset = this.guitext.getCharPos(this.cursorPos);
 
-        // Textbox loaded
+        // GUI TextBox successfully loaded
         return true;
     },
 

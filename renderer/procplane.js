@@ -42,6 +42,15 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
+//  WOS procedural plane billboard modes                                      //
+////////////////////////////////////////////////////////////////////////////////
+const WOSProcPlaneBillboardNone = 0;
+const WOSProcPlaneBillboardCylindricalY = 1;
+const WOSProcPlaneBillboardCylindricalX = 2;
+const WOSProcPlaneBillboardSpherical = 3;
+
+
+////////////////////////////////////////////////////////////////////////////////
 //  ProcPlane class definition                                                //
 //  param renderer : Renderer pointer                                         //
 ////////////////////////////////////////////////////////////////////////////////
@@ -60,32 +69,32 @@ function ProcPlane(renderer)
     this.shadowsMatrix = new Matrix4x4();
 
     // Procedural plane shader uniforms locations
-    this.shadowsTextureLocation = -1;
-    this.cameraPosLocation = -1;
-    this.cameraPosLocationMedium = -1;
-    this.lightsTextureLocation = -1;
-    this.lightsTextureLocationMedium = -1;
-    this.shadowsMatrixLocation = -1;
-    this.worldLightVecUniform = -1;
-    this.worldLightVecUniformMedium = -1;
-    this.worldLightColorUniform = -1;
-    this.worldLightColorUniformMedium = -1;
-    this.worldLightAmbientUniform = -1;
-    this.worldLightAmbientUniformMedium = -1;
-    this.specularityUniform = -1;
-    this.specularityUniformMedium = -1;
-    this.alphaUniform = -1;
-    this.alphaUniformMedium = -1;
-    this.alphaUniformLow = -1;
-    this.timeUniform = -1;
-    this.timeUniformMedium = -1;
-    this.timeUniformLow = -1;
-    this.offsetUniform = -1;
-    this.offsetUniformMedium = -1;
-    this.offsetUniformLow = -1;
+    this.lightsTextureLocation = null;
+    this.lightsTextureLocationMedium = null;
+    this.shadowsTextureLocation = null;
+    this.shadowsMatrixLocation = null;
+    this.cameraPosUniform = null;
+    this.cameraPosUniformMedium = null;
+    this.worldLightVecUniform = null;
+    this.worldLightVecUniformMedium = null;
+    this.worldLightColorUniform = null;
+    this.worldLightColorUniformMedium = null;
+    this.worldLightAmbientUniform = null;
+    this.worldLightAmbientUniformMedium = null;
+    this.specularityUniform = null;
+    this.specularityUniformMedium = null;
+    this.alphaUniform = null;
+    this.alphaUniformMedium = null;
+    this.alphaUniformLow = null;
+    this.timeUniform = null;
+    this.timeUniformMedium = null;
+    this.timeUniformLow = null;
+    this.offsetUniform = null;
+    this.offsetUniformMedium = null;
+    this.offsetUniformLow = null;
 
     // Procedural plane billboard mode
-    this.billboard = 0;
+    this.billboard = WOSProcPlaneBillboardNone;
     // Procedural plane position
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Procedural plane size
@@ -116,6 +125,7 @@ ProcPlane.prototype = {
     //  param lowShaderSrc : Procedural plane low shader source               //
     //  param width : Procedural plane width                                  //
     //  param height : Procedural plane height                                //
+    //  return : True if procedural plane is successfully loaded              //
     ////////////////////////////////////////////////////////////////////////////
     init: function(shaderSrc, mediumShaderSrc, lowShaderSrc, width, height)
     {
@@ -123,44 +133,54 @@ ProcPlane.prototype = {
         this.shader = null;
         this.shaderMedium = null;
         this.shaderLow = null;
+        if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
+        if (!this.shadowsMatrix) return false;
         this.shadowsMatrix.setIdentity();
-        this.shadowsTextureLocation = -1;
-        this.cameraPosLocation = -1;
-        this.cameraPosLocationMedium = -1;
-        this.lightsTextureLocation = -1;
-        this.lightsTextureLocationMedium = -1;
-        this.shadowsMatrixLocation = -1;
-        this.worldLightVecUniform = -1;
-        this.worldLightVecUniformMedium = -1;
-        this.worldLightColorUniform = -1;
-        this.worldLightColorUniformMedium = -1;
-        this.worldLightAmbientUniform = -1;
-        this.worldLightAmbientUniformMedium = -1;
-        this.specularityUniform = -1;
-        this.specularityUniformMedium = -1;
-        this.alphaUniform = -1;
-        this.alphaUniformMedium = -1;
-        this.alphaUniformLow = -1;
-        this.timeUniform = -1;
-        this.timeUniformMedium = -1;
-        this.timeUniformLow = -1;
-        this.offsetUniform = -1;
-        this.offsetUniformMedium = -1;
-        this.offsetUniformLow = -1;
-        this.billboard = 0;
+        this.lightsTextureLocation = null;
+        this.lightsTextureLocationMedium = null;
+        this.shadowsTextureLocation = null;
+        this.shadowsMatrixLocation = null;
+        this.cameraPosUniform = null;
+        this.cameraPosUniformMedium = null;
+        this.worldLightVecUniform = null;
+        this.worldLightVecUniformMedium = null;
+        this.worldLightColorUniform = null;
+        this.worldLightColorUniformMedium = null;
+        this.worldLightAmbientUniform = null;
+        this.worldLightAmbientUniformMedium = null;
+        this.specularityUniform = null;
+        this.specularityUniformMedium = null;
+        this.alphaUniform = null;
+        this.alphaUniformMedium = null;
+        this.alphaUniformLow = null;
+        this.timeUniform = null;
+        this.timeUniformMedium = null;
+        this.timeUniformLow = null;
+        this.offsetUniform = null;
+        this.offsetUniformMedium = null;
+        this.offsetUniformLow = null;
+        this.billboard = WOSProcPlaneBillboardNone;
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
+        if (!this.angles) return false;
         this.angles.reset();
+        if (!this.offset) return false;
         this.offset.reset();
         this.time = 0.0;
         this.alpha = 1.0;
         this.specularity = 0.0;
+        if (!this.lookAtVec) return false;
         this.lookAtVec.reset();
+        if (!this.rotVec) return false;
         this.rotVec.reset();
+        if (!this.delta) return false;
         this.delta.reset();
+        if (!this.delta2) return false;
         this.delta2.reset();
 
         // Check renderer pointer
@@ -189,10 +209,6 @@ ProcPlane.prototype = {
             this.shader.bind();
 
             // Get plane shader uniforms locations
-            this.shadowsMatrixLocation = this.shader.getUniform(
-                "shadowsMatrix"
-            );
-            this.cameraPosLocation = this.shader.getUniform("cameraPos");
             this.lightsTextureLocation = this.shader.getUniform(
                 "lightsTexture"
             );
@@ -201,6 +217,10 @@ ProcPlane.prototype = {
                 "shadowsTexture"
             );
             this.shader.sendIntUniform(this.shadowsTextureLocation, 1);
+            this.shadowsMatrixLocation = this.shader.getUniform(
+                "shadowsMatrix"
+            );
+            this.cameraPosUniform = this.shader.getUniform("cameraPos");
             this.worldLightVecUniform = this.shader.getUniform(
                 "worldLightVec"
             );
@@ -231,7 +251,7 @@ ProcPlane.prototype = {
 
             // Get medium plane shader uniforms locations
             this.shaderMedium.bind();
-            this.cameraPosLocationMedium = this.shaderMedium.getUniform(
+            this.cameraPosUniformMedium = this.shaderMedium.getUniform(
                 "cameraPos"
             );
             this.lightsTextureLocationMedium = this.shaderMedium.getUniform(
@@ -265,7 +285,7 @@ ProcPlane.prototype = {
         this.offsetUniformLow = this.shaderLow.getUniform("offset");
         this.shaderLow.unbind();
 
-        // Procedural plane loaded
+        // Procedural plane successfully loaded
         return true;
     },
 
@@ -275,8 +295,14 @@ ProcPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setBillboard: function(billboard)
     {
-        if (billboard <= 0) { billboard = 0; }
-        if (billboard >= 3) { billboard = 3; }
+        if (billboard <= WOSProcPlaneBillboardNone)
+        {
+            billboard = WOSProcPlaneBillboardNone;
+        }
+        if (billboard >= WOSProcPlaneBillboardSpherical)
+        {
+            billboard = WOSProcPlaneBillboardSpherical;
+        }
         this.billboard = billboard;
     },
 
@@ -660,7 +686,7 @@ ProcPlane.prototype = {
         // Set procedural plane model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec3(this.position);
-        if (this.billboard == 1)
+        if (this.billboard == WOSProcPlaneBillboardCylindricalY)
         {
             // Cylindrical billboard (Y)
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -683,7 +709,7 @@ ProcPlane.prototype = {
             );
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
-        else if (this.billboard == 2)
+        else if (this.billboard == WOSProcPlaneBillboardCylindricalX)
         {
             // Cylindrical billboard (X)
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -706,7 +732,7 @@ ProcPlane.prototype = {
             );
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
-        else if (this.billboard == 3)
+        else if (this.billboard == WOSProcPlaneBillboardSpherical)
         {
             // Spherical billboard
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -796,39 +822,74 @@ ProcPlane.prototype = {
 
             this.shader.sendWorldMatrix(this.renderer.worldMatrix);
             this.shader.sendModelMatrix(this.modelMatrix);
-            this.shader.sendUniformMat4(
-                this.shadowsMatrixLocation, this.shadowsMatrix
-            );
-            this.shader.sendUniformVec3(
-                this.cameraPosLocation, this.renderer.camera.position
-            );
-            this.shader.sendUniformVec3(
-                this.worldLightVecUniform, this.renderer.worldLight.direction
-            );
-            this.shader.sendUniformVec4(
-                this.worldLightColorUniform, this.renderer.worldLight.color
-            );
-            this.shader.sendUniformVec4(
-                this.worldLightAmbientUniform, this.renderer.worldLight.ambient
-            );
-            this.shader.sendUniform(
-                this.specularityUniform, this.specularity
-            );
-            this.shader.sendUniform(this.alphaUniform, this.alpha);
-            this.shader.sendUniform(this.timeUniform, this.time);
-            this.shader.sendUniformVec2(this.offsetUniform, this.offset);
+            if (this.shadowsMatrixLocation)
+            {
+                this.shader.sendUniformMat4(
+                    this.shadowsMatrixLocation, this.shadowsMatrix
+                );
+            }
+            if (this.cameraPosUniform)
+            {
+                this.shader.sendUniformVec3(
+                    this.cameraPosUniform, this.renderer.camera.position
+                );
+            }
+            if (this.worldLightVecUniform)
+            {
+                this.shader.sendUniformVec3(
+                    this.worldLightVecUniform,
+                    this.renderer.worldLight.direction
+                );
+            }
+            if (this.worldLightColorUniform)
+            {
+                this.shader.sendUniformVec4(
+                    this.worldLightColorUniform, this.renderer.worldLight.color
+                );
+            }
+            if (this.worldLightAmbientUniform)
+            {
+                this.shader.sendUniformVec4(
+                    this.worldLightAmbientUniform,
+                    this.renderer.worldLight.ambient
+                );
+            }
+            if (this.specularityUniform)
+            {
+                this.shader.sendUniform(
+                    this.specularityUniform, this.specularity
+                );
+            }
+            if (this.alphaUniform)
+            {
+                this.shader.sendUniform(this.alphaUniform, this.alpha);
+            }
+            if (this.timeUniform)
+            {
+                this.shader.sendUniform(this.timeUniform, this.time);
+            }
+            if (this.offsetUniform)
+            {
+                this.shader.sendUniformVec2(this.offsetUniform, this.offset);
+            }
 
             // Bind texture
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
-            this.renderer.gl.bindTexture(
-                this.renderer.gl.TEXTURE_2D,
-                this.renderer.dynamicLights.lightsTexture
-            );
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-            this.renderer.gl.bindTexture(
-                this.renderer.gl.TEXTURE_2D,
-                this.renderer.shadows.depthTexture
-            );
+            if (this.lightsTextureLocation)
+            {
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+                this.renderer.gl.bindTexture(
+                    this.renderer.gl.TEXTURE_2D,
+                    this.renderer.dynamicLights.lightsTexture
+                );
+            }
+            if (this.shadowsTextureLocation)
+            {
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+                this.renderer.gl.bindTexture(
+                    this.renderer.gl.TEXTURE_2D,
+                    this.renderer.shadows.depthTexture
+                );
+            }
 
             // Render VBO
             this.renderer.planeVertexBuffer.bind();
@@ -852,38 +913,67 @@ ProcPlane.prototype = {
             // Send medium quality shader uniforms
             this.shaderMedium.sendWorldMatrix(this.renderer.worldMatrix);
             this.shaderMedium.sendModelMatrix(this.modelMatrix);
-            this.shaderMedium.sendUniformVec3(
-                this.cameraPosLocationMedium, this.renderer.camera.position
-            );
-            this.shaderMedium.sendUniformVec3(
-                this.worldLightVecUniformMedium,
-                this.renderer.worldLight.direction
-            );
-            this.shaderMedium.sendUniformVec4(
-                this.worldLightColorUniformMedium,
-                this.renderer.worldLight.color
-            );
-            this.shaderMedium.sendUniformVec4(
-                this.worldLightAmbientUniformMedium,
-                this.renderer.worldLight.ambient
-            );
-            this.shaderMedium.sendUniform(
-                this.specularityUniformMedium, this.specularity
-            );
-            this.shaderMedium.sendUniform(
-                this.alphaUniformMedium, this.alpha
-            );
-            this.shaderMedium.sendUniform(this.timeUniformMedium, this.time);
-            this.shaderMedium.sendUniformVec2(
-                this.offsetUniformMedium, this.offset
-            );
+            if (this.cameraPosUniformMedium)
+            {
+                this.shaderMedium.sendUniformVec3(
+                    this.cameraPosUniformMedium, this.renderer.camera.position
+                );
+            }
+            if (this.worldLightVecUniformMedium)
+            {
+                this.shaderMedium.sendUniformVec3(
+                    this.worldLightVecUniformMedium,
+                    this.renderer.worldLight.direction
+                );
+            }
+            if (this.worldLightColorUniformMedium)
+            {
+                this.shaderMedium.sendUniformVec4(
+                    this.worldLightColorUniformMedium,
+                    this.renderer.worldLight.color
+                );
+            }
+            if (this.worldLightAmbientUniformMedium)
+            {
+                this.shaderMedium.sendUniformVec4(
+                    this.worldLightAmbientUniformMedium,
+                    this.renderer.worldLight.ambient
+                );
+            }
+            if (this.specularityUniformMedium)
+            {
+                this.shaderMedium.sendUniform(
+                    this.specularityUniformMedium, this.specularity
+                );
+            }
+            if (this.alphaUniformMedium)
+            {
+                this.shaderMedium.sendUniform(
+                    this.alphaUniformMedium, this.alpha
+                );
+            }
+            if (this.timeUniformMedium)
+            {
+                this.shaderMedium.sendUniform(
+                    this.timeUniformMedium, this.time
+                );
+            }
+            if (this.offsetUniformMedium)
+            {
+                this.shaderMedium.sendUniformVec2(
+                    this.offsetUniformMedium, this.offset
+                );
+            }
 
             // Bind texture
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
-            this.renderer.gl.bindTexture(
-                this.renderer.gl.TEXTURE_2D,
-                this.renderer.dynamicLights.lightsTexture
-            );
+            if (this.lightsTextureLocationMedium)
+            {
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+                this.renderer.gl.bindTexture(
+                    this.renderer.gl.TEXTURE_2D,
+                    this.renderer.dynamicLights.lightsTexture
+                );
+            }
 
             // Render VBO
             this.renderer.planeVertexBuffer.bind();
@@ -903,9 +993,20 @@ ProcPlane.prototype = {
 
             // Send low quality shader uniforms
             this.shaderLow.sendWorldMatrix(this.renderer.worldMatrix);
-            this.shaderLow.sendUniform(this.alphaUniformLow, this.alpha);
-            this.shaderLow.sendUniform(this.timeUniformLow, this.time);
-            this.shaderLow.sendUniformVec2(this.offsetUniformLow, this.offset);
+            if (this.alphaUniformLow)
+            {
+                this.shaderLow.sendUniform(this.alphaUniformLow, this.alpha);
+            }
+            if (this.timeUniformLow)
+            {
+                this.shaderLow.sendUniform(this.timeUniformLow, this.time);
+            }
+            if (this.offsetUniformLow)
+            {
+                this.shaderLow.sendUniformVec2(
+                    this.offsetUniformLow, this.offset
+                );
+            }
 
             // Render VBO
             this.renderer.planeVertexBuffer.bind();

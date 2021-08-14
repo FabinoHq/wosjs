@@ -43,13 +43,9 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 //  PointLight class definition                                               //
-//  param renderer : Renderer pointer                                         //
 ////////////////////////////////////////////////////////////////////////////////
-function PointLight(renderer)
+function PointLight()
 {
-    // Renderer pointer
-    this.renderer = renderer;
-
     // Point light position
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Point light color
@@ -65,11 +61,14 @@ PointLight.prototype = {
     //  init : Init point light                                               //
     //  param position : Position of the point light                          //
     //  param color : Color of the point light                                //
+    //  return : True if point light is successfully loaded                   //
     ////////////////////////////////////////////////////////////////////////////
     init: function(position, color)
     {
         // Reset point light
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.color) return false;
         this.color.reset();
         this.radius = 1.0;
         this.falloffRadius = 2.0;
@@ -80,10 +79,7 @@ PointLight.prototype = {
         // Set point light color
         if (color) this.color.setVector(color);
 
-        // Check renderer pointer
-        if (!this.renderer) return false;
-
-        // Point light loaded
+        // Point light successfully loaded
         return true;
     },
 
@@ -105,14 +101,11 @@ PointLight.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setPointLight: function(pointLight)
     {
-        if (pointLight)
-        {
-            // Set point light
-            this.position.setVector(pointLight.position);
-            this.color.setVector(pointLight.color);
-            this.radius = pointLight.radius;
-            this.falloffRadius = pointLight.falloffRadius;
-        }
+        // Set point light
+        this.position.setVector(pointLight.position);
+        this.color.setVector(pointLight.color);
+        this.radius = pointLight.radius;
+        this.falloffRadius = pointLight.falloffRadius;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -122,7 +115,7 @@ PointLight.prototype = {
     setPositionVec3: function(position)
     {
         // Set point light position
-        if (position) this.position.setVector(position);
+        this.position.setVector(position);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -174,7 +167,7 @@ PointLight.prototype = {
     setColorVec4: function(color)
     {
         // Set point light color
-        if (color) this.color.setVector(color);
+        this.color.setVector(color);
     },
 
     ////////////////////////////////////////////////////////////////////////////

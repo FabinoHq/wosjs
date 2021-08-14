@@ -88,6 +88,7 @@ const WOSDefaultPxTextBoxCursorWidthFactor = 0.04;
 const WOSDefaultPxTextBoxCursorHeightFactor = 0.96;
 const WOSDefaultPxTextBoxCursorOffsetFactor = -0.02;
 const WOSDefaultPxTextBoxTextOffsetFactor = -0.08;
+const WOSDefaultPxTextBoxTextOffsetYFactor = 0.03;
 const WOSDefaultPxTextBoxCheckWidthFactor = 0.005;
 const WOSDefaultPxTextBoxCheckWidthOffset = 0.002;
 const WOSDefaultPxTextBoxStateTime = 0.5;
@@ -149,6 +150,7 @@ GuiPxTextBox.prototype = {
     //  param height : PxTextBox field height                                 //
     //  param text : Text to set                                              //
     //  param hide : Text hide mode                                           //
+    //  return : True if GUI PxTextBox is successfully loaded                 //
     ////////////////////////////////////////////////////////////////////////////
     init: function(texture, width, height, text, hide)
     {
@@ -157,7 +159,9 @@ GuiPxTextBox.prototype = {
         this.textbox = null;
         this.textsel = null;
         this.textcursor = null;
+        if (!this.position) return false;
         this.position.reset();
+        if (!this.size) return false;
         this.size.setXY(1.0, 1.0);
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
@@ -190,7 +194,12 @@ GuiPxTextBox.prototype = {
 
         // Init text
         this.guipxtext = new GuiPxText(this.renderer, this.textShader);
-        this.guipxtext.init(false, texture, text, this.size.vec[1]*0.9, hide);
+        if (!this.guipxtext) return false;
+        if (!this.guipxtext.init(
+            false, texture, text, this.size.vec[1]*0.9, hide))
+        {
+            return false;
+        }
 
         // Check text size
         if (this.guipxtext.getWidth() >
@@ -202,29 +211,37 @@ GuiPxTextBox.prototype = {
 
         // Init pxtextbox
         this.textbox = new ProcSprite(this.renderer);
-        this.textbox.init(
-            pxtextboxFragmentShaderSrc, this.size.vec[0], this.size.vec[1]
-        );
+        if (!this.textbox) return false;
+        if (!this.textbox.init(
+            pxtextboxFragmentShaderSrc, this.size.vec[0], this.size.vec[1]))
+        {
+            return false;
+        }
 
         // Init text selection
         this.textsel = new ProcSprite(this.renderer);
-        this.textsel.init(
-            pxtextselectionFragmentShaderSrc, 0, this.size.vec[1]
-        );
+        if (!this.textsel) return false;
+        if (!this.textsel.init(
+            pxtextselectionFragmentShaderSrc, 0, this.size.vec[1]))
+        {
+            return false;
+        }
 
         // Init cursor
         this.textcursor = new ProcSprite(this.renderer);
-        this.textcursor.init(
-            pxtextcursorFragmentShaderSrc,
+        if (!this.textcursor) return false;
+        if (!this.textcursor.init(pxtextcursorFragmentShaderSrc,
             (this.size.vec[1]*WOSDefaultPxTextBoxCursorWidthFactor),
-            (this.size.vec[1]*WOSDefaultPxTextBoxCursorHeightFactor)
-        );
+            (this.size.vec[1]*WOSDefaultPxTextBoxCursorHeightFactor)))
+        {
+            return false;
+        }
 
         // Get initial cursor position
         this.cursorPos = this.guipxtext.getLength();
         this.cursorOffset = this.guipxtext.getCharPos(this.cursorPos);
 
-        // Textbox loaded
+        // GUI PxTextBox successfully loaded
         return true;
     },
 
@@ -991,7 +1008,8 @@ GuiPxTextBox.prototype = {
         this.guipxtext.setPosition(
             this.position.vec[0]+
             (this.size.vec[1]*WOSDefaultPxTextBoxTextOffsetFactor),
-            this.position.vec[1]
+            this.position.vec[1]+
+            (this.size.vec[1]*WOSDefaultPxTextBoxTextOffsetYFactor)
         );
         this.guipxtext.setAlpha(this.alpha);
         this.guipxtext.render();

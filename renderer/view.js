@@ -60,13 +60,18 @@ function View()
 View.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  reset : Reset the view                                                //
+    //  return : True if view is successfully reset                           //
     ////////////////////////////////////////////////////////////////////////////
     reset: function()
     {
+        if (!this.viewMatrix) return false;
         this.viewMatrix.setIdentity();
         this.x = 0.0;
         this.y = 0.0;
         this.angle = 0.0;
+
+        // View successfully reset
+        return true;
     },
 
     ////////////////////////////////////////////////////////////////////////////
