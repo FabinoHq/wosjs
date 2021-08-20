@@ -439,6 +439,7 @@ function Wos()
 Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Start WOS (load basic system)                                  //
+    //  return : True if WOS basic system is ready                            //
     ////////////////////////////////////////////////////////////////////////////
     init: function()
     {
@@ -928,7 +929,7 @@ Wos.prototype = {
         }
         this.freeflycam.rotateX(0.0);
         this.freeflycam.moveY(0.0);
-        this.freeflycam.moveZ(2.0);
+        this.freeflycam.moveZ(3.0);
 
         // Init test point light
         this.pointLight = new PointLight();
@@ -1025,7 +1026,7 @@ Wos.prototype = {
         this.testanimplane.setStart(0, 0);
         this.testanimplane.setEnd(1, 1);
         this.testanimplane.resetAnim();
-        this.testanimplane.setBillboard(WOSAnimPlaneBillboardSpherical);
+        this.testanimplane.setBillboard(WOSPlaneBillboardNone);
 
         // Init test procedural plane
         this.testprocplane = new ProcPlane(this.renderer);
@@ -1041,7 +1042,7 @@ Wos.prototype = {
             messageBoxText = "[0x0235] Could not init test procedural plane";
             return false;
         }
-        this.testprocplane.setBillboard(WOSProcPlaneBillboardNone);
+        this.testprocplane.setBillboard(WOSPlaneBillboardNone);
 
         // Init test static mesh
         this.staticmesh = new StaticMesh(
@@ -1313,6 +1314,8 @@ Wos.prototype = {
     compute: function()
     {
         this.audio.compute(this.frametime);
+        //this.camera.compute(this.renderer.ratio);
+        //this.freeflycam.compute(this.renderer.ratio, this.frametime);
         //this.testanim.compute(this.frametime);
         //this.testtextbox.compute(this.frametime);
         //this.testpxtextbox.compute(this.frametime);
@@ -1453,7 +1456,7 @@ Wos.prototype = {
         //this.renderer.setCamera(this.camera);
 
         // Set freefly camera
-        //this.renderer.setCamera(this.freeflycam, this.frametime);
+        //this.renderer.setCamera(this.freeflycam);
 
         // Render test plane
         //this.testplane.render(this.renderer.quality);

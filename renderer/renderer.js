@@ -642,7 +642,7 @@ Renderer.prototype = {
         {
             // Set default shadows
             this.shadows.setPosition(3.0, 3.0, -3.0);
-            this.shadows.setAngles(75.0, 230.0, 0.0);
+            this.shadows.setAngles(-0.7, -3.7, 0.0);
         }
 
         // Init text line renderer
@@ -847,10 +847,10 @@ Renderer.prototype = {
             this.projMatrix.setOrthographic(
                 -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
             );
-            this.projMatrix.translateZ(-1.0);
 
             // Reset view
             this.view.reset();
+            this.view.compute();
 
             // Disable depth buffer
             this.gl.disable(this.gl.DEPTH_TEST);
@@ -859,9 +859,6 @@ Renderer.prototype = {
             this.gl.enable(this.gl.BLEND);
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
             this.gl.blendEquation(this.gl.FUNC_ADD);
-
-            // Update view matrix
-            this.view.compute();
         }
     },
 
@@ -877,7 +874,6 @@ Renderer.prototype = {
             this.projMatrix.setOrthographic(
                 -this.ratio, this.ratio, 1.0, -1.0, -2.0, 2.0
             );
-            this.projMatrix.translateZ(-1.0);
 
             // Set current view
             this.view = view;
@@ -889,18 +885,14 @@ Renderer.prototype = {
             this.gl.enable(this.gl.BLEND);
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
             this.gl.blendEquation(this.gl.FUNC_ADD);
-
-            // Update view matrix
-            this.view.compute();
         }
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setCamera : Set rendering camera                                      //
     //  param camera : Camera to use for rendering                            //
-    //  param frametime : Frametime to compute camera movements               //
     ////////////////////////////////////////////////////////////////////////////
-    setCamera: function(camera, frametime)
+    setCamera: function(camera)
     {
         if (camera)
         {
@@ -917,9 +909,6 @@ Renderer.prototype = {
 
             // Clear depth buffer
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-
-            // Update view matrix
-            this.camera.compute(this.ratio, frametime);
         }
     },
 

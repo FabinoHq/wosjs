@@ -173,7 +173,7 @@ Matrix4x4.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setPerspective : Set 4x4 matrix to perspective view matrix            //
-    //  param fovy : Angle of the field of view                               //
+    //  param fovy : Angle of the field of view in radians                    //
     //  param ratio : Perspective aspect ratio (width / height)               //
     //  param near : Near plane of the frustum view                           //
     //  param far : Far plane of the frustum view                             //
@@ -181,13 +181,13 @@ Matrix4x4.prototype = {
     setPerspective: function(fovy, ratio, near, far)
     {
         // Compute view frustum
-        var frustHeight = (Math.tan((fovy/360.0)*Math.PI))*near;
+        var frustHeight = Math.tan(fovy*0.5)*near;
         var frustWidth = frustHeight*ratio;
         var left = -frustWidth;
         var right = frustWidth;
         var top = frustHeight;
         var bottom = -frustHeight;
-        
+
         // Set matrix
         this.matrix[0] = (2.0*near)/(right-left);
         this.matrix[1] = 0.0;
@@ -312,7 +312,7 @@ Matrix4x4.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate 4x4 matrix arround an arbritrary axis                 //
-    //  param angle : Angle to rotate in degrees                              //
+    //  param angle : Angle to rotate in radians                              //
     //  param x : X axis rotation value                                       //
     //  param y : Y axis rotation value                                       //
     //  param z : Z axis rotation value                                       //
@@ -320,8 +320,8 @@ Matrix4x4.prototype = {
     rotate: function(angle, x, y, z)
     {
         var magnitude = Math.sqrt(x*x + y*y + z*z);
-        var sinAngle = Math.sin(angle*Math.PI / 180.0);
-        var cosAngle = Math.cos(angle*Math.PI / 180.0);
+        var sinAngle = Math.sin(-angle);
+        var cosAngle = Math.cos(-angle);
         var oneMinCos = 1.0-cosAngle;
         if (magnitude > 0.0)
         {
@@ -420,12 +420,12 @@ Matrix4x4.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotateX : Rotate 4x4 matrix arround X axis                            //
-    //  param angle : Angle to rotate in degrees                              //
+    //  param angle : Angle to rotate in radians                              //
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angle)
     {
-        var sinAngle = Math.sin(angle*Math.PI / 180.0);
-        var cosAngle = Math.cos(angle*Math.PI / 180.0);
+        var sinAngle = Math.sin(-angle);
+        var cosAngle = Math.cos(-angle);
 
         var rotMat = new Matrix4x4();
 
@@ -468,12 +468,12 @@ Matrix4x4.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotateY : Rotate 4x4 matrix arround Y axis                            //
-    //  param angle : Angle to rotate in degrees                              //
+    //  param angle : Angle to rotate in radians                              //
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angle)
     {
-        var sinAngle = Math.sin(angle*Math.PI / 180.0);
-        var cosAngle = Math.cos(angle*Math.PI / 180.0);
+        var sinAngle = Math.sin(-angle);
+        var cosAngle = Math.cos(-angle);
 
         var rotMat = new Matrix4x4();
 
@@ -516,12 +516,12 @@ Matrix4x4.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotateZ : Rotate 4x4 matrix arround Z axis                            //
-    //  param angle : Angle to rotate in degrees                              //
+    //  param angle : Angle to rotate in radians                              //
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angle)
     {
-        var sinAngle = Math.sin(angle*Math.PI / 180.0);
-        var cosAngle = Math.cos(angle*Math.PI / 180.0);
+        var sinAngle = Math.sin(-angle);
+        var cosAngle = Math.cos(-angle);
 
         var rotMat = new Matrix4x4();
 

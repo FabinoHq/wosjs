@@ -72,6 +72,9 @@ function ProcSprite(renderer)
     this.time = 0.0;
     // Procedural sprite alpha
     this.alpha = 1.0;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 }
 
 ProcSprite.prototype = {
@@ -102,6 +105,8 @@ ProcSprite.prototype = {
         this.offset.reset();
         this.time = 0.0;
         this.alpha = 1.0;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -244,7 +249,7 @@ ProcSprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngle : Set procedural sprite rotation angle                       //
-    //  param angle : Procedural sprite rotation angle to set in degrees      //
+    //  param angle : Procedural sprite rotation angle to set in radians      //
     ////////////////////////////////////////////////////////////////////////////
     setAngle: function(angle)
     {
@@ -253,7 +258,7 @@ ProcSprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate procedural sprite                                     //
-    //  param angle : Angle to rotate procedural sprite by in degrees         //
+    //  param angle : Angle to rotate procedural sprite by in radians         //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
@@ -355,7 +360,7 @@ ProcSprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngle : Get procedural sprite rotation angle                       //
-    //  return : Procedural sprite rotation angle in degrees                  //
+    //  return : Procedural sprite rotation angle in radians                  //
     ////////////////////////////////////////////////////////////////////////////
     getAngle: function()
     {
@@ -414,6 +419,7 @@ ProcSprite.prototype = {
             -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
         );
         this.modelMatrix.scaleVec2(this.size);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Bind procedural shader
         this.shader.bind();
@@ -421,10 +427,10 @@ ProcSprite.prototype = {
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send shader uniforms
         this.shader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.shader.sendModelVecmat(this.vecmat);
         if (this.alphaUniform)
         {
             this.shader.sendUniform(this.alphaUniform, this.alpha);

@@ -70,7 +70,10 @@ function Shader(glPointer)
     // Shader uniforms locations
     this.textureLocation = null;
     this.worldMatrixLocation = null;
-    this.modelMatrixLocation = null;
+    this.modelCol0Location = null;
+    this.modelCol1Location = null;
+    this.modelCol2Location = null;
+    this.modelCol3Location = null;
 }
 
 Shader.prototype = {
@@ -96,7 +99,10 @@ Shader.prototype = {
         this.bonesWeightsLocation = -1;
         this.textureLocation = null;
         this.worldMatrixLocation = null;
-        this.modelMatrixLocation = null;
+        this.modelCol0Location = null;
+        this.modelCol1Location = null;
+        this.modelCol2Location = null;
+        this.modelCol3Location = null;
 
         // Check gl pointer
         if (!this.gl)
@@ -125,8 +131,7 @@ Shader.prototype = {
         this.gl.compileShader(this.vertexShader);
         if (!this.gl.getShaderParameter(
             this.vertexShader,
-            this.gl.COMPILE_STATUS
-        ))
+            this.gl.COMPILE_STATUS))
         {
             // Compiler status
             console.log("Vertex shader error : ");
@@ -154,8 +159,7 @@ Shader.prototype = {
         this.gl.compileShader(this.fragmentShader);
         if (!this.gl.getShaderParameter(
             this.fragmentShader,
-            this.gl.COMPILE_STATUS
-        ))
+            this.gl.COMPILE_STATUS))
         {
             // Compiler status
             console.log("Fragment shader error: ");
@@ -186,8 +190,7 @@ Shader.prototype = {
         this.gl.linkProgram(this.shaderProgram);
         if (!this.gl.getProgramParameter(
             this.shaderProgram,
-            this.gl.LINK_STATUS
-        ))
+            this.gl.LINK_STATUS))
         {
             // Could not link shader program
             return false;
@@ -243,10 +246,29 @@ Shader.prototype = {
         );
         if (!this.worldMatrixLocation) return false;
 
-        // Get model matrix location
-        this.modelMatrixLocation = this.gl.getUniformLocation(
-            this.shaderProgram, "modelMatrix"
+        // Get model matrix column 0 location
+        this.modelCol0Location = this.gl.getUniformLocation(
+            this.shaderProgram, "modelCol0"
         );
+        if (!this.modelCol0Location) return false;
+
+        // Get model matrix column 1 location
+        this.modelCol1Location = this.gl.getUniformLocation(
+            this.shaderProgram, "modelCol1"
+        );
+        if (!this.modelCol1Location) return false;
+
+        // Get model matrix column 2 location
+        this.modelCol2Location = this.gl.getUniformLocation(
+            this.shaderProgram, "modelCol2"
+        );
+        if (!this.modelCol2Location) return false;
+
+        // Get model matrix column 3 location
+        this.modelCol3Location = this.gl.getUniformLocation(
+            this.shaderProgram, "modelCol3"
+        );
+        if (!this.modelCol3Location) return false;
 
         this.gl.useProgram(null);
 
@@ -283,18 +305,52 @@ Shader.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  sendModelMatrix : Send model matrix to use with this shader           //
-    //  param modelMatrix : 4x4 Model matrix to use                           //
+    //  sendModelVecmat : Send model matrix 4 components vectors              //
+    //  param modelVecmat : 4x4 model matrix 4 components vectors             //
     ////////////////////////////////////////////////////////////////////////////
-    sendModelMatrix: function(modelMatrix)
+    sendModelVecmat: function(modelVecmat)
     {
-        if (this.modelMatrixLocation)
-        {
-            this.gl.uniformMatrix4fv(
-                this.modelMatrixLocation,
-                false, modelMatrix.matrix
-            );
-        }
+        // Send model matrix
+        this.gl.uniform4fv(this.modelCol0Location, modelVecmat.col0);
+        this.gl.uniform4fv(this.modelCol1Location, modelVecmat.col1);
+        this.gl.uniform4fv(this.modelCol2Location, modelVecmat.col2);
+        this.gl.uniform4fv(this.modelCol3Location, modelVecmat.col3);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendModelCol0 : Send model matrix column 0 vector                     //
+    //  param modelVecmat : 4x4 model matrix 4 components vectors             //
+    ////////////////////////////////////////////////////////////////////////////
+    sendModelCol0: function(modelVecmat)
+    {
+        this.gl.uniform4fv(this.modelCol0Location, modelVecmat.col0);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendModelCol1 : Send model matrix column 1 vector                     //
+    //  param modelVecmat : 4x4 model matrix 4 components vectors             //
+    ////////////////////////////////////////////////////////////////////////////
+    sendModelCol1: function(modelVecmat)
+    {
+        this.gl.uniform4fv(this.modelCol1Location, modelVecmat.col1);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendModelCol2 : Send model matrix column 2 vector                     //
+    //  param modelVecmat : 4x4 model matrix 4 components vectors             //
+    ////////////////////////////////////////////////////////////////////////////
+    sendModelCol2: function(modelVecmat)
+    {
+        this.gl.uniform4fv(this.modelCol2Location, modelVecmat.col2);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  sendModelCol3 : Send model matrix column 3 vector                     //
+    //  param modelVecmat : 4x4 model matrix 4 components vectors             //
+    ////////////////////////////////////////////////////////////////////////////
+    sendModelCol3: function(modelVecmat)
+    {
+        this.gl.uniform4fv(this.modelCol3Location, modelVecmat.col3);
     },
 
     ////////////////////////////////////////////////////////////////////////////

@@ -1261,6 +1261,7 @@ GuiMultiText.prototype = {
                 }
                 this.lines[i].modelMatrix.translateVec2(this.lines[i].position);
                 this.lines[i].modelMatrix.scaleVec2(this.lines[i].size);
+                this.lines[i].vecmat.setMatrix(this.lines[i].modelMatrix);
 
                 // Bind text shader
                 this.lines[i].textShader.bind();
@@ -1270,12 +1271,12 @@ GuiMultiText.prototype = {
                 this.renderer.worldMatrix.multiply(
                     this.renderer.view.viewMatrix
                 );
-                this.renderer.worldMatrix.multiply(this.lines[i].modelMatrix);
 
                 // Send shader uniforms
                 this.lines[i].textShader.sendWorldMatrix(
                     this.renderer.worldMatrix
                 );
+                this.lines[i].textShader.sendModelVecmat(this.lines[i].vecmat);
                 this.lines[i].textShader.sendUniformVec3(
                     this.lines[i].colorUniform, this.color
                 );

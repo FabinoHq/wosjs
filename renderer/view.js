@@ -50,8 +50,7 @@ function View()
     this.viewMatrix = new Matrix4x4();
 
     // View position
-    this.x = 0.0;
-    this.y = 0.0;
+    this.position = new Vector2();
 
     // View angle
     this.angle = 0.0;
@@ -66,8 +65,8 @@ View.prototype = {
     {
         if (!this.viewMatrix) return false;
         this.viewMatrix.setIdentity();
-        this.x = 0.0;
-        this.y = 0.0;
+        if (!this.position) return false;
+        this.position.reset();
         this.angle = 0.0;
 
         // View successfully reset
@@ -80,8 +79,10 @@ View.prototype = {
     compute: function()
     {
         this.viewMatrix.setIdentity();
-        this.viewMatrix.rotateZ(this.angle);
-        this.viewMatrix.translate(this.x, this.y, 0.0);
+        this.viewMatrix.rotateZ(-this.angle);
+        this.viewMatrix.translate(
+            -this.position.vec[0], -this.position.vec[1], -1.0
+        );
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -91,8 +92,8 @@ View.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setPosition: function(x, y)
     {
-        this.x = -x;
-        this.y = -y;
+        this.position.vec[0] = x;
+        this.position.vec[1] = y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -101,8 +102,8 @@ View.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setPositionVec2: function(vector)
     {
-        this.x = -vector.vec[0];
-        this.y = -vector.vec[1];
+        this.position.vec[0] = vector.vec[0];
+        this.position.vec[1] = vector.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -111,7 +112,7 @@ View.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
     {
-        this.position.vec[0] = -x;
+        this.position.vec[0] = x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -120,7 +121,7 @@ View.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
     {
-        this.position.vec[1] = -y;
+        this.position.vec[1] = y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -130,8 +131,8 @@ View.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     move: function(x, y)
     {
-        this.x -= x;
-        this.y -= y;
+        this.position.vec[0] += x;
+        this.position.vec[1] += y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -140,8 +141,8 @@ View.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveVec2: function(vector)
     {
-        this.x -= vector.vec[0];
-        this.y -= vector.vec[1];
+        this.position.vec[0] += vector.vec[0];
+        this.position.vec[1] += vector.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -150,7 +151,7 @@ View.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
-        this.x -= x;
+        this.position.vec[0] += x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -159,25 +160,25 @@ View.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
-        this.y -= y;
+        this.position.vec[1] += y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngle : Set view rotation angle                                    //
-    //  param angle : View rotation angle to set in degrees                   //
+    //  param angle : View rotation angle to set in radians                   //
     ////////////////////////////////////////////////////////////////////////////
     setAngle: function(angle)
     {
-        this.angle = -angle;
+        this.angle = angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate the view along the Z axis                             //
-    //  param angle : Value of the rotation in degrees                        //
+    //  param angle : Value of the rotation in radians                        //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
-        this.angle -= angle;
+        this.angle += angle;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -186,7 +187,7 @@ View.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getX: function()
     {
-        return this.x;
+        return this.position.vec[0];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -195,7 +196,7 @@ View.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getY: function()
     {
-        return this.y;
+        return this.position.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////

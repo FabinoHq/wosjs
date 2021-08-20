@@ -46,6 +46,29 @@
 ////////////////////////////////////////////////////////////////////////////////
 const WOSFloatEpsilon = 0.0000001;
 
+////////////////////////////////////////////////////////////////////////////////
+//  WOS pi constants                                                          //
+////////////////////////////////////////////////////////////////////////////////
+const WOSPi = Math.PI;
+const WOS2Pi = Math.PI*2.0;
+const WOS2Pi3 = Math.PI*2.0/3.0;
+const WOSPi2 = Math.PI*0.5;
+const WOSPi3 = Math.PI/3.0;
+const WOSPi4 = Math.PI*0.25;
+const WOSPi8 = Math.PI*0.125;
+const WOSDegToRad = Math.PI/180.0;
+const WOSRadToDeg = 180.0/Math.PI;
+
+
+////////////////////////////////////////////////////////////////////////////////
+//  sign : Get number sign (-1 or +1)                                         //
+//  param x : Number to get sign of                                           //
+//  return : Sign of the number (-1 or +1)                                    //
+////////////////////////////////////////////////////////////////////////////////
+function sign(x)
+{
+    return (x >= 0) ? 1 : -1;
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 //  truncate : Float to integer truncation                                    //

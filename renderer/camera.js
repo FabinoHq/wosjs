@@ -61,7 +61,7 @@ function Camera()
     this.upward = new Vector3(0.0, 1.0, 0.0);
 
     // Camera fovy
-    this.fovy = 90.0;
+    this.fovy = WOSPi2;
 
     // Camera near and far planes
     this.nearPlane = 0.001;
@@ -88,7 +88,7 @@ Camera.prototype = {
         this.target.reset();
         if (!this.upward) return false;
         this.upward.setXYZ(0.0, 1.0, 0.0);
-        this.fovy = 90.0;
+        this.fovy = WOSPi2;
         this.nearPlane = 0.001;
         this.farPlane = 1000.0;
 
@@ -103,11 +103,11 @@ Camera.prototype = {
     compute: function(ratio)
     {
         // Compute camera target
-        this.target.vec[0] = Math.cos(this.angles.vec[0]*Math.PI/180.0);
-        this.target.vec[0] *= Math.sin(this.angles.vec[1]*Math.PI/180.0);
-        this.target.vec[1] = Math.sin(this.angles.vec[0]*Math.PI/180.0);
-        this.target.vec[2] = Math.cos(this.angles.vec[0]*Math.PI/180.0);
-        this.target.vec[2] *= Math.cos(this.angles.vec[1]*Math.PI/180.0);
+        this.target.vec[0] = Math.cos(this.angles.vec[0]);
+        this.target.vec[0] *= Math.sin(this.angles.vec[1]);
+        this.target.vec[1] = Math.sin(this.angles.vec[0]);
+        this.target.vec[2] = Math.cos(this.angles.vec[0]);
+        this.target.vec[2] *= Math.cos(this.angles.vec[1]);
         this.target.normalize();
 
         // Compute projection matrix
@@ -118,10 +118,12 @@ Camera.prototype = {
 
         // Compute view matrix
         this.viewMatrix.setIdentity();
-        this.viewMatrix.rotateX(this.angles.vec[0]);
-        this.viewMatrix.rotateY(this.angles.vec[1]);
-        this.viewMatrix.rotateY(this.angles.vec[2]);
-        this.viewMatrix.translateVec3(this.position);
+        this.viewMatrix.rotateX(-this.angles.vec[0]);
+        this.viewMatrix.rotateY(-this.angles.vec[1]);
+        this.viewMatrix.rotateZ(-this.angles.vec[2]);
+        this.viewMatrix.translate(
+            -this.position.vec[0], -this.position.vec[1], -this.position.vec[2]
+        );
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -132,9 +134,9 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setPosition: function(x, y, z)
     {
-        this.position.vec[0] = -x;
-        this.position.vec[1] = -y;
-        this.position.vec[2] = -z;
+        this.position.vec[0] = x;
+        this.position.vec[1] = y;
+        this.position.vec[2] = z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -143,9 +145,9 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setPositionVec3: function(vector)
     {
-        this.position.vec[0] = -vector.vec[0];
-        this.position.vec[1] = -vector.vec[1];
-        this.position.vec[2] = -vector.vec[2];
+        this.position.vec[0] = vector.vec[0];
+        this.position.vec[1] = vector.vec[1];
+        this.position.vec[2] = vector.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -154,7 +156,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
     {
-        this.position.vec[0] = -x;
+        this.position.vec[0] = x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -163,7 +165,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
     {
-        this.position.vec[1] = -y;
+        this.position.vec[1] = y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -172,7 +174,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setZ: function(z)
     {
-        this.position.vec[2] = -z;
+        this.position.vec[2] = z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -183,9 +185,9 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     move: function(x, y, z)
     {
-        this.position.vec[0] -= x;
-        this.position.vec[1] -= y;
-        this.position.vec[2] -= z;
+        this.position.vec[0] += x;
+        this.position.vec[1] += y;
+        this.position.vec[2] += z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -194,9 +196,9 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveVec3: function(vector)
     {
-        this.position.vec[0] -= vector.vec[0];
-        this.position.vec[1] -= vector.vec[1];
-        this.position.vec[2] -= vector.vec[2];
+        this.position.vec[0] += vector.vec[0];
+        this.position.vec[1] += vector.vec[1];
+        this.position.vec[2] += vector.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -205,7 +207,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
-        this.position.vec[0] -= x;
+        this.position.vec[0] += x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -214,7 +216,7 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
-        this.position.vec[1] -= y;
+        this.position.vec[1] += y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -223,20 +225,20 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveZ: function(z)
     {
-        this.position.vec[2] -= z;
+        this.position.vec[2] += z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngles : Set camera rotation angles                                //
-    //  param angleX : Camera X rotation angle to set in degrees              //
-    //  param angleY : Camera Y rotation angle to set in degrees              //
-    //  param angleZ : Camera Z rotation angle to set in degrees              //
+    //  param angleX : Camera X rotation angle to set in radians              //
+    //  param angleY : Camera Y rotation angle to set in radians              //
+    //  param angleZ : Camera Z rotation angle to set in radians              //
     ////////////////////////////////////////////////////////////////////////////
     setAngles: function(angleX, angleY, angleZ)
     {
-        this.angles.vec[0] = -angleX;
-        this.angles.vec[1] = -angleY;
-        this.angles.vec[2] = -angleZ;
+        this.angles.vec[0] = angleX;
+        this.angles.vec[1] = angleY;
+        this.angles.vec[2] = angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -245,68 +247,92 @@ Camera.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setAnglesVec3: function(vector)
     {
-        this.angles.vec[0] = -vector.vec[0];
-        this.angles.vec[1] = -vector.vec[1];
-        this.angles.vec[2] = -vector.vec[2];
+        this.angles.vec[0] = vector.vec[0];
+        this.angles.vec[1] = vector.vec[1];
+        this.angles.vec[2] = vector.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleX : Set camera X rotation angle                               //
-    //  param angleX : Camera X rotation angle to set in degrees              //
+    //  param angleX : Camera X rotation angle to set in radians              //
     ////////////////////////////////////////////////////////////////////////////
     setAngleX: function(angleX)
     {
-        this.angles.vec[0] = -angleX;
+        this.angles.vec[0] = angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleY : Set camera Y rotation angle                               //
-    //  param angleY : Camera Y rotation angle to set in degrees              //
+    //  param angleY : Camera Y rotation angle to set in radians              //
     ////////////////////////////////////////////////////////////////////////////
     setAngleY: function(angleY)
     {
-        this.angles.vec[1] = -angleY;
+        this.angles.vec[1] = angleY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleZ : Set camera Z rotation angle                               //
-    //  param angleZ : Camera Z rotation angle to set in degrees              //
+    //  param angleZ : Camera Z rotation angle to set in radians              //
     ////////////////////////////////////////////////////////////////////////////
     setAngleZ: function(angleZ)
     {
-        this.angles.vec[2] = -angleZ;
+        this.angles.vec[2] = angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotate : Rotate camera                                                //
+    //  param angleX : X angle to rotate camera by in radians                 //
+    //  param angleY : Y angle to rotate camera by in radians                 //
+    //  param angleZ : Z angle to rotate camera by in radians                 //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angleX, angleY, angleZ)
+    {
+        this.angles.vec[0] += angleX;
+        this.angles.vec[1] += angleY;
+        this.angles.vec[2] += angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateVec3 : Rotate camera with a vector                              //
+    //  param angles : 3 component angles vector to rotate camera with        //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateVec3: function(angles)
+    {
+        this.angles.vec[0] += angles.vec[0];
+        this.angles.vec[1] += angles.vec[1];
+        this.angles.vec[2] += angles.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotateX : Rotate the camera along the X axis                          //
-    //  param angleX : Value of the X rotation in degrees                     //
+    //  param angleX : Value of the X rotation in radians                     //
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
-        this.angles.vec[0] -= angleX;
+        this.angles.vec[0] += angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotateY : Rotate the camera along the Y axis                          //
-    //  param angleY : Value of the Y rotation in degrees                     //
+    //  param angleY : Value of the Y rotation in radians                     //
     ////////////////////////////////////////////////////////////////////////////
-    rotateY: function(angleX)
+    rotateY: function(angleY)
     {
-        this.angles.vec[1] -= angleY;
+        this.angles.vec[1] += angleY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotateZ : Rotate the camera along the Z axis                          //
-    //  param angleZ : Value of the Z rotation in degrees                     //
+    //  param angleZ : Value of the Z rotation in radians                     //
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
-        this.angles.vec[2] -= angleZ;
+        this.angles.vec[2] += angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setFovy : Set the camera fovy angle                                   //
-    //  param fovy : Value of the camera fovy in degrees                      //
+    //  param fovy : Value of the camera fovy in radians                      //
     ////////////////////////////////////////////////////////////////////////////
     setFovy: function(fovy)
     {

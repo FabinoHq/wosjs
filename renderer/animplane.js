@@ -42,15 +42,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  WOS anim plane billboard modes                                            //
-////////////////////////////////////////////////////////////////////////////////
-const WOSAnimPlaneBillboardNone = 0;
-const WOSAnimPlaneBillboardCylindricalY = 1;
-const WOSAnimPlaneBillboardCylindricalX = 2;
-const WOSAnimPlaneBillboardSpherical = 3;
-
-
-////////////////////////////////////////////////////////////////////////////////
 //  AnimPlane class definition                                                //
 //  param renderer : Renderer pointer                                         //
 //  param animShader : Animated plane shader pointer                          //
@@ -105,19 +96,19 @@ function AnimPlane(renderer, animPlaneShader,
     this.normalMap = null;
     // Animated plane specular map
     this.specularMap = null;
-    // Animated plane model matrix
+    // Plane model matrix
     this.modelMatrix = new Matrix4x4();
     // Animated plane shadows matrix
     this.shadowsMatrix = new Matrix4x4();
 
     // Animated plane billboard mode
-    this.billboard = WOSAnimPlaneBillboardNone;
+    this.billboard = WOSPlaneBillboardNone;
     // Animated plane position
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Animated plane size
     this.size = new Vector2(1.0, 1.0);
     // Animated plane rotation angle
-    this.angles = new Vector3(0.0, 0.0, 0.0);
+    this.angles = new Vector4(0.0, 0.0, 0.0, 0.0);
     // Animated plane frame count
     this.count = new Vector2(1, 1);
     // Animated plane start frame
@@ -137,6 +128,9 @@ function AnimPlane(renderer, animPlaneShader,
     this.currentTime = 0.0;
     this.interpOffset = 0.0;
     this.interp = 0.0;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 
     // Temp vectors
     this.lookAtVec = new Vector3();
@@ -194,7 +188,7 @@ AnimPlane.prototype = {
         this.modelMatrix.setIdentity();
         if (!this.shadowsMatrix) return false;
         this.shadowsMatrix.setIdentity();
-        this.billboard = WOSAnimPlaneBillboardNone;
+        this.billboard = WOSPlaneBillboardNone;
         if (!this.position) return false;
         this.position.reset();
         if (!this.size) return false;
@@ -221,6 +215,8 @@ AnimPlane.prototype = {
         this.currentTime = 0.0;
         this.interpOffset = 0.0;
         this.interp = 0.0;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
         if (!this.lookAtVec) return false;
         this.lookAtVec.reset();
         if (!this.rotVec) return false;
@@ -423,13 +419,13 @@ AnimPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setBillboard: function(billboard)
     {
-        if (billboard <= WOSAnimPlaneBillboardNone)
+        if (billboard <= WOSPlaneBillboardNone)
         {
-            billboard = WOSAnimPlaneBillboardNone;
+            billboard = WOSPlaneBillboardNone;
         }
-        if (billboard >= WOSAnimPlaneBillboardSpherical)
+        if (billboard >= WOSPlaneBillboardSpherical)
         {
-            billboard = WOSAnimPlaneBillboardSpherical;
+            billboard = WOSPlaneBillboardSpherical;
         }
         this.billboard = billboard;
     },
@@ -576,12 +572,12 @@ AnimPlane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngle : Set animated plane rotation angle                          //
-    //  param angleX : Animated plane rotation X angle to set in degrees      //
-    //  param angleY : Animated plane rotation Y angle to set in degrees      //
-    //  param angleZ : Animated plane rotation Z angle to set in degrees      //
+    //  setAngles : Set animated plane rotation angles                        //
+    //  param angleX : Animated plane X rotation angle to set in radians      //
+    //  param angleY : Animated plane Y rotation angle to set in radians      //
+    //  param angleZ : Animated plane Z rotation angle to set in radians      //
     ////////////////////////////////////////////////////////////////////////////
-    setAngle: function(angleX, angleY, angleZ)
+    setAngles: function(angleX, angleY, angleZ)
     {
         this.angles.vec[0] = angleX;
         this.angles.vec[1] = angleY;
@@ -589,8 +585,19 @@ AnimPlane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAnglesVec3 : Set animated plane rotation angles from a vector      //
+    //  param angles : 3 component angles vector to rotate animated plane     //
+    ////////////////////////////////////////////////////////////////////////////
+    setAnglesVec3: function(angles)
+    {
+        this.angles.vec[0] = angles.vec[0];
+        this.angles.vec[1] = angles.vec[1];
+        this.angles.vec[2] = angles.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setAngleX : Set animated plane rotation X angle                       //
-    //  param angleX : Animated plane rotation X angle to set in degrees      //
+    //  param angleX : Animated plane rotation X angle to set in radians      //
     ////////////////////////////////////////////////////////////////////////////
     setAngleX: function(angleX)
     {
@@ -599,7 +606,7 @@ AnimPlane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleY : Set animated plane rotation Y angle                       //
-    //  param angleY : Animated plane rotation Y angle to set in degrees      //
+    //  param angleY : Animated plane rotation Y angle to set in radians      //
     ////////////////////////////////////////////////////////////////////////////
     setAngleY: function(angleY)
     {
@@ -608,7 +615,7 @@ AnimPlane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleZ : Set animated plane rotation Z angle                       //
-    //  param angleZ : Animated plane rotation Z angle to set in degrees      //
+    //  param angleZ : Animated plane rotation Z angle to set in radians      //
     ////////////////////////////////////////////////////////////////////////////
     setAngleZ: function(angleZ)
     {
@@ -617,9 +624,9 @@ AnimPlane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate animated plane                                        //
-    //  param angleX : X angle to rotate animated plane by in degrees         //
-    //  param angleY : Y angle to rotate animated plane by in degrees         //
-    //  param angleZ : Z angle to rotate animated plane by in degrees         //
+    //  param angleX : X angle to rotate animated plane by in radians         //
+    //  param angleY : Y angle to rotate animated plane by in radians         //
+    //  param angleZ : Z angle to rotate animated plane by in radians         //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angleX, angleY, angleZ)
     {
@@ -629,8 +636,19 @@ AnimPlane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateX : Rotate animated plane on X axis                             //
-    //  param angleX : X angle to rotate animated plane by in degrees         //
+    //  rotateVec3 : Rotate animated plane with a vector                      //
+    //  param angles : 3 component angles vector to rotate animated plane     //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateVec3: function(angles)
+    {
+        this.angles.vec[0] += angles.vec[0];
+        this.angles.vec[1] += angles.vec[1];
+        this.angles.vec[2] += angles.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateX : Rotate animated plane around the X axis                     //
+    //  param angleX : X angle to rotate animated plane by in radians         //
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
@@ -638,8 +656,8 @@ AnimPlane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateY : Rotate animated plane on Y axis                             //
-    //  param angleY : Y angle to rotate animated plane by in degrees         //
+    //  rotateY : Rotate animated plane around the Y axis                     //
+    //  param angleY : Y angle to rotate animated plane by in radians         //
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleY)
     {
@@ -647,8 +665,8 @@ AnimPlane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateZ : Rotate animated plane on Z axis                             //
-    //  param angleZ : Z angle to rotate animated plane by in degrees         //
+    //  rotateZ : Rotate animated plane around the Z axis                     //
+    //  param angleZ : Z angle to rotate animated plane by in radians         //
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
@@ -759,7 +777,7 @@ AnimPlane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleX : Get animated plane rotation X angle                       //
-    //  return : Animated plane rotation X angle in degrees                   //
+    //  return : Animated plane rotation X angle in radians                   //
     ////////////////////////////////////////////////////////////////////////////
     getAngleX: function()
     {
@@ -768,7 +786,7 @@ AnimPlane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleY : Get animated plane rotation Y angle                       //
-    //  return : Animated plane rotation Y angle in degrees                   //
+    //  return : Animated plane rotation Y angle in radians                   //
     ////////////////////////////////////////////////////////////////////////////
     getAngleY: function()
     {
@@ -777,7 +795,7 @@ AnimPlane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleZ : Get animated plane rotation Z angle                       //
-    //  return : Animated plane rotation Z angle in degrees                   //
+    //  return : Animated plane rotation Z angle in radians                   //
     ////////////////////////////////////////////////////////////////////////////
     getAngleZ: function()
     {
@@ -1004,7 +1022,7 @@ AnimPlane.prototype = {
         // Set animated plane model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec3(this.position);
-        if (this.billboard == WOSAnimPlaneBillboardCylindricalY)
+        if (this.billboard == WOSPlaneBillboardCylindricalY)
         {
             // Cylindrical billboard (Y)
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -1018,7 +1036,7 @@ AnimPlane.prototype = {
             dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
+            angle = WOSPi-Math.acos(dotProduct);
             this.modelMatrix.rotate(
                 angle,
                 this.rotVec.vec[0],
@@ -1027,7 +1045,7 @@ AnimPlane.prototype = {
             );
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
-        else if (this.billboard == WOSAnimPlaneBillboardCylindricalX)
+        else if (this.billboard == WOSPlaneBillboardCylindricalX)
         {
             // Cylindrical billboard (X)
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -1041,7 +1059,7 @@ AnimPlane.prototype = {
             dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
+            angle = WOSPi-Math.acos(dotProduct);
             this.modelMatrix.rotate(
                 angle,
                 this.rotVec.vec[0],
@@ -1050,7 +1068,7 @@ AnimPlane.prototype = {
             );
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
-        else if (this.billboard == WOSAnimPlaneBillboardSpherical)
+        else if (this.billboard == WOSPlaneBillboardSpherical)
         {
             // Spherical billboard
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -1064,7 +1082,7 @@ AnimPlane.prototype = {
             dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
+            angle = WOSPi-Math.acos(dotProduct);
             this.modelMatrix.rotate(
                 angle,
                 this.rotVec.vec[0],
@@ -1080,9 +1098,8 @@ AnimPlane.prototype = {
             dotProduct = this.delta.dotProduct(this.delta2);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = Math.acos(dotProduct)*180.0/Math.PI;
-            if (this.delta2.vec[1] < 0.0) { this.modelMatrix.rotateX(angle); }
-            else { this.modelMatrix.rotateX(-angle); }
+            angle = Math.acos(dotProduct)*sign(this.delta2.vec[1]);
+            this.modelMatrix.rotateX(angle);
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
         else
@@ -1094,11 +1111,11 @@ AnimPlane.prototype = {
             -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
         );
         this.modelMatrix.scaleVec2(this.size);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Set maximum quality
         if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
@@ -1135,11 +1152,15 @@ AnimPlane.prototype = {
             this.animPlaneShader.bind();
 
             // Send high quality shader uniforms
-            this.shadowsMatrix.setMatrix(this.renderer.shadows.projMatrix);
-            this.shadowsMatrix.multiply(this.renderer.shadows.viewMatrix);
+            this.shadowsMatrix.setMatrix(
+                this.renderer.shadows.camera.projMatrix
+            );
+            this.shadowsMatrix.multiply(
+                this.renderer.shadows.camera.viewMatrix
+            );
 
             this.animPlaneShader.sendWorldMatrix(this.renderer.worldMatrix);
-            this.animPlaneShader.sendModelMatrix(this.modelMatrix);
+            this.animPlaneShader.sendModelVecmat(this.vecmat);
             this.animPlaneShader.sendUniformMat4(
                 this.shadowsMatrixLocation, this.shadowsMatrix
             );
@@ -1221,7 +1242,7 @@ AnimPlane.prototype = {
             this.animPlaneShaderMedium.sendWorldMatrix(
                 this.renderer.worldMatrix
             );
-            this.animPlaneShaderMedium.sendModelMatrix(this.modelMatrix);
+            this.animPlaneShaderMedium.sendModelVecmat(this.vecmat);
             this.animPlaneShaderMedium.sendUniformVec3(
                 this.cameraPosUniformMedium, this.renderer.camera.position
             );
@@ -1288,6 +1309,7 @@ AnimPlane.prototype = {
 
             // Send low quality shader uniforms
             this.animPlaneShaderLow.sendWorldMatrix(this.renderer.worldMatrix);
+            this.animPlaneShaderLow.sendModelVecmat(this.vecmat);
             this.animPlaneShaderLow.sendUniform(
                 this.alphaUniformLow, this.alpha
             );

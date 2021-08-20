@@ -112,7 +112,7 @@ function Plane(renderer, planeShader, planeShaderMedium, planeShaderLow)
     // Plane size
     this.size = new Vector2(1.0, 1.0);
     // Plane rotation angles
-    this.angles = new Vector3(0.0, 0.0, 0.0);
+    this.angles = new Vector4(0.0, 0.0, 0.0, 0.0);
     // Plane texture UV size
     this.uvSize = new Vector2(1.0, 1.0);
     // Plane texture UV offset
@@ -121,6 +121,9 @@ function Plane(renderer, planeShader, planeShaderMedium, planeShaderLow)
     this.alpha = 1.0;
     // Plane specularity
     this.specularity = 0.0;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 
     // Temp vectors
     this.lookAtVec = new Vector3();
@@ -187,6 +190,8 @@ Plane.prototype = {
         this.uvOffset.reset();
         this.alpha = 1.0;
         this.specularity = 0.0;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
         if (!this.lookAtVec) return false;
         this.lookAtVec.reset();
         if (!this.rotVec) return false;
@@ -519,12 +524,12 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngle : Set plane rotation angle                                   //
-    //  param angleX : Plane rotation X angle to set in degrees               //
-    //  param angleY : Plane rotation Y angle to set in degrees               //
-    //  param angleZ : Plane rotation Z angle to set in degrees               //
+    //  setAngles : Set plane rotation angles                                 //
+    //  param angleX : Plane X rotation angle to set in radians               //
+    //  param angleY : Plane Y rotation angle to set in radians               //
+    //  param angleZ : Plane Z rotation angle to set in radians               //
     ////////////////////////////////////////////////////////////////////////////
-    setAngle: function(angleX, angleY, angleZ)
+    setAngles: function(angleX, angleY, angleZ)
     {
         this.angles.vec[0] = angleX;
         this.angles.vec[1] = angleY;
@@ -532,8 +537,19 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAnglesVec3 : Set plane rotation angles from a vector               //
+    //  param angles : 3 component angles vector to rotate plane              //
+    ////////////////////////////////////////////////////////////////////////////
+    setAnglesVec3: function(angles)
+    {
+        this.angles.vec[0] = angles.vec[0];
+        this.angles.vec[1] = angles.vec[1];
+        this.angles.vec[2] = angles.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setAngleX : Set plane rotation X angle                                //
-    //  param angleX : Plane rotation X angle to set in degrees               //
+    //  param angleX : Plane rotation X angle to set in radians               //
     ////////////////////////////////////////////////////////////////////////////
     setAngleX: function(angleX)
     {
@@ -542,7 +558,7 @@ Plane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleY : Set plane rotation Y angle                                //
-    //  param angleY : Plane rotation Y angle to set in degrees               //
+    //  param angleY : Plane rotation Y angle to set in radians               //
     ////////////////////////////////////////////////////////////////////////////
     setAngleY: function(angleY)
     {
@@ -551,7 +567,7 @@ Plane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleZ : Set plane rotation Z angle                                //
-    //  param angleZ : Plane rotation Z angle to set in degrees               //
+    //  param angleZ : Plane rotation Z angle to set in radians               //
     ////////////////////////////////////////////////////////////////////////////
     setAngleZ: function(angleZ)
     {
@@ -560,9 +576,9 @@ Plane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate plane                                                 //
-    //  param angleX : X angle to rotate plane by in degrees                  //
-    //  param angleY : Y angle to rotate plane by in degrees                  //
-    //  param angleZ : Z angle to rotate plane by in degrees                  //
+    //  param angleX : X angle to rotate plane by in radians                  //
+    //  param angleY : Y angle to rotate plane by in radians                  //
+    //  param angleZ : Z angle to rotate plane by in radians                  //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angleX, angleY, angleZ)
     {
@@ -572,8 +588,19 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateX : Rotate plane on X axis                                      //
-    //  param angleX : X angle to rotate plane by in degrees                  //
+    //  rotateVec3 : Rotate plane with a vector                               //
+    //  param angles : 3 component angles vector to rotate plane with         //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateVec3: function(angles)
+    {
+        this.angles.vec[0] += angles.vec[0];
+        this.angles.vec[1] += angles.vec[1];
+        this.angles.vec[2] += angles.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateX : Rotate plane around the X axis                              //
+    //  param angleX : X angle to rotate plane by in radians                  //
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
@@ -581,8 +608,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateY : Rotate plane on Y axis                                      //
-    //  param angleY : Y angle to rotate plane by in degrees                  //
+    //  rotateY : Rotate plane around the Y axis                              //
+    //  param angleY : Y angle to rotate plane by in radians                  //
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleY)
     {
@@ -590,8 +617,8 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateZ : Rotate plane on Z axis                                      //
-    //  param angleZ : Z angle to rotate plane by in degrees                  //
+    //  rotateZ : Rotate plane around the Z axis                              //
+    //  param angleZ : Z angle to rotate plane by in radians                  //
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
@@ -700,7 +727,7 @@ Plane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleX : Get plane rotation X angle                                //
-    //  return : Plane rotation X angle in degrees                            //
+    //  return : Plane rotation X angle in radians                            //
     ////////////////////////////////////////////////////////////////////////////
     getAngleX: function()
     {
@@ -709,7 +736,7 @@ Plane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleY : Get plane rotation Y angle                                //
-    //  return : Plane rotation Y angle in degrees                            //
+    //  return : Plane rotation Y angle in radians                            //
     ////////////////////////////////////////////////////////////////////////////
     getAngleY: function()
     {
@@ -718,7 +745,7 @@ Plane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleZ : Get plane rotation Z angle                                //
-    //  return : Plane rotation Z angle in degrees                            //
+    //  return : Plane rotation Z angle in radians                            //
     ////////////////////////////////////////////////////////////////////////////
     getAngleZ: function()
     {
@@ -796,7 +823,7 @@ Plane.prototype = {
             dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
+            angle = WOSPi-Math.acos(dotProduct);
             this.modelMatrix.rotate(
                 angle,
                 this.rotVec.vec[0],
@@ -819,7 +846,7 @@ Plane.prototype = {
             dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
+            angle = WOSPi-Math.acos(dotProduct);
             this.modelMatrix.rotate(
                 angle,
                 this.rotVec.vec[0],
@@ -842,7 +869,7 @@ Plane.prototype = {
             dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
+            angle = WOSPi-Math.acos(dotProduct);
             this.modelMatrix.rotate(
                 angle,
                 this.rotVec.vec[0],
@@ -858,9 +885,8 @@ Plane.prototype = {
             dotProduct = this.delta.dotProduct(this.delta2);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = Math.acos(dotProduct)*180.0/Math.PI;
-            if (this.delta2.vec[1] < 0.0) { this.modelMatrix.rotateX(angle); }
-            else { this.modelMatrix.rotateX(-angle); }
+            angle = Math.acos(dotProduct)*sign(this.delta2.vec[1]);
+            this.modelMatrix.rotateX(angle);
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
         else
@@ -872,11 +898,11 @@ Plane.prototype = {
             -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
         );
         this.modelMatrix.scaleVec2(this.size);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Set maximum quality
         if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
@@ -913,11 +939,15 @@ Plane.prototype = {
             this.planeShader.bind();
 
             // Send high quality shader uniforms
-            this.shadowsMatrix.setMatrix(this.renderer.shadows.projMatrix);
-            this.shadowsMatrix.multiply(this.renderer.shadows.viewMatrix);
+            this.shadowsMatrix.setMatrix(
+                this.renderer.shadows.camera.projMatrix
+            );
+            this.shadowsMatrix.multiply(
+                this.renderer.shadows.camera.viewMatrix
+            );
 
             this.planeShader.sendWorldMatrix(this.renderer.worldMatrix);
-            this.planeShader.sendModelMatrix(this.modelMatrix);
+            this.planeShader.sendModelVecmat(this.vecmat);
             this.planeShader.sendUniformMat4(
                 this.shadowsMatrixLocation, this.shadowsMatrix
             );
@@ -993,7 +1023,7 @@ Plane.prototype = {
 
             // Send medium quality shader uniforms
             this.planeShaderMedium.sendWorldMatrix(this.renderer.worldMatrix);
-            this.planeShaderMedium.sendModelMatrix(this.modelMatrix);
+            this.planeShaderMedium.sendModelVecmat(this.vecmat);
             this.planeShaderMedium.sendUniformVec3(
                 this.cameraPosUniformMedium, this.renderer.camera.position
             );
@@ -1054,6 +1084,7 @@ Plane.prototype = {
 
             // Send low quality shader uniforms
             this.planeShaderLow.sendWorldMatrix(this.renderer.worldMatrix);
+            this.planeShaderLow.sendModelVecmat(this.vecmat);
             this.planeShaderLow.sendUniform(this.alphaUniformLow, this.alpha);
             this.planeShaderLow.sendUniformVec2(
                 this.uvOffsetUniformLow, this.uvOffset

@@ -125,6 +125,9 @@ function GuiPxText(renderer, textShader, lineShader)
 
     // Line optimize mode
     this.lineOptimize = true;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 }
 
 GuiPxText.prototype = {
@@ -172,6 +175,8 @@ GuiPxText.prototype = {
         this.charsize.setXY(1.0, 1.0);
         this.hidden = false;
         this.hidetext = "";
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
 
         // Set line optimize mode
         if (lineOptimize !== undefined) this.lineOptimize = lineOptimize;
@@ -423,7 +428,7 @@ GuiPxText.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngle : Set text rotation angle                                    //
-    //  param angle : Text rotation angle to set in degrees                   //
+    //  param angle : Text rotation angle to set in radians                   //
     ////////////////////////////////////////////////////////////////////////////
     setAngle: function(angle)
     {
@@ -432,7 +437,7 @@ GuiPxText.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate text                                                  //
-    //  param angle : Angle to rotate text by in degrees                      //
+    //  param angle : Angle to rotate text by in radians                      //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
@@ -756,7 +761,7 @@ GuiPxText.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngle : Get text rotation angle                                    //
-    //  return : Text rotation angle in degrees                               //
+    //  return : Text rotation angle in radians                               //
     ////////////////////////////////////////////////////////////////////////////
     getAngle: function()
     {
@@ -962,6 +967,7 @@ GuiPxText.prototype = {
                         (WOSDefaultPxTextXOffset*this.charsize.vec[0]*0.18)
                     );
                     this.modelMatrix.scaleVec2(this.charsize);
+                    this.vecmat.setMatrix(this.modelMatrix);
 
                     // Compute world matrix
                     this.renderer.worldMatrix.setMatrix(
@@ -970,13 +976,13 @@ GuiPxText.prototype = {
                     this.renderer.worldMatrix.multiply(
                         this.renderer.view.viewMatrix
                     );
-                    this.renderer.worldMatrix.multiply(this.modelMatrix);
 
                     this.uvOffset.vec[0] = charX*WOSDefaultPxTextUVWidth;
                     this.uvOffset.vec[1] = charY*WOSDefaultPxTextUVHeight;
 
                     // Update shader uniforms
                     this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
+                    this.textShader.sendModelVecmat(this.vecmat);
                     this.textShader.sendUniformVec2(
                         this.uvOffsetUniform, this.uvOffset
                     );
@@ -1052,6 +1058,7 @@ GuiPxText.prototype = {
                     (WOSDefaultPxTextXOffset*this.charsize.vec[0]*0.18)
                 );
                 this.modelMatrix.scaleVec2(this.charsize);
+                this.vecmat.setMatrix(this.modelMatrix);
 
                 // Compute world matrix
                 this.renderer.worldMatrix.setMatrix(
@@ -1060,13 +1067,13 @@ GuiPxText.prototype = {
                 this.renderer.worldMatrix.multiply(
                     this.renderer.view.viewMatrix
                 );
-                this.renderer.worldMatrix.multiply(this.modelMatrix);
 
                 this.uvOffset.vec[0] = charX*WOSDefaultPxTextUVWidth;
                 this.uvOffset.vec[1] = charY*WOSDefaultPxTextUVHeight;
 
                 // Update shader uniforms
                 this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
+                this.textShader.sendModelVecmat(this.vecmat);
                 this.textShader.sendUniformVec2(
                     this.uvOffsetUniform, this.uvOffset
                 );

@@ -144,17 +144,22 @@ function SkeletalMesh(renderer,
     this.attachedRoot = null;
     // Skeletal mesh root bone attachment
     this.attachedRootBone = 0;
+    // Bones animated angles
+    this.bonesAnimRot = null;
 
     // Skeletal mesh position
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Skeletal mesh rotation angles
     this.angles = new Vector3(0.0, 0.0, 0.0);
     // Skeletal mesh scale
-    this.scale = 1.0;
+    this.scaleFactor = 1.0;
     // Skeletal mesh alpha
     this.alpha = 1.0;
     // Static mesh specularity
     this.specularity = 0.0;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 
     // Temp matrix
     this.tmpMat = new Matrix4x4();
@@ -238,13 +243,16 @@ SkeletalMesh.prototype = {
         this.attachedBones = null;
         this.attachedRoot = null;
         this.attachedRootBone = 0;
+        this.bonesAnimRot = null;
         if (!this.position) return false;
         this.position.reset();
         if (!this.angles) return false;
         this.angles.reset();
-        this.scale = 1.0;
+        this.scaleFactor = 1.0;
         this.alpha = 1.0;
         this.specularity = 0.0;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
         if (!this.tmpMat) return false;
         this.tmpMat.setIdentity();
         if (!this.prevPos) return false;
@@ -427,19 +435,32 @@ SkeletalMesh.prototype = {
         // Create bones matrices
         this.bonesCount = model.bonesCount;
         this.bonesParents = new Array(this.bonesCount);
+        if (!this.bonesParents) return false;
         this.bonesMatrices = new Array(this.bonesCount);
+        if (!this.bonesMatrices) return false;
         this.bonesInverses = new Array(this.bonesCount);
+        if (!this.bonesInverses) return false;
         this.bonesPositions = new Array(this.bonesCount);
+        if (!this.bonesPositions) return false;
         this.bonesAngles = new Array(this.bonesCount);
+        if (!this.bonesAngles) return false;
+        this.bonesAnimRot = new Array(this.bonesCount);
+        if (!this.bonesAnimRot) return false;
         for (i = 0; i < this.bonesCount; ++i)
         {
             this.bonesParents[i] = model.bonesParents[i];
             this.bonesPositions[i] = new Vector3(model.bonesPositions[(i*3)],
                 model.bonesPositions[(i*3)+1], model.bonesPositions[(i*3)+2]
             );
+            if (!this.bonesPositions[i]) return false;
             this.bonesAngles[i] = new Vector3(model.bonesAngles[(i*3)],
                 model.bonesAngles[(i*3)+1], model.bonesAngles[(i*3)+2]
             );
+            if (!this.bonesAngles[i]) return false;
+            this.bonesAnimRot[i] = new Vector3(model.bonesAngles[(i*3)],
+                model.bonesAngles[(i*3)+1], model.bonesAngles[(i*3)+2]
+            );
+            if (!this.bonesAnimRot[i]) return false;
             this.bonesMatrices[i] = new Matrix4x4();
             this.bonesMatrices[i].setIdentity();
             this.bonesMatrices[i].setMatrix(
@@ -611,8 +632,14 @@ SkeletalMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     resetAttachment: function()
     {
+        var i = 0;
         this.attachedMesh = null;
+        for (i = 0; i < this.attachedBones.length; ++i)
+        {
+            this.attachedBones[bone] = 0;
+        }
         this.attachedRoot = null;
+        this.attachedRootBone = 0;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -767,7 +794,7 @@ SkeletalMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngles : Set skeletal mesh rotation angles                         //
-    //  param angle : Skeletal mesh rotation angle to set in degrees          //
+    //  param angleX : Skeletal mesh rotation angle to set in radians         //
     ////////////////////////////////////////////////////////////////////////////
     setAngles: function(angleX, angleY, angleZ)
     {
@@ -789,7 +816,7 @@ SkeletalMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleX : Set skeletal mesh rotation X angle                        //
-    //  param angleX : Skeletal mesh rotation X angle to set in degrees       //
+    //  param angleX : Skeletal mesh rotation X angle to set in radians       //
     ////////////////////////////////////////////////////////////////////////////
     setAngleX: function(angleX)
     {
@@ -798,7 +825,7 @@ SkeletalMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleY : Set skeletal mesh rotation Y angle                        //
-    //  param angleY : Skeletal mesh rotation Y angle to set in degrees       //
+    //  param angleY : Skeletal mesh rotation Y angle to set in radians       //
     ////////////////////////////////////////////////////////////////////////////
     setAngleY: function(angleY)
     {
@@ -807,7 +834,7 @@ SkeletalMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleZ : Set skeletal mesh rotation Z angle                        //
-    //  param angleZ : Skeletal mesh rotation Z angle to set in degrees       //
+    //  param angleZ : Skeletal mesh rotation Z angle to set in radians       //
     ////////////////////////////////////////////////////////////////////////////
     setAngleZ: function(angleZ)
     {
@@ -815,8 +842,32 @@ SkeletalMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateX : Rotate skeletal mesh on the X axis                          //
-    //  param angleX : X angle to rotate skeletal mesh by in degrees          //
+    //  rotate : Rotate skeletal mesh                                         //
+    //  param angleX : X angle to rotate skeletal mesh by in radians          //
+    //  param angleY : Y angle to rotate skeletal mesh by in radians          //
+    //  param angleZ : Z angle to rotate skeletal mesh by in radians          //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angleX, angleY, angleZ)
+    {
+        this.angles.vec[0] += angleX;
+        this.angles.vec[1] += angleY;
+        this.angles.vec[2] += angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateVec3 : Rotate skeletal mesh with a vector                       //
+    //  param angles : 3 component angles vector to rotate skeletal mesh with //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateVec3: function(angles)
+    {
+        this.angles.vec[0] += angles.vec[0];
+        this.angles.vec[1] += angles.vec[1];
+        this.angles.vec[2] += angles.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateX : Rotate skeletal mesh around the X axis                      //
+    //  param angleX : X angle to rotate skeletal mesh by in radians          //
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
@@ -824,8 +875,8 @@ SkeletalMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateY : Rotate skeletal mesh on the Y axis                          //
-    //  param angleY : Y angle to rotate skeletal mesh by in degrees          //
+    //  rotateY : Rotate skeletal mesh around the Y axis                      //
+    //  param angleY : Y angle to rotate skeletal mesh by in radians          //
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleY)
     {
@@ -833,8 +884,8 @@ SkeletalMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateZ : Rotate skeletal mesh on the Z axis                          //
-    //  param angleZ : Z angle to rotate skeletal mesh by in degrees          //
+    //  rotateZ : Rotate skeletal mesh around the Z axis                      //
+    //  param angleZ : Z angle to rotate skeletal mesh by in radians          //
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
@@ -847,7 +898,7 @@ SkeletalMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setScale: function(scale)
     {
-        this.scale = scale;
+        this.scaleFactor = scale;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -856,7 +907,7 @@ SkeletalMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     scale: function(scale)
     {
-        this.scale *= scale;
+        this.scaleFactor *= scale;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -939,7 +990,7 @@ SkeletalMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleX : Get skeletal mesh X rotation angle                        //
-    //  return : Skeletal mesh X rotation angle in degrees                    //
+    //  return : Skeletal mesh X rotation angle in radians                    //
     ////////////////////////////////////////////////////////////////////////////
     getAngleX: function()
     {
@@ -948,7 +999,7 @@ SkeletalMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleY : Get skeletal mesh Y rotation angle                        //
-    //  return : Skeletal mesh Y rotation angle in degrees                    //
+    //  return : Skeletal mesh Y rotation angle in radians                    //
     ////////////////////////////////////////////////////////////////////////////
     getAngleY: function()
     {
@@ -957,7 +1008,7 @@ SkeletalMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleZ : Get skeletal mesh Z rotation angle                        //
-    //  return : Skeletal mesh Z rotation angle in degrees                    //
+    //  return : Skeletal mesh Z rotation angle in radians                    //
     ////////////////////////////////////////////////////////////////////////////
     getAngleZ: function()
     {
@@ -970,7 +1021,7 @@ SkeletalMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getScale: function()
     {
-        return this.scale;
+        return this.scaleFactor;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1080,6 +1131,7 @@ SkeletalMesh.prototype = {
                     }
                     if (currentFrame >= 0)
                     {
+                        // Animate bone
                         currentAnim = this.currentAnims[animGroup];
                         currentBone = this.currentBones[animGroup];
                         keyFrames = this.keyFrames[animGroup][currentAnim];
@@ -1164,6 +1216,19 @@ SkeletalMesh.prototype = {
                         }
                         this.bonesMatrices[i].translateVec3(this.pos);
                         this.bonesMatrices[i].rotateVec3(this.rot);
+
+                        // Compute final bone position and rotation
+                        if (i == 0)
+                        {
+                            this.bonesAnimRot[i].setVector(this.rot);
+                        }
+                        else
+                        {
+                            this.bonesAnimRot[i].setVector(
+                                this.bonesAnimRot[this.bonesParents[i]]
+                            );
+                            this.bonesAnimRot[i].add(this.rot);
+                        }
                         animated = true;
                     }
                     ++this.currentBones[animGroup];
@@ -1175,6 +1240,7 @@ SkeletalMesh.prototype = {
             {
                 this.bonesMatrices[i].translateVec3(this.bonesPositions[i]);
                 this.bonesMatrices[i].rotateVec3(this.bonesAngles[i]);
+                this.bonesAnimRot[i].setVector(this.bonesAngles[i]);
             }
 
             // Multiply bone matrix by inverse bind pose matrix
@@ -1239,12 +1305,14 @@ SkeletalMesh.prototype = {
         }
         this.modelMatrix.translateVec3(this.position);
         this.modelMatrix.rotateVec3(this.angles);
-        this.modelMatrix.scale(this.scale, this.scale, this.scale);
+        this.modelMatrix.scale(
+            this.scaleFactor, this.scaleFactor, this.scaleFactor
+        );
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Set maximum quality
         if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
@@ -1280,12 +1348,16 @@ SkeletalMesh.prototype = {
             // High quality
             this.skeletalShader.bind();
 
-            this.shadowsMatrix.setMatrix(this.renderer.shadows.projMatrix);
-            this.shadowsMatrix.multiply(this.renderer.shadows.viewMatrix);
-
             // Send high quality shader uniforms
+            this.shadowsMatrix.setMatrix(
+                this.renderer.shadows.camera.projMatrix
+            );
+            this.shadowsMatrix.multiply(
+                this.renderer.shadows.camera.viewMatrix
+            );
+
             this.skeletalShader.sendWorldMatrix(this.renderer.worldMatrix);
-            this.skeletalShader.sendModelMatrix(this.modelMatrix);
+            this.skeletalShader.sendModelVecmat(this.vecmat);
             this.skeletalShader.sendUniformMat4(
                 this.shadowsMatrixLocation, this.shadowsMatrix
             );
@@ -1362,7 +1434,7 @@ SkeletalMesh.prototype = {
             this.skeletalShaderMedium.sendWorldMatrix(
                 this.renderer.worldMatrix
             );
-            this.skeletalShaderMedium.sendModelMatrix(this.modelMatrix);
+            this.skeletalShaderMedium.sendModelVecmat(this.vecmat);
             this.skeletalShaderMedium.sendUniformVec3(
                 this.cameraPosUniformMedium, this.renderer.camera.position
             );
@@ -1424,6 +1496,7 @@ SkeletalMesh.prototype = {
 
             // Send low quality shader uniforms
             this.skeletalShaderLow.sendWorldMatrix(this.renderer.worldMatrix);
+            this.skeletalShaderLow.sendModelVecmat(this.vecmat);
             this.skeletalShaderLow.sendUniform(
                 this.bonesCountUniformLow, this.bonesCount
             );

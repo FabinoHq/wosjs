@@ -64,21 +64,13 @@ function Shadows(renderer)
     // Shadows depth texture
     this.depthTexture = null;
 
-    // Shadows projection matrix
-    this.projMatrix = new Matrix4x4();
-    // Shadows view matrix
-    this.viewMatrix = new Matrix4x4();
+    // Shadows camera
+    this.camera = null;
 
     // Shadows position
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Shadows angles
     this.angles = new Vector3(0.0, 0.0, 0.0);
-    // Shadows fovy
-    this.fovy = 90.0;
-
-    // Shadows near and far planes
-    this.nearPlane = 0.01;
-    this.farPlane = 100.0;
 }
 
 Shadows.prototype = {
@@ -97,17 +89,11 @@ Shadows.prototype = {
         this.framebuffer = null;
         this.texture = null;
         this.depthTexture = null;
-        if (!this.projMatrix) return false;
-        this.projMatrix.setIdentity();
-        if (!this.viewMatrix) return false;
-        this.viewMatrix.setIdentity();
+        this.camera = null;
         if (!this.position) return false;
         this.position.reset();
         if (!this.angles) return false;
         this.angles.reset();
-        this.fovy = 90.0;
-        this.nearPlane = 0.01;
-        this.farPlane = 100.0;
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -252,14 +238,13 @@ Shadows.prototype = {
         // Unbind framebuffer
         this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
 
-        // Set projection matrix
-        this.projMatrix.setIdentity();
-        this.projMatrix.setPerspective(
-            this.fovy, this.ratio, this.nearPlane, this.farPlane
-        );
-
-        // Set view matrix
-        this.viewMatrix.setIdentity();
+        // Init shadows camera
+        this.camera = new Camera();
+        if (!this.camera) return false;
+        if (!this.camera.reset()) return false;
+        this.camera.setNearPlane(0.01);
+        this.camera.setFarPlane(100.0);
+        this.camera.compute(this.renderer.ratio);
 
         // Shadows successfully loaded
         return true;
@@ -341,12 +326,6 @@ Shadows.prototype = {
         // Unbind framebuffer
         this.renderer.gl.bindFramebuffer(this.renderer.gl.FRAMEBUFFER, null);
 
-        // Set projection matrix
-        this.projMatrix.setIdentity();
-        this.projMatrix.setPerspective(
-            this.fovy, this.ratio, this.nearPlane, this.farPlane
-        );
-
         // Shadows texture size updated
         return true;
     },
@@ -390,22 +369,13 @@ Shadows.prototype = {
             this.renderer.gl.DEPTH_BUFFER_BIT
         );
 
-        // Compute projection matrix
-        this.projMatrix.setIdentity();
-        this.projMatrix.setPerspective(
-            this.fovy, this.ratio, this.nearPlane, this.farPlane
-        );
+        // Compute shadows camera
+        this.camera.setPositionVec3(this.position);
+        this.camera.setAnglesVec3(this.angles);
+        this.camera.compute(this.renderer.ratio);
 
-        // Compute view matrix
-        this.viewMatrix.setIdentity();
-        this.viewMatrix.rotateX(this.angles.vec[0]);
-        this.viewMatrix.rotateY(this.angles.vec[1]);
-        this.viewMatrix.rotateY(this.angles.vec[2]);
-        this.viewMatrix.translateVec3(this.position);
-
-        // Set renderer matrices
-        this.renderer.camera.projMatrix.setMatrix(this.projMatrix);
-        this.renderer.camera.viewMatrix.setMatrix(this.viewMatrix);
+        // Set shadows camera
+        this.renderer.setCamera(this.camera);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -438,20 +408,13 @@ Shadows.prototype = {
         this.renderer.gl.scissor(0, 0, this.width, this.height);
         this.renderer.gl.disable(this.renderer.gl.SCISSOR_TEST);
 
-        // Compute view matrix
-        this.viewMatrix.setIdentity();
-        this.viewMatrix.rotateX(this.angles.vec[0]);
-        this.viewMatrix.rotateY(this.angles.vec[1]);
-        this.viewMatrix.rotateY(this.angles.vec[2]);
-        this.viewMatrix.translateVec3(this.position);
+        // Compute shadows camera
+        this.camera.setPositionVec3(this.position);
+        this.camera.setAnglesVec3(this.angles);
+        this.camera.compute(this.renderer.ratio);
 
-        // Set renderer matrices
-        this.renderer.camera.projMatrix.setMatrix(this.projMatrix);
-        this.renderer.camera.viewMatrix.setMatrix(this.viewMatrix);
-
-        // Set renderer matrices
-        this.renderer.camera.projMatrix.setMatrix(this.projMatrix);
-        this.renderer.camera.viewMatrix.setMatrix(this.viewMatrix);
+        // Set shadows camera
+        this.renderer.setCamera(this.camera);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -462,9 +425,9 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setPosition: function(x, y, z)
     {
-        this.position.vec[0] = -x;
-        this.position.vec[1] = -y;
-        this.position.vec[2] = -z;
+        this.position.vec[0] = x;
+        this.position.vec[1] = y;
+        this.position.vec[2] = z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -473,9 +436,9 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setPositionVec3: function(vector)
     {
-        this.position.vec[0] = -vector.vec[0];
-        this.position.vec[1] = -vector.vec[1];
-        this.position.vec[2] = -vector.vec[2];
+        this.position.vec[0] = vector.vec[0];
+        this.position.vec[1] = vector.vec[1];
+        this.position.vec[2] = vector.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -484,7 +447,7 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setX: function(x)
     {
-        this.position.vec[0] = -x;
+        this.position.vec[0] = x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -493,7 +456,7 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setY: function(y)
     {
-        this.position.vec[1] = -y;
+        this.position.vec[1] = y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -502,7 +465,7 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setZ: function(z)
     {
-        this.position.vec[2] = -z;
+        this.position.vec[2] = z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -513,9 +476,9 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     move: function(x, y, z)
     {
-        this.position.vec[0] -= x;
-        this.position.vec[1] -= y;
-        this.position.vec[2] -= z;
+        this.position.vec[0] += x;
+        this.position.vec[1] += y;
+        this.position.vec[2] += z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -524,9 +487,9 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveVec3: function(vector)
     {
-        this.position.vec[0] -= vector.vec[0];
-        this.position.vec[1] -= vector.vec[1];
-        this.position.vec[2] -= vector.vec[2];
+        this.position.vec[0] += vector.vec[0];
+        this.position.vec[1] += vector.vec[1];
+        this.position.vec[2] += vector.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -535,7 +498,7 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveX: function(x)
     {
-        this.position.vec[0] -= x;
+        this.position.vec[0] += x;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -544,7 +507,7 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveY: function(y)
     {
-        this.position.vec[1] -= y;
+        this.position.vec[1] += y;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -553,20 +516,20 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     moveZ: function(z)
     {
-        this.position.vec[2] -= z;
+        this.position.vec[2] += z;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngles : Set shadows caster rotation angles                        //
-    //  param angleX : Shadows caster X rotation angle to set in degrees      //
-    //  param angleY : Shadows caster Y rotation angle to set in degrees      //
-    //  param angleZ : Shadows caster Z rotation angle to set in degrees      //
+    //  param angleX : Shadows caster X rotation angle to set in radians      //
+    //  param angleY : Shadows caster Y rotation angle to set in radians      //
+    //  param angleZ : Shadows caster Z rotation angle to set in radians      //
     ////////////////////////////////////////////////////////////////////////////
     setAngles: function(angleX, angleY, angleZ)
     {
-        this.angles.vec[0] = -angleX;
-        this.angles.vec[1] = -angleY;
-        this.angles.vec[2] = -angleZ;
+        this.angles.vec[0] = angleX;
+        this.angles.vec[1] = angleY;
+        this.angles.vec[2] = angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -575,72 +538,72 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setAnglesVec3: function(vector)
     {
-        this.angles.vec[0] = -vector.vec[0];
-        this.angles.vec[1] = -vector.vec[1];
-        this.angles.vec[2] = -vector.vec[2];
+        this.angles.vec[0] = vector.vec[0];
+        this.angles.vec[1] = vector.vec[1];
+        this.angles.vec[2] = vector.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleX : Set shadows caster X rotation angle                       //
-    //  param angleX : Shadows caster X rotation angle to set in degrees      //
+    //  param angleX : Shadows caster X rotation angle to set in radians      //
     ////////////////////////////////////////////////////////////////////////////
     setAngleX: function(angleX)
     {
-        this.angles.vec[0] = -angleX;
+        this.angles.vec[0] = angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleY : Set shadows caster Y rotation angle                       //
-    //  param angleY : Shadows caster Y rotation angle to set in degrees      //
+    //  param angleY : Shadows caster Y rotation angle to set in radians      //
     ////////////////////////////////////////////////////////////////////////////
     setAngleY: function(angleY)
     {
-        this.angles.vec[1] = -angleY;
+        this.angles.vec[1] = angleY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleZ : Set shadows caster Z rotation angle                       //
-    //  param angleZ : Shadows caster Z rotation angle to set in degrees      //
+    //  param angleZ : Shadows caster Z rotation angle to set in radians      //
     ////////////////////////////////////////////////////////////////////////////
     setAngleZ: function(angleZ)
     {
-        this.angles.vec[2] = -angleZ;
+        this.angles.vec[2] = angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotateX : Rotate the shadows caster along the X axis                  //
-    //  param angleX : Value of the X rotation in degrees                     //
+    //  param angleX : Value of the X rotation in radians                     //
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
-        this.angles.vec[0] -= angleX;
+        this.angles.vec[0] += angleX;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotateY : Rotate the shadows caster along the Y axis                  //
-    //  param angleY : Value of the Y rotation in degrees                     //
+    //  param angleY : Value of the Y rotation in radians                     //
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleX)
     {
-        this.angles.vec[1] -= angleY;
+        this.angles.vec[1] += angleY;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotateZ : Rotate the shadows caster along the Z axis                  //
-    //  param angleZ : Value of the Z rotation in degrees                     //
+    //  param angleZ : Value of the Z rotation in radians                     //
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
-        this.angles.vec[2] -= angleZ;
+        this.angles.vec[2] += angleZ;
     },
 
     ////////////////////////////////////////////////////////////////////////////
     //  setFovy : Set the shadows caster fovy angle                           //
-    //  param fovy : Value of the shadows caster fovy in degrees              //
+    //  param fovy : Value of the shadows caster fovy in radians              //
     ////////////////////////////////////////////////////////////////////////////
     setFovy: function(fovy)
     {
-        this.fovy = fovy;
+        this.camera.setFovy(fovy);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -649,7 +612,7 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setNearPlane: function(nearPlane)
     {
-        this.nearPlane = nearPlane;
+        this.camera.setNearPlane(nearPlane);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -658,7 +621,7 @@ Shadows.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setFarPlane: function(farPlane)
     {
-        this.farPlane = farPlane;
+        this.camera.setFarPlane(farPlane);
     },
 
     ////////////////////////////////////////////////////////////////////////////

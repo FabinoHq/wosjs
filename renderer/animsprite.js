@@ -89,6 +89,9 @@ function AnimSprite(renderer, animShader)
     this.currentTime = 0.0;
     this.interpOffset = 0.0;
     this.interp = 0.0;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 }
 
 AnimSprite.prototype = {
@@ -136,6 +139,8 @@ AnimSprite.prototype = {
         this.currentTime = 0.0;
         this.interpOffset = 0.0;
         this.interp = 0.0;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -287,7 +292,7 @@ AnimSprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngle : Set animated sprite rotation angle                         //
-    //  param angle : Animated sprite rotation angle to set in degrees        //
+    //  param angle : Animated sprite rotation angle to set in radians        //
     ////////////////////////////////////////////////////////////////////////////
     setAngle: function(angle)
     {
@@ -296,7 +301,7 @@ AnimSprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate animated sprite                                       //
-    //  param angle : Angle to rotate animated sprite by in degrees           //
+    //  param angle : Angle to rotate animated sprite by in radians           //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
@@ -389,7 +394,7 @@ AnimSprite.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngle : Get animated sprite rotation angle                         //
-    //  return : Animated sprite rotation angle in degrees                    //
+    //  return : Animated sprite rotation angle in radians                    //
     ////////////////////////////////////////////////////////////////////////////
     getAngle: function()
     {
@@ -620,6 +625,7 @@ AnimSprite.prototype = {
             -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
         );
         this.modelMatrix.scaleVec2(this.size);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Bind shader
         this.animShader.bind();
@@ -627,10 +633,10 @@ AnimSprite.prototype = {
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send animated sprite shader uniforms
         this.animShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.animShader.sendModelVecmat(this.vecmat);
         this.animShader.sendUniform(this.alphaUniform, this.alpha);
         this.animShader.sendUniformVec2(this.countUniform, this.count);
         this.animShader.sendUniformVec2(this.currentUniform, this.current);

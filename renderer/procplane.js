@@ -42,15 +42,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  WOS procedural plane billboard modes                                      //
-////////////////////////////////////////////////////////////////////////////////
-const WOSProcPlaneBillboardNone = 0;
-const WOSProcPlaneBillboardCylindricalY = 1;
-const WOSProcPlaneBillboardCylindricalX = 2;
-const WOSProcPlaneBillboardSpherical = 3;
-
-
-////////////////////////////////////////////////////////////////////////////////
 //  ProcPlane class definition                                                //
 //  param renderer : Renderer pointer                                         //
 ////////////////////////////////////////////////////////////////////////////////
@@ -94,13 +85,13 @@ function ProcPlane(renderer)
     this.offsetUniformLow = null;
 
     // Procedural plane billboard mode
-    this.billboard = WOSProcPlaneBillboardNone;
+    this.billboard = WOSPlaneBillboardNone;
     // Procedural plane position
     this.position = new Vector3(0.0, 0.0, 0.0);
     // Procedural plane size
     this.size = new Vector2(1.0, 1.0);
     // Procedural plane rotation angle
-    this.angles = new Vector3(0.0, 0.0, 0.0);
+    this.angles = new Vector4(0.0, 0.0, 0.0, 0.0);
     // Procedural plane offset
     this.offset = new Vector2(0.0, 0.0);
     // Procedural plane time
@@ -109,6 +100,9 @@ function ProcPlane(renderer)
     this.alpha = 1.0;
     // Procedural plane specularity
     this.specularity = 0.0;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 
     // Temp vectors
     this.lookAtVec = new Vector3();
@@ -160,7 +154,7 @@ ProcPlane.prototype = {
         this.offsetUniform = null;
         this.offsetUniformMedium = null;
         this.offsetUniformLow = null;
-        this.billboard = WOSProcPlaneBillboardNone;
+        this.billboard = WOSPlaneBillboardNone;
         if (!this.position) return false;
         this.position.reset();
         if (!this.size) return false;
@@ -174,6 +168,8 @@ ProcPlane.prototype = {
         this.time = 0.0;
         this.alpha = 1.0;
         this.specularity = 0.0;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
         if (!this.lookAtVec) return false;
         this.lookAtVec.reset();
         if (!this.rotVec) return false;
@@ -295,13 +291,13 @@ ProcPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setBillboard: function(billboard)
     {
-        if (billboard <= WOSProcPlaneBillboardNone)
+        if (billboard <= WOSPlaneBillboardNone)
         {
-            billboard = WOSProcPlaneBillboardNone;
+            billboard = WOSPlaneBillboardNone;
         }
-        if (billboard >= WOSProcPlaneBillboardSpherical)
+        if (billboard >= WOSPlaneBillboardSpherical)
         {
-            billboard = WOSProcPlaneBillboardSpherical;
+            billboard = WOSPlaneBillboardSpherical;
         }
         this.billboard = billboard;
     },
@@ -448,12 +444,12 @@ ProcPlane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setAngle : Set procedural plane rotation angle                        //
-    //  param angleX : Procedural plane rotation X angle to set in degrees    //
-    //  param angleY : Procedural plane rotation Y angle to set in degrees    //
-    //  param angleZ : Procedural plane rotation Z angle to set in degrees    //
+    //  setAngles : Set procedural plane rotation angles                      //
+    //  param angleX : Procedural plane X rotation angle to set in radians    //
+    //  param angleY : Procedural plane Y rotation angle to set in radians    //
+    //  param angleZ : Procedural plane Z rotation angle to set in radians    //
     ////////////////////////////////////////////////////////////////////////////
-    setAngle: function(angleX, angleY, angleZ)
+    setAngles: function(angleX, angleY, angleZ)
     {
         this.angles.vec[0] = angleX;
         this.angles.vec[1] = angleY;
@@ -461,8 +457,19 @@ ProcPlane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setAnglesVec3 : Set procedural plane rotation angles from a vector    //
+    //  param angles : 3 component angles vector to rotate procedural plane   //
+    ////////////////////////////////////////////////////////////////////////////
+    setAnglesVec3: function(angles)
+    {
+        this.angles.vec[0] = angles.vec[0];
+        this.angles.vec[1] = angles.vec[1];
+        this.angles.vec[2] = angles.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setAngleX : Set procedural plane rotation X angle                     //
-    //  param angleX : Procedural plane rotation X angle to set in degrees    //
+    //  param angleX : Procedural plane rotation X angle to set in radians    //
     ////////////////////////////////////////////////////////////////////////////
     setAngleX: function(angleX)
     {
@@ -471,7 +478,7 @@ ProcPlane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleY : Set procedural plane rotation Y angle                     //
-    //  param angleY : Procedural plane rotation Y angle to set in degrees    //
+    //  param angleY : Procedural plane rotation Y angle to set in radians    //
     ////////////////////////////////////////////////////////////////////////////
     setAngleY: function(angleY)
     {
@@ -480,7 +487,7 @@ ProcPlane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleZ : Set procedural plane rotation Z angle                     //
-    //  param angleZ : Procedural plane rotation Z angle to set in degrees    //
+    //  param angleZ : Procedural plane rotation Z angle to set in radians    //
     ////////////////////////////////////////////////////////////////////////////
     setAngleZ: function(angleZ)
     {
@@ -489,9 +496,9 @@ ProcPlane.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate procedural plane                                      //
-    //  param angleX : X angle to rotate procedural plane by in degrees       //
-    //  param angleY : Y angle to rotate procedural plane by in degrees       //
-    //  param angleZ : Z angle to rotate procedural plane by in degrees       //
+    //  param angleX : X angle to rotate procedural plane by in radians       //
+    //  param angleY : Y angle to rotate procedural plane by in radians       //
+    //  param angleZ : Z angle to rotate procedural plane by in radians       //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angleX, angleY, angleZ)
     {
@@ -501,8 +508,19 @@ ProcPlane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateX : Rotate procedural plane on X axis                           //
-    //  param angleX : X angle to rotate procedural plane by in degrees       //
+    //  rotateVec3 : Rotate procedural plane with a vector                    //
+    //  param angles : 3 component angles vector to rotate procedural plane   //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateVec3: function(angles)
+    {
+        this.angles.vec[0] += angles.vec[0];
+        this.angles.vec[1] += angles.vec[1];
+        this.angles.vec[2] += angles.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateX : Rotate procedural plane around the X axis                   //
+    //  param angleX : X angle to rotate procedural plane by in radians       //
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
@@ -510,8 +528,8 @@ ProcPlane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateY : Rotate procedural plane on Y axis                           //
-    //  param angleY : Y angle to rotate procedural plane by in degrees       //
+    //  rotateY : Rotate procedural plane around the Y axis                   //
+    //  param angleY : Y angle to rotate procedural plane by in radians       //
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleY)
     {
@@ -519,8 +537,8 @@ ProcPlane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateZ : Rotate procedural plane on Z axis                           //
-    //  param angleZ : Z angle to rotate procedural plane by in degrees       //
+    //  rotateZ : Rotate procedural plane around the Z axis                   //
+    //  param angleZ : Z angle to rotate procedural plane by in radians       //
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
@@ -630,12 +648,30 @@ ProcPlane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getAngle : Get procedural plane rotation angle                        //
-    //  return : Procedural plane rotation angle in degrees                   //
+    //  getAngleX : Get procedural plane rotation X angle                     //
+    //  return : Procedural plane rotation X angle in radians                 //
     ////////////////////////////////////////////////////////////////////////////
-    getAngle: function()
+    getAngleX: function()
     {
-        return this.angles;
+        return this.angles.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngleY : Get procedural plane rotation Y angle                     //
+    //  return : Procedural plane rotation Y angle in radians                 //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngleY: function()
+    {
+        return this.angles.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getAngleZ : Get procedural plane rotation Z angle                     //
+    //  return : Procedural plane rotation Z angle in radians                 //
+    ////////////////////////////////////////////////////////////////////////////
+    getAngleZ: function()
+    {
+        return this.angles.vec[2];
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -686,7 +722,7 @@ ProcPlane.prototype = {
         // Set procedural plane model matrix
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec3(this.position);
-        if (this.billboard == WOSProcPlaneBillboardCylindricalY)
+        if (this.billboard == WOSPlaneBillboardCylindricalY)
         {
             // Cylindrical billboard (Y)
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -700,7 +736,7 @@ ProcPlane.prototype = {
             dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
+            angle = WOSPi-Math.acos(dotProduct);
             this.modelMatrix.rotate(
                 angle,
                 this.rotVec.vec[0],
@@ -709,7 +745,7 @@ ProcPlane.prototype = {
             );
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
-        else if (this.billboard == WOSProcPlaneBillboardCylindricalX)
+        else if (this.billboard == WOSPlaneBillboardCylindricalX)
         {
             // Cylindrical billboard (X)
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -723,7 +759,7 @@ ProcPlane.prototype = {
             dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
+            angle = WOSPi-Math.acos(dotProduct);
             this.modelMatrix.rotate(
                 angle,
                 this.rotVec.vec[0],
@@ -732,7 +768,7 @@ ProcPlane.prototype = {
             );
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
-        else if (this.billboard == WOSProcPlaneBillboardSpherical)
+        else if (this.billboard == WOSPlaneBillboardSpherical)
         {
             // Spherical billboard
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
@@ -746,7 +782,7 @@ ProcPlane.prototype = {
             dotProduct = this.lookAtVec.dotProduct(this.delta);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = 180.0+Math.acos(dotProduct)*180.0/Math.PI;
+            angle = WOSPi-Math.acos(dotProduct);
             this.modelMatrix.rotate(
                 angle,
                 this.rotVec.vec[0],
@@ -762,9 +798,8 @@ ProcPlane.prototype = {
             dotProduct = this.delta.dotProduct(this.delta2);
             if (dotProduct <= -1.0) { dotProduct = -1.0; }
             if (dotProduct >= 1.0) { dotProduct = 1.0; }
-            angle = Math.acos(dotProduct)*180.0/Math.PI;
-            if (this.delta2.vec[1] < 0.0) { this.modelMatrix.rotateX(angle); }
-            else { this.modelMatrix.rotateX(-angle); }
+            angle = Math.acos(dotProduct)*sign(this.delta2.vec[1]);
+            this.modelMatrix.rotateX(angle);
             this.modelMatrix.rotateZ(this.angles.vec[2]);
         }
         else
@@ -776,11 +811,11 @@ ProcPlane.prototype = {
             -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
         );
         this.modelMatrix.scaleVec2(this.size);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Set maximum quality
         if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
@@ -817,11 +852,15 @@ ProcPlane.prototype = {
             this.shader.bind();
 
             // Send high quality shader uniforms
-            this.shadowsMatrix.setMatrix(this.renderer.shadows.projMatrix);
-            this.shadowsMatrix.multiply(this.renderer.shadows.viewMatrix);
+            this.shadowsMatrix.setMatrix(
+                this.renderer.shadows.camera.projMatrix
+            );
+            this.shadowsMatrix.multiply(
+                this.renderer.shadows.camera.viewMatrix
+            );
 
             this.shader.sendWorldMatrix(this.renderer.worldMatrix);
-            this.shader.sendModelMatrix(this.modelMatrix);
+            this.shader.sendModelVecmat(this.vecmat);
             if (this.shadowsMatrixLocation)
             {
                 this.shader.sendUniformMat4(
@@ -912,7 +951,7 @@ ProcPlane.prototype = {
 
             // Send medium quality shader uniforms
             this.shaderMedium.sendWorldMatrix(this.renderer.worldMatrix);
-            this.shaderMedium.sendModelMatrix(this.modelMatrix);
+            this.shaderMedium.sendModelVecmat(this.vecmat);
             if (this.cameraPosUniformMedium)
             {
                 this.shaderMedium.sendUniformVec3(
@@ -993,6 +1032,7 @@ ProcPlane.prototype = {
 
             // Send low quality shader uniforms
             this.shaderLow.sendWorldMatrix(this.renderer.worldMatrix);
+            this.shaderLow.sendModelVecmat(this.vecmat);
             if (this.alphaUniformLow)
             {
                 this.shaderLow.sendUniform(this.alphaUniformLow, this.alpha);

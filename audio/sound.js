@@ -268,9 +268,6 @@ Sound.prototype = {
                 }
                 this.panner.pan.value = this.pannerValue;
             }
-
-            this.distance.gain.value = 1.0;
-            this.panner.pan.value = 0.0;
         }
     },
 

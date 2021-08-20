@@ -23,6 +23,7 @@
 !math/vector_3.js
 !math/vector_4.js
 !math/matrix_4_4.js
+!math/vecmat_4_4.js
 
 !physics/collision.js
 !physics/boundingbox.js

@@ -103,11 +103,14 @@ function StaticMesh(renderer, meshShader, meshShaderMedium, meshShaderLow)
     // Static mesh rotation angles
     this.angles = new Vector3(0.0, 0.0, 0.0);
     // Static mesh scale
-    this.scale = 1.0;
+    this.scaleFactor = 1.0;
     // Static mesh alpha
     this.alpha = 1.0;
     // Static mesh specularity
     this.specularity = 0.0;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 }
 
 StaticMesh.prototype = {
@@ -153,9 +156,11 @@ StaticMesh.prototype = {
         this.position.reset();
         if (!this.angles) return false;
         this.angles.reset();
-        this.scale = 1.0;
+        this.scaleFactor = 1.0;
         this.alpha = 1.0;
         this.specularity = 0.0;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -330,6 +335,15 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  resetAttachment : Reset skeletal mesh attachments                     //
+    ////////////////////////////////////////////////////////////////////////////
+    resetAttachment: function()
+    {
+        this.attachedMesh = null;
+        this.attachedBone = 0;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setAttachment : Set skeletal mesh attachment bone                     //
     //  param skeletalMesh : Skeletal mesh to attach static mesh to           //
     //  param skeletalBone : Skeletal mesh bone to attach static mesh to      //
@@ -447,7 +461,9 @@ StaticMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngles : Set static mesh rotation angles                           //
-    //  param angle : Static mesh rotation angle to set in degrees            //
+    //  param angleX : Static mesh X rotation angle to set in radians         //
+    //  param angleY : Static mesh Y rotation angle to set in radians         //
+    //  param angleZ : Static mesh Z rotation angle to set in radians         //
     ////////////////////////////////////////////////////////////////////////////
     setAngles: function(angleX, angleY, angleZ)
     {
@@ -469,7 +485,7 @@ StaticMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleX : Set static mesh rotation X angle                          //
-    //  param angleX : Static mesh rotation X angle to set in degrees         //
+    //  param angleX : Static mesh rotation X angle to set in radians         //
     ////////////////////////////////////////////////////////////////////////////
     setAngleX: function(angleX)
     {
@@ -478,7 +494,7 @@ StaticMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleY : Set static mesh rotation Y angle                          //
-    //  param angleY : Static mesh rotation Y angle to set in degrees         //
+    //  param angleY : Static mesh rotation Y angle to set in radians         //
     ////////////////////////////////////////////////////////////////////////////
     setAngleY: function(angleY)
     {
@@ -487,7 +503,7 @@ StaticMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngleZ : Set static mesh rotation Z angle                          //
-    //  param angleZ : Static mesh rotation Z angle to set in degrees         //
+    //  param angleZ : Static mesh rotation Z angle to set in radians         //
     ////////////////////////////////////////////////////////////////////////////
     setAngleZ: function(angleZ)
     {
@@ -495,8 +511,32 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateX : Rotate static mesh on the X axis                            //
-    //  param angleX : X angle to rotate static mesh by in degrees            //
+    //  rotate : Rotate static mesh                                           //
+    //  param angleX : X angle to rotate static mesh by in radians            //
+    //  param angleY : Y angle to rotate static mesh by in radians            //
+    //  param angleZ : Z angle to rotate static mesh by in radians            //
+    ////////////////////////////////////////////////////////////////////////////
+    rotate: function(angleX, angleY, angleZ)
+    {
+        this.angles.vec[0] += angleX;
+        this.angles.vec[1] += angleY;
+        this.angles.vec[2] += angleZ;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateVec3 : Rotate static mesh with a vector                         //
+    //  param angles : 3 component angles vector to rotate static mesh with   //
+    ////////////////////////////////////////////////////////////////////////////
+    rotateVec3: function(angles)
+    {
+        this.angles.vec[0] += angles.vec[0];
+        this.angles.vec[1] += angles.vec[1];
+        this.angles.vec[2] += angles.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  rotateX : Rotate static mesh around the X axis                        //
+    //  param angleX : X angle to rotate static mesh by in radians            //
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
     {
@@ -504,8 +544,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateY : Rotate static mesh on the Y axis                            //
-    //  param angleY : Y angle to rotate static mesh by in degrees            //
+    //  rotateY : Rotate static mesh around the Y axis                        //
+    //  param angleY : Y angle to rotate static mesh by in radians            //
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleY)
     {
@@ -513,8 +553,8 @@ StaticMesh.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateZ : Rotate static mesh on the Z axis                            //
-    //  param angleZ : Z angle to rotate static mesh by in degrees            //
+    //  rotateZ : Rotate static mesh around the Z axis                        //
+    //  param angleZ : Z angle to rotate static mesh by in radians            //
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)
     {
@@ -527,7 +567,7 @@ StaticMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     setScale: function(scale)
     {
-        this.scale = scale;
+        this.scaleFactor = scale;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -536,7 +576,7 @@ StaticMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     scale: function(scale)
     {
-        this.scale *= scale;
+        this.scaleFactor *= scale;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -586,7 +626,7 @@ StaticMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleX : Get static mesh X rotation angle                          //
-    //  return : Static mesh X rotation angle in degrees                      //
+    //  return : Static mesh X rotation angle in radians                      //
     ////////////////////////////////////////////////////////////////////////////
     getAngleX: function()
     {
@@ -595,7 +635,7 @@ StaticMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleY : Get static mesh Y rotation angle                          //
-    //  return : Static mesh Y rotation angle in degrees                      //
+    //  return : Static mesh Y rotation angle in radians                      //
     ////////////////////////////////////////////////////////////////////////////
     getAngleY: function()
     {
@@ -604,7 +644,7 @@ StaticMesh.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngleZ : Get static mesh Z rotation angle                          //
-    //  return : Static mesh Z rotation angle in degrees                      //
+    //  return : Static mesh Z rotation angle in radians                      //
     ////////////////////////////////////////////////////////////////////////////
     getAngleZ: function()
     {
@@ -617,7 +657,7 @@ StaticMesh.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     getScale: function()
     {
-        return this.scale;
+        return this.scaleFactor;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -648,18 +688,21 @@ StaticMesh.prototype = {
         this.modelMatrix.setIdentity();
         if (this.attachedMesh)
         {
-            this.modelMatrix.setMatrix(
+            this.modelMatrix.setMatrix(this.attachedMesh.modelMatrix);
+            this.modelMatrix.multiply(
                 this.attachedMesh.bonesMatrices[this.attachedBone]
             );
         }
         this.modelMatrix.translateVec3(this.position);
         this.modelMatrix.rotateVec3(this.angles);
-        this.modelMatrix.scale(this.scale, this.scale, this.scale);
+        this.modelMatrix.scale(
+            this.scaleFactor, this.scaleFactor, this.scaleFactor
+        );
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Set maximum quality
         if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
@@ -696,11 +739,15 @@ StaticMesh.prototype = {
             this.meshShader.bind();
 
             // Send high quality shader uniforms
-            this.shadowsMatrix.setMatrix(this.renderer.shadows.projMatrix);
-            this.shadowsMatrix.multiply(this.renderer.shadows.viewMatrix);
+            this.shadowsMatrix.setMatrix(
+                this.renderer.shadows.camera.projMatrix
+            );
+            this.shadowsMatrix.multiply(
+                this.renderer.shadows.camera.viewMatrix
+            );
 
             this.meshShader.sendWorldMatrix(this.renderer.worldMatrix);
-            this.meshShader.sendModelMatrix(this.modelMatrix);
+            this.meshShader.sendModelVecmat(this.vecmat);
             this.meshShader.sendUniformMat4(
                 this.shadowsMatrixLocation, this.shadowsMatrix
             );
@@ -772,7 +819,7 @@ StaticMesh.prototype = {
 
             // Send medium quality shader uniforms
             this.meshShaderMedium.sendWorldMatrix(this.renderer.worldMatrix);
-            this.meshShaderMedium.sendModelMatrix(this.modelMatrix);
+            this.meshShaderMedium.sendModelVecmat(this.vecmat);
             this.meshShaderMedium.sendUniformVec3(
                 this.cameraPosUniformMedium, this.renderer.camera.position
             );
@@ -825,6 +872,7 @@ StaticMesh.prototype = {
 
             // Send low quality shader uniforms
             this.meshShaderLow.sendWorldMatrix(this.renderer.worldMatrix);
+            this.meshShaderLow.sendModelVecmat(this.vecmat);
             this.meshShaderLow.sendUniform(this.alphaUniformLow, this.alpha);
 
             // Bind texture

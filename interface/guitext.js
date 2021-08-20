@@ -109,6 +109,9 @@ function GuiText(renderer, textShader)
 
     // ASCII mode
     this.asciiMode = false;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 }
 
 GuiText.prototype = {
@@ -147,6 +150,8 @@ GuiText.prototype = {
         this.hidden = false;
         this.hidetext = "";
         this.asciiMode = false;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
 
         // Set hidden mode
         if (hide !== undefined) this.hidden = hide;
@@ -410,7 +415,7 @@ GuiText.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  setAngle : Set text rotation angle                                    //
-    //  param angle : Text rotation angle to set in degrees                   //
+    //  param angle : Text rotation angle to set in radians                   //
     ////////////////////////////////////////////////////////////////////////////
     setAngle: function(angle)
     {
@@ -419,7 +424,7 @@ GuiText.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  rotate : Rotate text                                                  //
-    //  param angle : Angle to rotate text by in degrees                      //
+    //  param angle : Angle to rotate text by in radians                      //
     ////////////////////////////////////////////////////////////////////////////
     rotate: function(angle)
     {
@@ -752,7 +757,7 @@ GuiText.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  getAngle : Get text rotation angle                                    //
-    //  return : Text rotation angle in degrees                               //
+    //  return : Text rotation angle in radians                               //
     ////////////////////////////////////////////////////////////////////////////
     getAngle: function()
     {
@@ -870,6 +875,7 @@ GuiText.prototype = {
             -this.size.vec[0]*0.5, -this.size.vec[1]*0.5, 0.0
         );
         this.modelMatrix.scaleVec2(this.size);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Bind text shader
         this.textShader.bind();
@@ -877,10 +883,10 @@ GuiText.prototype = {
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send shader uniforms
         this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.textShader.sendModelVecmat(this.vecmat);
         this.textShader.sendUniformVec3(this.colorUniform, this.color);
         this.textShader.sendUniform(this.alphaUniform, this.alpha);
 

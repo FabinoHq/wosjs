@@ -75,6 +75,9 @@ function Line(renderer, lineShader)
     this.thickness = 0.01;
     // Line smoothness
     this.smoothness = 0.0;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 }
 
 Line.prototype = {
@@ -109,6 +112,8 @@ Line.prototype = {
         this.thickness = 0.01;
         if (thickness !== undefined) this.thickness = thickness;
         this.smoothness = 0.0;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -401,7 +406,6 @@ Line.prototype = {
         var dy = this.target.vec[1]-this.origin.vec[1];
         var length = Math.sqrt(dx*dx+dy*dy);
         var angle = Math.atan2(dy, dx);
-        var degAngle = -((angle/Math.PI)*180.0);
         var crossX = Math.sin(angle)*this.thickness*0.5;
         var crossY = -Math.cos(angle)*this.thickness*0.5;
         var offsetX = Math.cos(angle)*this.smoothness*0.5*this.thickness;
@@ -418,11 +422,12 @@ Line.prototype = {
             this.origin.vec[0]+crossX-offsetX,
             this.origin.vec[1]+crossY-offsetY, 0.0
         );
-        this.modelMatrix.rotateZ(degAngle);
+        this.modelMatrix.rotateZ(angle);
         this.modelMatrix.scale(
             length+this.smoothness*this.thickness,
             this.thickness, 0.0
         );
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Bind line shader
         this.lineShader.bind();
@@ -430,10 +435,10 @@ Line.prototype = {
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send line shader uniforms
         this.lineShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.lineShader.sendModelVecmat(this.vecmat);
         this.lineShader.sendUniformVec3(this.colorUniform, this.color);
         this.lineShader.sendUniform(this.alphaUniform, this.alpha);
         this.lineShader.sendUniform(this.ratioUniform, ratio);

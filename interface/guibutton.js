@@ -74,6 +74,9 @@ function GuiButton(renderer, buttonShader)
 
     // Round button
     this.isRound = false;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 }
 
 GuiButton.prototype = {
@@ -103,6 +106,8 @@ GuiButton.prototype = {
         this.buttonState = 0;
         this.isRound = false;
         if (round !== undefined) { if (round) this.isRound = true; }
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -423,6 +428,7 @@ GuiButton.prototype = {
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec2(this.position);
         this.modelMatrix.scaleVec2(this.size);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Bind button shader
         this.buttonShader.bind();
@@ -430,10 +436,10 @@ GuiButton.prototype = {
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send shader uniforms
         this.buttonShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.buttonShader.sendModelVecmat(this.vecmat);
         this.buttonShader.sendUniform(this.alphaUniform, this.alpha);
         this.buttonShader.sendIntUniform(this.stateUniform, this.buttonState);
 

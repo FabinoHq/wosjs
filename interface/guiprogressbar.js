@@ -77,6 +77,9 @@ function GuiProgressBar(renderer, progressBarShader)
 
     // ProgressBar percentage value
     this.value = 0.0;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 }
 
 GuiProgressBar.prototype = {
@@ -109,6 +112,8 @@ GuiProgressBar.prototype = {
         if (factor !== undefined) this.uvFactor = factor;
         this.alpha = 1.0;
         this.value = 0.0;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -352,6 +357,7 @@ GuiProgressBar.prototype = {
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec2(this.position);
         this.modelMatrix.scaleVec2(this.size);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Bind progress bar shader
         this.progressBarShader.bind();
@@ -359,10 +365,10 @@ GuiProgressBar.prototype = {
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send shader uniforms
         this.progressBarShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.progressBarShader.sendModelVecmat(this.vecmat);
         this.uvSize.vec[0] = this.size.vec[0];
         this.uvSize.vec[1] = 0.0;
         this.progressBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
@@ -384,12 +390,10 @@ GuiProgressBar.prototype = {
         this.modelMatrix.scale(
             this.size.vec[0]*this.value, this.size.vec[1], 1.0
         );
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Render progress bar
-        this.progressBarShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.progressBarShader.sendModelVecmat(this.vecmat);
         this.uvSize.vec[0] = this.size.vec[0]*this.value;
         this.uvSize.vec[1] = 0.5;
         this.progressBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);

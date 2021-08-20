@@ -250,6 +250,33 @@ Vector3.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  negate : Vector negation                                              //
+    ////////////////////////////////////////////////////////////////////////////
+    negate: function()
+    {
+        this.vec[0] = -this.vec[0];
+        this.vec[1] = -this.vec[1];
+        this.vec[2] = -this.vec[2];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  multiplyMat4 : Multiply vector by a 4x4 matrix                        //
+    //  param mat : 4x4 matrix to multiply vector by                          //
+    ////////////////////////////////////////////////////////////////////////////
+    multiplyMat4: function(mat)
+    {
+        var x = this.vec[0];
+        var y = this.vec[1];
+        var z = this.vec[2];
+        this.vec[0] =
+            x*mat.matrix[0]+y*mat.matrix[4]+z*mat.matrix[8]+mat.matrix[12];
+        this.vec[1] =
+            x*mat.matrix[1]+y*mat.matrix[5]+z*mat.matrix[9]+mat.matrix[13];
+        this.vec[2] =
+            x*mat.matrix[2]+y*mat.matrix[6]+z*mat.matrix[10]+mat.matrix[14];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  linearInterp : Linear interpolation                                   //
     //  param v1 : First vector                                               //
     //  param v2 : Second vector                                              //

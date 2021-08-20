@@ -81,6 +81,9 @@ function GuiScrollBar(renderer, scrollBarShader)
     this.offset = 0.0;
     // ScrollBar height
     this.height = 1.0;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 }
 
 GuiScrollBar.prototype = {
@@ -115,6 +118,8 @@ GuiScrollBar.prototype = {
         this.scrollBarPressed = false;
         this.offset = 0.0;
         this.height = 1.0;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -456,6 +461,7 @@ GuiScrollBar.prototype = {
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec2(this.position);
         this.modelMatrix.scaleVec2(this.size);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Bind scrollbar shader
         this.scrollBarShader.bind();
@@ -463,10 +469,10 @@ GuiScrollBar.prototype = {
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send shader uniforms
         this.scrollBarShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.scrollBarShader.sendModelVecmat(this.vecmat);
         this.uvSize.vec[0] = 0.0;
         this.uvSize.vec[1] = this.size.vec[1];
         this.scrollBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
@@ -492,14 +498,12 @@ GuiScrollBar.prototype = {
         this.modelMatrix.scale(
             this.size.vec[0], this.size.vec[1]*this.height, 1.0
         );
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Render scrollbar
+        this.scrollBarShader.sendModelVecmat(this.vecmat);
         this.uvSize.vec[0] = 0.5;
         this.uvSize.vec[1] = this.size.vec[1]*this.height;
-        this.scrollBarShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.scrollBarShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
         this.renderer.vertexBuffer.render(this.scrollBarShader);
 

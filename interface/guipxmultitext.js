@@ -1384,6 +1384,9 @@ GuiPxMultiText.prototype = {
                             this.lines[i].modelMatrix.scaleVec2(
                                 this.lines[i].charsize
                             );
+                            this.lines[i].vecmat.setMatrix(
+                                this.lines[i].modelMatrix
+                            );
 
                             // Compute world matrix
                             this.renderer.worldMatrix.setMatrix(
@@ -1391,9 +1394,6 @@ GuiPxMultiText.prototype = {
                             );
                             this.renderer.worldMatrix.multiply(
                                 this.renderer.view.viewMatrix
-                            );
-                            this.renderer.worldMatrix.multiply(
-                                this.lines[i].modelMatrix
                             );
 
                             this.lines[i].uvOffset.vec[0] =
@@ -1404,6 +1404,9 @@ GuiPxMultiText.prototype = {
                             // Update shader uniforms
                             this.lines[i].textShader.sendWorldMatrix(
                                 this.renderer.worldMatrix
+                            );
+                            this.lines[i].textShader.sendModelVecmat(
+                                this.lines[i].vecmat
                             );
                             this.lines[i].textShader.sendUniformVec2(
                                 this.lines[i].uvOffsetUniform,
@@ -1515,6 +1518,9 @@ GuiPxMultiText.prototype = {
                         this.lines[i].modelMatrix.scaleVec2(
                             this.lines[i].charsize
                         );
+                        this.lines[i].vecmat.setMatrix(
+                            this.lines[i].modelMatrix
+                        );
 
                         // Compute world matrix
                         this.renderer.worldMatrix.setMatrix(
@@ -1522,9 +1528,6 @@ GuiPxMultiText.prototype = {
                         );
                         this.renderer.worldMatrix.multiply(
                             this.renderer.view.viewMatrix
-                        );
-                        this.renderer.worldMatrix.multiply(
-                            this.lines[i].modelMatrix
                         );
 
                         this.lines[i].uvOffset.vec[0] =
@@ -1535,6 +1538,9 @@ GuiPxMultiText.prototype = {
                         // Update shader uniforms
                         this.lines[i].textShader.sendWorldMatrix(
                             this.renderer.worldMatrix
+                        );
+                        this.lines[i].textShader.sendModelVecmat(
+                            this.lines[i].vecmat
                         );
                         this.lines[i].textShader.sendUniformVec2(
                             this.lines[i].uvOffsetUniform,

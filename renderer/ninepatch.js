@@ -72,6 +72,9 @@ function Ninepatch(renderer, ninepatchShader)
     this.uvFactor = 1.0;
     // Ninepatch alpha
     this.alpha = 1.0;
+
+    // VecMat 4x4 model matrix
+    this.vecmat = new VecMat4x4();
 }
 
 Ninepatch.prototype = {
@@ -101,6 +104,8 @@ Ninepatch.prototype = {
         this.uvFactor = 1.0;
         if (factor !== undefined) this.uvFactor = factor;
         this.alpha = 1.0;
+        if (!this.vecmat) return false;
+        this.vecmat.setIdentity();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -324,6 +329,7 @@ Ninepatch.prototype = {
         this.modelMatrix.setIdentity();
         this.modelMatrix.translateVec2(this.position);
         this.modelMatrix.scaleVec2(this.size);
+        this.vecmat.setMatrix(this.modelMatrix);
 
         // Bind ninepatch shader
         this.ninepatchShader.bind();
@@ -331,10 +337,10 @@ Ninepatch.prototype = {
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-        this.renderer.worldMatrix.multiply(this.modelMatrix);
 
         // Send ninepatch shader uniforms
         this.ninepatchShader.sendWorldMatrix(this.renderer.worldMatrix);
+        this.ninepatchShader.sendModelVecmat(this.vecmat);
         this.ninepatchShader.sendUniformVec2(this.uvSizeUniform, this.size);
         this.ninepatchShader.sendUniform(this.uvFactorUniform, this.uvFactor);
         this.ninepatchShader.sendUniform(this.alphaUniform, this.alpha);
