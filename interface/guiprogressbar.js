@@ -362,12 +362,7 @@ GuiProgressBar.prototype = {
         // Bind progress bar shader
         this.progressBarShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send shader uniforms
-        this.progressBarShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.progressBarShader.sendModelVecmat(this.vecmat);
         this.uvSize.vec[0] = this.size.vec[0];
         this.uvSize.vec[1] = 0.0;

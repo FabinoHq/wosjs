@@ -141,6 +141,7 @@ function Renderer()
     this.projMatrix = new Matrix4x4();
     this.view = null;
     this.camera = null;
+    this.uniforms = null;
 
     // Lighting
     this.worldLight = null;
@@ -206,6 +207,7 @@ Renderer.prototype = {
         this.projMatrix.setIdentity();
         this.view = null;
         this.camera = null;
+        this.uniforms = null;
         this.worldLight = null;
         this.dynamicLights = null;
         this.normalMap = null;
@@ -320,20 +322,13 @@ Renderer.prototype = {
             return false;
         }
 
-        if ((this.maxTextureUnits < 2) || (this.maxVertTextureUnits < 2) ||
-            (this.maxCombTextureUnits < 4))
-        {
-            // Not enough texture units for medium quality
-            this.maxQuality = WOSRendererQualityLow;
-        }
-
         if ((this.maxTextureUnits < 2) || (this.maxVertTextureUnits < 5) ||
             (this.maxCombTextureUnits < 7))
         {
-            // Not enough texture units for high quality
-            if (this.maxQuality >= WOSRendererQualityMedium)
+            // Not enough texture units for high or medium quality
+            if (this.maxQuality >= WOSRendererQualityLow)
             {
-                this.maxQuality = WOSRendererQualityMedium;
+                this.maxQuality = WOSRendererQualityLow;
             }
         }
 
@@ -550,18 +545,27 @@ Renderer.prototype = {
             return false;
         }
 
+        // Init shaders uniforms
+        this.uniforms = new Uniforms();
+        if (!this.uniforms)
+        {
+            // Could not create shaders uniforms
+            messageBoxText = "[0x0013] Could not create shaders uniforms";
+            return false;
+        }
+
         // Init world light
         this.worldLight = new WorldLight();
         if (!this.worldLight)
         {
             // Could not create world light
-            messageBoxText = "[0x0013] Could not create world light";
+            messageBoxText = "[0x0014] Could not create world light";
             return false;
         }
         if (!this.worldLight.init())
         {
             // Could not init world light
-            messageBoxText = "[0x0014] Could not init world light";
+            messageBoxText = "[0x0015] Could not init world light";
             return false;
         }
         this.worldLight.setDirection(0.2, 0.1, 0.9);
@@ -573,13 +577,13 @@ Renderer.prototype = {
         if (!this.dynamicLights)
         {
             // Could not create dynamic lights
-            messageBoxText = "[0x0015] Could not create dynamic lights";
+            messageBoxText = "[0x0016] Could not create dynamic lights";
             return false;
         }
         if (!this.dynamicLights.init())
         {
             // Could not init dynamic lights
-            messageBoxText = "[0x0016] Could not init dynamic lights";
+            messageBoxText = "[0x0017] Could not init dynamic lights";
             return false;
         }
 
@@ -588,13 +592,13 @@ Renderer.prototype = {
         if (!this.normalMap)
         {
             // Could not create default normal map
-            messageBoxText = "[0x0017] Could not create default normal map";
+            messageBoxText = "[0x0018] Could not create default normal map";
             return false;
         }
         if (!this.normalMap.init(1, 1, new Uint8Array([128, 128, 255, 255])))
         {
             // Could not init default normal map
-            messageBoxText = "[0x0018] Could not init default normal map";
+            messageBoxText = "[0x0019] Could not init default normal map";
             return false;
         }
 
@@ -603,13 +607,13 @@ Renderer.prototype = {
         if (!this.specularMap)
         {
             // Could not create default specular map
-            messageBoxText = "[0x0019] Could not create default specular map";
+            messageBoxText = "[0x001A] Could not create default specular map";
             return false;
         }
         if (!this.specularMap.init(1, 1, new Uint8Array([255, 255, 255, 255])))
         {
             // Could not init default specular map
-            messageBoxText = "[0x001A] Could not init default specular map";
+            messageBoxText = "[0x001B] Could not init default specular map";
             return false;
         }
 
@@ -650,13 +654,13 @@ Renderer.prototype = {
         if (!this.textLineRenderer)
         {
             // Could not create text line renderer
-            messageBoxText = "[0x001B] Could not create text line renderer";
+            messageBoxText = "[0x001C] Could not create text line renderer";
             return false;
         }
         if (!this.textLineRenderer.init(1, 1, true))
         {
             // Could not init text line renderer
-            messageBoxText = "[0x001C] Could not init text line renderer";
+            messageBoxText = "[0x001D] Could not init text line renderer";
             return false;
         }
 
@@ -665,13 +669,13 @@ Renderer.prototype = {
         if (!this.textFieldRenderer)
         {
             // Could not create text field renderer
-            messageBoxText = "[0x001D] Could not create text field renderer";
+            messageBoxText = "[0x001E] Could not create text field renderer";
             return false;
         }
         if (!this.textFieldRenderer.init(1, 1, true))
         {
             // Could not init text field renderer
-            messageBoxText = "[0x001E] Could not init text field renderer";
+            messageBoxText = "[0x001F] Could not init text field renderer";
             return false;
         }
 

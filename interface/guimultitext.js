@@ -1205,6 +1205,8 @@ GuiMultiText.prototype = {
 
         if (this.needUpdate)
         {
+            if (this.lines.length <= 0) return;
+
             // Set background renderer size
             fieldWidth = Math.round(
                 this.size.vec[0]*WOSDefaultPxTextScaleXFactor
@@ -1225,6 +1227,16 @@ GuiMultiText.prototype = {
             // Render into background renderer
             this.renderer.textFieldRenderer.clear();
             this.renderer.textFieldRenderer.setActive();
+
+            // Compute world matrix
+            this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
+            this.renderer.worldMatrix.multiply(
+                this.renderer.view.viewMatrix
+            );
+
+            // Bind text shader
+            this.textShader.bind();
+            this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
 
             if ((this.height*WOSDefaultTextYOffset) > 0.0)
             {
@@ -1263,24 +1275,12 @@ GuiMultiText.prototype = {
                 this.lines[i].modelMatrix.scaleVec2(this.lines[i].size);
                 this.lines[i].vecmat.setMatrix(this.lines[i].modelMatrix);
 
-                // Bind text shader
-                this.lines[i].textShader.bind();
-
-                // Compute world matrix
-                this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-                this.renderer.worldMatrix.multiply(
-                    this.renderer.view.viewMatrix
-                );
-
                 // Send shader uniforms
-                this.lines[i].textShader.sendWorldMatrix(
-                    this.renderer.worldMatrix
-                );
-                this.lines[i].textShader.sendModelVecmat(this.lines[i].vecmat);
-                this.lines[i].textShader.sendUniformVec3(
+                this.textShader.sendModelVecmat(this.lines[i].vecmat);
+                this.textShader.sendUniformVec3(
                     this.lines[i].colorUniform, this.color
                 );
-                this.lines[i].textShader.sendUniform(
+                this.textShader.sendUniform(
                     this.lines[i].alphaUniform, 1.0
                 );
 
@@ -1292,18 +1292,25 @@ GuiMultiText.prototype = {
 
                 // Render VBO
                 this.renderer.vertexBuffer.bind();
-                this.renderer.vertexBuffer.render(this.lines[i].textShader);
+                this.renderer.vertexBuffer.render(this.textShader);
                 this.renderer.vertexBuffer.unbind();
 
                 // Unbind texture
                 this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-
-                // Unbind text shader
-                this.lines[i].textShader.unbind();
             }
 
             // Set renderer as active
             this.renderer.setActive();
+
+            // Recompute world matrix
+            this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
+            this.renderer.worldMatrix.multiply(
+                this.renderer.view.viewMatrix
+            );
+            this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
+
+            // Unbind line shader
+            this.textShader.unbind();
 
             // Multitext updated
             this.needUpdate = false;

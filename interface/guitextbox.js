@@ -42,42 +42,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GUI Textbox default fragment shader                                       //
-////////////////////////////////////////////////////////////////////////////////
-const textboxFragmentShaderSrc = [
-    "precision mediump float;",
-    "varying vec2 texCoord;",
-    "uniform float alpha;",
-    "void main()",
-    "{",
-    "    gl_FragColor = vec4(0.2, 0.2, 0.2, 0.8*alpha);",
-    "}" ].join("\n");
-
-////////////////////////////////////////////////////////////////////////////////
-//  GUI Textbox selection default fragment shader                             //
-////////////////////////////////////////////////////////////////////////////////
-const textselectionFragmentShaderSrc = [
-    "precision mediump float;",
-    "varying vec2 texCoord;",
-    "uniform float alpha;",
-    "void main()",
-    "{",
-    "    gl_FragColor = vec4(0.0, 0.0, 0.8, 0.3*alpha);",
-    "}" ].join("\n");
-
-////////////////////////////////////////////////////////////////////////////////
-//  GUI Textbox cursor default fragment shader                                //
-////////////////////////////////////////////////////////////////////////////////
-const textcursorFragmentShaderSrc = [
-    "precision mediump float;",
-    "varying vec2 texCoord;",
-    "uniform float alpha;",
-    "void main()",
-    "{",
-    "    gl_FragColor = vec4(0.8, 0.8, 0.8, 0.8*alpha);",
-    "}" ].join("\n");
-
-////////////////////////////////////////////////////////////////////////////////
 //  Default textbox settings                                                  //
 ////////////////////////////////////////////////////////////////////////////////
 const WOSDefaultTextBoxMinWidth = 0.001;
@@ -97,14 +61,24 @@ const WOSDefaultTextBoxStateTime = 0.5;
 //  GuiTextBox class definition                                               //
 //  param renderer : Renderer pointer                                         //
 //  param textShader : Text shader pointer                                    //
+//  param textBoxShader : Text box shader pointer                             //
+//  param textSelectionShader : Text selection shader pointer                 //
+//  param textCursorShader : Text cursor shader pointer                       //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiTextBox(renderer, textShader)
+function GuiTextBox(
+    renderer, textShader, textBoxShader, textSelectionShader, textCursorShader)
 {
     // Renderer pointer
     this.renderer = renderer;
 
     // Text shader pointer
     this.textShader = textShader;
+    // Text box shader pointer
+    this.textBoxShader = textBoxShader;
+    // Text selection shader pointer
+    this.textSelectionShader = textSelectionShader;
+    // Text cursor shader pointer
+    this.textCursorShader = textCursorShader;
 
     // GuiText
     this.guitext = null;
@@ -191,6 +165,12 @@ GuiTextBox.prototype = {
         // Check renderer pointer
         if (!this.renderer) return false;
 
+        // Check shaders pointers
+        if (!this.textShader) return false;
+        if (!this.textBoxShader) return false;
+        if (!this.textSelectionShader) return false;
+        if (!this.textCursorShader) return false;
+
         // Init text
         this.guitext = new GuiText(this.renderer, this.textShader);
         this.guitext.init(text, this.size.vec[1]*0.9, hide);
@@ -207,17 +187,17 @@ GuiTextBox.prototype = {
         // Init textbox
         this.textbox = new ProcSprite(this.renderer);
         this.textbox.init(
-            textboxFragmentShaderSrc, this.size.vec[0], this.size.vec[1]
+            this.textBoxShader, this.size.vec[0], this.size.vec[1]
         );
 
         // Init text selection
         this.textsel = new ProcSprite(this.renderer);
-        this.textsel.init(textselectionFragmentShaderSrc, 0, this.size.vec[1]);
+        this.textsel.init(this.textSelectionShader, 0, this.size.vec[1]);
 
         // Init cursor
         this.textcursor = new ProcSprite(this.renderer);
         this.textcursor.init(
-            textcursorFragmentShaderSrc,
+            this.textCursorShader,
             (this.size.vec[1]*WOSDefaultTextBoxCursorWidthFactor),
             (this.size.vec[1]*WOSDefaultTextBoxCursorHeightFactor)
         );

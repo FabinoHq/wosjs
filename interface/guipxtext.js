@@ -922,7 +922,6 @@ GuiPxText.prototype = {
                 this.textShader.bind();
 
                 // Send shader uniforms
-                this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
                 this.textShader.sendUniformVec3(this.colorUniform, this.color);
                 this.textShader.sendUniform(this.alphaUniform, this.charAlpha);
                 this.textShader.sendUniform(this.smoothUniform, this.smooth);
@@ -997,11 +996,20 @@ GuiPxText.prototype = {
                 // Unbind texture
                 this.texture.unbind();
 
-                // Unbind text shader
-                this.textShader.unbind();
-
                 // Set renderer as active
                 this.renderer.setActive();
+
+                // Recompute world matrix
+                this.renderer.worldMatrix.setMatrix(
+                    this.renderer.projMatrix
+                );
+                this.renderer.worldMatrix.multiply(
+                    this.renderer.view.viewMatrix
+                );
+                this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
+
+                // Unbind text shader
+                this.textShader.unbind();
 
                 // Text line updated
                 this.needUpdate = false;
@@ -1022,7 +1030,6 @@ GuiPxText.prototype = {
             this.textShader.bind();
 
             // Send shader uniforms
-            this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
             this.textShader.sendUniformVec3(this.colorUniform, this.color);
             this.textShader.sendUniform(this.alphaUniform, this.alpha);
             this.textShader.sendUniform(this.smoothUniform, this.smooth);
@@ -1060,19 +1067,10 @@ GuiPxText.prototype = {
                 this.modelMatrix.scaleVec2(this.charsize);
                 this.vecmat.setMatrix(this.modelMatrix);
 
-                // Compute world matrix
-                this.renderer.worldMatrix.setMatrix(
-                    this.renderer.projMatrix
-                );
-                this.renderer.worldMatrix.multiply(
-                    this.renderer.view.viewMatrix
-                );
-
                 this.uvOffset.vec[0] = charX*WOSDefaultPxTextUVWidth;
                 this.uvOffset.vec[1] = charY*WOSDefaultPxTextUVHeight;
 
                 // Update shader uniforms
-                this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
                 this.textShader.sendModelVecmat(this.vecmat);
                 this.textShader.sendUniformVec2(
                     this.uvOffsetUniform, this.uvOffset

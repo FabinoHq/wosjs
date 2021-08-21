@@ -62,6 +62,9 @@ function Loader(renderer, audio)
     this.ninepatchShader = null;
     this.animSpriteShader = null;
     this.buttonShader = null;
+    this.textBoxShader = null;
+    this.textSelectionShader = null;
+    this.textCursorShader = null;
     this.textButtonShader = null;
     this.toggleButtonShader = null;
     this.scrollBarShader = null;
@@ -115,6 +118,9 @@ Loader.prototype = {
         this.ninepatchShader = null;
         this.animSpriteShader = null;
         this.buttonShader = null;
+        this.textBoxShader = null;
+        this.textSelectionShader = null;
+        this.textCursorShader = null;
         this.textButtonShader = null;
         this.toggleButtonShader = null;
         this.scrollBarShader = null;
@@ -210,6 +216,30 @@ Loader.prototype = {
         this.buttonShader = new Shader(this.renderer.gl);
         if (!this.buttonShader.init(
             defaultVertexShaderSrc, buttonFragmentShaderSrc))
+        {
+            return false;
+        }
+
+        // Init text box shader
+        this.textBoxShader = new Shader(this.renderer.gl);
+        if (!this.textBoxShader.init(
+            defaultVertexShaderSrc, textBoxFragmentShaderSrc))
+        {
+            return false;
+        }
+
+        // Init text selection shader
+        this.textSelectionShader = new Shader(this.renderer.gl);
+        if (!this.textSelectionShader.init(
+            defaultVertexShaderSrc, textSelectionFragmentShaderSrc))
+        {
+            return false;
+        }
+
+        // Init text cursor shader
+        this.textCursorShader = new Shader(this.renderer.gl);
+        if (!this.textCursorShader.init(
+            defaultVertexShaderSrc, textCursorFragmentShaderSrc))
         {
             return false;
         }

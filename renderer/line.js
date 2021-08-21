@@ -432,12 +432,7 @@ Line.prototype = {
         // Bind line shader
         this.lineShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send line shader uniforms
-        this.lineShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.lineShader.sendModelVecmat(this.vecmat);
         this.lineShader.sendUniformVec3(this.colorUniform, this.color);
         this.lineShader.sendUniform(this.alphaUniform, this.alpha);

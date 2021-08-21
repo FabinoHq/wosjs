@@ -80,12 +80,12 @@ function ProcSprite(renderer)
 ProcSprite.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init procedural sprite                                         //
-    //  param shaderSrc : Procedural sprite fragment shader source            //
+    //  param shader : Procedural sprite shader                               //
     //  param width : Procedural sprite width                                 //
     //  param height : Procedural sprite height                               //
     //  return : True if procedural sprite is loaded                          //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(shaderSrc, width, height)
+    init: function(shader, width, height)
     {
         // Reset procedural sprite
         this.shader = null;
@@ -115,9 +115,8 @@ ProcSprite.prototype = {
         if (!this.renderer.gl) return false;
 
         // Init shader
-        this.shader = new Shader(this.renderer.gl);
+        this.shader = shader;
         if (!this.shader) return false;
-        if (!this.shader.init(defaultVertexShaderSrc, shaderSrc)) return false;
 
         // Get uniforms locations
         this.shader.bind();
@@ -424,12 +423,7 @@ ProcSprite.prototype = {
         // Bind procedural shader
         this.shader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send shader uniforms
-        this.shader.sendWorldMatrix(this.renderer.worldMatrix);
         this.shader.sendModelVecmat(this.vecmat);
         if (this.alphaUniform)
         {

@@ -695,12 +695,7 @@ GuiPxTextButton.prototype = {
         // Bind pixel text button shader
         this.buttonShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send shader uniforms
-        this.buttonShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.buttonShader.sendModelVecmat(this.vecmat);
         this.buttonShader.sendUniformVec2(this.uvSizeUniform, this.size);
         this.buttonShader.sendUniform(this.uvFactorUniform, this.uvFactor);

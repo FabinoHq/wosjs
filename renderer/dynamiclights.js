@@ -352,6 +352,7 @@ DynamicLights.prototype = {
         }
 
         // Upload dynamic lights into texture
+        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
         this.renderer.gl.bindTexture(
             this.renderer.gl.TEXTURE_2D, this.lightsTexture
         );
@@ -360,6 +361,6 @@ DynamicLights.prototype = {
             4, WOSMaxDynamicLights, 0, this.renderer.gl.RGBA,
             this.renderer.gl.FLOAT, this.lightsArray
         );
-        this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
+        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
     }
 };

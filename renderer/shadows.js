@@ -418,6 +418,19 @@ Shadows.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  bindTexture : Bind computed shadows texture                           //
+    ////////////////////////////////////////////////////////////////////////////
+    bindTexture: function()
+    {
+        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE5);
+        this.renderer.gl.bindTexture(
+            this.renderer.gl.TEXTURE_2D,
+            this.depthTexture
+        );
+        this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setPosition : Set the shadows caster's position                       //
     //  param x : X position of the shadows caster                            //
     //  param y : Y position of the shadows caster                            //

@@ -68,20 +68,6 @@ function Plane(renderer, planeShader, planeShaderMedium, planeShaderLow)
     this.planeShaderLow = planeShaderLow;
 
     // Plane shader uniforms locations
-    this.lightsTextureLocation = null;
-    this.lightsTextureLocationMedium = null;
-    this.shadowsTextureLocation = null;
-    this.normalMapLocation = null;
-    this.specularMapLocation = null;
-    this.shadowsMatrixLocation = null;
-    this.cameraPosUniform = null;
-    this.cameraPosUniformMedium = null;
-    this.worldLightVecUniform = null;
-    this.worldLightVecUniformMedium = null;
-    this.worldLightColorUniform = null;
-    this.worldLightColorUniformMedium = null;
-    this.worldLightAmbientUniform = null;
-    this.worldLightAmbientUniformMedium = null;
     this.specularityUniform = null;
     this.specularityUniformMedium = null;
     this.alphaUniform = null;
@@ -102,8 +88,6 @@ function Plane(renderer, planeShader, planeShaderMedium, planeShaderLow)
     this.specularMap = null;
     // Plane model matrix
     this.modelMatrix = new Matrix4x4();
-    // Plane shadows matrix
-    this.shadowsMatrix = new Matrix4x4();
 
     // Plane billboard mode
     this.billboard = WOSPlaneBillboardNone;
@@ -143,20 +127,6 @@ Plane.prototype = {
     init: function(texture, width, height)
     {
         // Reset Plane
-        this.lightsTextureLocation = null;
-        this.lightsTextureLocationMedium = null;
-        this.shadowsTextureLocation = null;
-        this.normalMapLocation = null;
-        this.specularMapLocation = null;
-        this.shadowsMatrixLocation = null;
-        this.cameraPosUniform = null;
-        this.cameraPosUniformMedium = null;
-        this.worldLightVecUniform = null;
-        this.worldLightVecUniformMedium = null;
-        this.worldLightColorUniform = null;
-        this.worldLightColorUniformMedium = null;
-        this.worldLightAmbientUniform = null;
-        this.worldLightAmbientUniformMedium = null;
         this.specularityUniform = null;
         this.specularityUniformMedium = null;
         this.alphaUniform = null;
@@ -173,8 +143,6 @@ Plane.prototype = {
         this.specularMap = null;
         if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
-        if (!this.shadowsMatrix) return false;
-        this.shadowsMatrix.setIdentity();
         this.billboard = WOSPlaneBillboardNone;
         if (!this.position) return false;
         this.position.reset();
@@ -214,39 +182,6 @@ Plane.prototype = {
             if (!this.planeShader) return false;
 
             this.planeShader.bind();
-            this.lightsTextureLocation = this.planeShader.getUniform(
-                "lightsTexture"
-            );
-            if (!this.lightsTextureLocation) return false;
-            this.planeShader.sendIntUniform(this.lightsTextureLocation, 1);
-            this.shadowsTextureLocation = this.planeShader.getUniform(
-                "shadowsTexture"
-            );
-            if (!this.shadowsTextureLocation) return false;
-            this.planeShader.sendIntUniform(this.shadowsTextureLocation, 2);
-            this.normalMapLocation = this.planeShader.getUniform("normalMap");
-            if (!this.normalMapLocation) return false;
-            this.planeShader.sendIntUniform(this.normalMapLocation, 3);
-            this.specularMapLocation = this.planeShader.getUniform(
-                "specularMap"
-            );
-            if (!this.specularMapLocation) return false;
-            this.planeShader.sendIntUniform(this.specularMapLocation, 4);
-            this.shadowsMatrixLocation = this.planeShader.getUniform(
-                "shadowsMatrix"
-            );
-            if (!this.shadowsMatrixLocation) return false;
-            this.cameraPosUniform = this.planeShader.getUniform("cameraPos");
-            if (!this.cameraPosUniform) return false;
-            this.worldLightVecUniform =
-                this.planeShader.getUniform("worldLightVec");
-            if (!this.worldLightVecUniform) return false;
-            this.worldLightColorUniform =
-                this.planeShader.getUniform("worldLightColor");
-            if (!this.worldLightColorUniform) return false;
-            this.worldLightAmbientUniform =
-                this.planeShader.getUniform("worldLightAmbient");
-            if (!this.worldLightAmbientUniform) return false;
             this.specularityUniform = this.planeShader.getUniform(
                 "specularity"
             );
@@ -267,40 +202,17 @@ Plane.prototype = {
             if (!this.planeShaderMedium) return false;
 
             this.planeShaderMedium.bind();
-            this.lightsTextureLocationMedium =
-                this.planeShaderMedium.getUniform("lightsTexture");
-            if (!this.lightsTextureLocationMedium) return false;
-            this.planeShaderMedium.sendIntUniform(
-                this.lightsTextureLocationMedium, 1
-            );
-            this.cameraPosUniformMedium = this.planeShaderMedium.getUniform(
-                "cameraPos"
-            );
-            if (!this.cameraPosUniformMedium) return false;
-            this.worldLightVecUniformMedium =
-                this.planeShaderMedium.getUniform("worldLightVec");
-            if (!this.worldLightVecUniformMedium) return false;
-            this.worldLightColorUniformMedium =
-                this.planeShaderMedium.getUniform("worldLightColor");
-            if (!this.worldLightColorUniformMedium) return false;
-            this.worldLightAmbientUniformMedium =
-                this.planeShaderMedium.getUniform("worldLightAmbient");
-            if (!this.worldLightAmbientUniformMedium) return false;
-            this.specularityUniformMedium = this.planeShaderMedium.getUniform(
-                "specularity"
-            );
+            this.specularityUniformMedium =
+                this.planeShaderMedium.getUniform("specularity");
             if (!this.specularityUniformMedium) return false;
-            this.alphaUniformMedium = this.planeShaderMedium.getUniform(
-                "alpha"
-            );
+            this.alphaUniformMedium =
+                this.planeShaderMedium.getUniform("alpha");
             if (!this.alphaUniformMedium) return false;
-            this.uvOffsetUniformMedium = this.planeShaderMedium.getUniform(
-                "uvOffset"
-            );
+            this.uvOffsetUniformMedium =
+                this.planeShaderMedium.getUniform("uvOffset");
             if (!this.uvOffsetUniformMedium) return false;
-            this.uvSizeUniformMedium = this.planeShaderMedium.getUniform(
-                "uvSize"
-            );
+            this.uvSizeUniformMedium =
+                this.planeShaderMedium.getUniform("uvSize");
             if (!this.uvSizeUniformMedium) return false;
             this.planeShaderMedium.unbind();
         }
@@ -814,9 +726,9 @@ Plane.prototype = {
             // Cylindrical billboard (Y)
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
             this.delta.setXYZ(
-                this.renderer.camera.position.vec[0] + this.position.vec[0],
+                this.position.vec[0] - this.renderer.camera.position.vec[0],
                 0.0,
-                this.renderer.camera.position.vec[2] + this.position.vec[2]
+                this.position.vec[2] - this.renderer.camera.position.vec[2]
             );
             this.delta.normalize();
             this.rotVec.crossProduct(this.lookAtVec, this.delta);
@@ -838,8 +750,8 @@ Plane.prototype = {
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
             this.delta.setXYZ(
                 0.0,
-                this.renderer.camera.position.vec[1] + this.position.vec[1],
-                this.renderer.camera.position.vec[2] + this.position.vec[2]
+                this.position.vec[1] - this.renderer.camera.position.vec[1],
+                this.position.vec[2] - this.renderer.camera.position.vec[2]
             );
             this.delta.normalize();
             this.rotVec.crossProduct(this.lookAtVec, this.delta);
@@ -860,9 +772,9 @@ Plane.prototype = {
             // Spherical billboard
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
             this.delta.setXYZ(
-                this.renderer.camera.position.vec[0] + this.position.vec[0],
+                this.position.vec[0] - this.renderer.camera.position.vec[0],
                 0.0,
-                this.renderer.camera.position.vec[2] + this.position.vec[2]
+                this.position.vec[2] - this.renderer.camera.position.vec[2]
             );
             this.delta.normalize();
             this.rotVec.crossProduct(this.lookAtVec, this.delta);
@@ -877,9 +789,9 @@ Plane.prototype = {
                 this.rotVec.vec[2]
             );
             this.delta2.setXYZ(
-                this.renderer.camera.position.vec[0] + this.position.vec[0],
-                this.renderer.camera.position.vec[1] + this.position.vec[1],
-                this.renderer.camera.position.vec[2] + this.position.vec[2]
+                this.position.vec[0] - this.renderer.camera.position.vec[0],
+                this.position.vec[1] - this.renderer.camera.position.vec[1],
+                this.position.vec[2] - this.renderer.camera.position.vec[2]
             );
             this.delta2.normalize();
             dotProduct = this.delta.dotProduct(this.delta2);
@@ -899,10 +811,6 @@ Plane.prototype = {
         );
         this.modelMatrix.scaleVec2(this.size);
         this.vecmat.setMatrix(this.modelMatrix);
-
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
 
         // Set maximum quality
         if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
@@ -939,30 +847,7 @@ Plane.prototype = {
             this.planeShader.bind();
 
             // Send high quality shader uniforms
-            this.shadowsMatrix.setMatrix(
-                this.renderer.shadows.camera.projMatrix
-            );
-            this.shadowsMatrix.multiply(
-                this.renderer.shadows.camera.viewMatrix
-            );
-
-            this.planeShader.sendWorldMatrix(this.renderer.worldMatrix);
             this.planeShader.sendModelVecmat(this.vecmat);
-            this.planeShader.sendUniformMat4(
-                this.shadowsMatrixLocation, this.shadowsMatrix
-            );
-            this.planeShader.sendUniformVec3(
-                this.cameraPosUniform, this.renderer.camera.position
-            );
-            this.planeShader.sendUniformVec3(
-                this.worldLightVecUniform, this.renderer.worldLight.direction
-            );
-            this.planeShader.sendUniformVec4(
-                this.worldLightColorUniform, this.renderer.worldLight.color
-            );
-            this.planeShader.sendUniformVec4(
-                this.worldLightAmbientUniform, this.renderer.worldLight.ambient
-            );
             this.planeShader.sendUniform(
                 this.specularityUniform, this.specularity
             );
@@ -972,27 +857,17 @@ Plane.prototype = {
             );
             this.planeShader.sendUniformVec2(this.uvSizeUniform, this.uvSize);
 
-            // Bind texture
+            // Bind textures
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
             this.texture.bind();
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-            this.renderer.gl.bindTexture(
-                this.renderer.gl.TEXTURE_2D,
-                this.renderer.dynamicLights.lightsTexture
-            );
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
-            this.renderer.gl.bindTexture(
-                this.renderer.gl.TEXTURE_2D,
-                this.renderer.shadows.depthTexture
-            );
             if (this.normalMap)
             {
-                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
                 this.normalMap.bind();
             }
             if (this.specularMap)
             {
-                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
                 this.specularMap.bind();
             }
 
@@ -1002,10 +877,6 @@ Plane.prototype = {
             this.renderer.planeVertexBuffer.unbind();
 
             // Unbind texture
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
-            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
-            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
             this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
@@ -1022,23 +893,7 @@ Plane.prototype = {
             this.planeShaderMedium.bind();
 
             // Send medium quality shader uniforms
-            this.planeShaderMedium.sendWorldMatrix(this.renderer.worldMatrix);
             this.planeShaderMedium.sendModelVecmat(this.vecmat);
-            this.planeShaderMedium.sendUniformVec3(
-                this.cameraPosUniformMedium, this.renderer.camera.position
-            );
-            this.planeShaderMedium.sendUniformVec3(
-                this.worldLightVecUniformMedium,
-                this.renderer.worldLight.direction
-            );
-            this.planeShaderMedium.sendUniformVec4(
-                this.worldLightColorUniformMedium,
-                this.renderer.worldLight.color
-            );
-            this.planeShaderMedium.sendUniformVec4(
-                this.worldLightAmbientUniformMedium,
-                this.renderer.worldLight.ambient
-            );
             this.planeShaderMedium.sendUniform(
                 this.specularityUniformMedium, this.specularity
             );
@@ -1053,13 +908,7 @@ Plane.prototype = {
             );
 
             // Bind texture
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
             this.texture.bind();
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-            this.renderer.gl.bindTexture(
-                this.renderer.gl.TEXTURE_2D,
-                this.renderer.dynamicLights.lightsTexture
-            );
 
             // Render VBO
             this.renderer.planeVertexBuffer.bind();
@@ -1069,9 +918,6 @@ Plane.prototype = {
             this.renderer.planeVertexBuffer.unbind();
 
             // Unbind texture
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
             this.texture.unbind();
 
             // Unbind plane shader
@@ -1083,7 +929,6 @@ Plane.prototype = {
             this.planeShaderLow.bind();
 
             // Send low quality shader uniforms
-            this.planeShaderLow.sendWorldMatrix(this.renderer.worldMatrix);
             this.planeShaderLow.sendModelVecmat(this.vecmat);
             this.planeShaderLow.sendUniform(this.alphaUniformLow, this.alpha);
             this.planeShaderLow.sendUniformVec2(

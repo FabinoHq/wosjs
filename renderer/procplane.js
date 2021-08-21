@@ -56,22 +56,8 @@ function ProcPlane(renderer)
     this.shaderLow = null;
     // Procedural plane model matrix
     this.modelMatrix = new Matrix4x4();
-    // Procedural plane shadows matrix
-    this.shadowsMatrix = new Matrix4x4();
 
     // Procedural plane shader uniforms locations
-    this.lightsTextureLocation = null;
-    this.lightsTextureLocationMedium = null;
-    this.shadowsTextureLocation = null;
-    this.shadowsMatrixLocation = null;
-    this.cameraPosUniform = null;
-    this.cameraPosUniformMedium = null;
-    this.worldLightVecUniform = null;
-    this.worldLightVecUniformMedium = null;
-    this.worldLightColorUniform = null;
-    this.worldLightColorUniformMedium = null;
-    this.worldLightAmbientUniform = null;
-    this.worldLightAmbientUniformMedium = null;
     this.specularityUniform = null;
     this.specularityUniformMedium = null;
     this.alphaUniform = null;
@@ -114,14 +100,14 @@ function ProcPlane(renderer)
 ProcPlane.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     //  init : Init procedural plane                                          //
-    //  param shaderSrc : Procedural plane fragment shader source             //
-    //  param mediumShaderSrc : Procedural plane medium shader source         //
-    //  param lowShaderSrc : Procedural plane low shader source               //
+    //  param shader : Procedural plane shader                                //
+    //  param shaderMedium : Procedural plane medium shader                   //
+    //  param shaderLow : Procedural plane low shader                         //
     //  param width : Procedural plane width                                  //
     //  param height : Procedural plane height                                //
     //  return : True if procedural plane is successfully loaded              //
     ////////////////////////////////////////////////////////////////////////////
-    init: function(shaderSrc, mediumShaderSrc, lowShaderSrc, width, height)
+    init: function(shader, shaderMedium, shaderLow, width, height)
     {
         // Reset procedural plane
         this.shader = null;
@@ -129,20 +115,6 @@ ProcPlane.prototype = {
         this.shaderLow = null;
         if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
-        if (!this.shadowsMatrix) return false;
-        this.shadowsMatrix.setIdentity();
-        this.lightsTextureLocation = null;
-        this.lightsTextureLocationMedium = null;
-        this.shadowsTextureLocation = null;
-        this.shadowsMatrixLocation = null;
-        this.cameraPosUniform = null;
-        this.cameraPosUniformMedium = null;
-        this.worldLightVecUniform = null;
-        this.worldLightVecUniformMedium = null;
-        this.worldLightColorUniform = null;
-        this.worldLightColorUniformMedium = null;
-        this.worldLightAmbientUniform = null;
-        this.worldLightAmbientUniformMedium = null;
         this.specularityUniform = null;
         this.specularityUniformMedium = null;
         this.alphaUniform = null;
@@ -186,46 +158,17 @@ ProcPlane.prototype = {
         if (!this.renderer.gl) return false;
 
         // Init shader
-        this.shaderLow = new Shader(this.renderer.gl);
+        this.shaderLow = shaderLow;
         if (!this.shaderLow) return false;
-        if (!this.shaderLow.init(planeVertexShaderLowSrc, lowShaderSrc))
-        {
-            return false;
-        }
 
         // Init high quality shader
         if (this.renderer.maxQuality >= WOSRendererQualityHigh)
         {
-            this.shader = new Shader(this.renderer.gl);
+            this.shader = shader;
             if (!this.shader) return false;
-            if (!this.shader.init(planeVertexShaderSrc, shaderSrc))
-            {
-                return false;
-            }
             this.shader.bind();
 
             // Get plane shader uniforms locations
-            this.lightsTextureLocation = this.shader.getUniform(
-                "lightsTexture"
-            );
-            this.shader.sendIntUniform(this.lightsTextureLocation, 0);
-            this.shadowsTextureLocation = this.shader.getUniform(
-                "shadowsTexture"
-            );
-            this.shader.sendIntUniform(this.shadowsTextureLocation, 1);
-            this.shadowsMatrixLocation = this.shader.getUniform(
-                "shadowsMatrix"
-            );
-            this.cameraPosUniform = this.shader.getUniform("cameraPos");
-            this.worldLightVecUniform = this.shader.getUniform(
-                "worldLightVec"
-            );
-            this.worldLightColorUniform = this.shader.getUniform(
-                "worldLightColor"
-            );
-            this.worldLightAmbientUniform = this.shader.getUniform(
-                "worldLightAmbient"
-            );
             this.specularityUniform = this.shader.getUniform("specularity");
             this.alphaUniform = this.shader.getUniform("alpha");
             this.timeUniform = this.shader.getUniform("time");
@@ -236,38 +179,14 @@ ProcPlane.prototype = {
         // Init medium quality shader
         if (this.renderer.maxQuality >= WOSRendererQualityMedium)
         {
-            this.shaderMedium = new Shader(this.renderer.gl);
+            this.shaderMedium = shaderMedium;
             if (!this.shaderMedium) return false;
-            if (!this.shaderMedium.init(
-                planeVertexShaderMediumSrc, mediumShaderSrc))
-            {
-                return false;
-            }
             this.shaderMedium.bind();
 
             // Get medium plane shader uniforms locations
             this.shaderMedium.bind();
-            this.cameraPosUniformMedium = this.shaderMedium.getUniform(
-                "cameraPos"
-            );
-            this.lightsTextureLocationMedium = this.shaderMedium.getUniform(
-                "lightsTexture"
-            );
-            this.shaderMedium.sendIntUniform(
-                this.lightsTextureLocationMedium, 0
-            );
-            this.worldLightVecUniformMedium = this.shaderMedium.getUniform(
-                "worldLightVec"
-            );
-            this.worldLightColorUniformMedium = this.shaderMedium.getUniform(
-                "worldLightColor"
-            );
-            this.worldLightAmbientUniformMedium = this.shaderMedium.getUniform(
-                "worldLightAmbient"
-            );
-            this.specularityUniformMedium = this.shaderMedium.getUniform(
-                "specularity"
-            );
+            this.specularityUniformMedium =
+                this.shaderMedium.getUniform("specularity");
             this.alphaUniformMedium = this.shaderMedium.getUniform("alpha");
             this.timeUniformMedium = this.shaderMedium.getUniform("time");
             this.offsetUniformMedium = this.shaderMedium.getUniform("offset");
@@ -727,9 +646,9 @@ ProcPlane.prototype = {
             // Cylindrical billboard (Y)
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
             this.delta.setXYZ(
-                this.renderer.camera.position.vec[0] + this.position.vec[0],
+                this.position.vec[0] - this.renderer.camera.position.vec[0],
                 0.0,
-                this.renderer.camera.position.vec[2] + this.position.vec[2]
+                this.position.vec[2] - this.renderer.camera.position.vec[2]
             );
             this.delta.normalize();
             this.rotVec.crossProduct(this.lookAtVec, this.delta);
@@ -751,8 +670,8 @@ ProcPlane.prototype = {
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
             this.delta.setXYZ(
                 0.0,
-                this.renderer.camera.position.vec[1] + this.position.vec[1],
-                this.renderer.camera.position.vec[2] + this.position.vec[2]
+                this.position.vec[1] - this.renderer.camera.position.vec[1],
+                this.position.vec[2] - this.renderer.camera.position.vec[2]
             );
             this.delta.normalize();
             this.rotVec.crossProduct(this.lookAtVec, this.delta);
@@ -773,9 +692,9 @@ ProcPlane.prototype = {
             // Spherical billboard
             this.lookAtVec.setXYZ(0.0, 0.0, 1.0);
             this.delta.setXYZ(
-                this.renderer.camera.position.vec[0] + this.position.vec[0],
+                this.position.vec[0] - this.renderer.camera.position.vec[0],
                 0.0,
-                this.renderer.camera.position.vec[2] + this.position.vec[2]
+                this.position.vec[2] - this.renderer.camera.position.vec[2]
             );
             this.delta.normalize();
             this.rotVec.crossProduct(this.lookAtVec, this.delta);
@@ -790,9 +709,9 @@ ProcPlane.prototype = {
                 this.rotVec.vec[2]
             );
             this.delta2.setXYZ(
-                this.renderer.camera.position.vec[0] + this.position.vec[0],
-                this.renderer.camera.position.vec[1] + this.position.vec[1],
-                this.renderer.camera.position.vec[2] + this.position.vec[2]
+                this.position.vec[0] - this.renderer.camera.position.vec[0],
+                this.position.vec[1] - this.renderer.camera.position.vec[1],
+                this.position.vec[2] - this.renderer.camera.position.vec[2]
             );
             this.delta2.normalize();
             dotProduct = this.delta.dotProduct(this.delta2);
@@ -812,10 +731,6 @@ ProcPlane.prototype = {
         );
         this.modelMatrix.scaleVec2(this.size);
         this.vecmat.setMatrix(this.modelMatrix);
-
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
 
         // Set maximum quality
         if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
@@ -852,47 +767,7 @@ ProcPlane.prototype = {
             this.shader.bind();
 
             // Send high quality shader uniforms
-            this.shadowsMatrix.setMatrix(
-                this.renderer.shadows.camera.projMatrix
-            );
-            this.shadowsMatrix.multiply(
-                this.renderer.shadows.camera.viewMatrix
-            );
-
-            this.shader.sendWorldMatrix(this.renderer.worldMatrix);
             this.shader.sendModelVecmat(this.vecmat);
-            if (this.shadowsMatrixLocation)
-            {
-                this.shader.sendUniformMat4(
-                    this.shadowsMatrixLocation, this.shadowsMatrix
-                );
-            }
-            if (this.cameraPosUniform)
-            {
-                this.shader.sendUniformVec3(
-                    this.cameraPosUniform, this.renderer.camera.position
-                );
-            }
-            if (this.worldLightVecUniform)
-            {
-                this.shader.sendUniformVec3(
-                    this.worldLightVecUniform,
-                    this.renderer.worldLight.direction
-                );
-            }
-            if (this.worldLightColorUniform)
-            {
-                this.shader.sendUniformVec4(
-                    this.worldLightColorUniform, this.renderer.worldLight.color
-                );
-            }
-            if (this.worldLightAmbientUniform)
-            {
-                this.shader.sendUniformVec4(
-                    this.worldLightAmbientUniform,
-                    this.renderer.worldLight.ambient
-                );
-            }
             if (this.specularityUniform)
             {
                 this.shader.sendUniform(
@@ -912,34 +787,10 @@ ProcPlane.prototype = {
                 this.shader.sendUniformVec2(this.offsetUniform, this.offset);
             }
 
-            // Bind texture
-            if (this.lightsTextureLocation)
-            {
-                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
-                this.renderer.gl.bindTexture(
-                    this.renderer.gl.TEXTURE_2D,
-                    this.renderer.dynamicLights.lightsTexture
-                );
-            }
-            if (this.shadowsTextureLocation)
-            {
-                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-                this.renderer.gl.bindTexture(
-                    this.renderer.gl.TEXTURE_2D,
-                    this.renderer.shadows.depthTexture
-                );
-            }
-
             // Render VBO
             this.renderer.planeVertexBuffer.bind();
             this.renderer.planeVertexBuffer.render(this.shader, quality);
             this.renderer.planeVertexBuffer.unbind();
-
-            // Unbind texture
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
-            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
             // Unbind plane shader
             this.shader.unbind();
@@ -950,35 +801,7 @@ ProcPlane.prototype = {
             this.shaderMedium.bind();
 
             // Send medium quality shader uniforms
-            this.shaderMedium.sendWorldMatrix(this.renderer.worldMatrix);
             this.shaderMedium.sendModelVecmat(this.vecmat);
-            if (this.cameraPosUniformMedium)
-            {
-                this.shaderMedium.sendUniformVec3(
-                    this.cameraPosUniformMedium, this.renderer.camera.position
-                );
-            }
-            if (this.worldLightVecUniformMedium)
-            {
-                this.shaderMedium.sendUniformVec3(
-                    this.worldLightVecUniformMedium,
-                    this.renderer.worldLight.direction
-                );
-            }
-            if (this.worldLightColorUniformMedium)
-            {
-                this.shaderMedium.sendUniformVec4(
-                    this.worldLightColorUniformMedium,
-                    this.renderer.worldLight.color
-                );
-            }
-            if (this.worldLightAmbientUniformMedium)
-            {
-                this.shaderMedium.sendUniformVec4(
-                    this.worldLightAmbientUniformMedium,
-                    this.renderer.worldLight.ambient
-                );
-            }
             if (this.specularityUniformMedium)
             {
                 this.shaderMedium.sendUniform(
@@ -1004,23 +827,10 @@ ProcPlane.prototype = {
                 );
             }
 
-            // Bind texture
-            if (this.lightsTextureLocationMedium)
-            {
-                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
-                this.renderer.gl.bindTexture(
-                    this.renderer.gl.TEXTURE_2D,
-                    this.renderer.dynamicLights.lightsTexture
-                );
-            }
-
             // Render VBO
             this.renderer.planeVertexBuffer.bind();
             this.renderer.planeVertexBuffer.render(this.shaderMedium, quality);
             this.renderer.planeVertexBuffer.unbind();
-
-            // Unbind texture
-            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
 
             // Unbind procedural shader
             this.shaderMedium.unbind();
@@ -1031,7 +841,6 @@ ProcPlane.prototype = {
             this.shaderLow.bind();
 
             // Send low quality shader uniforms
-            this.shaderLow.sendWorldMatrix(this.renderer.worldMatrix);
             this.shaderLow.sendModelVecmat(this.vecmat);
             if (this.alphaUniformLow)
             {

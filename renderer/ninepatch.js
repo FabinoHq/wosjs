@@ -334,12 +334,7 @@ Ninepatch.prototype = {
         // Bind ninepatch shader
         this.ninepatchShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send ninepatch shader uniforms
-        this.ninepatchShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.ninepatchShader.sendModelVecmat(this.vecmat);
         this.ninepatchShader.sendUniformVec2(this.uvSizeUniform, this.size);
         this.ninepatchShader.sendUniform(this.uvFactorUniform, this.uvFactor);

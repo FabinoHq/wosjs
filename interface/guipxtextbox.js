@@ -42,42 +42,6 @@
 
 
 ////////////////////////////////////////////////////////////////////////////////
-//  GUI Pixel Textbox default fragment shader                                 //
-////////////////////////////////////////////////////////////////////////////////
-const pxtextboxFragmentShaderSrc = [
-    "precision mediump float;",
-    "varying vec2 texCoord;",
-    "uniform float alpha;",
-    "void main()",
-    "{",
-    "    gl_FragColor = vec4(0.2, 0.2, 0.2, 0.8*alpha);",
-    "}" ].join("\n");
-
-////////////////////////////////////////////////////////////////////////////////
-//  GUI Pixel Textbox selection default fragment shader                       //
-////////////////////////////////////////////////////////////////////////////////
-const pxtextselectionFragmentShaderSrc = [
-    "precision mediump float;",
-    "varying vec2 texCoord;",
-    "uniform float alpha;",
-    "void main()",
-    "{",
-    "    gl_FragColor = vec4(0.0, 0.0, 0.8, 0.3*alpha);",
-    "}" ].join("\n");
-
-////////////////////////////////////////////////////////////////////////////////
-//  GUI Pixel Textbox cursor default fragment shader                          //
-////////////////////////////////////////////////////////////////////////////////
-const pxtextcursorFragmentShaderSrc = [
-    "precision mediump float;",
-    "varying vec2 texCoord;",
-    "uniform float alpha;",
-    "void main()",
-    "{",
-    "    gl_FragColor = vec4(0.8, 0.8, 0.8, 0.8*alpha);",
-    "}" ].join("\n");
-
-////////////////////////////////////////////////////////////////////////////////
 //  Default pixel textbox settings                                            //
 ////////////////////////////////////////////////////////////////////////////////
 const WOSDefaultPxTextBoxMinWidth = 0.1;
@@ -98,14 +62,24 @@ const WOSDefaultPxTextBoxStateTime = 0.5;
 //  GuiPxTextBox class definition                                             //
 //  param renderer : Renderer pointer                                         //
 //  param textShader : Text shader pointer                                    //
+//  param textBoxShader : Text box shader pointer                             //
+//  param textSelectionShader : Text selection shader pointer                 //
+//  param textCursorShader : Text cursor shader pointer                       //
 ////////////////////////////////////////////////////////////////////////////////
-function GuiPxTextBox(renderer, textShader)
+function GuiPxTextBox(
+    renderer, textShader, textBoxShader, textSelectionShader, textCursorShader)
 {
     // Renderer pointer
     this.renderer = renderer;
 
     // Text shader pointer
     this.textShader = textShader;
+    // Text box shader pointer
+    this.textBoxShader = textBoxShader;
+    // Text selection shader pointer
+    this.textSelectionShader = textSelectionShader;
+    // Text cursor shader pointer
+    this.textCursorShader = textCursorShader;
 
     // GuiPxText
     this.guipxtext = null;
@@ -192,6 +166,12 @@ GuiPxTextBox.prototype = {
         // Check renderer pointer
         if (!this.renderer) return false;
 
+        // Check shaders pointers
+        if (!this.textShader) return false;
+        if (!this.textBoxShader) return false;
+        if (!this.textSelectionShader) return false;
+        if (!this.textCursorShader) return false;
+
         // Init text
         this.guipxtext = new GuiPxText(this.renderer, this.textShader);
         if (!this.guipxtext) return false;
@@ -213,7 +193,7 @@ GuiPxTextBox.prototype = {
         this.textbox = new ProcSprite(this.renderer);
         if (!this.textbox) return false;
         if (!this.textbox.init(
-            pxtextboxFragmentShaderSrc, this.size.vec[0], this.size.vec[1]))
+            this.textBoxShader, this.size.vec[0], this.size.vec[1]))
         {
             return false;
         }
@@ -221,8 +201,7 @@ GuiPxTextBox.prototype = {
         // Init text selection
         this.textsel = new ProcSprite(this.renderer);
         if (!this.textsel) return false;
-        if (!this.textsel.init(
-            pxtextselectionFragmentShaderSrc, 0, this.size.vec[1]))
+        if (!this.textsel.init(this.textSelectionShader, 0, this.size.vec[1]))
         {
             return false;
         }
@@ -230,7 +209,7 @@ GuiPxTextBox.prototype = {
         // Init cursor
         this.textcursor = new ProcSprite(this.renderer);
         if (!this.textcursor) return false;
-        if (!this.textcursor.init(pxtextcursorFragmentShaderSrc,
+        if (!this.textcursor.init(this.textCursorShader,
             (this.size.vec[1]*WOSDefaultPxTextBoxCursorWidthFactor),
             (this.size.vec[1]*WOSDefaultPxTextBoxCursorHeightFactor)))
         {

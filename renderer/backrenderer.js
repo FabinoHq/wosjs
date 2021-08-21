@@ -751,12 +751,7 @@ BackRenderer.prototype = {
         // Bind background renderer shader
         this.backrendererShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send shader uniforms
-        this.backrendererShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.backrendererShader.sendModelVecmat(this.vecmat);
         if (this.alphaUniform)
         {

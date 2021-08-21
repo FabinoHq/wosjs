@@ -517,12 +517,7 @@ GuiToggleButton.prototype = {
         // Bind toggle button shader
         this.toggleButtonShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send shader uniforms
-        this.toggleButtonShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.toggleButtonShader.sendModelVecmat(this.vecmat);
         this.toggleButtonShader.sendUniform(this.alphaUniform, this.alpha);
         this.toggleButtonShader.sendIntUniform(

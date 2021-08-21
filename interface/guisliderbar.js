@@ -465,12 +465,7 @@ GuiSliderBar.prototype = {
         // Bind slider bar shader
         this.sliderBarShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send shader uniforms
-        this.sliderBarShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.sliderBarShader.sendModelVecmat(this.vecmat);
         this.uvSize.vec[0] = this.size.vec[0];
         this.uvSize.vec[1] = 0.0;
@@ -505,8 +500,6 @@ GuiSliderBar.prototype = {
             this.size.vec[1], this.size.vec[1], 1.0
         );
         this.vecmat.setMatrix(this.modelMatrix);
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
 
         // Render cursor
         this.sliderBarShader.sendModelVecmat(this.vecmat);

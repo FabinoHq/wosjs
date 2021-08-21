@@ -880,12 +880,7 @@ GuiText.prototype = {
         // Bind text shader
         this.textShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send shader uniforms
-        this.textShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.textShader.sendModelVecmat(this.vecmat);
         this.textShader.sendUniformVec3(this.colorUniform, this.color);
         this.textShader.sendUniform(this.alphaUniform, this.alpha);

@@ -59,20 +59,6 @@ function StaticMesh(renderer, meshShader, meshShaderMedium, meshShaderLow)
     this.meshShaderLow = meshShaderLow;
 
     // Static mesh shader uniforms locations
-    this.lightsTextureLocation = null;
-    this.lightsTextureLocationMedium = null;
-    this.shadowsTextureLocation = null;
-    this.normalMapLocation = null;
-    this.specularMapLocation = null;
-    this.shadowsMatrixLocation = null;
-    this.cameraPosUniform = null;
-    this.cameraPosUniformMedium = null;
-    this.worldLightVecUniform = null;
-    this.worldLightVecUniformMedium = null;
-    this.worldLightColorUniform = null;
-    this.worldLightColorUniformMedium = null;
-    this.worldLightAmbientUniform = null;
-    this.worldLightAmbientUniformMedium = null;
     this.specularityUniform = null;
     this.specularityUniformMedium = null;
     this.alphaUniform = null;
@@ -90,8 +76,6 @@ function StaticMesh(renderer, meshShader, meshShaderMedium, meshShaderLow)
     this.specularMap = null;
     // Static mesh model matrix
     this.modelMatrix = new Matrix4x4();
-    // Static mesh shadows matrix
-    this.shadowsMatrix = new Matrix4x4();
 
     // Skeletal mesh attachment
     this.attachedMesh = null;
@@ -123,20 +107,6 @@ StaticMesh.prototype = {
     init: function(model, texture)
     {
         // Reset static mesh
-        this.lightsTextureLocation = null;
-        this.lightsTextureLocationMedium = null;
-        this.shadowsTextureLocation = null;
-        this.normalMapLocation = null;
-        this.specularMapLocation = null;
-        this.shadowsMatrixLocation = null;
-        this.cameraPosUniform = null;
-        this.cameraPosUniformMedium = null;
-        this.worldLightVecUniform = null;
-        this.worldLightVecUniformMedium = null;
-        this.worldLightColorUniform = null;
-        this.worldLightColorUniformMedium = null;
-        this.worldLightAmbientUniform = null;
-        this.worldLightAmbientUniformMedium = null;
         this.specularityUniform = null;
         this.specularityUniformMedium = null;
         this.alphaUniform = null;
@@ -148,8 +118,6 @@ StaticMesh.prototype = {
         this.specularMap = null;
         if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
-        if (!this.shadowsMatrix) return false;
-        this.shadowsMatrix.setIdentity();
         this.attachedMesh = null;
         this.attachedBone = 0;
         if (!this.position) return false;
@@ -178,39 +146,6 @@ StaticMesh.prototype = {
             if (!this.meshShader) return false;
 
             this.meshShader.bind();
-            this.lightsTextureLocation = this.meshShader.getUniform(
-                "lightsTexture"
-            );
-            if (!this.lightsTextureLocation) return false;
-            this.meshShader.sendIntUniform(this.lightsTextureLocation, 1);
-            this.shadowsTextureLocation = this.meshShader.getUniform(
-                "shadowsTexture"
-            );
-            if (!this.shadowsTextureLocation) return false;
-            this.meshShader.sendIntUniform(this.shadowsTextureLocation, 2);
-            this.normalMapLocation = this.meshShader.getUniform("normalMap");
-            if (!this.normalMapLocation) return false;
-            this.meshShader.sendIntUniform(this.normalMapLocation, 3);
-            this.specularMapLocation = this.meshShader.getUniform(
-                "specularMap"
-            );
-            if (!this.specularMapLocation) return false;
-            this.meshShader.sendIntUniform(this.specularMapLocation, 4);
-            this.shadowsMatrixLocation = this.meshShader.getUniform(
-                "shadowsMatrix"
-            );
-            if (!this.shadowsMatrixLocation) return false;
-            this.cameraPosUniform = this.meshShader.getUniform("cameraPos");
-            if (!this.cameraPosUniform) return false;
-            this.worldLightVecUniform =
-                this.meshShader.getUniform("worldLightVec");
-            if (!this.worldLightVecUniform) return false;
-            this.worldLightColorUniform =
-                this.meshShader.getUniform("worldLightColor");
-            if (!this.worldLightColorUniform) return false;
-            this.worldLightAmbientUniform =
-                this.meshShader.getUniform("worldLightAmbient");
-            if (!this.worldLightAmbientUniform) return false;
             this.specularityUniform = this.meshShader.getUniform("specularity");
             if (!this.specularityUniform) return false;
             this.alphaUniform = this.meshShader.getUniform("alpha");
@@ -225,29 +160,8 @@ StaticMesh.prototype = {
             if (!this.meshShaderMedium) return false;
 
             this.meshShaderMedium.bind();
-            this.lightsTextureLocationMedium = this.meshShaderMedium.getUniform(
-                "lightsTexture"
-            );
-            if (!this.lightsTextureLocationMedium) return false;
-            this.meshShaderMedium.sendIntUniform(
-                this.lightsTextureLocationMedium, 1
-            );
-            this.cameraPosUniformMedium = this.meshShaderMedium.getUniform(
-                "cameraPos"
-            );
-            if (!this.cameraPosUniformMedium) return false;
-            this.worldLightVecUniformMedium =
-                this.meshShaderMedium.getUniform("worldLightVec");
-            if (!this.worldLightVecUniformMedium) return false;
-            this.worldLightColorUniformMedium =
-                this.meshShaderMedium.getUniform("worldLightColor");
-            if (!this.worldLightColorUniformMedium) return false;
-            this.worldLightAmbientUniformMedium =
-                this.meshShaderMedium.getUniform("worldLightAmbient");
-            if (!this.worldLightAmbientUniformMedium) return false;
-            this.specularityUniformMedium = this.meshShaderMedium.getUniform(
-                "specularity"
-            );
+            this.specularityUniformMedium =
+                this.meshShaderMedium.getUniform("specularity");
             if (!this.specularityUniformMedium) return false;
             this.alphaUniformMedium = this.meshShaderMedium.getUniform("alpha");
             if (!this.alphaUniformMedium) return false;
@@ -700,10 +614,6 @@ StaticMesh.prototype = {
         );
         this.vecmat.setMatrix(this.modelMatrix);
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
-
         // Set maximum quality
         if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
         {
@@ -739,30 +649,7 @@ StaticMesh.prototype = {
             this.meshShader.bind();
 
             // Send high quality shader uniforms
-            this.shadowsMatrix.setMatrix(
-                this.renderer.shadows.camera.projMatrix
-            );
-            this.shadowsMatrix.multiply(
-                this.renderer.shadows.camera.viewMatrix
-            );
-
-            this.meshShader.sendWorldMatrix(this.renderer.worldMatrix);
             this.meshShader.sendModelVecmat(this.vecmat);
-            this.meshShader.sendUniformMat4(
-                this.shadowsMatrixLocation, this.shadowsMatrix
-            );
-            this.meshShader.sendUniformVec3(
-                this.cameraPosUniform, this.renderer.camera.position
-            );
-            this.meshShader.sendUniformVec3(
-                this.worldLightVecUniform, this.renderer.worldLight.direction
-            );
-            this.meshShader.sendUniformVec4(
-                this.worldLightColorUniform, this.renderer.worldLight.color
-            );
-            this.meshShader.sendUniformVec4(
-                this.worldLightAmbientUniform, this.renderer.worldLight.ambient
-            );
             this.meshShader.sendUniform(
                 this.specularityUniform, this.specularity
             );
@@ -771,24 +658,14 @@ StaticMesh.prototype = {
             // Bind textures
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
             this.texture.bind();
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-            this.renderer.gl.bindTexture(
-                this.renderer.gl.TEXTURE_2D,
-                this.renderer.dynamicLights.lightsTexture
-            );
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
-            this.renderer.gl.bindTexture(
-                this.renderer.gl.TEXTURE_2D,
-                this.renderer.shadows.depthTexture
-            );
             if (this.normalMap)
             {
-                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
                 this.normalMap.bind();
             }
             if (this.specularMap)
             {
-                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
                 this.specularMap.bind();
             }
 
@@ -798,10 +675,6 @@ StaticMesh.prototype = {
             this.vertexBuffer.unbind();
 
             // Unbind textures
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE4);
-            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
-            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
             this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
@@ -818,23 +691,7 @@ StaticMesh.prototype = {
             this.meshShaderMedium.bind();
 
             // Send medium quality shader uniforms
-            this.meshShaderMedium.sendWorldMatrix(this.renderer.worldMatrix);
             this.meshShaderMedium.sendModelVecmat(this.vecmat);
-            this.meshShaderMedium.sendUniformVec3(
-                this.cameraPosUniformMedium, this.renderer.camera.position
-            );
-            this.meshShaderMedium.sendUniformVec3(
-                this.worldLightVecUniformMedium,
-                this.renderer.worldLight.direction
-            );
-            this.meshShaderMedium.sendUniformVec4(
-                this.worldLightColorUniformMedium,
-                this.renderer.worldLight.color
-            );
-            this.meshShaderMedium.sendUniformVec4(
-                this.worldLightAmbientUniformMedium,
-                this.renderer.worldLight.ambient
-            );
             this.meshShaderMedium.sendUniform(
                 this.specularityUniformMedium, this.specularity
             );
@@ -842,24 +699,15 @@ StaticMesh.prototype = {
                 this.alphaUniformMedium, this.alpha
             );
 
-            // Bind textures
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+            // Bind texture
             this.texture.bind();
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-            this.renderer.gl.bindTexture(
-                this.renderer.gl.TEXTURE_2D,
-                this.renderer.dynamicLights.lightsTexture
-            );
 
             // Render VBO
             this.vertexBuffer.bind();
             this.vertexBuffer.render(this.meshShaderMedium, quality);
             this.vertexBuffer.unbind();
 
-            // Unbind textures
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
-            this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
+            // Unbind texture
             this.texture.unbind();
 
             // Unbind medium static mesh shader
@@ -871,12 +719,10 @@ StaticMesh.prototype = {
             this.meshShaderLow.bind();
 
             // Send low quality shader uniforms
-            this.meshShaderLow.sendWorldMatrix(this.renderer.worldMatrix);
             this.meshShaderLow.sendModelVecmat(this.vecmat);
             this.meshShaderLow.sendUniform(this.alphaUniformLow, this.alpha);
 
             // Bind texture
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
             this.texture.bind();
 
             // Render VBO

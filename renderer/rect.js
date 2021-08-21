@@ -399,12 +399,7 @@ Rect.prototype = {
         // Bind rect shader
         this.rectShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send rect shader uniforms
-        this.rectShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.rectShader.sendModelVecmat(this.vecmat);
         this.rectShader.sendUniformVec3(this.colorUniform, this.color);
         this.rectShader.sendUniform(this.alphaUniform, this.alpha);

@@ -433,12 +433,7 @@ GuiButton.prototype = {
         // Bind button shader
         this.buttonShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send shader uniforms
-        this.buttonShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.buttonShader.sendModelVecmat(this.vecmat);
         this.buttonShader.sendUniform(this.alphaUniform, this.alpha);
         this.buttonShader.sendIntUniform(this.stateUniform, this.buttonState);

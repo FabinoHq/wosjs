@@ -36,6 +36,7 @@
 !renderer/meshvertexbuffer.js
 !renderer/skeletalvertexbuffer.js
 !renderer/shader.js
+!renderer/uniforms.js
 !renderer/texture.js
 !renderer/modeldata.js
 !renderer/line.js
@@ -66,6 +67,7 @@
 !renderer/shaders/animspriteshader.js
 !renderer/shaders/ninepatchshader.js
 !renderer/shaders/buttonshader.js
+!renderer/shaders/textboxshader.js
 !renderer/shaders/textbuttonshader.js
 !renderer/shaders/togglebuttonshader.js
 !renderer/shaders/scrollbarshader.js

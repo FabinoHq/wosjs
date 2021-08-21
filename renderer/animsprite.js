@@ -630,12 +630,7 @@ AnimSprite.prototype = {
         // Bind shader
         this.animShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send animated sprite shader uniforms
-        this.animShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.animShader.sendModelVecmat(this.vecmat);
         this.animShader.sendUniform(this.alphaUniform, this.alpha);
         this.animShader.sendUniformVec2(this.countUniform, this.count);

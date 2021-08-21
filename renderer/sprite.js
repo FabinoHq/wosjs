@@ -429,12 +429,7 @@ Sprite.prototype = {
         // Bind sprite shader
         this.spriteShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send shader uniforms
-        this.spriteShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.spriteShader.sendModelVecmat(this.vecmat);
         this.spriteShader.sendUniform(this.alphaUniform, this.alpha);
         this.spriteShader.sendUniformVec2(this.uvOffsetUniform, this.uvOffset);

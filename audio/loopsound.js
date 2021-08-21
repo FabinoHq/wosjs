@@ -379,9 +379,9 @@ LoopSound.prototype = {
             // Compute loop sound spatialization
             this.cross.crossProduct(this.audio.target, this.audio.upward);
             this.delta.setXYZ(
-                this.audio.position.vec[0] + this.position.vec[0],
-                this.audio.position.vec[1] + this.position.vec[1],
-                this.audio.position.vec[2] + this.position.vec[2]
+                this.position.vec[0] - this.audio.position.vec[0],
+                this.position.vec[1] - this.audio.position.vec[1],
+                this.position.vec[2] - this.audio.position.vec[2]
             );
 
             // Set loop sound distance

@@ -466,12 +466,7 @@ GuiScrollBar.prototype = {
         // Bind scrollbar shader
         this.scrollBarShader.bind();
 
-        // Compute world matrix
-        this.renderer.worldMatrix.setMatrix(this.renderer.projMatrix);
-        this.renderer.worldMatrix.multiply(this.renderer.view.viewMatrix);
-
         // Send shader uniforms
-        this.scrollBarShader.sendWorldMatrix(this.renderer.worldMatrix);
         this.scrollBarShader.sendModelVecmat(this.vecmat);
         this.uvSize.vec[0] = 0.0;
         this.uvSize.vec[1] = this.size.vec[1];
