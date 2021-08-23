@@ -104,11 +104,11 @@ function Uniforms()
     this.staticMeshWorldLightAmbientUniformMedium = null;
         
     // Skeletal mesh shader locations
-    this.skeletalMeshNormalMapLocation = null;
-    this.skeletalMeshSpecularMapLocation = null;
     this.skeletalMeshBonesMatricesLocation = null;
     this.skeletalMeshBonesMatricesLocationMedium = null;
     this.skeletalMeshBonesMatricesLocationLow = null;
+    this.skeletalMeshNormalMapLocation = null;
+    this.skeletalMeshSpecularMapLocation = null;
     this.skeletalMeshLightsTextureLocation = null;
     this.skeletalMeshLightsTextureLocationMedium = null;
     this.skeletalMeshShadowsTextureLocation = null;
@@ -177,11 +177,11 @@ Uniforms.prototype = {
         this.staticMeshWorldLightColorUniformMedium = null;
         this.staticMeshWorldLightAmbientUniform = null;
         this.staticMeshWorldLightAmbientUniformMedium = null;
-        this.skeletalMeshNormalMapLocation = null;
-        this.skeletalMeshSpecularMapLocation = null;
         this.skeletalMeshBonesMatricesLocation = null;
         this.skeletalMeshBonesMatricesLocationMedium = null;
         this.skeletalMeshBonesMatricesLocationLow = null;
+        this.skeletalMeshNormalMapLocation = null;
+        this.skeletalMeshSpecularMapLocation = null;
         this.skeletalMeshLightsTextureLocation = null;
         this.skeletalMeshLightsTextureLocationMedium = null;
         this.skeletalMeshShadowsTextureLocation = null;
@@ -218,13 +218,13 @@ Uniforms.prototype = {
                 this.loader.planeShader.getUniform("normalMap");
             if (!this.planeNormalMapLocation) return false;
             this.loader.planeShader.sendIntUniform(
-                this.planeNormalMapLocation, 1
+                this.planeNormalMapLocation, 2
             );
             this.planeSpecularMapLocation =
                 this.loader.planeShader.getUniform("specularMap");
             if (!this.planeSpecularMapLocation) return false;
             this.loader.planeShader.sendIntUniform(
-                this.planeSpecularMapLocation, 2
+                this.planeSpecularMapLocation, 3
             );
             this.planeLightsTextureLocation =
                 this.loader.planeShader.getUniform("lightsTexture");
@@ -286,13 +286,13 @@ Uniforms.prototype = {
                 this.loader.animPlaneShader.getUniform("normalMap");
             if (!this.animPlaneNormalMapLocation) return false;
             this.loader.animPlaneShader.sendIntUniform(
-                this.animPlaneNormalMapLocation, 1
+                this.animPlaneNormalMapLocation, 2
             );
             this.animPlaneSpecularMapLocation =
                 this.loader.animPlaneShader.getUniform("specularMap");
             if (!this.animPlaneSpecularMapLocation) return false;
             this.loader.animPlaneShader.sendIntUniform(
-                this.animPlaneSpecularMapLocation, 2
+                this.animPlaneSpecularMapLocation, 3
             );
             this.animPlaneLightsTextureLocation =
                 this.loader.animPlaneShader.getUniform("lightsTexture");
@@ -356,13 +356,13 @@ Uniforms.prototype = {
                 this.loader.staticMeshShader.getUniform("normalMap");
             if (!this.staticMeshNormalMapLocation) return false;
             this.loader.staticMeshShader.sendIntUniform(
-                this.staticMeshNormalMapLocation, 1
+                this.staticMeshNormalMapLocation, 2
             );
             this.staticMeshSpecularMapLocation =
                 this.loader.staticMeshShader.getUniform("specularMap");
             if (!this.staticMeshSpecularMapLocation) return false;
             this.loader.staticMeshShader.sendIntUniform(
-                this.staticMeshSpecularMapLocation, 2
+                this.staticMeshSpecularMapLocation, 3
             );
             this.staticMeshLightsTextureLocation =
                 this.loader.staticMeshShader.getUniform("lightsTexture");
@@ -424,23 +424,23 @@ Uniforms.prototype = {
         if (this.renderer.maxQuality >= WOSRendererQualityHigh)
         {
             this.loader.skeletalMeshShader.bind();
+            this.skeletalMeshBonesMatricesLocation =
+                this.loader.skeletalMeshShader.getUniform("bonesMatrices");
+            if (!this.skeletalMeshBonesMatricesLocation) return false;
+            this.loader.skeletalMeshShader.sendIntUniform(
+                this.skeletalMeshBonesMatricesLocation, 1
+            );
             this.skeletalMeshNormalMapLocation =
                 this.loader.skeletalMeshShader.getUniform("normalMap");
             if (!this.skeletalMeshNormalMapLocation) return false;
             this.loader.skeletalMeshShader.sendIntUniform(
-                this.skeletalMeshNormalMapLocation, 1
+                this.skeletalMeshNormalMapLocation, 2
             );
             this.skeletalMeshSpecularMapLocation =
                 this.loader.skeletalMeshShader.getUniform("specularMap");
             if (!this.skeletalMeshSpecularMapLocation) return false;
             this.loader.skeletalMeshShader.sendIntUniform(
-                this.skeletalMeshSpecularMapLocation, 2
-            );
-            this.skeletalMeshBonesMatricesLocation =
-                this.loader.skeletalMeshShader.getUniform("bonesMatrices");
-            if (!this.skeletalMeshBonesMatricesLocation) return false;
-            this.loader.skeletalMeshShader.sendIntUniform(
-                this.skeletalMeshBonesMatricesLocation, 3
+                this.skeletalMeshSpecularMapLocation, 3
             );
             this.skeletalMeshLightsTextureLocation =
                 this.loader.skeletalMeshShader.getUniform("lightsTexture");
@@ -480,7 +480,7 @@ Uniforms.prototype = {
                 );
             if (!this.skeletalMeshBonesMatricesLocationMedium) return false;
             this.loader.skeletalMeshShaderMedium.sendIntUniform(
-                this.skeletalMeshBonesMatricesLocationMedium, 3
+                this.skeletalMeshBonesMatricesLocationMedium, 1
             );
             this.skeletalMeshLightsTextureLocationMedium =
                 this.loader.skeletalMeshShaderMedium.getUniform(
@@ -515,7 +515,7 @@ Uniforms.prototype = {
             this.loader.skeletalMeshShaderLow.getUniform("bonesMatrices");
         if (!this.skeletalMeshBonesMatricesLocationLow) return false;
         this.loader.skeletalMeshShaderLow.sendIntUniform(
-            this.skeletalMeshBonesMatricesLocationLow, 3
+            this.skeletalMeshBonesMatricesLocationLow, 1
         );
 
         // Unbind shader
@@ -588,9 +588,38 @@ Uniforms.prototype = {
 
     ////////////////////////////////////////////////////////////////////////////
     //  updateWorldMatrix : Upload world matrices to GPU                      //
+    //  param quality : Renderer shader quality                               //
     ////////////////////////////////////////////////////////////////////////////
-    updateWorldMatrix: function()
+    updateWorldMatrix: function(quality)
     {
+        // Set maximum quality
+        if (this.renderer.shadowsQuality <= WOSRendererShadowsQualityLow)
+        {
+            if (this.renderer.maxQuality >= WOSRendererQualityMedium)
+            {
+                if (quality >= WOSRendererQualityMedium)
+                {
+                    quality = WOSRendererQualityMedium;
+                }
+                else
+                {
+                    quality = WOSRendererQualityLow;
+                }
+            }
+            else
+            {
+                quality = WOSRendererQualityLow;
+            }
+        }
+        if (quality >= this.renderer.quality)
+        {
+            quality = this.renderer.quality;
+        }
+        if (quality >= this.renderer.maxQuality)
+        {
+            quality = this.renderer.maxQuality;
+        }
+
         // Compute world matrix
         this.renderer.worldMatrix.setMatrix(this.renderer.camera.projMatrix);
         this.renderer.worldMatrix.multiply(this.renderer.camera.viewMatrix);
@@ -602,10 +631,13 @@ Uniforms.prototype = {
         this.loader.backrendererShader.sendWorldMatrix(
             this.renderer.worldMatrix
         );
-        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
+        if (quality == WOSRendererQualityHigh)
         {
+            // High quality shaders
             this.loader.planeShader.bind();
-            this.loader.planeShader.sendWorldMatrix(this.renderer.worldMatrix);
+            this.loader.planeShader.sendWorldMatrix(
+                this.renderer.worldMatrix
+            );
             this.loader.animPlaneShader.bind();
             this.loader.animPlaneShader.sendWorldMatrix(
                 this.renderer.worldMatrix
@@ -619,8 +651,9 @@ Uniforms.prototype = {
                 this.renderer.worldMatrix
             );
         }
-        if (this.renderer.maxQuality >= WOSRendererQualityMedium)
+        else if (quality == WOSRendererQualityMedium)
         {
+            // Medium quality shaders
             this.loader.planeShaderMedium.bind();
             this.loader.planeShaderMedium.sendWorldMatrix(
                 this.renderer.worldMatrix
@@ -638,20 +671,26 @@ Uniforms.prototype = {
                 this.renderer.worldMatrix
             );
         }
-        this.loader.planeShaderLow.bind();
-        this.loader.planeShaderLow.sendWorldMatrix(this.renderer.worldMatrix);
-        this.loader.animPlaneShaderLow.bind();
-        this.loader.animPlaneShaderLow.sendWorldMatrix(
-            this.renderer.worldMatrix
-        );
-        this.loader.staticMeshShaderLow.bind();
-        this.loader.staticMeshShaderLow.sendWorldMatrix(
-            this.renderer.worldMatrix
-        );
-        this.loader.skeletalMeshShaderLow.bind();
-        this.loader.skeletalMeshShaderLow.sendWorldMatrix(
-            this.renderer.worldMatrix
-        );
+        else
+        {
+            // Low quality shaders
+            this.loader.planeShaderLow.bind();
+            this.loader.planeShaderLow.sendWorldMatrix(
+                this.renderer.worldMatrix
+            );
+            this.loader.animPlaneShaderLow.bind();
+            this.loader.animPlaneShaderLow.sendWorldMatrix(
+                this.renderer.worldMatrix
+            );
+            this.loader.staticMeshShaderLow.bind();
+            this.loader.staticMeshShaderLow.sendWorldMatrix(
+                this.renderer.worldMatrix
+            );
+            this.loader.skeletalMeshShaderLow.bind();
+            this.loader.skeletalMeshShaderLow.sendWorldMatrix(
+                this.renderer.worldMatrix
+            );
+        }
 
         // Unbind shader
         this.renderer.gl.useProgram(null);
@@ -705,17 +744,20 @@ Uniforms.prototype = {
             // Update high quality plane
             this.loader.planeShader.bind();
             this.loader.planeShader.sendUniformMat4(
-                this.planeShadowsMatrixUniform, this.shadowsMatrix
+                this.planeShadowsMatrixUniform,
+                this.shadowsMatrix
             );
             this.loader.planeShader.sendUniformVec3(
-                this.planeCameraPosUniform, this.renderer.camera.position
+                this.planeCameraPosUniform,
+                this.renderer.camera.position
             );
             this.loader.planeShader.sendUniformVec3(
                 this.planeWorldLightVecUniform,
                 this.renderer.worldLight.direction
             );
             this.loader.planeShader.sendUniformVec4(
-                this.planeWorldLightColorUniform, this.renderer.worldLight.color
+                this.planeWorldLightColorUniform,
+                this.renderer.worldLight.color
             );
             this.loader.planeShader.sendUniformVec4(
                 this.planeWorldLightAmbientUniform,
@@ -725,10 +767,12 @@ Uniforms.prototype = {
             // Update high quality animated plane
             this.loader.animPlaneShader.bind();
             this.loader.animPlaneShader.sendUniformMat4(
-                this.animPlaneShadowsMatrixUniform, this.shadowsMatrix
+                this.animPlaneShadowsMatrixUniform,
+                this.shadowsMatrix
             );
             this.loader.animPlaneShader.sendUniformVec3(
-                this.animPlaneCameraPosUniform, this.renderer.camera.position
+                this.animPlaneCameraPosUniform,
+                this.renderer.camera.position
             );
             this.loader.animPlaneShader.sendUniformVec3(
                 this.animPlaneWorldLightVecUniform,
@@ -746,10 +790,12 @@ Uniforms.prototype = {
             // Update high quality static mesh
             this.loader.staticMeshShader.bind();
             this.loader.staticMeshShader.sendUniformMat4(
-                this.staticMeshShadowsMatrixUniform, this.shadowsMatrix
+                this.staticMeshShadowsMatrixUniform,
+                this.shadowsMatrix
             );
             this.loader.staticMeshShader.sendUniformVec3(
-                this.staticMeshCameraPosUniform, this.renderer.camera.position
+                this.staticMeshCameraPosUniform,
+                this.renderer.camera.position
             );
             this.loader.staticMeshShader.sendUniformVec3(
                 this.staticMeshWorldLightVecUniform,
@@ -767,10 +813,12 @@ Uniforms.prototype = {
             // Update high quality skeletal mesh
             this.loader.skeletalMeshShader.bind();
             this.loader.skeletalMeshShader.sendUniformMat4(
-                this.skeletalMeshShadowsMatrixUniform, this.shadowsMatrix
+                this.skeletalMeshShadowsMatrixUniform,
+                this.shadowsMatrix
             );
             this.loader.skeletalMeshShader.sendUniformVec3(
-                this.skeletalMeshCameraPosUniform, this.renderer.camera.position
+                this.skeletalMeshCameraPosUniform,
+                this.renderer.camera.position
             );
             this.loader.skeletalMeshShader.sendUniformVec3(
                 this.skeletalMeshWorldLightVecUniform,
@@ -790,7 +838,8 @@ Uniforms.prototype = {
             // Update medium quality plane
             this.loader.planeShaderMedium.bind();
             this.loader.planeShaderMedium.sendUniformVec3(
-                this.planeCameraPosUniformMedium, this.renderer.camera.position
+                this.planeCameraPosUniformMedium,
+                this.renderer.camera.position
             );
             this.loader.planeShaderMedium.sendUniformVec3(
                 this.planeWorldLightVecUniformMedium,

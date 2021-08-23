@@ -660,12 +660,12 @@ StaticMesh.prototype = {
             this.texture.bind();
             if (this.normalMap)
             {
-                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
                 this.normalMap.bind();
             }
             if (this.specularMap)
             {
-                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
+                this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
                 this.specularMap.bind();
             }
 
@@ -675,9 +675,9 @@ StaticMesh.prototype = {
             this.vertexBuffer.unbind();
 
             // Unbind textures
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE3);
             this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
-            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE1);
+            this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE2);
             this.renderer.gl.bindTexture(this.renderer.gl.TEXTURE_2D, null);
             this.renderer.gl.activeTexture(this.renderer.gl.TEXTURE0);
             this.texture.unbind();

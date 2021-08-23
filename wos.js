@@ -1109,11 +1109,25 @@ Wos.prototype = {
         this.skeletalmesh.setFrametime(1, 1.0);
 
         // Default world matrix and lighting
+        this.camera.compute(this.renderer.ratio);
         this.renderer.setCamera(this.camera);
         this.renderer.uniforms.update2DWorldMatrix();
-        this.renderer.uniforms.updateWorldMatrix();
         this.renderer.dynamicLights.update();
-        this.renderer.uniforms.updateWorldLighting(this.renderer.quality);
+        if (this.renderer.maxQuality >= WOSRendererQualityHigh)
+        {
+            this.renderer.uniforms.updateWorldLighting(
+                WOSRendererQualityHigh
+            );
+            this.renderer.uniforms.updateWorldMatrix(WOSRendererQualityHigh);
+        }
+        if (this.renderer.maxQuality >= WOSRendererQualityMedium)
+        {
+            this.renderer.uniforms.updateWorldLighting(
+                WOSRendererQualityMedium
+            );
+            this.renderer.uniforms.updateWorldMatrix(WOSRendererQualityMedium);
+        }
+        this.renderer.uniforms.updateWorldMatrix(WOSRendererQualityLow);
         this.renderer.shadows.bindTexture();
 
         // Clear renderer
@@ -1357,7 +1371,7 @@ Wos.prototype = {
 
         // Update world matrix
         this.renderer.uniforms.update2DWorldMatrix();
-        this.renderer.uniforms.updateWorldMatrix();
+        this.renderer.uniforms.updateWorldMatrix(this.renderer.quality);
 
         // Render into background renderer
         //this.backrenderer.clear();
