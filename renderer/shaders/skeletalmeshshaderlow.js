@@ -87,7 +87,7 @@ const skeletalMeshVertexShaderLowSrc = [
     "",
     "    // Output",
     "    texCoord = vertexCoord;",
-    "    gl_Position = worldMatrix*skinMatrix*vec4(vertexPos, 1.0);",
+    "    gl_Position = worldMatrix*modelMatrix*skinMatrix*vec4(vertexPos,1.0);",
     "    ;",
     "}",
     ""

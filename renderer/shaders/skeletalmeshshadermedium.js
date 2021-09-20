@@ -108,7 +108,7 @@ const skeletalMeshVertexShaderMediumSrc = [
     "        mat3(modelMatrix)*mat3(skinMatrix)*vec3(vertexNorm)",
     "    );",
     "    texCoord = vertexCoord;",
-    "    gl_Position = worldMatrix*vertPos;",
+    "    gl_Position = worldMatrix*modelMatrix*vertPos;",
     "}",
     ""
 ].join("\n");
