@@ -1351,7 +1351,7 @@ Wos.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     compute: function()
     {
-        this.audio.compute(this.frametime);
+        //this.audio.compute(this.frametime);
         //this.camera.compute(this.renderer.ratio);
         //this.freeflycam.compute(this.renderer.ratio, this.frametime);
         //this.testanim.compute(this.frametime);
@@ -1370,8 +1370,7 @@ Wos.prototype = {
         this.renderer.clear();
 
         // Update world matrix
-        this.renderer.uniforms.update2DWorldMatrix();
-        this.renderer.uniforms.updateWorldMatrix(this.renderer.quality);
+        //this.renderer.uniforms.update2DWorldMatrix();
 
         // Render into background renderer
         //this.backrenderer.clear();
@@ -1502,7 +1501,7 @@ Wos.prototype = {
         //this.renderer.setCamera(this.freeflycam);
 
         // Update world matrix and lighting
-        //this.renderer.uniforms.updateWorldMatrix();
+        //this.renderer.uniforms.updateWorldMatrix(this.renderer.quality);
         //this.renderer.dynamicLights.update();
         //this.renderer.uniforms.updateWorldLighting(this.renderer.quality);
         //this.renderer.shadows.bindTexture();

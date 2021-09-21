@@ -64,8 +64,8 @@ function Camera()
     this.fovy = WOSPi2;
 
     // Camera near and far planes
-    this.nearPlane = 0.001;
-    this.farPlane = 1000.0;
+    this.nearPlane = 0.1;
+    this.farPlane = 100.0;
 }
 
 Camera.prototype = {
@@ -89,8 +89,8 @@ Camera.prototype = {
         if (!this.upward) return false;
         this.upward.setXYZ(0.0, 1.0, 0.0);
         this.fovy = WOSPi2;
-        this.nearPlane = 0.001;
-        this.farPlane = 1000.0;
+        this.nearPlane = 0.1;
+        this.farPlane = 100.0;
 
         // Camera successfully reset
         return true;

@@ -68,8 +68,8 @@ function FreeflyCam()
     this.fovy = WOSPi2;
 
     // Freefly camera near and far planes
-    this.nearPlane = 0.001;
-    this.farPlane = 1000.0;
+    this.nearPlane = 0.1;
+    this.farPlane = 100.0;
 
     // Freefly camera speed
     this.speed = 1.0;
@@ -103,8 +103,8 @@ FreeflyCam.prototype = {
         if (!this.angles) return false;
         this.angles.reset();
         this.fovy = WOSPi2;
-        this.nearPlane = 0.001;
-        this.farPlane = 1000.0;
+        this.nearPlane = 0.1;
+        this.farPlane = 100.0;
         this.speed = 1.0;
         if (!this.target) return false;
         this.target.reset();

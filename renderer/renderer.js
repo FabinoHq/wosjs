@@ -487,7 +487,7 @@ Renderer.prototype = {
         this.gl.scissor(this.vpoffx, this.vpoffy, this.vpwidth, this.vpheight);
         this.gl.disable(this.gl.SCISSOR_TEST);
 
-        // Disable face culling
+        // Disable back face culling
         this.gl.disable(this.gl.CULL_FACE);
         this.gl.frontFace(this.gl.CCW);
         this.gl.cullFace(this.gl.BACK);
@@ -859,6 +859,9 @@ Renderer.prototype = {
             // Disable depth buffer
             this.gl.disable(this.gl.DEPTH_TEST);
 
+            // Disable back face culling
+            this.gl.disable(this.gl.CULL_FACE);
+
             // Enable blending
             this.gl.enable(this.gl.BLEND);
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
@@ -885,6 +888,9 @@ Renderer.prototype = {
             // Disable depth buffer
             this.gl.disable(this.gl.DEPTH_TEST);
 
+            // Disable back face culling
+            this.gl.disable(this.gl.CULL_FACE);
+
             // Enable blending
             this.gl.enable(this.gl.BLEND);
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
@@ -906,6 +912,9 @@ Renderer.prototype = {
             // Enable depth buffer
             this.gl.enable(this.gl.DEPTH_TEST);
 
+            // Enable back face culling
+            this.gl.enable(this.gl.CULL_FACE);
+
             // Enable blending
             this.gl.enable(this.gl.BLEND);
             this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
@@ -913,6 +922,22 @@ Renderer.prototype = {
 
             // Clear depth buffer
             this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
+        }
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  setBackFaceCulling : Set renderer back face culling state             //
+    //  param backFaceCulling : Renderer back face culling state to set       //
+    ////////////////////////////////////////////////////////////////////////////
+    setBackFaceCulling: function(backFaceCulling)
+    {
+        if (backFaceCulling)
+        {
+            this.gl.enable(this.gl.CULL_FACE);
+        }
+        else
+        {
+            this.gl.disable(this.gl.CULL_FACE);
         }
     },
 
