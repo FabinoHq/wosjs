@@ -73,12 +73,12 @@ function Plane(renderer, planeShader, planeShaderMedium, planeShaderLow)
     this.alphaUniform = null;
     this.alphaUniformMedium = null;
     this.alphaUniformLow = null;
-    this.uvSizeUniform = null;
-    this.uvSizeUniformMedium = null;
-    this.uvSizeUniformLow = null;
     this.uvOffsetUniform = null;
     this.uvOffsetUniformMedium = null;
     this.uvOffsetUniformLow = null;
+    this.uvSizeUniform = null;
+    this.uvSizeUniformMedium = null;
+    this.uvSizeUniformLow = null;
 
     // Plane texture
     this.texture = null;
@@ -97,10 +97,10 @@ function Plane(renderer, planeShader, planeShaderMedium, planeShaderLow)
     this.size = new Vector2(1.0, 1.0);
     // Plane rotation angles
     this.angles = new Vector4(0.0, 0.0, 0.0, 0.0);
-    // Plane texture UV size
-    this.uvSize = new Vector2(1.0, 1.0);
     // Plane texture UV offset
     this.uvOffset = new Vector2(0.0, 0.0);
+    // Plane texture UV size
+    this.uvSize = new Vector2(1.0, 1.0);
     // Plane alpha
     this.alpha = 1.0;
     // Plane specularity
@@ -132,12 +132,12 @@ Plane.prototype = {
         this.alphaUniform = null;
         this.alphaUniformMedium = null;
         this.alphaUniformLow = null;
-        this.uvSizeUniform = null;
-        this.uvSizeUniformMedium = null;
-        this.uvSizeUniformLow = null;
         this.uvOffsetUniform = null;
         this.uvOffsetUniformMedium = null;
         this.uvOffsetUniformLow = null;
+        this.uvSizeUniform = null;
+        this.uvSizeUniformMedium = null;
+        this.uvSizeUniformLow = null;
         this.texture = null;
         this.normalMap = null;
         this.specularMap = null;
@@ -152,10 +152,10 @@ Plane.prototype = {
         if (height !== undefined) this.size.vec[1] = height;
         if (!this.angles) return false;
         this.angles.reset();
-        if (!this.uvSize) return false;
-        this.uvSize.setXY(1.0, 1.0);
         if (!this.uvOffset) return false;
         this.uvOffset.reset();
+        if (!this.uvSize) return false;
+        this.uvSize.setXY(1.0, 1.0);
         this.alpha = 1.0;
         this.specularity = 0.0;
         if (!this.vecmat) return false;
@@ -538,17 +538,6 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setUVSize : Set plane render subrectangle size                        //
-    //  param usize : Plane texture U size                                    //
-    //  param vsize : Plane texture V size                                    //
-    ////////////////////////////////////////////////////////////////////////////
-    setUVSize: function(usize, vsize)
-    {
-        this.uvSize.vec[0] = usize;
-        this.uvSize.vec[1] = vsize;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setSubrect : Set plane render subrectangle offset                     //
     //  param uoffset : Plane texture U offset                                //
     //  param voffset : Plane texture V offset                                //
@@ -560,18 +549,29 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setUVSize : Set plane render subrectangle size                        //
+    //  param usize : Plane texture U size                                    //
+    //  param vsize : Plane texture V size                                    //
+    ////////////////////////////////////////////////////////////////////////////
+    setUVSize: function(usize, vsize)
+    {
+        this.uvSize.vec[0] = usize;
+        this.uvSize.vec[1] = vsize;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setSubrect : Set plane render subrectangle                            //
     //  param usize : Plane texture U size                                    //
     //  param vsize : Plane texture V size                                    //
     //  param uoffset : Plane texture U offset                                //
     //  param voffset : Plane texture V offset                                //
     ////////////////////////////////////////////////////////////////////////////
-    setSubrect: function(usize, vsize, uoffset, voffset)
+    setSubrect: function(uoffset, voffset, usize, vsize)
     {
-        this.uvSize.vec[0] = usize;
-        this.uvSize.vec[1] = vsize;
         this.uvOffset.vec[0] = uoffset;
         this.uvOffset.vec[1] = voffset;
+        this.uvSize.vec[0] = usize;
+        this.uvSize.vec[1] = vsize;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -665,24 +665,6 @@ Plane.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getUVWidth : Get plane render subrectangle width                      //
-    //  return : Plane render subrectangle width                              //
-    ////////////////////////////////////////////////////////////////////////////
-    getUVWidth: function()
-    {
-        return this.uvSize.vec[0];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getUVHeight : Get plane render subrectangle height                    //
-    //  return : Plane render subrectangle height                             //
-    ////////////////////////////////////////////////////////////////////////////
-    getUVHeight: function()
-    {
-        return this.uvSize.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  getUVWidth : Get plane render subrectangle X offset                   //
     //  return : Plane render subrectangle X offset                           //
     ////////////////////////////////////////////////////////////////////////////
@@ -698,6 +680,24 @@ Plane.prototype = {
     getUVOffsetY: function()
     {
         return this.uvOffset.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getUVWidth : Get plane render subrectangle width                      //
+    //  return : Plane render subrectangle width                              //
+    ////////////////////////////////////////////////////////////////////////////
+    getUVWidth: function()
+    {
+        return this.uvSize.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getUVHeight : Get plane render subrectangle height                    //
+    //  return : Plane render subrectangle height                             //
+    ////////////////////////////////////////////////////////////////////////////
+    getUVHeight: function()
+    {
+        return this.uvSize.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////

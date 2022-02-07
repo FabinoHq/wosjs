@@ -304,7 +304,7 @@ Camera.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateX : Rotate the camera along the X axis                          //
+    //  rotateX : Rotate the camera around the X axis                         //
     //  param angleX : Value of the X rotation in radians                     //
     ////////////////////////////////////////////////////////////////////////////
     rotateX: function(angleX)
@@ -313,7 +313,7 @@ Camera.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateY : Rotate the camera along the Y axis                          //
+    //  rotateY : Rotate the camera around the Y axis                         //
     //  param angleY : Value of the Y rotation in radians                     //
     ////////////////////////////////////////////////////////////////////////////
     rotateY: function(angleY)
@@ -322,7 +322,7 @@ Camera.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  rotateZ : Rotate the camera along the Z axis                          //
+    //  rotateZ : Rotate the camera around the Z axis                         //
     //  param angleZ : Value of the Z rotation in radians                     //
     ////////////////////////////////////////////////////////////////////////////
     rotateZ: function(angleZ)

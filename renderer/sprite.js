@@ -56,8 +56,8 @@ function Sprite(renderer, spriteShader)
 
     // Sprite shader uniforms locations
     this.alphaUniform = null;
-    this.uvSizeUniform = null;
     this.uvOffsetUniform = null;
+    this.uvSizeUniform = null;
 
     // Sprite texture
     this.texture = null;
@@ -70,10 +70,10 @@ function Sprite(renderer, spriteShader)
     this.size = new Vector2(1.0, 1.0);
     // Sprite rotation angle
     this.angle = 0.0;
-    // Sprite texture UV size
-    this.uvSize = new Vector2(1.0, 1.0);
     // Sprite texture UV offset
     this.uvOffset = new Vector2(0.0, 0.0);
+    // Sprite texture UV size
+    this.uvSize = new Vector2(1.0, 1.0);
     // Sprite alpha
     this.alpha = 1.0;
 
@@ -93,8 +93,8 @@ Sprite.prototype = {
     {
         // Reset sprite
         this.alphaUniform = null;
-        this.uvSizeUniform = null;
         this.uvOffsetUniform = null;
+        this.uvSizeUniform = null;
         this.texture = null;
         if (!this.modelMatrix) return false;
         this.modelMatrix.setIdentity();
@@ -105,10 +105,10 @@ Sprite.prototype = {
         if (width !== undefined) this.size.vec[0] = width;
         if (height !== undefined) this.size.vec[1] = height;
         this.angle = 0.0;
-        if (!this.uvSize) return false;
-        this.uvSize.setXY(1.0, 1.0);
         if (!this.uvOffset) return false;
         this.uvOffset.reset();
+        if (!this.uvSize) return false;
+        this.uvSize.setXY(1.0, 1.0);
         this.alpha = 1.0;
         if (!this.vecmat) return false;
         this.vecmat.setIdentity();
@@ -273,17 +273,6 @@ Sprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  setUVSize : Set sprite render subrectangle size                       //
-    //  param usize : Sprite texture U size                                   //
-    //  param vsize : Sprite texture V size                                   //
-    ////////////////////////////////////////////////////////////////////////////
-    setUVSize: function(usize, vsize)
-    {
-        this.uvSize.vec[0] = usize;
-        this.uvSize.vec[1] = vsize;
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  setSubrect : Set sprite render subrectangle offset                    //
     //  param uoffset : Sprite texture U offset                               //
     //  param voffset : Sprite texture V offset                               //
@@ -295,18 +284,29 @@ Sprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
+    //  setUVSize : Set sprite render subrectangle size                       //
+    //  param usize : Sprite texture U size                                   //
+    //  param vsize : Sprite texture V size                                   //
+    ////////////////////////////////////////////////////////////////////////////
+    setUVSize: function(usize, vsize)
+    {
+        this.uvSize.vec[0] = usize;
+        this.uvSize.vec[1] = vsize;
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
     //  setSubrect : Set sprite render subrectangle                           //
     //  param usize : Sprite texture U size                                   //
     //  param vsize : Sprite texture V size                                   //
     //  param uoffset : Sprite texture U offset                               //
     //  param voffset : Sprite texture V offset                               //
     ////////////////////////////////////////////////////////////////////////////
-    setSubrect: function(usize, vsize, uoffset, voffset)
+    setSubrect: function(uoffset, voffset, usize, vsize)
     {
-        this.uvSize.vec[0] = usize;
-        this.uvSize.vec[1] = vsize;
         this.uvOffset.vec[0] = uoffset;
         this.uvOffset.vec[1] = voffset;
+        this.uvSize.vec[0] = usize;
+        this.uvSize.vec[1] = vsize;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -364,24 +364,6 @@ Sprite.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  getUVWidth : Get sprite render subrectangle width                     //
-    //  return : Sprite render subrectangle width                             //
-    ////////////////////////////////////////////////////////////////////////////
-    getUVWidth: function()
-    {
-        return this.uvSize.vec[0];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
-    //  getUVHeight : Get sprite render subrectangle height                   //
-    //  return : Sprite render subrectangle height                            //
-    ////////////////////////////////////////////////////////////////////////////
-    getUVHeight: function()
-    {
-        return this.uvSize.vec[1];
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  getUVWidth : Get sprite render subrectangle X offset                  //
     //  return : Sprite render subrectangle X offset                          //
     ////////////////////////////////////////////////////////////////////////////
@@ -397,6 +379,24 @@ Sprite.prototype = {
     getUVOffsetY: function()
     {
         return this.uvOffset.vec[1];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getUVWidth : Get sprite render subrectangle width                     //
+    //  return : Sprite render subrectangle width                             //
+    ////////////////////////////////////////////////////////////////////////////
+    getUVWidth: function()
+    {
+        return this.uvSize.vec[0];
+    },
+
+    ////////////////////////////////////////////////////////////////////////////
+    //  getUVHeight : Get sprite render subrectangle height                   //
+    //  return : Sprite render subrectangle height                            //
+    ////////////////////////////////////////////////////////////////////////////
+    getUVHeight: function()
+    {
+        return this.uvSize.vec[1];
     },
 
     ////////////////////////////////////////////////////////////////////////////

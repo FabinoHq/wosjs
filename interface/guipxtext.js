@@ -707,7 +707,7 @@ GuiPxText.prototype = {
         if (character == '\u00FC') return 'u';
         if (character == '\u00FD') return 'y';
         if (character == '\u00FF') return 'y';
-        if (character.charCodeAt(0) < 32) return '';
+        if (character.charCodeAt(0) < 32) return '?';
         if (character.charCodeAt(0) > 126) return '?';
         return character;
     },
