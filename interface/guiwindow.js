@@ -81,7 +81,7 @@ function GuiWindow(renderer, ninepatchShader)
     this.grabLeft = false;
     this.grabRight = false;
     // Window grab position
-    this.grabPosition = new Vector2(0.0, 0.0);
+    this.grabVector = new Vector2(0.0, 0.0);
     this.moveOffset = new Vector2(0.0, 0.0);
 }
 
@@ -117,8 +117,8 @@ GuiWindow.prototype = {
         this.grabBottom = false;
         this.grabLeft = false;
         this.grabRight = false;
-        if (!this.grabPosition) return false;
-        this.grabPosition.reset();
+        if (!this.grabVector) return false;
+        this.grabVector.reset();
         if (!this.moveOffset) return false;
         this.moveOffset.reset();
 
@@ -412,8 +412,8 @@ GuiWindow.prototype = {
                 this.isLeftResizePicking(mouseX, mouseY))
             {
                 // Top Left resize
-                this.grabPosition.vec[0] = (this.size.vec[0] + mouseX);
-                this.grabPosition.vec[1] = (this.size.vec[1] - mouseY);
+                this.grabVector.vec[0] = (this.size.vec[0] + mouseX);
+                this.grabVector.vec[1] = (this.size.vec[1] - mouseY);
                 this.grabTop = true;
                 this.grabLeft = true;
                 this.grabWindow = false;
@@ -426,8 +426,8 @@ GuiWindow.prototype = {
                 this.isRightResizePicking(mouseX, mouseY))
             {
                 // Top Right resize
-                this.grabPosition.vec[0] = (this.size.vec[0] - mouseX);
-                this.grabPosition.vec[1] = (this.size.vec[1] - mouseY);
+                this.grabVector.vec[0] = (this.size.vec[0] - mouseX);
+                this.grabVector.vec[1] = (this.size.vec[1] - mouseY);
                 this.grabTop = true;
                 this.grabRight = true;
                 this.grabWindow = false;
@@ -440,8 +440,8 @@ GuiWindow.prototype = {
                 this.isLeftResizePicking(mouseX, mouseY))
             {
                 // Bottom Left resize
-                this.grabPosition.vec[0] = (this.size.vec[0] + mouseX);
-                this.grabPosition.vec[1] = (this.size.vec[1] + mouseY);
+                this.grabVector.vec[0] = (this.size.vec[0] + mouseX);
+                this.grabVector.vec[1] = (this.size.vec[1] + mouseY);
                 this.grabBottom = true;
                 this.grabLeft = true;
                 this.grabWindow = false;
@@ -454,8 +454,8 @@ GuiWindow.prototype = {
                 this.isRightResizePicking(mouseX, mouseY))
             {
                 // Bottom Right resize
-                this.grabPosition.vec[0] = (this.size.vec[0] - mouseX);
-                this.grabPosition.vec[1] = (this.size.vec[1] + mouseY);
+                this.grabVector.vec[0] = (this.size.vec[0] - mouseX);
+                this.grabVector.vec[1] = (this.size.vec[1] + mouseY);
                 this.grabBottom = true;
                 this.grabRight = true;
                 this.grabWindow = false;
@@ -467,7 +467,7 @@ GuiWindow.prototype = {
             if (this.isTopResizePicking(mouseX, mouseY))
             {
                 // Top resize
-                this.grabPosition.vec[1] = (this.size.vec[1] - mouseY);
+                this.grabVector.vec[1] = (this.size.vec[1] - mouseY);
                 this.grabTop = true;
                 this.grabWindow = false;
                 this.grabBottom = false;
@@ -479,7 +479,7 @@ GuiWindow.prototype = {
             if (this.isBottomResizePicking(mouseX, mouseY))
             {
                 // Bottom resize
-                this.grabPosition.vec[1] = (this.size.vec[1] + mouseY);
+                this.grabVector.vec[1] = (this.size.vec[1] + mouseY);
                 this.grabBottom = true;
                 this.grabWindow = false;
                 this.grabTop = false;
@@ -491,7 +491,7 @@ GuiWindow.prototype = {
             if (this.isLeftResizePicking(mouseX, mouseY))
             {
                 // Left resize
-                this.grabPosition.vec[0] = (this.size.vec[0] + mouseX);
+                this.grabVector.vec[0] = (this.size.vec[0] + mouseX);
                 this.grabLeft = true;
                 this.grabWindow = false;
                 this.grabTop = false;
@@ -503,7 +503,7 @@ GuiWindow.prototype = {
             if (this.isRightResizePicking(mouseX, mouseY))
             {
                 // Right resize
-                this.grabPosition.vec[0] = (this.size.vec[0] - mouseX);
+                this.grabVector.vec[0] = (this.size.vec[0] - mouseX);
                 this.grabRight = true;
                 this.grabWindow = false;
                 this.grabTop = false;
@@ -516,8 +516,8 @@ GuiWindow.prototype = {
         if (this.movable && this.isTopBarPicking(mouseX, mouseY))
         {
             // Move window
-            this.grabPosition.vec[0] = (this.position.vec[0] - mouseX);
-            this.grabPosition.vec[1] = (this.position.vec[1] - mouseY);
+            this.grabVector.vec[0] = (this.position.vec[0] - mouseX);
+            this.grabVector.vec[1] = (this.position.vec[1] - mouseY);
             this.grabWindow = true;
             this.grabTop = false;
             this.grabBottom = false;
@@ -541,7 +541,7 @@ GuiWindow.prototype = {
         this.grabBottom = false;
         this.grabLeft = false;
         this.grabRight = false;
-        return false;
+        return isPicking(mouseX, mouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -565,8 +565,8 @@ GuiWindow.prototype = {
         {
             // Resize top left window
             this.moveOffset.vec[0] = this.size.vec[0];
-            this.size.vec[0] = (this.grabPosition.vec[0] - mouseX);
-            this.size.vec[1] = (this.grabPosition.vec[1] + mouseY);
+            this.size.vec[0] = (this.grabVector.vec[0] - mouseX);
+            this.size.vec[1] = (this.grabVector.vec[1] + mouseY);
             this.clampWindowSize();
             this.moveOffset.vec[0] -= this.size.vec[0];
             this.position.vec[0] += this.moveOffset.vec[0];
@@ -576,8 +576,8 @@ GuiWindow.prototype = {
         if (this.grabTop && this.grabRight)
         {
             // Resize top right window
-            this.size.vec[0] = (this.grabPosition.vec[0] + mouseX);
-            this.size.vec[1] = (this.grabPosition.vec[1] + mouseY);
+            this.size.vec[0] = (this.grabVector.vec[0] + mouseX);
+            this.size.vec[1] = (this.grabVector.vec[1] + mouseY);
             this.clampWindowSize();
             return true;
         }
@@ -587,8 +587,8 @@ GuiWindow.prototype = {
             // Resize bottom left window
             this.moveOffset.vec[0] = this.size.vec[0];
             this.moveOffset.vec[1] = this.size.vec[1];
-            this.size.vec[0] = (this.grabPosition.vec[0] - mouseX);
-            this.size.vec[1] = (this.grabPosition.vec[1] - mouseY);
+            this.size.vec[0] = (this.grabVector.vec[0] - mouseX);
+            this.size.vec[1] = (this.grabVector.vec[1] - mouseY);
             this.clampWindowSize();
             this.moveOffset.vec[0] -= this.size.vec[0];
             this.position.vec[0] += this.moveOffset.vec[0];
@@ -601,8 +601,8 @@ GuiWindow.prototype = {
         {
             // Resize bottom right window
             this.moveOffset.vec[1] = this.size.vec[1];
-            this.size.vec[0] = (this.grabPosition.vec[0] + mouseX);
-            this.size.vec[1] = (this.grabPosition.vec[1] - mouseY);
+            this.size.vec[0] = (this.grabVector.vec[0] + mouseX);
+            this.size.vec[1] = (this.grabVector.vec[1] - mouseY);
             this.clampWindowSize();
             this.moveOffset.vec[1] -= this.size.vec[1];
             this.position.vec[1] += this.moveOffset.vec[1];
@@ -612,7 +612,7 @@ GuiWindow.prototype = {
         if (this.grabTop)
         {
             // Resize top window
-            this.size.vec[1] = (this.grabPosition.vec[1] + mouseY);
+            this.size.vec[1] = (this.grabVector.vec[1] + mouseY);
             this.clampWindowSize();
             return true;
         }
@@ -621,7 +621,7 @@ GuiWindow.prototype = {
         {
             // Resize bottom window
             this.moveOffset.vec[1] = this.size.vec[1];
-            this.size.vec[1] = (this.grabPosition.vec[1] - mouseY);
+            this.size.vec[1] = (this.grabVector.vec[1] - mouseY);
             this.clampWindowSize();
             this.moveOffset.vec[1] -= this.size.vec[1];
             this.position.vec[1] += this.moveOffset.vec[1];
@@ -632,7 +632,7 @@ GuiWindow.prototype = {
         {
             // Resize left window
             this.moveOffset.vec[0] = this.size.vec[0];
-            this.size.vec[0] = (this.grabPosition.vec[0] - mouseX);
+            this.size.vec[0] = (this.grabVector.vec[0] - mouseX);
             this.clampWindowSize();
             this.moveOffset.vec[0] -= this.size.vec[0];
             this.position.vec[0] += this.moveOffset.vec[0];
@@ -642,7 +642,7 @@ GuiWindow.prototype = {
         if (this.grabRight)
         {
             // Resize right window
-            this.size.vec[0] = (this.grabPosition.vec[0] + mouseX);
+            this.size.vec[0] = (this.grabVector.vec[0] + mouseX);
             this.clampWindowSize();
             return true;
         }
@@ -650,8 +650,8 @@ GuiWindow.prototype = {
         if (this.grabWindow)
         {
             // Move window
-            this.position.vec[0] = (this.grabPosition.vec[0] + mouseX);
-            this.position.vec[1] = (this.grabPosition.vec[1] + mouseY);
+            this.position.vec[0] = (this.grabVector.vec[0] + mouseX);
+            this.position.vec[1] = (this.grabVector.vec[1] + mouseY);
             return true;
         }
 
