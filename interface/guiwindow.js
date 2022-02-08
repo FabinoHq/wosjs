@@ -74,14 +74,15 @@ function GuiWindow(renderer, ninepatchShader)
     this.topBarSize = 0.05;
     // Window resize bar size
     this.resizeBarSize = 0.01;
-    // Window grabbed states
+    // Window grabbing states
     this.grabWindow = false;
-    this.grabTopWindow = false;
-    this.grabBottomWindow = false;
-    this.grabLeftWindow = false;
-    this.grabRightWindow = false;
+    this.grabTop = false;
+    this.grabBottom = false;
+    this.grabLeft = false;
+    this.grabRight = false;
     // Window grab position
     this.grabPosition = new Vector2(0.0, 0.0);
+    this.moveOffset = new Vector2(0.0, 0.0);
 }
 
 GuiWindow.prototype = {
@@ -112,12 +113,14 @@ GuiWindow.prototype = {
         this.topBarSize = 0.05;
         this.resizeBarSize = 0.01;
         this.grabWindow = false;
-        this.grabTopWindow = false;
-        this.grabBottomWindow = false;
-        this.grabLeftWindow = false;
-        this.grabRightWindow = false;
+        this.grabTop = false;
+        this.grabBottom = false;
+        this.grabLeft = false;
+        this.grabRight = false;
         if (!this.grabPosition) return false;
         this.grabPosition.reset();
+        if (!this.moveOffset) return false;
+        this.moveOffset.reset();
 
         // Check renderer pointer
         if (!this.renderer) return false;
@@ -139,7 +142,6 @@ GuiWindow.prototype = {
     {
         this.position.vec[0] = x;
         this.position.vec[1] = y;
-        this.clampWindowPosition();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -150,7 +152,6 @@ GuiWindow.prototype = {
     {
         this.position.vec[0] = vector.vec[0];
         this.position.vec[1] = vector.vec[1];
-        this.clampWindowPosition();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -160,7 +161,6 @@ GuiWindow.prototype = {
     setX: function(x)
     {
         this.position.vec[0] = x;
-        this.clampWindowPosition();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -170,7 +170,6 @@ GuiWindow.prototype = {
     setY: function(y)
     {
         this.position.vec[1] = y;
-        this.clampWindowPosition();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -182,7 +181,6 @@ GuiWindow.prototype = {
     {
         this.position.vec[0] += x;
         this.position.vec[1] += y;
-        this.clampWindowPosition();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -193,7 +191,6 @@ GuiWindow.prototype = {
     {
         this.position.vec[0] += vector.vec[0];
         this.position.vec[1] += vector.vec[1];
-        this.clampWindowPosition();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -203,7 +200,6 @@ GuiWindow.prototype = {
     moveX: function(x)
     {
         this.position.vec[0] += x;
-        this.clampWindowPosition();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -213,7 +209,6 @@ GuiWindow.prototype = {
     moveY: function(y)
     {
         this.position.vec[1] += y;
-        this.clampWindowPosition();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -225,7 +220,6 @@ GuiWindow.prototype = {
     {
         this.size.vec[0] = width;
         this.size.vec[1] = height;
-        this.clampWindowSize();
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -279,7 +273,6 @@ GuiWindow.prototype = {
         if (minHeight <= 0.0) minHeight = 0.0;
         this.minSize.vec[0] = minWidth;
         this.minSize.vec[1] = minHeight;
-        // Clamp window size
         this.clampWindowSize();
     },
 
@@ -293,7 +286,6 @@ GuiWindow.prototype = {
         this.minSize.vec[1] = minSize.vec[1];
         if (this.minSize.vec[0] <= 0.0) this.minSize.vec[0] = 0.0;
         if (this.minSize.vec[1] <= 0.0) this.minSize.vec[1] = 0.0;
-        // Clamp window size
         this.clampWindowSize();
     },
 
@@ -305,7 +297,6 @@ GuiWindow.prototype = {
     {
         if (minWidth <= 0.0) minWidth = 0.0;
         this.minSize.vec[0] = minWidth;
-        // Clamp window size
         this.clampWindowSize();
     },
 
@@ -317,7 +308,6 @@ GuiWindow.prototype = {
     {
         if (minHeight <= 0.0) minHeight = 0.0;
         this.minSize.vec[1] = minHeight;
-        // Clamp window size
         this.clampWindowSize();
     },
 
@@ -332,7 +322,6 @@ GuiWindow.prototype = {
         if (maxHeight <= 0.0) maxHeight = 0.0;
         this.maxSize.vec[0] = maxWidth;
         this.maxSize.vec[1] = maxHeight;
-        // Clamp window size
         this.clampWindowSize();
     },
 
@@ -346,7 +335,6 @@ GuiWindow.prototype = {
         this.maxSize.vec[1] = maxSize.vec[1];
         if (this.maxSize.vec[0] <= 0.0) this.maxSize.vec[0] = 0.0;
         if (this.maxSize.vec[1] <= 0.0) this.maxSize.vec[1] = 0.0;
-        // Clamp window size
         this.clampWindowSize();
     },
 
@@ -358,7 +346,6 @@ GuiWindow.prototype = {
     {
         if (maxWidth <= 0.0) maxWidth = 0.0;
         this.maxSize.vec[0] = maxWidth;
-        // Clamp window size
         this.clampWindowSize();
     },
 
@@ -370,7 +357,6 @@ GuiWindow.prototype = {
     {
         if (maxHeight <= 0.0) maxHeight = 0.0;
         this.maxSize.vec[1] = maxHeight;
-        // Clamp window size
         this.clampWindowSize();
     },
 
@@ -413,15 +399,6 @@ GuiWindow.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  handleOnResize : Handle canvas window resizing                        //
-    ////////////////////////////////////////////////////////////////////////////
-    handleOnResize: function()
-    {
-        this.clampWindowPosition();
-        this.clampWindowSize();
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  mousePress : Handle mouse press event                                 //
     //  param mouseX : Cursor X position                                      //
     //  param mouseY : Cursor Y position                                      //
@@ -435,13 +412,13 @@ GuiWindow.prototype = {
                 this.isLeftResizePicking(mouseX, mouseY))
             {
                 // Top Left resize
-                this.grabPosition.vec[0] = mouseX;
-                this.grabPosition.vec[1] = mouseY;
-                this.grabTopWindow = true;
-                this.grabLeftWindow = true;
+                this.grabPosition.vec[0] = (this.size.vec[0] + mouseX);
+                this.grabPosition.vec[1] = (this.size.vec[1] - mouseY);
+                this.grabTop = true;
+                this.grabLeft = true;
                 this.grabWindow = false;
-                this.grabBottomWindow = false;
-                this.grabRightWindow = false;
+                this.grabBottom = false;
+                this.grabRight = false;
                 return true;
             }
 
@@ -449,13 +426,13 @@ GuiWindow.prototype = {
                 this.isRightResizePicking(mouseX, mouseY))
             {
                 // Top Right resize
-                this.grabPosition.vec[0] = mouseX;
-                this.grabPosition.vec[1] = mouseY;
-                this.grabTopWindow = true;
-                this.grabRightWindow = true;
+                this.grabPosition.vec[0] = (this.size.vec[0] - mouseX);
+                this.grabPosition.vec[1] = (this.size.vec[1] - mouseY);
+                this.grabTop = true;
+                this.grabRight = true;
                 this.grabWindow = false;
-                this.grabBottomWindow = false;
-                this.grabLeftWindow = false;
+                this.grabBottom = false;
+                this.grabLeft = false;
                 return true;
             }
 
@@ -463,13 +440,13 @@ GuiWindow.prototype = {
                 this.isLeftResizePicking(mouseX, mouseY))
             {
                 // Bottom Left resize
-                this.grabPosition.vec[0] = mouseX;
-                this.grabPosition.vec[1] = mouseY;
-                this.grabBottomWindow = true;
-                this.grabLeftWindow = true;
+                this.grabPosition.vec[0] = (this.size.vec[0] + mouseX);
+                this.grabPosition.vec[1] = (this.size.vec[1] + mouseY);
+                this.grabBottom = true;
+                this.grabLeft = true;
                 this.grabWindow = false;
-                this.grabTopWindow = false;
-                this.grabRightWindow = false;
+                this.grabTop = false;
+                this.grabRight = false;
                 return true;
             }
 
@@ -477,65 +454,61 @@ GuiWindow.prototype = {
                 this.isRightResizePicking(mouseX, mouseY))
             {
                 // Bottom Right resize
-                this.grabPosition.vec[0] = mouseX;
-                this.grabPosition.vec[1] = mouseY;
-                this.grabBottomWindow = true;
-                this.grabRightWindow = true;
+                this.grabPosition.vec[0] = (this.size.vec[0] - mouseX);
+                this.grabPosition.vec[1] = (this.size.vec[1] + mouseY);
+                this.grabBottom = true;
+                this.grabRight = true;
                 this.grabWindow = false;
-                this.grabTopWindow = false;
-                this.grabLeftWindow = false;
+                this.grabTop = false;
+                this.grabLeft = false;
                 return true;
             }
 
             if (this.isTopResizePicking(mouseX, mouseY))
             {
                 // Top resize
-                this.grabPosition.vec[0] = mouseX;
-                this.grabPosition.vec[1] = mouseY;
-                this.grabTopWindow = true;
+                this.grabPosition.vec[1] = (this.size.vec[1] - mouseY);
+                this.grabTop = true;
                 this.grabWindow = false;
-                this.grabBottomWindow = false;
-                this.grabLeftWindow = false;
-                this.grabRightWindow = false;
+                this.grabBottom = false;
+                this.grabLeft = false;
+                this.grabRight = false;
                 return true;
             }
 
             if (this.isBottomResizePicking(mouseX, mouseY))
             {
                 // Bottom resize
-                this.grabPosition.vec[0] = mouseX;
-                this.grabPosition.vec[1] = mouseY;
-                this.grabBottomWindow = true;
+                this.grabPosition.vec[1] = (this.size.vec[1] + mouseY);
+                this.grabBottom = true;
                 this.grabWindow = false;
-                this.grabTopWindow = false;
-                this.grabLeftWindow = false;
-                this.grabRightWindow = false;
+                this.grabTop = false;
+                this.grabLeft = false;
+                this.grabRight = false;
                 return true;
             }
 
             if (this.isLeftResizePicking(mouseX, mouseY))
             {
                 // Left resize
-                this.grabPosition.vec[0] = mouseX;
-                this.grabPosition.vec[1] = mouseY;
-                this.grabLeftWindow = true;
+                this.grabPosition.vec[0] = (this.size.vec[0] + mouseX);
+                this.grabLeft = true;
                 this.grabWindow = false;
-                this.grabTopWindow = false;
-                this.grabBottomWindow = false;
-                this.grabRightWindow = false;
+                this.grabTop = false;
+                this.grabBottom = false;
+                this.grabRight = false;
                 return true;
             }
 
             if (this.isRightResizePicking(mouseX, mouseY))
             {
                 // Right resize
-                this.grabPosition.vec[0] = mouseX;
-                this.grabPosition.vec[1] = mouseY;
-                this.grabRightWindow = true;
+                this.grabPosition.vec[0] = (this.size.vec[0] - mouseX);
+                this.grabRight = true;
                 this.grabWindow = false;
-                this.grabTopWindow = false;
-                this.grabBottomWindow = false;
-                this.grabLeftWindow = false;
+                this.grabTop = false;
+                this.grabBottom = false;
+                this.grabLeft = false;
                 return true;
             }
         }
@@ -543,13 +516,13 @@ GuiWindow.prototype = {
         if (this.movable && this.isTopBarPicking(mouseX, mouseY))
         {
             // Move window
-            this.grabPosition.vec[0] = mouseX;
-            this.grabPosition.vec[1] = mouseY;
+            this.grabPosition.vec[0] = (this.position.vec[0] - mouseX);
+            this.grabPosition.vec[1] = (this.position.vec[1] - mouseY);
             this.grabWindow = true;
-            this.grabTopWindow = false;
-            this.grabBottomWindow = false;
-            this.grabLeftWindow = false;
-            this.grabRightWindow = false;
+            this.grabTop = false;
+            this.grabBottom = false;
+            this.grabLeft = false;
+            this.grabRight = false;
             return true;
         }
 
@@ -564,10 +537,11 @@ GuiWindow.prototype = {
     mouseRelease: function(mouseX, mouseY)
     {
         this.grabWindow = false;
-        this.grabTopWindow = false;
-        this.grabBottomWindow = false;
-        this.grabLeftWindow = false;
-        this.grabRightWindow = false;
+        this.grabTop = false;
+        this.grabBottom = false;
+        this.grabLeft = false;
+        this.grabRight = false;
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -578,226 +552,109 @@ GuiWindow.prototype = {
     ////////////////////////////////////////////////////////////////////////////
     mouseMove: function(mouseX, mouseY)
     {
-        var offset = 0.0;
-        var offset2 = 0.0;
+        // Clamp mouse position
+        if (mouseX <= -this.renderer.ratio) { mouseX = -this.renderer.ratio; }
+        if (mouseX >= this.renderer.ratio) { mouseX = this.renderer.ratio; }
+        if (mouseY <= -1.0) { mouseY = -1.0; }
+        if (mouseY >= 1.0) { mouseY = 1.0; }
 
         // Set window resize cursors
         this.updateCursors(mouseX, mouseY);
 
-        if (this.grabTopWindow && this.grabLeftWindow)
+        if (this.grabTop && this.grabLeft)
+        {
+            // Resize top left window
+            this.moveOffset.vec[0] = this.size.vec[0];
+            this.size.vec[0] = (this.grabPosition.vec[0] - mouseX);
+            this.size.vec[1] = (this.grabPosition.vec[1] + mouseY);
+            this.clampWindowSize();
+            this.moveOffset.vec[0] -= this.size.vec[0];
+            this.position.vec[0] += this.moveOffset.vec[0];
+            return true;
+        }
+
+        if (this.grabTop && this.grabRight)
+        {
+            // Resize top right window
+            this.size.vec[0] = (this.grabPosition.vec[0] + mouseX);
+            this.size.vec[1] = (this.grabPosition.vec[1] + mouseY);
+            this.clampWindowSize();
+            return true;
+        }
+
+        if (this.grabBottom && this.grabLeft)
+        {
+            // Resize bottom left window
+            this.moveOffset.vec[0] = this.size.vec[0];
+            this.moveOffset.vec[1] = this.size.vec[1];
+            this.size.vec[0] = (this.grabPosition.vec[0] - mouseX);
+            this.size.vec[1] = (this.grabPosition.vec[1] - mouseY);
+            this.clampWindowSize();
+            this.moveOffset.vec[0] -= this.size.vec[0];
+            this.position.vec[0] += this.moveOffset.vec[0];
+            this.moveOffset.vec[1] -= this.size.vec[1];
+            this.position.vec[1] += this.moveOffset.vec[1];
+            return true;
+        }
+
+        if (this.grabBottom && this.grabRight)
+        {
+            // Resize bottom right window
+            this.moveOffset.vec[1] = this.size.vec[1];
+            this.size.vec[0] = (this.grabPosition.vec[0] + mouseX);
+            this.size.vec[1] = (this.grabPosition.vec[1] - mouseY);
+            this.clampWindowSize();
+            this.moveOffset.vec[1] -= this.size.vec[1];
+            this.position.vec[1] += this.moveOffset.vec[1];
+            return true;
+        }
+
+        if (this.grabTop)
         {
             // Resize top window
-            this.size.vec[1] += (mouseY-this.grabPosition.vec[1]);
+            this.size.vec[1] = (this.grabPosition.vec[1] + mouseY);
             this.clampWindowSize();
-
-            // Resize left window
-            if (mouseX-this.grabPosition.vec[0] >= 0.0)
-            {
-                offset = this.size.vec[0];
-                this.size.vec[0] -= (mouseX-this.grabPosition.vec[0]);
-                this.clampWindowSize();
-                this.position.vec[0] -= (this.size.vec[0]-offset);
-            }
-            else
-            {
-                offset = this.position.vec[0];
-                offset2 = this.size.vec[0];
-                this.position.vec[0] += (mouseX-this.grabPosition.vec[0]);
-                this.clampWindowPosition();
-                this.size.vec[0] -= (this.position.vec[0]-offset);
-                this.clampWindowSize();
-                this.position.vec[0] -= (this.position.vec[0]-offset);
-                this.position.vec[0] -= (this.size.vec[0]-offset2);
-            }
-
-            this.grabPosition.vec[0] = mouseX;
-            this.grabPosition.vec[1] = mouseY;
             return true;
         }
 
-        if (this.grabTopWindow && this.grabRightWindow)
-        {
-            // Resize top window
-            this.size.vec[1] += (mouseY-this.grabPosition.vec[1]);
-            this.clampWindowSize();
-
-            // Resize right
-            this.size.vec[0] += (mouseX-this.grabPosition.vec[0]);
-            this.clampWindowSize();
-
-            this.grabPosition.vec[0] = mouseX;
-            this.grabPosition.vec[1] = mouseY;
-            return true;
-        }
-
-        if (this.grabBottomWindow && this.grabLeftWindow)
+        if (this.grabBottom)
         {
             // Resize bottom window
-            if (mouseY-this.grabPosition.vec[1] >= 0.0)
-            {
-                offset = this.size.vec[1];
-                this.size.vec[1] -= (mouseY-this.grabPosition.vec[1]);
-                this.clampWindowSize();
-                this.position.vec[1] -= (this.size.vec[1]-offset);
-                this.clampWindowPosition();
-            }
-            else
-            {
-                offset = this.position.vec[1];
-                offset2 = this.size.vec[1];
-                this.position.vec[1] += (mouseY-this.grabPosition.vec[1]);
-                this.clampWindowPosition();
-                this.size.vec[1] -= (this.position.vec[1]-offset);
-                this.clampWindowSize();
-                this.position.vec[1] -= (this.position.vec[1]-offset);
-                this.position.vec[1] -= (this.size.vec[1]-offset2);
-            }
-
-            // Resize left window
-            if (mouseX-this.grabPosition.vec[0] >= 0.0)
-            {
-                offset = this.size.vec[0];
-                this.size.vec[0] -= (mouseX-this.grabPosition.vec[0]);
-                this.clampWindowSize();
-                this.position.vec[0] -= (this.size.vec[0]-offset);
-            }
-            else
-            {
-                offset = this.position.vec[0];
-                offset2 = this.size.vec[0];
-                this.position.vec[0] += (mouseX-this.grabPosition.vec[0]);
-                this.clampWindowPosition();
-                this.size.vec[0] -= (this.position.vec[0]-offset);
-                this.clampWindowSize();
-                this.position.vec[0] -= (this.position.vec[0]-offset);
-                this.position.vec[0] -= (this.size.vec[0]-offset2);
-            }
-
-            this.grabPosition.vec[0] = mouseX;
-            this.grabPosition.vec[1] = mouseY;
-            return true;
-        }
-
-        if (this.grabBottomWindow && this.grabRightWindow)
-        {
-            // Resize bottom window
-            if (mouseY-this.grabPosition.vec[1] >= 0.0)
-            {
-                offset = this.size.vec[1];
-                this.size.vec[1] -= (mouseY-this.grabPosition.vec[1]);
-                this.clampWindowSize();
-                this.position.vec[1] -= (this.size.vec[1]-offset);
-                this.clampWindowPosition();
-            }
-            else
-            {
-                offset = this.position.vec[1];
-                offset2 = this.size.vec[1];
-                this.position.vec[1] += (mouseY-this.grabPosition.vec[1]);
-                this.clampWindowPosition();
-                this.size.vec[1] -= (this.position.vec[1]-offset);
-                this.clampWindowSize();
-                this.position.vec[1] -= (this.position.vec[1]-offset);
-                this.position.vec[1] -= (this.size.vec[1]-offset2);
-            }
-
-            // Resize right window
-            this.size.vec[0] += (mouseX-this.grabPosition.vec[0]);
+            this.moveOffset.vec[1] = this.size.vec[1];
+            this.size.vec[1] = (this.grabPosition.vec[1] - mouseY);
             this.clampWindowSize();
-
-            this.grabPosition.vec[0] = mouseX;
-            this.grabPosition.vec[1] = mouseY;
+            this.moveOffset.vec[1] -= this.size.vec[1];
+            this.position.vec[1] += this.moveOffset.vec[1];
             return true;
         }
 
-        if (this.grabTopWindow)
-        {
-            // Resize top window
-            this.size.vec[1] += (mouseY-this.grabPosition.vec[1]);
-            this.clampWindowSize();
-
-            this.grabPosition.vec[0] = mouseX;
-            this.grabPosition.vec[1] = mouseY;
-            return true;
-        }
-
-        if (this.grabBottomWindow)
-        {
-            // Resize bottom window
-            if (mouseY-this.grabPosition.vec[1] >= 0.0)
-            {
-                offset = this.size.vec[1];
-                this.size.vec[1] -= (mouseY-this.grabPosition.vec[1]);
-                this.clampWindowSize();
-                this.position.vec[1] -= (this.size.vec[1]-offset);
-                this.clampWindowPosition();
-            }
-            else
-            {
-                offset = this.position.vec[1];
-                offset2 = this.size.vec[1];
-                this.position.vec[1] += (mouseY-this.grabPosition.vec[1]);
-                this.clampWindowPosition();
-                this.size.vec[1] -= (this.position.vec[1]-offset);
-                this.clampWindowSize();
-                this.position.vec[1] -= (this.position.vec[1]-offset);
-                this.position.vec[1] -= (this.size.vec[1]-offset2);
-            }
-
-            this.grabPosition.vec[0] = mouseX;
-            this.grabPosition.vec[1] = mouseY;
-            return true;
-        }
-
-        if (this.grabLeftWindow)
+        if (this.grabLeft)
         {
             // Resize left window
-            if (mouseX-this.grabPosition.vec[0] >= 0.0)
-            {
-                offset = this.size.vec[0];
-                this.size.vec[0] -= (mouseX-this.grabPosition.vec[0]);
-                this.clampWindowSize();
-                this.position.vec[0] -= (this.size.vec[0]-offset);
-            }
-            else
-            {
-                offset = this.position.vec[0];
-                offset2 = this.size.vec[0];
-                this.position.vec[0] += (mouseX-this.grabPosition.vec[0]);
-                this.clampWindowPosition();
-                this.size.vec[0] -= (this.position.vec[0]-offset);
-                this.clampWindowSize();
-                this.position.vec[0] -= (this.position.vec[0]-offset);
-                this.position.vec[0] -= (this.size.vec[0]-offset2);
-            }
-
-            this.grabPosition.vec[0] = mouseX;
-            this.grabPosition.vec[1] = mouseY;
+            this.moveOffset.vec[0] = this.size.vec[0];
+            this.size.vec[0] = (this.grabPosition.vec[0] - mouseX);
+            this.clampWindowSize();
+            this.moveOffset.vec[0] -= this.size.vec[0];
+            this.position.vec[0] += this.moveOffset.vec[0];
             return true;
         }
 
-        if (this.grabRightWindow)
+        if (this.grabRight)
         {
             // Resize right window
-            this.size.vec[0] += (mouseX-this.grabPosition.vec[0]);
+            this.size.vec[0] = (this.grabPosition.vec[0] + mouseX);
             this.clampWindowSize();
-
-            this.grabPosition.vec[0] = mouseX;
-            this.grabPosition.vec[1] = mouseY;
-            return;
+            return true;
         }
 
         if (this.grabWindow)
         {
             // Move window
-            this.position.vec[0] += (mouseX-this.grabPosition.vec[0]);
-            this.position.vec[1] += (mouseY-this.grabPosition.vec[1]);
-            this.clampWindowPosition();
-
-            this.grabPosition.vec[0] = mouseX;
-            this.grabPosition.vec[1] = mouseY;
+            this.position.vec[0] = (this.grabPosition.vec[0] + mouseX);
+            this.position.vec[1] = (this.grabPosition.vec[1] + mouseY);
             return true;
         }
+
         return false;
     },
 
@@ -925,49 +782,49 @@ GuiWindow.prototype = {
     {
         if (this.resizable)
         {
-            if (this.grabTopWindow && this.grabLeftWindow)
+            if (this.grabTop && this.grabLeft)
             {
                 this.renderer.setNWSEResizeCursor();
                 return;
             }
 
-            if (this.grabTopWindow && this.grabRightWindow)
+            if (this.grabTop && this.grabRight)
             {
                 this.renderer.setNESWResizeCursor();
                 return;
             }
 
-            if (this.grabBottomWindow && this.grabLeftWindow)
+            if (this.grabBottom && this.grabLeft)
             {
                 this.renderer.setNESWResizeCursor();
                 return;
             }
 
-            if (this.grabBottomWindow && this.grabRightWindow)
+            if (this.grabBottom && this.grabRight)
             {
                 this.renderer.setNWSEResizeCursor();
                 return;
             }
 
-            if (this.grabTopWindow)
+            if (this.grabTop)
             {
                 this.renderer.setNSResizeCursor();
                 return;
             }
 
-            if (this.grabBottomWindow)
+            if (this.grabBottom)
             {
                 this.renderer.setNSResizeCursor();
                 return;
             }
 
-            if (this.grabLeftWindow)
+            if (this.grabLeft)
             {
                 this.renderer.setEWResizeCursor();
                 return;
             }
 
-            if (this.grabRightWindow)
+            if (this.grabRight)
             {
                 this.renderer.setEWResizeCursor();
                 return;
@@ -1035,30 +892,6 @@ GuiWindow.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  clampWindowPosition : Clamp window position                           //
-    ////////////////////////////////////////////////////////////////////////////
-    clampWindowPosition: function()
-    {
-        // Clamp window position
-        if (this.position.vec[0] >= (this.renderer.ratio-this.size.vec[0]))
-        {
-            this.position.vec[0] = (this.renderer.ratio-this.size.vec[0]);
-        }
-        if (this.position.vec[0] <= -this.renderer.ratio)
-        {
-            this.position.vec[0] = -this.renderer.ratio;
-        }
-        if (this.position.vec[1] >= (1.0-this.size.vec[1]))
-        {
-            this.position.vec[1] = (1.0-this.size.vec[1]);
-        }
-        if (this.position.vec[1] <= -1.0)
-        {
-            this.position.vec[1] = -1.0;
-        }
-    },
-
-    ////////////////////////////////////////////////////////////////////////////
     //  clampWindowSize : Clamp window size                                   //
     ////////////////////////////////////////////////////////////////////////////
     clampWindowSize: function()
@@ -1068,33 +901,17 @@ GuiWindow.prototype = {
         {
             this.size.vec[0] = this.minSize.vec[0];
         }
-        if (this.size.vec[0] <= 0.0)
-        {
-            this.size.vec[0] = 0.0;
-        }
         if (this.size.vec[0] >= this.maxSize.vec[0])
         {
             this.size.vec[0] = this.maxSize.vec[0];
-        }
-        if (this.size.vec[0] >= (this.renderer.ratio-this.position.vec[0]))
-        {
-            this.size.vec[0] = (this.renderer.ratio-this.position.vec[0]);
         }
         if (this.size.vec[1] <= this.minSize.vec[1])
         {
             this.size.vec[1] = this.minSize.vec[1];
         }
-        if (this.size.vec[1] <= 0.0)
-        {
-            this.size.vec[1] = 0.0;
-        }
         if (this.size.vec[1] >= this.maxSize.vec[1])
         {
             this.size.vec[1] = this.maxSize.vec[1];
-        }
-        if (this.size.vec[1] >= (1.0-this.position.vec[1]))
-        {
-            this.size.vec[1] = (1.0-this.position.vec[1]);
         }
     },
 

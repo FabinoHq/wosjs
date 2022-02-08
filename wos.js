@@ -1162,7 +1162,6 @@ Wos.prototype = {
     handleOnResize: function()
     {
         this.renderer.handleOnResize();
-        //this.testwindow.handleOnResize();
     },
 
     ////////////////////////////////////////////////////////////////////////////
