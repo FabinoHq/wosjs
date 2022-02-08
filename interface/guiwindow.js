@@ -558,9 +558,6 @@ GuiWindow.prototype = {
         if (mouseY <= -1.0) { mouseY = -1.0; }
         if (mouseY >= 1.0) { mouseY = 1.0; }
 
-        // Set window resize cursors
-        this.updateCursors(mouseX, mouseY);
-
         if (this.grabTop && this.grabLeft)
         {
             // Resize top left window
@@ -776,119 +773,106 @@ GuiWindow.prototype = {
     },
 
     ////////////////////////////////////////////////////////////////////////////
-    //  updateCursors : Update current window cursor                          //
+    //  updateCursor : Update current window cursor                           //
     ////////////////////////////////////////////////////////////////////////////
-    updateCursors: function(mouseX, mouseY)
+    updateCursor: function(mouseX, mouseY)
     {
         if (this.resizable)
         {
             if (this.grabTop && this.grabLeft)
             {
                 this.renderer.setNWSEResizeCursor();
-                return;
+                return true;
             }
-
             if (this.grabTop && this.grabRight)
             {
                 this.renderer.setNESWResizeCursor();
-                return;
+                return true;
             }
-
             if (this.grabBottom && this.grabLeft)
             {
                 this.renderer.setNESWResizeCursor();
-                return;
+                return true;
             }
-
             if (this.grabBottom && this.grabRight)
             {
                 this.renderer.setNWSEResizeCursor();
-                return;
+                return true;
             }
-
             if (this.grabTop)
             {
                 this.renderer.setNSResizeCursor();
-                return;
+                return true;
             }
-
             if (this.grabBottom)
             {
                 this.renderer.setNSResizeCursor();
-                return;
+                return true;
             }
-
             if (this.grabLeft)
             {
                 this.renderer.setEWResizeCursor();
-                return;
+                return true;
             }
-
             if (this.grabRight)
             {
                 this.renderer.setEWResizeCursor();
-                return;
+                return true;
             }
-
             if (this.grabWindow)
             {
                 this.renderer.setDefaultCursor();
-                return;
+                return true;
             }
 
             if (this.isTopResizePicking(mouseX, mouseY) &&
                 this.isLeftResizePicking(mouseX, mouseY))
             {
                 this.renderer.setNWSEResizeCursor();
-                return;
+                return true;
             }
-
             if (this.isTopResizePicking(mouseX, mouseY) &&
                 this.isRightResizePicking(mouseX, mouseY))
             {
                 this.renderer.setNESWResizeCursor();
-                return;
+                return true;
             }
-
             if (this.isBottomResizePicking(mouseX, mouseY) &&
                 this.isLeftResizePicking(mouseX, mouseY))
             {
                 this.renderer.setNESWResizeCursor();
-                return;
+                return true;
             }
-
             if (this.isBottomResizePicking(mouseX, mouseY) &&
                 this.isRightResizePicking(mouseX, mouseY))
             {
                 this.renderer.setNWSEResizeCursor();
-                return;
+                return true;
             }
-
             if (this.isTopResizePicking(mouseX, mouseY))
             {
                 this.renderer.setNSResizeCursor();
-                return;
+                return true;
             }
-
             if (this.isBottomResizePicking(mouseX, mouseY))
             {
                 this.renderer.setNSResizeCursor();
-                return;
+                return true;
             }
-
             if (this.isLeftResizePicking(mouseX, mouseY))
             {
                 this.renderer.setEWResizeCursor();
-                return;
+                return true;
             }
-
             if (this.isRightResizePicking(mouseX, mouseY))
             {
                 this.renderer.setEWResizeCursor();
-                return;
+                return true;
             }
         }
+
         this.renderer.setDefaultCursor();
+        return false;
     },
 
     ////////////////////////////////////////////////////////////////////////////

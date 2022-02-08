@@ -1236,6 +1236,7 @@ Wos.prototype = {
         //this.testpxtextbox.mouseMove(this.realMouseX, this.realMouseY);
         //this.testpxtextbutton.mouseMove(this.realMouseX, this.realMouseY);
         //this.testwindow.mouseMove(this.realMouseX, this.realMouseY);
+        //this.testwindow.updateCursor(this.realMouseX, this.realMouseY);
     },
 
     ////////////////////////////////////////////////////////////////////////////
@@ -1369,7 +1370,7 @@ Wos.prototype = {
         this.renderer.clear();
 
         // Update world matrix
-        //this.renderer.uniforms.update2DWorldMatrix();
+        this.renderer.uniforms.update2DWorldMatrix();
 
         // Render into background renderer
         //this.backrenderer.clear();
